@@ -11,6 +11,7 @@
 - `search-index`: JSONL 문서를 새 인덱스에 색인하고 문서 수를 확인한 뒤 읽기 별칭을
   원자적으로 전환한다. 이전 인덱스는 롤백을 위해 보존한다.
 - OpenSearch 3.8.0 + `analysis-nori` 로컬 개발 컨테이너. Dockerfile로 API 배포 가능.
+- OpenSearch Dashboards 로컬 관리 화면(`http://127.0.0.1:5603`).
 
 ## 로컬 실행
 
@@ -41,6 +42,15 @@ curl -sS http://127.0.0.1:8092/v1/search \
 
 `GET /health/live`는 앱 프로세스, `GET /health/ready`는 OpenSearch 연결을 확인한다.
 테스트는 `.venv/bin/pytest -q`로 실행한다.
+
+## 웹 관리 화면
+
+색인 후 `http://127.0.0.1:5603`에서 OpenSearch Dashboards를 연다.
+`Management > Dashboards Management > Index patterns`에서 `search-documents`를
+인덱스 패턴으로 만들고 시간 필터는 사용하지 않음을 선택한다. `Discover`에서
+색인된 문서를 조회하거나 `Dev Tools`에서 `GET search-documents/_search`를 실행할 수 있다.
+Dashboards는 색인·데이터를 확인하는 관리 화면이며, 서비스 이용자에게 제공할 검색 화면은
+별도로 만들어야 한다.
 
 ## 색인 입력 계약
 
