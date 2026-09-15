@@ -17,8 +17,9 @@
 Python 3.11 이상과 Docker가 필요하다. API는 로컬에서 실행하고 OpenSearch만 Compose로 띄운다.
 
 ```bash
+cd /Users/jeongbin/git/searchEngine
+colima start  # 이 Mac의 Docker 컨텍스트가 Colima인 경우
 cp .env.example .env
-# .env의 SEARCH_API_KEY를 실제 개발용 비밀값으로 교체
 docker compose up -d --build --wait
 python3 -m venv .venv
 .venv/bin/pip install -e '.[test]'
@@ -31,9 +32,12 @@ python3 -m venv .venv
 ```bash
 curl -sS http://127.0.0.1:8092/v1/search \
   -H 'Content-Type: application/json' \
-  -H 'X-API-Key: <.env에 설정한 SEARCH_API_KEY>' \
+  -H 'X-API-Key: local-development-key-change-me' \
   -d '{"query":"자가판정 신청 방법","as_of":"2026-09-15","k":5}'
 ```
+
+위 키는 `.env.example`의 로컬 실습 값이다. `.env`에서 키를 바꿨다면 요청 헤더에도
+같은 값을 사용한다. 외부에서 접근할 수 있게 배포하기 전에 반드시 비밀값으로 교체한다.
 
 `GET /health/live`는 앱 프로세스, `GET /health/ready`는 OpenSearch 연결을 확인한다.
 테스트는 `.venv/bin/pytest -q`로 실행한다.
