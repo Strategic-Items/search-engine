@@ -115,3 +115,49 @@ def test_following_a_pointer_never_returns_more_than_asked_for():
     hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 2)
 
     assert [hit.parent_id for hit in hits] == ["form-old", "form-new"]
+
+
+def notice(parent_id: str, title: str, published_at: str | None) -> dict:
+    return {"parent_id": parent_id, "source_type": "공지사항",
+            "title": title, "published_at": published_at}
+
+
+def test_a_gosi_edition_is_a_slot_but_other_notices_are_not():
+    from search_engine.prepare import document_slot
+
+    assert document_slot("공지사항", "제38차 전략물자수출입고시 개정 안내(9.1 시행)") == (
+        "고시", "전략물자수출입고시")
+    assert document_slot("공지사항", "시스템 점검 안내(5.21일(목) 18:30 ~ 20:30)") is None
+    assert document_slot(
+        "공지사항", "제38차 「전략물자 수출입고시」 별표 2 개정에 따른 전략물자-HSK 연계표") is None
+
+
+def test_the_later_gosi_edition_replaces_the_earlier_one():
+    rows = [
+        notice("n-37", "제37차 전략물자수출입고시 개정 안내(2.2 시행)", "2026-02-01"),
+        notice("n-38", "제38차 전략물자수출입고시 개정 안내(9.1 시행)", "2026-09-01"),
+    ]
+    assert supersessions(rows) == {"n-37": "n-38"}
+
+
+def test_a_draft_is_never_the_text_in_force_even_when_it_is_the_newest():
+    """A draft for the next edition is published after the current one."""
+    rows = [
+        notice("n-38", "제38차 전략물자수출입고시 개정 안내(9.1 시행)", "2026-09-01"),
+        notice("n-draft", "｢전략물자 수출입고시｣ 일부개정(안) 행정예고", "2026-10-01"),
+    ]
+    assert supersessions(rows) == {"n-draft": "n-38"}
+
+
+def test_a_draft_with_no_enacted_edition_to_point_at_is_left_alone():
+    rows = [notice("n-draft", "｢전략물자 수출입고시｣ 일부개정(안) 행정예고", "2026-07-24")]
+    assert supersessions(rows) == {}
+
+
+def test_only_a_gosi_notice_reads_as_a_draft():
+    from search_engine.prepare import is_gosi_draft
+
+    assert is_gosi_draft("공지사항", "｢전략물자 수출입고시｣ 일부개정(안) 행정예고")
+    assert not is_gosi_draft("공지사항", "무역안보 현안설명회 개최 안내(12.8(월), SETEC)")
+    assert not is_gosi_draft("공지사항", "제38차 전략물자수출입고시 개정 안내(9.1 시행)")
+    assert not is_gosi_draft("민원서식", "[별지 제4호 서식] 전문판정(신청)서")

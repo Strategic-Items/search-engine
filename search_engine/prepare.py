@@ -21,6 +21,12 @@ FORM_TYPE = "민원서식"
 FORM_SLOT = re.compile(r"(별지|별표)\s*(?:제\s*)?(\d+)\s*(?:호)?\s*(?:의\s*(\d+))?")
 # 다른 법령의 서식은 번호 체계가 달라 같은 자리로 볼 수 없다.
 OTHER_STATUTE = re.compile(r"[가-힣]{2,}법(?:\s*시행(?:령|규칙))?\s*별지")
+NOTICE_TYPE = "공지사항"
+# 고시는 차수로 이어지는 한 줄기다. 제38차가 제37차를 대체한다.
+GOSI_REVISION = re.compile(r"제\s*\d+\s*차\s*[^\n]*?고시\s*개정")
+# 행정예고는 시행 전 초안이다. 게시일이 현행 고시보다 나중일 수 있으므로
+# 날짜 순서로는 현행을 가릴 수 있다. 초안은 언제 올라오든 현행이 아니다.
+GOSI_DRAFT = re.compile(r"고시[^\n]*?(?:행정예고|입법예고)|(?:행정예고|입법예고)[^\n]*?고시")
 HSK_TYPE = "HSK 연계표"
 # Lab review found that this undated FAQ conflicts with the current self-judgement guide.
 EXCLUDED_CORE_IDS = {"faq-042": "conflicts_with_current_self_judgement_guide"}
@@ -37,16 +43,35 @@ def form_slot(title: str) -> tuple[str, str] | None:
     return match.group(1), match.group(2) + suffix
 
 
-def supersessions(rows: list[dict]) -> dict[str, str]:
-    """Map each outdated form to the newest form in the same slot.
+def document_slot(source_type: str, title: str) -> tuple[str, str] | None:
+    """The place a document occupies in a numbered series, if it occupies one.
 
-    Superseded forms are kept and indexed. The published record is public and
+    A form sits in a 별지/별표 slot. A 고시 개정 notice carries the whole text
+    of that edition, and the next edition replaces it. Both series publish in
+    order, so the newest publication date in a slot is the one in force.
+    """
+    if source_type == FORM_TYPE:
+        return form_slot(title)
+    if source_type == NOTICE_TYPE and GOSI_REVISION.search(title):
+        return "고시", "전략물자수출입고시"
+    return None
+
+
+def is_gosi_draft(source_type: str, title: str) -> bool:
+    """A 고시 draft out for comment. It is never the text in force."""
+    return source_type == NOTICE_TYPE and bool(GOSI_DRAFT.search(title))
+
+
+def supersessions(rows: list[dict]) -> dict[str, str]:
+    """Map each replaced document to the newest one in the same slot.
+
+    Replaced documents are kept and indexed. The published record is public and
     people do ask for an earlier edition by its year; search demotes them
     instead of hiding them.
     """
     slots = {}
     for row in rows:
-        slot = form_slot(row["title"])
+        slot = document_slot(row.get("source_type", FORM_TYPE), row["title"])
         published = row.get("published_at")
         if slot and published:
             slots.setdefault(slot, []).append((published, row["parent_id"]))
@@ -57,6 +82,15 @@ def supersessions(rows: list[dict]) -> dict[str, str]:
         for published, parent_id in versions[:-1]:
             if published < newest_date and parent_id != newest_id:
                 superseded[parent_id] = newest_id
+
+    # A draft is replaced by whatever is actually in force, whenever it was
+    # published: a draft for the next edition arrives after the current one.
+    enacted = slots.get(("고시", "전략물자수출입고시"))
+    if enacted:
+        in_force = enacted[-1][1]
+        for row in rows:
+            if is_gosi_draft(row.get("source_type", ""), row["title"]):
+                superseded.setdefault(row["parent_id"], in_force)
     return superseded
 
 
@@ -90,18 +124,22 @@ def _prepare_row(row: dict, source_type: str) -> dict:
     return SearchDocument.model_validate(source).model_dump(mode="json", exclude_none=True)
 
 
-def _form_parents(source_path: Path) -> list[dict]:
-    """One row per form parent, read ahead so supersession is known before writing."""
+def _serial_parents(source_path: Path) -> list[dict]:
+    """One row per parent that sits in a numbered series, read ahead of writing."""
     seen = {}
     with source_path.open(encoding="utf-8") as file:
         for line in file:
             if not line.strip():
                 continue
             row = json.loads(line)
-            if row.get("source_type") != FORM_TYPE or row.get("id") in EXCLUDED_CORE_IDS:
+            source_type = row.get("source_type")
+            if source_type not in (FORM_TYPE, NOTICE_TYPE):
+                continue
+            if row.get("id") in EXCLUDED_CORE_IDS:
                 continue
             parent_id = row.get("parent_id") or row.get("id")
             seen.setdefault(parent_id, {"parent_id": parent_id,
+                                        "source_type": source_type,
                                         "title": row.get("title") or "",
                                         "published_at": row.get("published_at")})
     return list(seen.values())
@@ -119,7 +157,7 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
             raise ValueError("lab corpus does not match its source manifest")
         source_manifest_sha = file_sha256(source_manifest_path)
 
-    superseded = supersessions(_form_parents(source_path))
+    superseded = supersessions(_serial_parents(source_path))
 
     out_dir.mkdir(parents=True, exist_ok=True)
     tmp_core = out_dir / f".core-{uuid4().hex}.tmp"
