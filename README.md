@@ -1,8 +1,14 @@
 # Strategic Items Search Engine
 
-실서비스에서 사용할 OpenSearch 검색 API와 색인 작업의 출발점이다. 검색 로직 비교와
-평가셋은 기존 `/Users/jeongbin/git/search-engine` 실습 저장소에 두고, 이 저장소에는
-운영 요청과 색인 배포에 필요한 코드만 둔다.
+실서비스에서 사용할 OpenSearch 검색 API와 색인 작업의 출발점이다. 검색 로직 비교
+실험은 기존 `/Users/jeongbin/git/search-engine` 실습 저장소에 두고, 이 저장소에는
+운영 요청과 색인 배포에 필요한 코드를 둔다.
+
+정답 질의는 `data/queries_v1.jsonl`로 가져와 여기서 관리한다. 실습 저장소에서는
+git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출처와 원본 체크섬은
+`data/queries_v1.manifest.json`에, 재판정 내역은 [gold_review_v1](docs/gold_review_v1.md)에
+있다. 코퍼스 원본은 여전히 실습 저장소에 있고, `search-prepare`의 출력은
+`data/generated/`에만 두며 Git에 넣지 않는다.
 
 ## 현재 제공하는 기능
 

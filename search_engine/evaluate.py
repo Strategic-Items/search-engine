@@ -1,7 +1,7 @@
-"""Measure the live /v1/search against the lab's reviewed query set.
+"""Measure the live /v1/search against the reviewed query set.
 
-The query set stays in the lab repository; this reads it by path, the way
-`search-prepare` reads the corpus, and never copies it into this repo.
+The set is `data/queries_v1.jsonl`, copied from the lab repository and
+corrected here; `data/queries_v1.manifest.json` records where it came from.
 """
 
 import argparse
@@ -155,7 +155,8 @@ def format_report(report: dict) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Score the running search API against the lab's reviewed query set")
-    parser.add_argument("queries_jsonl", type=Path)
+    parser.add_argument("queries_jsonl", type=Path, nargs="?",
+                        default=Path("data/queries_v1.jsonl"))
     parser.add_argument("--base-url", default="http://127.0.0.1:8092")
     parser.add_argument("--prepared", type=Path, default=Path("data/generated"),
                         help="Prepared datasets, used to tell coverage gaps from ranking misses")
