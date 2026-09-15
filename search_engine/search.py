@@ -8,6 +8,17 @@ from search_engine.results import SearchHit, SearchResults
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 
+# The request carries only a query, so the kind of document a user is asking for
+# has to be read from the text. These lift a kind rather than filter to it: a
+# misread costs some rank, never the answer itself.
+GUIDE_TYPES = ("판정 안내", "허가 안내", "이용 안내")
+FORM_TYPES = ("민원서식",)
+INTENT_HINTS = (
+    (GUIDE_TYPES, re.compile(r"절차|방법|순서|어떻게|하려면|무엇인가요|어디서|이용방법")),
+    (FORM_TYPES, re.compile(r"서식|양식|신청서|서약서|진술서|별표|별지|내려받기|다운로드")),
+)
+SOURCE_TYPE_WEIGHT = 14
+
 
 def _requested_period(query: str) -> tuple[str, str] | None:
     """Return the half-open date range a "2024년 3월" style query asks for."""
@@ -22,6 +33,14 @@ def _requested_period(query: str) -> tuple[str, str] | None:
         return f"{year}-01-01", f"{year + 1}-01-01"
     next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
     return f"{year}-{month:02d}-01", f"{next_year}-{next_month:02d}-01"
+
+
+def _intent_boosts(query: str) -> list[dict]:
+    """Boost the document kinds the query asks for, in the words users use."""
+    return [
+        {"filter": {"terms": {"source_type": list(types)}}, "weight": SOURCE_TYPE_WEIGHT}
+        for types, hint in INTENT_HINTS if hint.search(query)
+    ]
 
 
 def build_query(query: str, as_of: date) -> dict:
@@ -46,14 +65,16 @@ def build_query(query: str, as_of: date) -> dict:
         ], "minimum_should_match": 1}},
     ]
     base = {"bool": {"should": should, "minimum_should_match": 1, "filter": filters}}
+    functions = _intent_boosts(query)
     period = _requested_period(query)
-    if not period:
+    if period:
+        start, end = period
+        functions += [
+            {"filter": {"range": {field: {"gte": start, "lt": end}}}, "weight": 6}
+            for field in ("published_at", "effective_from")
+        ]
+    if not functions:
         return base
-    start, end = period
-    functions = [
-        {"filter": {"range": {field: {"gte": start, "lt": end}}}, "weight": 6}
-        for field in ("published_at", "effective_from")
-    ]
     return {"function_score": {"query": base, "functions": functions,
                                "score_mode": "sum", "boost_mode": "sum"}}
 

@@ -1,5 +1,8 @@
 # 검색 품질 baseline — 2026-09-15
 
+> 이 문서의 표는 자료 유형 가점을 넣기 **전**의 기준선이다.
+> 가점 이후 수치는 [질의 유형 가점](query_intent_boost.md)에 있다.
+
 `search-evaluate`로 실행 중인 `/v1/search`를 실습 저장소의 검토 중인 정답 질의
 93건(`/Users/jeongbin/git/search-engine/data/queries_project_v1_reviewed.jsonl`)에
 대해 측정한 결과다. 평가셋은 실습 저장소에 두고 경로로 읽으며 이 저장소에 복사하지

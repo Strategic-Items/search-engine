@@ -11,7 +11,10 @@ manifest. 원본 SHA-256은 `a1ba213c2da5508705a3d4974dc34f70b9e83bead2448bbfbf7
 | `search-hsk` | HSK 연계표 | 18,673 | 18,673 |
 
 원본 FAQ 207건 중 `faq-042`는 현행 [온라인 자가판정 안내](https://www.yestrade.go.kr/judgements/self/guide)와
-로그인 안내가 충돌한다는 실습 저장소의 공동 정답 검토에 따라 이 초기 색인에서 제외했다.
+로그인 안내가 충돌하므로 이 초기 색인에서 제외했다. 실습 저장소의 공동 정답 검토는 이
+충돌을 기록하고 해당 질의 5건에 `source_conflict_review`를 달았을 뿐 제외를 결정하지
+않았다. 색인 제외는 이 저장소의 판단이며, 근거와 재검토 결과는
+[질의 유형 가점](query_intent_boost.md)에 있다.
 서식 623청크는 출처의 `form-게시물ID`를 사용해 게시판 목록 URL을 개별 상세 URL로
 바꿨다. 대표 항목 `form-23311`의 상세 URL 응답을 확인했다. FAQ 206건은 원본에
 서비스 URL이 없어 검색 결과의 출처 URL도 비어 있다.
