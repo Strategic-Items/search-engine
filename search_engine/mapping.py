@@ -47,6 +47,7 @@ INDEX_BODY = {
             "codes_exact": {"type": "keyword"},
             "source_type": {"type": "keyword"},
             "date_basis": {"type": "keyword"},
+            "superseded_by": {"type": "keyword"},
             "source_url": {"type": "keyword", "index": False},
             "published_at": {"type": "date"},
             "effective_from": {"type": "date"},

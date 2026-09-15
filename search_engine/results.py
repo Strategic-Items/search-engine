@@ -18,6 +18,8 @@ class SearchHit(BaseModel):
     effective_from: str | None = None
     effective_to: str | None = None
     date_basis: str = "unknown"
+    # Set when a newer edition of the same form exists, so a caller can say so.
+    superseded_by: str | None = None
 
 
 class HskHit(BaseModel):

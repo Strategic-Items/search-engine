@@ -14,9 +14,50 @@ from search_engine.documents import SearchDocument
 from search_engine.indexer import file_sha256
 
 CORE_TYPES = {"FAQ", "민원서식", "공지사항", "판정 안내", "허가 안내", "이용 안내"}
+FORM_TYPE = "민원서식"
+# 「전략물자수출입고시」의 서식은 별지·별표 번호로 자리를 잡는다. 같은 자리의
+# 새 판이 올라오면 옛 판은 대체된다. 제목 형식은 두 가지가 섞여 있다:
+# "[38차 개정, 26.9.1] 별지 4." 와 "[별지 제4호 서식]".
+FORM_SLOT = re.compile(r"(별지|별표)\s*(?:제\s*)?(\d+)\s*(?:호)?\s*(?:의\s*(\d+))?")
+# 다른 법령의 서식은 번호 체계가 달라 같은 자리로 볼 수 없다.
+OTHER_STATUTE = re.compile(r"[가-힣]{2,}법(?:\s*시행(?:령|규칙))?\s*별지")
 HSK_TYPE = "HSK 연계표"
 # Lab review found that this undated FAQ conflicts with the current self-judgement guide.
 EXCLUDED_CORE_IDS = {"faq-042": "conflicts_with_current_self_judgement_guide"}
+
+
+def form_slot(title: str) -> tuple[str, str] | None:
+    """The 별지/별표 slot a form occupies, or None when it is not one."""
+    if OTHER_STATUTE.search(title):
+        return None
+    match = FORM_SLOT.search(title)
+    if not match:
+        return None
+    suffix = f"의{match.group(3)}" if match.group(3) else ""
+    return match.group(1), match.group(2) + suffix
+
+
+def supersessions(rows: list[dict]) -> dict[str, str]:
+    """Map each outdated form to the newest form in the same slot.
+
+    Superseded forms are kept and indexed. The published record is public and
+    people do ask for an earlier edition by its year; search demotes them
+    instead of hiding them.
+    """
+    slots = {}
+    for row in rows:
+        slot = form_slot(row["title"])
+        published = row.get("published_at")
+        if slot and published:
+            slots.setdefault(slot, []).append((published, row["parent_id"]))
+    superseded = {}
+    for versions in slots.values():
+        versions.sort()
+        newest_date, newest_id = versions[-1]
+        for published, parent_id in versions[:-1]:
+            if published < newest_date and parent_id != newest_id:
+                superseded[parent_id] = newest_id
+    return superseded
 
 
 def _date_basis(row: dict) -> str:
@@ -49,6 +90,23 @@ def _prepare_row(row: dict, source_type: str) -> dict:
     return SearchDocument.model_validate(source).model_dump(mode="json", exclude_none=True)
 
 
+def _form_parents(source_path: Path) -> list[dict]:
+    """One row per form parent, read ahead so supersession is known before writing."""
+    seen = {}
+    with source_path.open(encoding="utf-8") as file:
+        for line in file:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            if row.get("source_type") != FORM_TYPE or row.get("id") in EXCLUDED_CORE_IDS:
+                continue
+            parent_id = row.get("parent_id") or row.get("id")
+            seen.setdefault(parent_id, {"parent_id": parent_id,
+                                        "title": row.get("title") or "",
+                                        "published_at": row.get("published_at")})
+    return list(seen.values())
+
+
 def prepare(source_path: Path, out_dir: Path) -> dict:
     if not source_path.is_file():
         raise FileNotFoundError(source_path)
@@ -60,6 +118,8 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
         if source_manifest.get("corpus_sha256") != source_sha:
             raise ValueError("lab corpus does not match its source manifest")
         source_manifest_sha = file_sha256(source_manifest_path)
+
+    superseded = supersessions(_form_parents(source_path))
 
     out_dir.mkdir(parents=True, exist_ok=True)
     tmp_core = out_dir / f".core-{uuid4().hex}.tmp"
@@ -99,6 +159,10 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 counts[dataset]["missing_effective_from"] += not bool(prepared.get("effective_from"))
                 if prepared.get("published_at"):
                     ranges[dataset].append(prepared["published_at"])
+                replacement = superseded.get(prepared.get("parent_id") or doc_id)
+                if replacement:
+                    prepared["superseded_by"] = replacement
+                    counts[dataset]["superseded"] += 1
                 output = hsk_file if dataset == "hsk" else core_file
                 output.write(json.dumps(prepared, ensure_ascii=False) + "\n")
 
@@ -119,6 +183,7 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 "missing_source_url": counts[dataset]["missing_source_url"],
                 "missing_published_at": counts[dataset]["missing_published_at"],
                 "missing_effective_from": counts[dataset]["missing_effective_from"],
+                "superseded": counts[dataset]["superseded"],
                 "published_min": min(ranges[dataset]) if ranges[dataset] else None,
                 "published_max": max(ranges[dataset]) if ranges[dataset] else None,
                 "sha256": file_sha256(path),

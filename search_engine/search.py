@@ -18,6 +18,9 @@ INTENT_HINTS = (
     (FORM_TYPES, re.compile(r"서식|양식|신청서|서약서|진술서|별표|별지|내려받기|다운로드")),
 )
 SOURCE_TYPE_WEIGHT = 14
+# A form that a newer edition replaced stays searchable -- people ask for an
+# earlier edition by its year -- but the current one answers first by default.
+CURRENT_EDITION_WEIGHT = 4
 
 
 def _requested_period(query: str) -> tuple[str, str] | None:
@@ -66,6 +69,10 @@ def build_query(query: str, as_of: date) -> dict:
     ]
     base = {"bool": {"should": should, "minimum_should_match": 1, "filter": filters}}
     functions = _intent_boosts(query)
+    functions.append({
+        "filter": {"bool": {"must_not": {"exists": {"field": "superseded_by"}}}},
+        "weight": CURRENT_EDITION_WEIGHT,
+    })
     period = _requested_period(query)
     if period:
         start, end = period
@@ -98,7 +105,58 @@ def retrieve(
         }))
         if len(out) == k:
             break
-    return out
+    return _with_current_editions(client, alias, out, k)
+
+
+def _current_editions(
+    client: OpenSearch, alias: str, hits: list[SearchHit],
+) -> dict[str, SearchHit]:
+    """The editions that replaced any superseded hit, keyed by what they replace.
+
+    A retired form keeps its old title while the current one may have been
+    renamed -- the 38th revision rewrote several into English -- so a query in
+    the old words reaches only the retired document. Following the pointer is
+    the only way those words reach the form now in force.
+    """
+    wanted = {hit.superseded_by for hit in hits if hit.superseded_by}
+    wanted -= {hit.parent_id for hit in hits}
+    if not wanted:
+        return {}
+    response = client.search(
+        index=alias,
+        body={"query": {"bool": {"filter": [{"terms": {"parent_id": sorted(wanted)}}]}},
+              "sort": [{"id": "asc"}]},
+        size=len(wanted) * 2,
+    )
+    editions = {}
+    for hit in response["hits"]["hits"]:
+        source = hit["_source"]
+        parent_id = source.get("parent_id") or hit["_id"]
+        if parent_id in editions:
+            continue
+        editions[parent_id] = SearchHit.model_validate({
+            **{key: value for key, value in source.items() if value is not None},
+            "id": hit["_id"], "parent_id": parent_id, "score": None,
+        })
+    return editions
+
+
+def _with_current_editions(
+    client: OpenSearch, alias: str, hits: list[SearchHit], k: int,
+) -> list[SearchHit]:
+    """Put each replacement right behind the retired document that names it."""
+    editions = _current_editions(client, alias, hits)
+    if not editions:
+        return hits
+    merged: list[SearchHit] = []
+    present = {hit.parent_id for hit in hits}
+    for hit in hits:
+        merged.append(hit)
+        replacement = editions.get(hit.superseded_by)
+        if replacement and replacement.parent_id not in present:
+            merged.append(replacement)
+            present.add(replacement.parent_id)
+    return merged[:k]
 
 
 def search_all(
