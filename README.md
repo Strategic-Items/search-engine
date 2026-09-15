@@ -6,13 +6,13 @@
 
 ## 현재 제공하는 기능
 
-- `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색, 통제번호 정확 매칭,
-  자료 유형과 시행일 필터, 청크의 부모 문서 중복 제거. `X-API-Key` 인증 필수.
+- `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색,
+  시행일 필터, 청크의 부모 문서 중복 제거. 검색어에 10자리 HSK 코드가 있으면 HSK
+  연계표도 함께 정확 조회한다. `X-API-Key` 인증 필수.
 - `search-index`: JSONL 문서를 새 인덱스에 색인하고 문서 수를 확인한 뒤 읽기 별칭을
   원자적으로 전환한다. 이전 인덱스는 롤백을 위해 보존한다.
 - `search-prepare`: 이전 실습 코퍼스에서 FAQ·안내·공지·서식과 HSK 연계표를
   별도 데이터셋으로 준비하고 원본/출력 체크섬을 기록한다.
-- `POST /v1/hsk/search`: 10자리 HSK 또는 통제번호의 정확 조회.
 - OpenSearch 3.8.0 + `analysis-nori` 로컬 개발 컨테이너. Dockerfile로 API 배포 가능.
 - OpenSearch Dashboards 로컬 관리 화면(`http://127.0.0.1:5603`).
 
@@ -54,27 +54,18 @@ python3 -m venv .venv
 curl -sS http://127.0.0.1:8092/v1/search \
   -H 'Content-Type: application/json' \
   -H 'X-API-Key: local-development-key-change-me' \
-  -d '{"query":"자가판정 신청 방법","as_of":"2026-09-15","k":5}'
+  -d '{"query":"자가판정 신청 방법"}'
 ```
 
 위 키는 `.env.example`의 로컬 실습 값이다. `.env`에서 키를 바꿨다면 요청 헤더에도
 같은 값을 사용한다. 외부에서 접근할 수 있게 배포하기 전에 반드시 비밀값으로 교체한다.
 
-서식만 찾을 때는 `source_types`에 `["민원서식"]`을, 안내만 찾을 때는
-`["판정 안내","허가 안내","이용 안내"]`를 보낸다.
+일반 검색에 10자리 HSK 코드를 넣으면 문서 결과(`hits`)와 HSK 연계표 결과(`hsk`)를
+함께 반환한다. HSK 연계표는 전략물자 해당 여부의 확정 판정이 아니다.
 
 ```json
-{"query":"2026년 9월 개정 전문판정 신청서","source_types":["민원서식"],"k":5}
+{"query":"HSK 2826902000"}
 ```
-
-HSK 연계표는 별도 API에서 번호로 정확 조회한다.
-
-```json
-{"hsk_code":"2826902000","k":20}
-```
-
-위 JSON은 `POST /v1/hsk/search`의 요청 본문이다. HSK-통제번호 연계는 전략물자
-해당 여부의 확정 판정이 아니다.
 
 `GET /health/live`는 앱 프로세스, `GET /health/ready`는 OpenSearch 연결을 확인한다.
 테스트는 `.venv/bin/pytest -q`로 실행한다.
@@ -89,6 +80,24 @@ HSK 행을 보려면 `search-hsk` 인덱스 패턴을 별도로 만든다.
 Dashboards는 색인·데이터를 확인하는 관리 화면이며, 서비스 이용자에게 제공할 검색 화면은
 별도로 만들어야 한다.
 
+## 코드 구조
+
+`search_engine/` 아래 평평한 모듈 하나당 역할 하나다.
+
+```
+api.py         FastAPI 앱과 요청 스키마
+search.py      문서 질의 조립, 검색, HSK 병합(search_all)
+hsk.py         HSK 코드 추출, 연계표 조회
+indexer.py     색인 재생성과 읽기 별칭 전환 (search-index)
+prepare.py     실습 코퍼스 → core/hsk 데이터셋 (search-prepare)
+documents.py   색인 입력 문서 모델
+results.py     검색 응답 모델
+codes.py       통제번호·법령 참조 정규화
+mapping.py     인덱스 매핑
+client.py      OpenSearch 클라이언트
+config.py      환경변수 설정
+```
+
 ## 색인 입력 계약
 
 JSONL 한 줄이 하나의 검색 문서다. `id`와 `title`은 필수다. `id`는 출처의 안정적인 ID여야
@@ -98,9 +107,10 @@ JSONL 한 줄이 하나의 검색 문서다. `id`와 `title`은 필수다. `id`�
 경계다. 날짜를 모르면 `null`로 둔다. 색인 입력에 빠진 기존 문서는 재색인으로 사라지므로,
 수집 실패가 있는 부분 파일은 전체 재색인에 사용하면 안 된다.
 
-검색 요청은 `query` 또는 `code` 중 하나를 담아야 한다. `as_of` 기본값은 요청일이며,
-`source_types`는 자료 유형의 정확한 값 목록이다. 응답은 검색 청크의 `id`와 부모
-`parent_id`, 제목·본문·출처·시행일을 반환한다.
+검색 요청은 `query`만 담아야 한다. 서버는 현재 날짜 기준으로 유효한 문서를 검색하며,
+응답은 검색 청크의 `id`와 부모 `parent_id`, 제목·본문·출처·시행일을 반환한다.
+`query`에 10자리 HSK 코드(공백·하이픈 허용)가 있으면 `hsk` 필드에 연계표 결과도
+반환하고, 그 외에는 `hsk`가 `null`이다.
 
 ## 운영 연결 전 확인할 것
 

@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 
 
 def document_actions(path: Path, index_name: str):
+    """Validate every line, refusing a file that repeats a document ID."""
     seen = set()
     with path.open(encoding="utf-8") as file:
         for line_no, line in enumerate(file, 1):
@@ -93,8 +94,7 @@ def rebuild(
             raise RuntimeError(f"index count mismatch: expected {indexed}, got {actual}")
 
         previous = current_alias_indexes(client, alias)
-        actions = [{"remove": {"index": old, "alias": alias}}
-                   for old in previous]
+        actions = [{"remove": {"index": old, "alias": alias}} for old in previous]
         actions.append({"add": {"index": index_name, "alias": alias}})
         client.indices.update_aliases(body={"actions": actions})
         switched = True

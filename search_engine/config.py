@@ -1,3 +1,5 @@
+"""Runtime settings, independent from the HTTP layer."""
+
 from functools import lru_cache
 
 from pydantic import Field

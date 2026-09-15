@@ -1,6 +1,19 @@
+import re
+
 from opensearchpy import OpenSearch
 
 from search_engine.codes import normalize_control
+from search_engine.results import HskHit, HskResults
+
+HSK_CODE = re.compile(r"(?<!\d)(?:\d[\s-]?){9}\d(?!\d)")
+
+
+def extract_hsk_code(text: str) -> str | None:
+    """Return the first 10-digit HSK code in text, allowing spaces or hyphens."""
+    match = HSK_CODE.search(text)
+    if not match:
+        return None
+    return re.sub(r"[\s-]", "", match.group())
 
 
 def build_hsk_query(hsk_code: str | None, control_number: str | None) -> dict:
@@ -21,7 +34,7 @@ def build_hsk_query(hsk_code: str | None, control_number: str | None) -> dict:
 def retrieve_hsk(
     client: OpenSearch, alias: str, hsk_code: str | None,
     control_number: str | None, k: int,
-) -> dict:
+) -> HskResults:
     response = client.search(
         index=alias,
         body={"query": build_hsk_query(hsk_code, control_number),
@@ -32,17 +45,11 @@ def retrieve_hsk(
     hits = []
     for hit in response["hits"]["hits"]:
         source = hit["_source"]
-        hits.append({
+        hits.append(HskHit.model_validate({
+            **{key: value for key, value in source.items() if value is not None},
             "id": hit["_id"],
-            "hsk_code": source.get("hsk_code", ""),
-            "control_number": source.get("control_number", ""),
-            "name_ko": source.get("name_ko", ""),
-            "name_en": source.get("name_en", ""),
-            "source_url": source.get("source_url", ""),
-            "retrieved_at": source.get("retrieved_at"),
-            "linkage_notice": source.get("linkage_notice", ""),
-        })
+        }))
     total = response["hits"].get("total", 0)
     if isinstance(total, dict):
         total = total["value"]
-    return {"total": total, "hits": hits}
+    return HskResults(total=total, hits=hits)
