@@ -28,3 +28,13 @@ def test_search_returns_hits_from_alias(monkeypatch):
     assert response.status_code == 200
     assert response.json()["hits"][0]["id"] == "faq-1"
     assert os_client.search.call_args.kwargs["index"] == "search-documents"
+
+
+def test_hsk_api_rejects_non_numeric_code_and_blank_control(monkeypatch):
+    monkeypatch.setattr("search_engine.api.get_settings", lambda: Settings(search_api_key="secret"))
+    client = TestClient(app)
+    headers = {"X-API-Key": "secret"}
+    assert client.post("/v1/hsk/search", headers=headers,
+                       json={"hsk_code": "123"}).status_code == 422
+    assert client.post("/v1/hsk/search", headers=headers,
+                       json={"control_number": " . "}).status_code == 422

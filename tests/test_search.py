@@ -11,7 +11,7 @@ def test_query_keeps_unknown_dates_and_filters_expired_documents():
     assert filters[1]["bool"]["should"][0]["range"]["effective_to"]["gt"] == "2026-09-15"
     assert filters[0]["bool"]["should"][1]["bool"]["must_not"]["exists"]["field"] == "effective_from"
     assert filters[2] == {"terms": {"source_type": ["notice"]}}
-    assert query["bool"]["should"][1]["term"]["code_norm"]["value"] == "5D002"
+    assert query["bool"]["should"][1]["term"]["codes_exact"]["value"] == "5d002"
 
 
 def test_retrieve_returns_unique_parent_documents():
@@ -24,3 +24,12 @@ def test_retrieve_returns_unique_parent_documents():
     hits = retrieve(client, "search-documents", "수출허가", None, date.today(), [], 2)
     assert [hit["parent_id"] for hit in hits] == ["doc-1", "doc-2"]
     assert client.search.call_args.kwargs["size"] == 10
+
+
+def test_explicit_year_month_boosts_matching_publication_and_effective_dates():
+    query = build_query("2026년 9월 개정 전문판정 신청서", None, date(2026, 9, 15), [])
+    scored = query["function_score"]
+    assert scored["query"]["bool"]["minimum_should_match"] == 1
+    assert scored["functions"][0]["filter"]["range"]["published_at"] == {
+        "gte": "2026-09-01", "lt": "2026-10-01",
+    }

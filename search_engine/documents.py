@@ -2,6 +2,8 @@ from datetime import date
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from search_engine.codes import extract, normalize_control
+
 
 class SearchDocument(BaseModel):
     """Stable source ID and validity dates are required for operational indexing."""
@@ -39,5 +41,8 @@ class SearchDocument(BaseModel):
     def index_source(self) -> dict:
         source = self.model_dump(mode="json", exclude_none=True)
         source["parent_id"] = self.parent_id or self.id
-        source["code_norm"] = "".join(self.code.upper().split())
+        source["codes_exact"] = extract(self.code)
+        source["code_norm"] = normalize_control(self.code)
+        if source.get("source_type") == "HSK 연계표":
+            source["control_no_norm"] = normalize_control(str(source.get("control_number", "")))
         return source

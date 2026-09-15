@@ -1,6 +1,23 @@
 from datetime import date
+import re
 
 from opensearchpy import OpenSearch
+
+from search_engine.codes import extract
+
+
+def _requested_period(query: str) -> tuple[str, str] | None:
+    match = re.search(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?", query)
+    if not match:
+        return None
+    year = int(match.group(1))
+    month = int(match.group(2)) if match.group(2) else None
+    if month is not None and not 1 <= month <= 12:
+        return None
+    if month is None:
+        return f"{year}-01-01", f"{year + 1}-01-01"
+    next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
+    return f"{year}-{month:02d}-01", f"{next_year}-{next_month:02d}-01"
 
 
 def build_query(query: str, code: str | None, as_of: date, source_types: list[str]) -> dict:
@@ -12,9 +29,8 @@ def build_query(query: str, code: str | None, as_of: date, source_types: list[st
             "type": "best_fields",
         }})
     if code:
-        normalized = "".join(code.upper().split())
-        if normalized:
-            should.append({"term": {"code_norm": {"value": normalized, "boost": 6}}})
+        for normalized in extract(code):
+            should.append({"term": {"codes_exact": {"value": normalized, "boost": 6}}})
     if not should:
         raise ValueError("query or code is required")
 
@@ -31,7 +47,17 @@ def build_query(query: str, code: str | None, as_of: date, source_types: list[st
     if source_types:
         filters.append({"terms": {"source_type": source_types}})
 
-    return {"bool": {"should": should, "minimum_should_match": 1, "filter": filters}}
+    base = {"bool": {"should": should, "minimum_should_match": 1, "filter": filters}}
+    period = _requested_period(query)
+    if not period:
+        return base
+    start, end = period
+    functions = [
+        {"filter": {"range": {field: {"gte": start, "lt": end}}}, "weight": 6}
+        for field in ("published_at", "effective_from")
+    ]
+    return {"function_score": {"query": base, "functions": functions,
+                               "score_mode": "sum", "boost_mode": "sum"}}
 
 
 def retrieve(
@@ -60,6 +86,7 @@ def retrieve(
             "published_at": source.get("published_at"),
             "effective_from": source.get("effective_from"),
             "effective_to": source.get("effective_to"),
+            "date_basis": source.get("date_basis", "unknown"),
         })
         if len(out) == k:
             break

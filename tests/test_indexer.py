@@ -10,11 +10,11 @@ from search_engine.indexer import document_actions, rebuild
 
 def test_document_actions_validates_ids_and_source_dates(tmp_path: Path):
     path = tmp_path / "docs.jsonl"
-    path.write_text(json.dumps({"id": "faq-1", "title": "허가", "code": "5 d 002",
+    path.write_text(json.dumps({"id": "faq-1", "title": "허가", "code": "5D002",
                                 "effective_from": 20260901}) + "\n")
     action = next(document_actions(path, "new-index"))
     assert action["_id"] == "faq-1"
-    assert action["_source"]["code_norm"] == "5D002"
+    assert action["_source"]["codes_exact"] == ["5d002"]
     assert action["_source"]["effective_from"] == "2026-09-01"
 
 
@@ -54,3 +54,23 @@ def test_rebuild_rejects_empty_index_before_publish(tmp_path, monkeypatch):
         rebuild(path)
     client.indices.update_aliases.assert_not_called()
     client.indices.delete.assert_called_once()
+
+
+def test_rebuild_hsk_uses_separate_alias_and_mapping(tmp_path, monkeypatch):
+    path = tmp_path / "hsk.jsonl"
+    path.write_text('{"id":"hsk-1","title":"HSK 0123456789","hsk_code":"0123456789",'
+                    '"source_type":"HSK 연계표"}\n')
+    client = Mock()
+    client.ping.return_value = True
+    client.count.return_value = {"count": 1}
+    client.indices.get_alias.return_value = {}
+    monkeypatch.setattr("search_engine.indexer.get_settings", lambda: Settings())
+    monkeypatch.setattr("search_engine.indexer.create_client", lambda settings: client)
+    monkeypatch.setattr("search_engine.indexer.streaming_bulk", lambda *a, **kw: [(True, {})])
+
+    index_name, count = rebuild(path, dataset="hsk", expected_count=1)
+    assert count == 1
+    assert index_name.startswith("search-hsk-v")
+    assert "hsk_code" in client.indices.create.call_args.kwargs["body"]["mappings"]["properties"]
+    actions = client.indices.update_aliases.call_args.kwargs["body"]["actions"]
+    assert actions[-1] == {"add": {"index": index_name, "alias": "search-hsk"}}
