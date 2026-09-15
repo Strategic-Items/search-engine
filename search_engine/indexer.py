@@ -14,6 +14,7 @@ from search_engine.client import create_client
 from search_engine.config import get_settings
 from search_engine.documents import SearchDocument
 from search_engine.mapping import HSK_INDEX_BODY, INDEX_BODY
+from search_engine.synonyms import load_synonyms
 
 log = logging.getLogger(__name__)
 
@@ -72,6 +73,8 @@ def rebuild(
     prefix = settings.search_index_prefix if dataset == "core" else settings.search_hsk_prefix
     mapping = deepcopy(INDEX_BODY if dataset == "core" else HSK_INDEX_BODY)
     mapping["settings"]["number_of_replicas"] = settings.search_number_of_replicas
+    if dataset == "core":
+        mapping["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"] = load_synonyms()
     index_name = f"{prefix}{stamp}-{uuid4().hex[:6]}"
     client.indices.create(index=index_name, body=mapping)
     switched = False

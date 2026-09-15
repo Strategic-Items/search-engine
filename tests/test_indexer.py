@@ -177,3 +177,32 @@ def test_rebuild_rejects_an_unknown_dataset(tmp_path):
     path = write(tmp_path, {"id": "faq-1", "title": "허가"})
     with pytest.raises(ValueError, match="unknown dataset"):
         rebuild(path, dataset="other")
+
+
+def test_the_core_index_is_built_with_the_synonym_dictionary(tmp_path, monkeypatch):
+    path = write(tmp_path, {"id": "faq-1", "title": "허가"})
+    client = Mock()
+    client.count.return_value = {"count": 1}
+    client.indices.get_alias.return_value = {}
+    patch_cluster(monkeypatch, client)
+
+    rebuild(path)
+
+    body = client.indices.create.call_args.kwargs["body"]
+    rules = body["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"]
+    assert rules and all("," in rule for rule in rules)
+
+
+def test_the_hsk_index_carries_no_synonyms(tmp_path, monkeypatch):
+    path = write(tmp_path, {"id": "hsk-1", "title": "HSK 0123456789",
+                            "hsk_code": "0123456789", "source_type": "HSK 연계표"},
+                 name="hsk.jsonl")
+    client = Mock()
+    client.count.return_value = {"count": 1}
+    client.indices.get_alias.return_value = {}
+    patch_cluster(monkeypatch, client)
+
+    rebuild(path, dataset="hsk")
+
+    body = client.indices.create.call_args.kwargs["body"]
+    assert "domain_synonyms" not in body["settings"]["analysis"].get("filter", {})
