@@ -1,6 +1,6 @@
 """Grounded-answer prompt and the no-context response."""
 
-from search_engine.results import SearchHit
+from search_engine.search.results import SearchHit
 
 ANSWER_TEMPLATE = """당신은 전략물자 수출통제 상담을 지원하는 도우미다.
 아래 '근거 자료'에 있는 내용만 사용해 답한다.

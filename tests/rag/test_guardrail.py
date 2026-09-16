@@ -1,5 +1,5 @@
 from search_engine.rag import guardrail
-from search_engine.results import SearchHit
+from search_engine.search.results import SearchHit
 
 
 def test_empty_context_skips_model_prompt():

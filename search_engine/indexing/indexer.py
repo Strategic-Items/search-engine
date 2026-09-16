@@ -12,9 +12,9 @@ from opensearchpy.helpers import streaming_bulk
 
 from search_engine.client import create_client
 from search_engine.config import get_settings
-from search_engine.documents import SearchDocument
-from search_engine.mapping import HSK_INDEX_BODY, INDEX_BODY
-from search_engine.synonyms import load_synonyms
+from search_engine.indexing.documents import SearchDocument
+from search_engine.indexing.mapping import HSK_INDEX_BODY, INDEX_BODY
+from search_engine.indexing.synonyms import load_synonyms
 
 log = logging.getLogger(__name__)
 

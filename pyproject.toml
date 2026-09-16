@@ -15,9 +15,9 @@ dependencies = [
 test = ["pytest>=8,<10", "pytest-asyncio>=0.24,<2"]
 
 [project.scripts]
-search-index = "search_engine.indexer:main"
-search-prepare = "search_engine.prepare:main"
-search-evaluate = "search_engine.evaluate:main"
+search-index = "search_engine.indexing.indexer:main"
+search-prepare = "search_engine.indexing.prepare:main"
+search-evaluate = "search_engine.evaluation.evaluate:main"
 
 [build-system]
 requires = ["setuptools>=68"]

@@ -5,45 +5,14 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from opensearchpy import OpenSearchException
-from pydantic import BaseModel, ConfigDict, model_validator
 
 from search_engine.client import create_client
 from search_engine.config import get_settings
-from search_engine.results import SearchResults
-from search_engine.search import search_all
+from search_engine.api.schemas import RagRequest, SearchRequest
 from search_engine.rag import pipeline
+from search_engine.search import SearchResults, search_all
 
 app = FastAPI(title="Strategic Items Search", version="0.1.0")
-
-
-class SearchRequest(BaseModel):
-    """The public search request. Users provide only a natural-language query."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    query: str = ""
-
-    @model_validator(mode="after")
-    def require_search_term(self):
-        if not self.query.strip():
-            raise ValueError("query is required")
-        return self
-
-
-class RagRequest(BaseModel):
-    """A grounded RAG request; extra fields are deliberately rejected."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    query: str = ""
-    session_id: str | None = None
-
-    @model_validator(mode="after")
-    def require_search_term(self):
-        if not self.query.strip():
-            raise ValueError("query is required")
-        return self
-
 
 
 @app.get("/health/live")

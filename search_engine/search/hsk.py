@@ -3,7 +3,7 @@ import re
 from opensearchpy import OpenSearch
 
 from search_engine.codes import normalize_control
-from search_engine.results import HskHit, HskResults
+from search_engine.search.results import HskHit, HskResults
 
 HSK_CODE = re.compile(r"(?<!\d)(?:\d[\s-]?){9}\d(?!\d)")
 

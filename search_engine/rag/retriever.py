@@ -6,7 +6,7 @@ from anyio import to_thread
 
 from search_engine.client import create_client
 from search_engine.config import get_settings
-from search_engine.results import SearchHit
+from search_engine.search.results import SearchHit
 from search_engine.search import search_all
 
 

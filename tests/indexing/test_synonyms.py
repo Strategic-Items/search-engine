@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from search_engine.mapping import INDEX_BODY
-from search_engine.synonyms import load_synonyms
+from search_engine.indexing.mapping import INDEX_BODY
+from search_engine.indexing.synonyms import load_synonyms
 
 
 def test_a_group_becomes_one_rule(tmp_path: Path):

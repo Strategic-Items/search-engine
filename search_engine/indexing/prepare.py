@@ -10,8 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
-from search_engine.documents import SearchDocument
-from search_engine.indexer import file_sha256
+from search_engine.indexing.documents import SearchDocument
+from search_engine.indexing.indexer import file_sha256
 
 CORE_TYPES = {"FAQ", "민원서식", "공지사항", "판정 안내", "허가 안내", "이용 안내"}
 FORM_TYPE = "민원서식"

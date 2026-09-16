@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from search_engine.indexer import file_sha256
-from search_engine.prepare import prepare
+from search_engine.indexing.indexer import file_sha256
+from search_engine.indexing.prepare import prepare
 
 
 def test_prepare_separates_core_and_hsk_and_checks_manifest(tmp_path: Path):

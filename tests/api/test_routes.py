@@ -16,7 +16,7 @@ def test_search_returns_hits_from_alias(monkeypatch):
     os_client.search.return_value = {"hits": {"hits": [
         {"_id": "faq-1", "_score": 3.0, "_source": {"title": "허가", "body": "본문"}},
     ]}}
-    monkeypatch.setattr("search_engine.api.create_client", lambda: os_client)
+    monkeypatch.setattr("search_engine.api.routes.create_client", lambda: os_client)
 
     response = TestClient(app).post("/v1/search", json={"query": "허가"})
 
@@ -33,7 +33,7 @@ def test_search_includes_hsk_linkage_for_an_hsk_code_query(monkeypatch):
             "_id": "hsk-1", "_source": {"hsk_code": "2826902000", "control_number": "1A001"},
         }]}},
     ]
-    monkeypatch.setattr("search_engine.api.create_client", lambda: os_client)
+    monkeypatch.setattr("search_engine.api.routes.create_client", lambda: os_client)
 
     response = TestClient(app).post(
         "/v1/search", json={"query": "HSK 2826-9020-00"},
@@ -49,7 +49,7 @@ def test_search_includes_hsk_linkage_for_an_hsk_code_query(monkeypatch):
 def test_a_cluster_failure_is_reported_as_a_temporary_failure(monkeypatch):
     os_client = Mock()
     os_client.search.side_effect = ConnectionError("no route to cluster")
-    monkeypatch.setattr("search_engine.api.create_client", lambda: os_client)
+    monkeypatch.setattr("search_engine.api.routes.create_client", lambda: os_client)
 
     response = TestClient(app).post("/v1/search", json={"query": "허가"})
 
@@ -58,7 +58,7 @@ def test_a_cluster_failure_is_reported_as_a_temporary_failure(monkeypatch):
 
 def test_readiness_follows_the_cluster(monkeypatch):
     os_client = Mock()
-    monkeypatch.setattr("search_engine.api.create_client", lambda: os_client)
+    monkeypatch.setattr("search_engine.api.routes.create_client", lambda: os_client)
 
     os_client.ping.return_value = True
     assert TestClient(app).get("/health/ready").status_code == 200

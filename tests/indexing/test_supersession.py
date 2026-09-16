@@ -1,7 +1,7 @@
 from datetime import date
 from unittest.mock import Mock
 
-from search_engine.prepare import form_slot, supersessions
+from search_engine.indexing.prepare import form_slot, supersessions
 from search_engine.search import build_query, retrieve
 
 
@@ -123,7 +123,7 @@ def notice(parent_id: str, title: str, published_at: str | None) -> dict:
 
 
 def test_a_gosi_edition_is_a_slot_but_other_notices_are_not():
-    from search_engine.prepare import document_slot
+    from search_engine.indexing.prepare import document_slot
 
     assert document_slot("공지사항", "제38차 전략물자수출입고시 개정 안내(9.1 시행)") == (
         "고시", "전략물자수출입고시")
@@ -155,7 +155,7 @@ def test_a_draft_with_no_enacted_edition_to_point_at_is_left_alone():
 
 
 def test_only_a_gosi_notice_reads_as_a_draft():
-    from search_engine.prepare import is_gosi_draft
+    from search_engine.indexing.prepare import is_gosi_draft
 
     assert is_gosi_draft("공지사항", "｢전략물자 수출입고시｣ 일부개정(안) 행정예고")
     assert not is_gosi_draft("공지사항", "무역안보 현안설명회 개최 안내(12.8(월), SETEC)")

@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from search_engine.config import Settings
-from search_engine.indexer import document_actions, rebuild
+from search_engine.indexing.indexer import document_actions, rebuild
 
 
 def write(tmp_path: Path, *rows: dict, name: str = "docs.jsonl") -> Path:
@@ -17,9 +17,9 @@ def write(tmp_path: Path, *rows: dict, name: str = "docs.jsonl") -> Path:
 def patch_cluster(monkeypatch, client: Mock, bulk_results=((True, {}),), **settings) -> Mock:
     """Point rebuild at a mock cluster whose bulk writes report bulk_results."""
     client.ping.return_value = True
-    monkeypatch.setattr("search_engine.indexer.get_settings", lambda: Settings(**settings))
-    monkeypatch.setattr("search_engine.indexer.create_client", lambda settings: client)
-    monkeypatch.setattr("search_engine.indexer.streaming_bulk",
+    monkeypatch.setattr("search_engine.indexing.indexer.get_settings", lambda: Settings(**settings))
+    monkeypatch.setattr("search_engine.indexing.indexer.create_client", lambda settings: client)
+    monkeypatch.setattr("search_engine.indexing.indexer.streaming_bulk",
                         lambda *a, **kw: list(bulk_results))
     return client
 

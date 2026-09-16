@@ -98,22 +98,34 @@ Dashboards는 색인·데이터를 확인하는 관리 화면이며, 서비스 �
 
 ## 코드 구조
 
-`search_engine/` 아래 평평한 모듈 하나당 역할 하나다.
+`search_engine/` 아래는 의존 방향이 한쪽으로만 흐르는 계층이다.
+`api → rag → search → client/config`, `indexing → client/config`.
 
 ```
-api.py         FastAPI 앱과 요청 스키마
-search.py      문서 질의 조립, 검색, HSK 병합(search_all)
-hsk.py         HSK 코드 추출, 연계표 조회
-indexer.py     색인 재생성과 읽기 별칭 전환 (search-index)
-prepare.py     실습 코퍼스 → core/hsk 데이터셋 (search-prepare)
-documents.py   색인 입력 문서 모델
-results.py     검색 응답 모델
-codes.py       통제번호·법령 참조 정규화
-mapping.py     인덱스 매핑
-client.py      OpenSearch 클라이언트
 config.py      환경변수 설정
+client.py      OpenSearch 클라이언트
+codes.py       통제번호·법령 참조 정규화 (색인·검색 공용)
+
+api/           HTTP 표면 (uvicorn search_engine.api:app)
+  routes.py      FastAPI 앱과 라우트
+  schemas.py     요청 스키마
+search/        런타임 질의 경로
+  query.py       문서 질의 조립, 검색, HSK 병합(search_all)
+  hsk.py         HSK 코드 추출, 연계표 조회
+  results.py     검색 응답 모델
+indexing/      오프라인 색인 파이프라인
+  prepare.py     실습 코퍼스 → core/hsk 데이터셋 (search-prepare)
+  indexer.py     색인 재생성과 읽기 별칭 전환 (search-index)
+  documents.py   색인 입력 문서 모델
+  mapping.py     인덱스 매핑
+  synonyms.py    동의어 사전 로딩
 rag/           검색 기반 답변 파이프라인
+evaluation/    검색 품질 측정 (search-evaluate)
 ```
+
+`search`와 `indexing`은 서로를 부르지 않는다. 각 패키지의 `__init__.py`가 공개
+이름을 재수출하므로 `from search_engine.search import search_all`처럼 패키지
+단위로 임포트한다.
 
 ## 색인 입력 계약
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from search_engine.evaluate import (
+from search_engine.evaluation.evaluate import (
     evaluate,
     hit_at,
     indexed_ids,
@@ -67,7 +67,7 @@ def test_a_gold_document_that_was_never_indexed_is_reported_separately(tmp_path,
         {"qid": "q1", "query": "있는 문서", "gold": ["doc-1"], "category": "faq_legacy"},
         {"qid": "q2", "query": "없는 문서", "gold": ["doc-404"], "category": "faq_legacy"},
     ]
-    monkeypatch.setattr("search_engine.evaluate.search",
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search",
                         lambda *a, **kw: {"hits": [{"parent_id": "doc-1"}], "hsk": None})
 
     report = evaluate(queries, "http://127.0.0.1:8092", tmp_path)
@@ -82,7 +82,7 @@ def test_scores_are_grouped_by_category(tmp_path, monkeypatch):
         {"qid": "q1", "query": "a", "gold": ["doc-1"], "category": "guide"},
         {"qid": "q2", "query": "b", "gold": ["doc-9"], "category": "form"},
     ]
-    monkeypatch.setattr("search_engine.evaluate.search", lambda *a, **kw: {
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search", lambda *a, **kw: {
         "hits": [{"parent_id": "doc-2"}, {"parent_id": "doc-1"}], "hsk": None})
 
     report = evaluate(queries, "http://127.0.0.1:8092", tmp_path)
@@ -100,7 +100,7 @@ def test_the_answerable_subset_excludes_gold_that_never_reached_the_index(tmp_pa
         {"qid": "q1", "query": "a", "gold": ["doc-1"], "category": "faq_legacy"},
         {"qid": "q2", "query": "b", "gold": ["doc-404"], "category": "faq_legacy"},
     ]
-    monkeypatch.setattr("search_engine.evaluate.search",
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search",
                         lambda *a, **kw: {"hits": [{"parent_id": "doc-1"}], "hsk": None})
 
     report = evaluate(queries, "http://127.0.0.1:8092", tmp_path)

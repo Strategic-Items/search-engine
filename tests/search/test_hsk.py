@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from search_engine.hsk import build_hsk_query, extract_hsk_code, retrieve_hsk
+from search_engine.search.hsk import build_hsk_query, extract_hsk_code, retrieve_hsk
 
 
 def test_extract_hsk_code_accepts_compact_and_separated_codes():
