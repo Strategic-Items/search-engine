@@ -6,6 +6,7 @@ from search_engine.search.query import (
     GUIDE_TYPES,
     SOURCE_TYPE_WEIGHT,
     build_query,
+    build_vector_query,
     retrieve,
     search_all,
 )
@@ -20,6 +21,7 @@ __all__ = [
     "SearchHit",
     "SearchResults",
     "build_query",
+    "build_vector_query",
     "extract_hsk_code",
     "retrieve",
     "retrieve_hsk",

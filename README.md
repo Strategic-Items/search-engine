@@ -12,7 +12,8 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 
 ## 현재 제공하는 기능
 
-- `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색,
+- `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색과 Ollama 임베딩 HNSW
+  벡터 검색을 RRF로 결합한 하이브리드 검색,
   시행일 필터, 청크의 부모 문서 중복 제거. 검색어에 10자리 HSK 코드가 있으면 HSK
   연계표도 함께 정확 조회한다.
 - `POST /v1/rag/stream`: 검색 근거가 있는 답변만 Ollama로 스트리밍하며, `fetch`로
@@ -28,7 +29,9 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 
 Python 3.11 이상, Docker와 Ollama가 필요하다. API와 Ollama는 로컬에서 실행하고
 OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실행하고
-`ollama pull qwen2.5:3b`(또는 `OLLAMA_CHAT_MODEL`에 지정한 모델)을 받아 둔다.
+`ollama pull qwen2.5:3b`(또는 `OLLAMA_CHAT_MODEL`에 지정한 모델)과
+`ollama pull nomic-embed-text`(또는 `OLLAMA_EMBEDDING_MODEL`)를 받아 둔다. 임베딩 모델의
+차원은 `SEARCH_EMBEDDING_DIMENSIONS`와 반드시 같아야 한다(기본 `nomic-embed-text`: 768).
 
 ```bash
 cd /Users/jeongbin/git/searchEngine
