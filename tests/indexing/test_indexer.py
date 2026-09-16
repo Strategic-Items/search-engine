@@ -6,7 +6,8 @@ import pytest
 
 from search_engine.config import Settings
 from search_engine.indexing.indexer import document_actions, rebuild
-from search_engine.indexing.mapping import INDEX_BODY
+from search_engine.config import get_settings
+from search_engine.indexing.mapping import index_body
 
 
 def write(tmp_path: Path, *rows: dict, name: str = "docs.jsonl") -> Path:
@@ -224,7 +225,8 @@ def test_rebuild_docs_uses_its_own_alias_but_the_document_mapping(tmp_path, monk
     assert count == 1
     assert index_name.startswith("search-docs-v")
     body = client.indices.create.call_args.kwargs["body"]
-    assert body["mappings"] == INDEX_BODY["mappings"]
+    assert body["mappings"] == index_body(
+        get_settings().search_embedding_dimensions)["mappings"]
     assert body["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"]
     actions = client.indices.update_aliases.call_args.kwargs["body"]["actions"]
     assert actions[-1] == {"add": {"index": index_name, "alias": "search-docs"}}

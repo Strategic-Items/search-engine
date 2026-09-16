@@ -31,8 +31,12 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 Python 3.11 이상, Docker와 Ollama가 필요하다. API와 Ollama는 로컬에서 실행하고
 OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실행하고
 `ollama pull qwen2.5:3b`(또는 `OLLAMA_CHAT_MODEL`에 지정한 모델)과
-`ollama pull nomic-embed-text`(또는 `OLLAMA_EMBEDDING_MODEL`)를 받아 둔다. 임베딩 모델의
-차원은 `SEARCH_EMBEDDING_DIMENSIONS`와 반드시 같아야 한다(기본 `nomic-embed-text`: 768).
+`ollama pull bge-m3`(또는 `OLLAMA_EMBEDDING_MODEL`)를 받아 둔다. 임베딩 모델의
+차원은 `SEARCH_EMBEDDING_DIMENSIONS`와 반드시 같아야 한다(기본 `bge-m3`: 1024).
+**모델이나 차원을 바꾸면 모든 데이터셋을 전부 재색인해야 한다.** 매핑이 인덱스마다
+벡터 폭을 고정하므로, 차원이 다른 기존 인덱스는 k-NN 결과에 전혀 기여하지 못한다.
+`bge-m3`는 다국어 모델이다. 영어 중심 모델은 이 한국어 코퍼스에서 문서 Recall@5가
+100%에서 22%로 떨어진다([검색 성능 이력](docs/performance_history.md) 6단계).
 
 ```bash
 cd /Users/jeongbin/git/searchEngine
@@ -147,6 +151,9 @@ cd /Users/jeongbin/git/searchEngine
 평가를 중단한다. 하이브리드 운영 검색의 임베딩 장애 시 BM25 폴백은 유지한다.
 
 - Hit@k: 정답 문서를 하나라도 찾은 질문의 비율.
+- Precision@k: 질문마다 `찾은 정답 부모 수 / k`를 계산한 평균(macro).
+  중복 정답은 한 번만 세며, 반환이 k개보다 적어도 분모는 k다.
+  Precision@1은 1위 문서가 정답인 질문 비율이며 Hit@1과 같다.
 - Recall@k: 질문마다 `찾은 정답 부모 수 / 전체 정답 부모 수`를 계산한 평균(macro).
   모든 질문의 정답 수를 합산한 micro Recall도 JSON에 기록한다.
 - MRR@k: 첫 정답의 순위 역수 평균. k 안에 정답이 없으면 0.
@@ -156,6 +163,9 @@ cd /Users/jeongbin/git/searchEngine
 기본 API는 상위 5건이며 비교 도구는 상위 10건 요청으로 후보 수를 정하므로 두 결과가
 다를 수 있다. API 평가의 `--prepared`는 입력 파일 기준 색인 범위 확인이고, 비교 도구는
 실제 클러스터의 청크 ID·부모 ID·content hash·벡터 매핑까지 검증한다.
+
+임베딩 모델 선택이 벡터 검색 품질을 좌우한다. 같은 코퍼스·질문에서 `nomic-embed-text`는
+문서 Recall@5 22.1%, `bge-m3`는 100.0%였다. 벡터가 약해 보이면 방식보다 모델을 먼저 의심한다.
 
 표현이 바뀐 질문("업체의 약속 문서" ↔ "수출자 서약서")은 `SEARCH_QUERY_REWRITE=true`로
 켜면 `OLLAMA_CHAT_MODEL`이 다시 쓴 검색어를 **원본과 함께** 검색해 순위를 가중 RRF로

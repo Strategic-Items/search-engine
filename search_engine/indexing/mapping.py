@@ -1,7 +1,7 @@
 """Index definitions. Synonyms expand at search time, so the dictionary can
 change without reindexing the documents themselves."""
 
-def index_body(embedding_dimensions: int = 768) -> dict:
+def index_body(embedding_dimensions: int) -> dict:
     """Core mapping, including an HNSW cosine vector index."""
     return {
     "settings": {
@@ -69,8 +69,6 @@ def index_body(embedding_dimensions: int = 768) -> dict:
 
 
 # Preserve a directly inspectable default mapping for callers and tests.
-INDEX_BODY = index_body()
-
 HSK_INDEX_BODY = {
     "settings": {
         "number_of_shards": 1,

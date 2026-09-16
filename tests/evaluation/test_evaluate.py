@@ -9,6 +9,7 @@ from search_engine.evaluation.evaluate import (
     indexed_ids,
     load_queries,
     quality_metrics,
+    precision_at,
     ranked_ids,
 )
 
@@ -37,6 +38,34 @@ def test_any_gold_inside_the_cutoff_counts_as_answered():
     assert not hit_at(["a", "b", "c"], ["c"], 2)
     assert hit_at(["a"], ["z", "a"], 1)
     assert not hit_at([], ["a"], 5)
+
+
+def test_precision_uses_k_slots_and_counts_duplicate_parents_once():
+    assert precision_at(["a", "a", "x", "b", "y", "c"], ["a", "b", "c"], 5) == .4
+    assert precision_at(["a"], ["a"], 5) == .2
+    assert precision_at([], ["a"], 5) == 0
+    with pytest.raises(ValueError):
+        precision_at(["a"], ["a"], 0)
+
+
+def test_precision_and_mrr_average_queries_including_misses():
+    metrics = quality_metrics([
+        {"returned": ["x", "a", "b"], "gold": ["a", "b"]},
+        {"returned": [], "gold": ["c"]},
+    ], 5)
+    assert metrics["precision_at_5"] == .2
+    assert metrics["precision_at_1"] == 0
+    assert metrics["mrr_at_5"] == .25
+
+
+def test_precision_at_one_matches_first_result_accuracy():
+    metrics = quality_metrics([
+        {"returned": ["a", "x"], "gold": ["a"]},
+        {"returned": ["x", "b"], "gold": ["b"]},
+        {"returned": [], "gold": ["c"]},
+    ], 5)
+    assert metrics["precision_at_1"] == pytest.approx(1 / 3)
+    assert metrics["precision_at_1"] == metrics["hit_at_1"]
 
 
 def test_queries_without_gold_are_refused(tmp_path: Path):

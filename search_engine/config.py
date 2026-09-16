@@ -31,7 +31,9 @@ class Settings(BaseSettings):
     ollama_chat_model: str = "qwen2.5:3b"
     # Keep the embedding model separate from the chat model: chat models are
     # usually much larger and may not expose Ollama's embedding endpoint.
-    ollama_embedding_model: str = "nomic-embed-text"
+    # Multilingual: the corpus and the questions are Korean, and an English-first
+    # model scores them close to randomly (docs/performance_history.md, stage 6).
+    ollama_embedding_model: str = "bge-m3"
     ollama_temperature: float = 0.4
     # Ollama silently drops the front of a prompt that exceeds the context window,
     # which would cut the grounding rules and leave the evidence, and the window
@@ -39,7 +41,9 @@ class Settings(BaseSettings):
     # longest docs v2 prompt measured 7,695 tokens, so this leaves room to answer.
     ollama_num_ctx: int = Field(default=16384, ge=512)
     ollama_timeout_seconds: float = Field(default=120.0, gt=0)
-    search_embedding_dimensions: int = Field(default=768, ge=1)
+    # Must match OLLAMA_EMBEDDING_MODEL exactly; changing either needs a reindex
+    # of every dataset, since the mapping fixes the vector width per index.
+    search_embedding_dimensions: int = Field(default=1024, ge=1)
     search_vector_candidates: int = Field(default=50, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
     # Chunks carried per returned document. Ranking still returns one document
