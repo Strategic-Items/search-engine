@@ -58,6 +58,20 @@ python3 -m venv .venv
   --manifest data/generated/manifest.json
 ```
 
+원본 문서(HWP/HWPX/PDF)를 파싱해 만든 코퍼스는 별도 데이터셋 `docs`로 색인한다.
+색인은 데이터셋마다 인덱스를 통째로 교체하므로, 분리해 두면 한쪽을 다시 만들어도
+다른 쪽이 사라지지 않는다.
+
+```bash
+# unstructured-doc-parser 저장소에서 코퍼스를 먼저 만든다
+.venv/bin/search-index ../unstructured-doc-parser/data/chunks/docs.jsonl \
+  --dataset docs \
+  --manifest ../unstructured-doc-parser/data/chunks/manifest.json
+```
+
+검색은 `core`와 `docs`를 함께 조회한다(`Settings.document_aliases`). 연동 계약은
+[문서 파서 연동 기록](docs/doc_parser_import.md)에 있다.
+
 이번 초기 적재 범위와 검토 결과는 [import_v1 기록](docs/import_v1.md)에 있다.
 
 다른 터미널에서 검색한다.
@@ -137,7 +151,12 @@ JSONL 한 줄이 하나의 검색 문서다. `id`와 `title`은 필수다. `id`�
 `parent_id`, `published_at`, `effective_from`, `effective_to`, `content_hash`를 받을 수 있다.
 날짜는 `YYYY-MM-DD` 또는 `YYYYMMDD`이며 `effective_to`는 **그 날짜부터 효력이 없는**
 경계다. 날짜를 모르면 `null`로 둔다. 색인 입력에 빠진 기존 문서는 재색인으로 사라지므로,
-수집 실패가 있는 부분 파일은 전체 재색인에 사용하면 안 된다.
+수집 실패가 있는 부분 파일은 전체 재색인에 사용하면 안 된다. 이는 `core`뿐 아니라
+`docs`·`hsk`에도 똑같이 적용된다 -- 데이터셋마다 인덱스가 통째로 교체된다.
+
+임베딩은 색인할 때 이 저장소가 직접 만든다(`core`, `docs`). 입력에 `embedding`을 담아
+보낼 필요가 없고, 담아도 덮어쓴다. 대신 `search-index`를 실행하기 전에 Ollama가 떠
+있고 `OLLAMA_EMBEDDING_MODEL`이 받아져 있어야 한다.
 
 검색 요청은 `query`만 담아야 한다. 서버는 현재 날짜 기준으로 유효한 문서를 검색하며,
 응답은 검색 청크의 `id`와 부모 `parent_id`, 제목·본문·출처·시행일을 반환한다.

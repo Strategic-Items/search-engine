@@ -8,7 +8,8 @@ async def test_retriever_calls_search_in_process_with_configured_aliases(monkeyp
     client = Mock()
     monkeypatch.setattr(retriever, "create_client", lambda: client)
     monkeypatch.setattr(retriever, "get_settings", lambda: Settings(
-        search_index_alias="docs", search_hsk_alias="hsk", rag_top_k=3,
+        search_index_alias="docs", search_docs_alias="parsed",
+        search_hsk_alias="hsk", rag_top_k=3,
     ))
     client.search.return_value = {"hits": {"hits": [{
         "_id": "form-1", "_score": 2.0, "_source": {
@@ -20,4 +21,4 @@ async def test_retriever_calls_search_in_process_with_configured_aliases(monkeyp
 
     assert hits[0].id == "form-1"
     assert hits[0].source_type == "민원서식"
-    assert client.search.call_args.kwargs["index"] == "docs"
+    assert client.search.call_args.kwargs["index"] == "docs,parsed"

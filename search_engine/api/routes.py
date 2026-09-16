@@ -35,7 +35,7 @@ def search(request: SearchRequest) -> SearchResults:
     settings = get_settings()
     try:
         return search_all(
-            create_client(), settings.search_index_alias, settings.search_hsk_alias,
+            create_client(), settings.document_aliases, settings.search_hsk_alias,
             request.query, date.today(), 5,
         )
     except OpenSearchException as exc:

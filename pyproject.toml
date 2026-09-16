@@ -28,3 +28,6 @@ include = ["search_engine*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+markers = [
+    "uses_embedding_service: test drives the real OllamaEmbedder construction path",
+]

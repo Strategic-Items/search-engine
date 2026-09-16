@@ -1,4 +1,5 @@
 from datetime import date
+import logging
 import re
 from collections.abc import Iterable
 
@@ -9,6 +10,8 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.results import SearchHit, SearchResults
+
+log = logging.getLogger(__name__)
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 
@@ -113,6 +116,23 @@ def build_vector_query(vector: list[float], as_of: date, candidates: int) -> dic
     }}}
 
 
+def _warn_on_partial_results(response: dict, retriever: str) -> None:
+    """Say so when an index drops out of a search instead of losing it quietly.
+
+    Searching several indexes at once returns 200 even when a shard fails, so a
+    whole index can vanish from a rank list with no visible error -- an index
+    built before the vector mapping contributes nothing to k-NN, and RRF then
+    buries every document in it. That is a reindex, not a query bug, and it is
+    only actionable if it is visible.
+    """
+    shards = response.get("_shards", {})
+    if not shards.get("failed"):
+        return
+    for failure in shards.get("failures", []):
+        log.warning("%s search skipped index %s: %s", retriever, failure.get("index"),
+                    failure.get("reason", {}).get("reason"))
+
+
 def _rrf(hits_by_retriever: Iterable[list[dict]], rrf_k: int) -> list[dict]:
     """Fuse rank lists without comparing BM25 scores to cosine similarities."""
     fused: dict[str, tuple[float, dict]] = {}
@@ -136,10 +156,19 @@ def retrieve(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int,
     embedder: OllamaEmbedder | None = None,
 ) -> list[SearchHit]:
+    """Retrieve from `alias`, which may name several indexes, comma separated.
+
+    Searches ignore an index that does not exist yet: a corpus that has never
+    been indexed should narrow the results, not fail the request.
+    """
     settings = get_settings()
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
-    lexical = client.search(index=alias, body={"query": build_query(query, as_of)}, size=lexical_candidates)
+    lexical = client.search(
+        index=alias, body={"query": build_query(query, as_of)},
+        size=lexical_candidates, ignore_unavailable=True,
+    )
+    _warn_on_partial_results(lexical, "lexical")
     ranked_lists = [lexical["hits"]["hits"]]
     try:
         vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
@@ -147,7 +176,9 @@ def retrieve(
             index=alias,
             body={"query": build_vector_query(vector, as_of, vector_candidates)},
             size=vector_candidates,
+            ignore_unavailable=True,
         )
+        _warn_on_partial_results(semantic, "vector")
         ranked_lists.append(semantic["hits"]["hits"])
     except httpx.HTTPError:
         # Lexical search remains available during an embedding service outage.
@@ -185,6 +216,7 @@ def _current_editions(
         body={"query": {"bool": {"filter": [{"terms": {"parent_id": sorted(wanted)}}]}},
               "sort": [{"id": "asc"}]},
         size=len(wanted) * 2,
+        ignore_unavailable=True,
     )
     editions = {}
     for hit in response["hits"]["hits"]:

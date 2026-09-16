@@ -6,6 +6,7 @@ import pytest
 
 from search_engine.config import Settings
 from search_engine.indexing.indexer import document_actions, rebuild
+from search_engine.indexing.mapping import INDEX_BODY
 
 
 def write(tmp_path: Path, *rows: dict, name: str = "docs.jsonl") -> Path:
@@ -206,3 +207,57 @@ def test_the_hsk_index_carries_no_synonyms(tmp_path, monkeypatch):
 
     body = client.indices.create.call_args.kwargs["body"]
     assert "domain_synonyms" not in body["settings"]["analysis"].get("filter", {})
+
+
+def test_rebuild_docs_uses_its_own_alias_but_the_document_mapping(tmp_path, monkeypatch):
+    """The docs corpus is indexed separately yet stays searchable alongside core."""
+    path = write(tmp_path, {"id": "notice-1#0000", "title": "공고문",
+                            "parent_id": "notice-1", "source_type": "공고문"},
+                 name="docs.jsonl")
+    client = Mock()
+    client.count.return_value = {"count": 1}
+    client.indices.get_alias.return_value = {}
+    patch_cluster(monkeypatch, client)
+
+    index_name, count = rebuild(path, dataset="docs", expected_count=1)
+
+    assert count == 1
+    assert index_name.startswith("search-docs-v")
+    body = client.indices.create.call_args.kwargs["body"]
+    assert body["mappings"] == INDEX_BODY["mappings"]
+    assert body["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"]
+    actions = client.indices.update_aliases.call_args.kwargs["body"]["actions"]
+    assert actions[-1] == {"add": {"index": index_name, "alias": "search-docs"}}
+
+
+def test_rebuilding_docs_leaves_the_core_alias_alone(tmp_path, monkeypatch):
+    """Separate datasets exist so one corpus cannot drop the other."""
+    path = write(tmp_path, {"id": "notice-1#0000", "title": "공고문"}, name="docs.jsonl")
+    client = Mock()
+    client.count.return_value = {"count": 1}
+    client.indices.get_alias.return_value = {}
+    patch_cluster(monkeypatch, client)
+
+    rebuild(path, dataset="docs")
+
+    assert client.indices.get_alias.call_args.kwargs["name"] == "search-docs"
+    touched = {action[verb]["alias"]
+               for action in client.indices.update_aliases.call_args.kwargs["body"]["actions"]
+               for verb in action}
+    assert touched == {"search-docs"}
+
+
+def test_docs_are_embedded_like_core(tmp_path, monkeypatch):
+    """Both document corpora are read through one hybrid search, so both need vectors."""
+    path = write(tmp_path, {"id": "notice-1#0000", "title": "공고문"}, name="docs.jsonl")
+    client = Mock()
+    client.count.return_value = {"count": 1}
+    client.indices.get_alias.return_value = {}
+    patch_cluster(monkeypatch, client)
+    embedders = []
+    monkeypatch.setattr("search_engine.indexing.indexer.OllamaEmbedder",
+                        lambda settings: embedders.append(settings) or Mock())
+
+    rebuild(path, dataset="docs")
+
+    assert len(embedders) == 1

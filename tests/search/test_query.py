@@ -1,4 +1,5 @@
 from datetime import date
+import logging
 from unittest.mock import Mock
 
 from search_engine.search import (
@@ -116,3 +117,23 @@ def test_boosting_never_removes_a_document_from_the_result_set():
     matching = matching_query(query)["bool"]
     assert matching["minimum_should_match"] == 1
     assert "source_type" not in str(matching["filter"])
+
+
+def test_an_index_dropping_out_of_a_search_is_reported(monkeypatch, caplog):
+    """A failed shard still returns 200, so the only signal is a log line."""
+    client = Mock()
+    client.search.return_value = {
+        "_shards": {"total": 2, "successful": 1, "failed": 1, "failures": [
+            {"index": "search-documents-v1",
+             "reason": {"reason": "Field 'embedding' is not knn_vector type."}},
+        ]},
+        "hits": {"hits": []},
+    }
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 768
+
+    with caplog.at_level(logging.WARNING):
+        retrieve(client, "search-documents,search-docs", "허가", date(2026, 9, 16), 5, embedder)
+
+    assert "search-documents-v1" in caplog.text
+    assert "not knn_vector type" in caplog.text

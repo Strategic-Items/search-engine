@@ -14,7 +14,7 @@ async def retrieve(query_text: str) -> list[SearchHit]:
     settings = get_settings()
     results = await to_thread.run_sync(
         lambda: search_all(
-            create_client(), settings.search_index_alias, settings.search_hsk_alias,
+            create_client(), settings.document_aliases, settings.search_hsk_alias,
             query_text, date.today(), settings.rag_top_k,
         )
     )

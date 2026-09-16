@@ -19,6 +19,18 @@ from search_engine.indexing.synonyms import load_synonyms
 
 log = logging.getLogger(__name__)
 
+# Each dataset is its own index with its own alias, rebuilt independently.
+# "core" and "docs" share the document mapping so one search can read both;
+# "hsk" is an exact-lookup table with no vectors.
+DATASETS = {
+    "core": {"alias": "search_index_alias", "prefix": "search_index_prefix",
+             "mapping": "document", "embed": True},
+    "docs": {"alias": "search_docs_alias", "prefix": "search_docs_prefix",
+             "mapping": "document", "embed": True},
+    "hsk": {"alias": "search_hsk_alias", "prefix": "search_hsk_prefix",
+            "mapping": "hsk", "embed": False},
+}
+
 
 def document_actions(path: Path, index_name: str, embedder: OllamaEmbedder | None = None):
     """Validate every line, refusing a file that repeats a document ID."""
@@ -62,7 +74,8 @@ def rebuild(
     """Build a complete new index, verify it, then atomically move the read alias."""
     if not path.is_file():
         raise FileNotFoundError(path)
-    if dataset not in ("core", "hsk"):
+    spec = DATASETS.get(dataset)
+    if spec is None:
         raise ValueError(f"unknown dataset: {dataset}")
     if expected_sha256 and file_sha256(path) != expected_sha256:
         raise ValueError("input file checksum does not match manifest")
@@ -72,18 +85,21 @@ def rebuild(
         raise RuntimeError("OpenSearch is unavailable")
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    alias = settings.search_index_alias if dataset == "core" else settings.search_hsk_alias
-    prefix = settings.search_index_prefix if dataset == "core" else settings.search_hsk_prefix
-    mapping = deepcopy(index_body(settings.search_embedding_dimensions) if dataset == "core" else HSK_INDEX_BODY)
+    alias = getattr(settings, spec["alias"])
+    prefix = getattr(settings, spec["prefix"])
+    is_document = spec["mapping"] == "document"
+    mapping = deepcopy(
+        index_body(settings.search_embedding_dimensions) if is_document else HSK_INDEX_BODY
+    )
     mapping["settings"]["number_of_replicas"] = settings.search_number_of_replicas
-    if dataset == "core":
+    if is_document:
         mapping["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"] = load_synonyms()
     index_name = f"{prefix}{stamp}-{uuid4().hex[:6]}"
     client.indices.create(index=index_name, body=mapping)
     switched = False
     try:
         indexed = 0
-        embedder = OllamaEmbedder(settings) if dataset == "core" else None
+        embedder = OllamaEmbedder(settings) if spec["embed"] else None
         for ok, item in streaming_bulk(
             client, document_actions(path, index_name, embedder),
             chunk_size=500, max_retries=3, raise_on_error=True,
@@ -123,7 +139,7 @@ def rebuild(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Rebuild the OpenSearch read index from JSONL")
     parser.add_argument("jsonl", type=Path)
-    parser.add_argument("--dataset", choices=("core", "hsk"), default="core")
+    parser.add_argument("--dataset", choices=tuple(DATASETS), default="core")
     parser.add_argument("--manifest", type=Path,
                         help="Manifest from search-prepare; verifies count and SHA-256")
     args = parser.parse_args()
