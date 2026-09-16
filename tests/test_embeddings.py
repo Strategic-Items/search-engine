@@ -28,10 +28,11 @@ def test_ollama_embedding_request_and_dimension_validation(monkeypatch):
         return httpx.Response(200, json={"embeddings": [[0, 0.5, 1]]}, request=httpx.Request("POST", url))
 
     monkeypatch.setattr("search_engine.embeddings.httpx.post", post)
-    embedder = OllamaEmbedder(Settings(ollama_base_url="http://ollama.test", search_embedding_dimensions=3))
+    settings = Settings(ollama_base_url="http://ollama.test", search_embedding_dimensions=3)
+    embedder = OllamaEmbedder(settings)
     assert embedder.embed_query("수출 허가") == [0.0, 0.5, 1.0]
     assert seen["url"] == "http://ollama.test/api/embed"
-    assert seen["json"] == {"model": "nomic-embed-text", "input": ["수출 허가"]}
+    assert seen["json"] == {"model": settings.ollama_embedding_model, "input": ["수출 허가"]}
 
 
 def test_document_action_stores_the_embedding(tmp_path: Path):

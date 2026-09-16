@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from search_engine.indexing.mapping import INDEX_BODY
+from search_engine.indexing.mapping import index_body
 from search_engine.indexing.synonyms import load_synonyms
 
 
@@ -24,13 +24,13 @@ def test_the_shipped_dictionary_loads():
 
 def test_synonyms_expand_before_the_part_of_speech_filter():
     """That filter drops tokens, and a synonym graph cannot span the gap."""
-    analyzer = INDEX_BODY["settings"]["analysis"]["analyzer"]["korean_nori_search"]
+    analyzer = index_body(8)["settings"]["analysis"]["analyzer"]["korean_nori_search"]
     assert analyzer["filter"].index("domain_synonyms") < \
         analyzer["filter"].index("nori_part_of_speech")
 
 
 def test_only_the_body_expands_synonyms():
     """Titles stay literal so that naming a document still matches it exactly."""
-    properties = INDEX_BODY["mappings"]["properties"]
+    properties = index_body(8)["mappings"]["properties"]
     assert properties["body"]["search_analyzer"] == "korean_nori_search"
     assert "search_analyzer" not in properties["title"]

@@ -9,7 +9,8 @@ from opensearchpy import OpenSearch
 from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
-from search_engine.search.results import SearchHit, SearchResults
+from search_engine.search.rewrite import rewrite_query
+from search_engine.search.results import Passage, SearchHit, SearchResults
 
 log = logging.getLogger(__name__)
 
@@ -133,10 +134,15 @@ def _warn_on_partial_results(response: dict, retriever: str) -> None:
                     failure.get("reason", {}).get("reason"))
 
 
-def _rrf(hits_by_retriever: Iterable[list[dict]], rrf_k: int) -> list[dict]:
-    """Fuse rank lists without comparing BM25 scores to cosine similarities."""
+def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[dict]:
+    """Fuse weighted rank lists without comparing BM25 scores to cosine similarities.
+
+    The weight is what keeps an unreliable list from outvoting a reliable one: a
+    rewritten query contributes at a fraction of the original's, so a rewrite that
+    went wrong can add a document but cannot push the original's best answer down.
+    """
     fused: dict[str, tuple[float, dict]] = {}
-    for hits in hits_by_retriever:
+    for hits, weight in ranked_lists:
         seen_in_list: set[str] = set()
         for rank, hit in enumerate(hits, 1):
             source = hit["_source"]
@@ -145,17 +151,83 @@ def _rrf(hits_by_retriever: Iterable[list[dict]], rrf_k: int) -> list[dict]:
                 continue
             seen_in_list.add(parent_id)
             score, exemplar = fused.get(parent_id, (0.0, hit))
-            fused[parent_id] = (score + 1 / (rrf_k + rank), exemplar)
+            fused[parent_id] = (score + weight / (rrf_k + rank), exemplar)
     return [
         {**hit, "_score": score}
         for score, hit in sorted(fused.values(), key=lambda pair: (-pair[0], pair[1]["_id"]))
     ]
 
 
+def _candidates_by_parent(
+    ranked_lists: Iterable[tuple[list[dict], float]],
+) -> dict[str, list[dict]]:
+    """Group every candidate chunk under its parent, best rank first.
+
+    A retriever's own ranking orders the chunks within a parent; a hybrid search
+    then appends whatever only the other retriever found. Which parents come back
+    is already settled before this runs, so the ordering here only decides which
+    chunks of a parent are shown, never which documents.
+    """
+    by_parent: dict[str, list[dict]] = {}
+    seen: set[str] = set()
+    for hits, _weight in ranked_lists:
+        for hit in hits:
+            if hit["_id"] in seen:
+                continue
+            seen.add(hit["_id"])
+            parent = hit["_source"].get("parent_id") or hit["_id"]
+            by_parent.setdefault(parent, []).append(hit)
+    return by_parent
+
+
+def _with_passages(
+    hits: list[SearchHit], ranked_lists: Iterable[tuple[list[dict], float]],
+    chunks_per_document: int,
+) -> list[SearchHit]:
+    """Carry the document's other matching chunks alongside the one that ranked it.
+
+    One chunk per document is the right unit for ranking documents but the wrong
+    unit for answering: on the docs v2 set the labelled evidence sat in a chunk
+    the deduplication dropped for 23 of 40 questions, even though its document
+    was already first. The extra chunks come out of the candidate pool the search
+    already fetched, so this costs no further round trip.
+    """
+    if chunks_per_document < 2:
+        return hits
+    by_parent = _candidates_by_parent(ranked_lists)
+    for hit in hits:
+        others = [c for c in by_parent.get(hit.parent_id, []) if c["_id"] != hit.id]
+        hit.passages = [
+            Passage(id=c["_id"], body=c["_source"].get("body", ""), score=c.get("_score"))
+            for c in others[:chunks_per_document - 1]
+        ]
+    return hits
+
+
+def _rewritten_queries(query: str, strict: bool) -> list[str]:
+    """The rewrite to search alongside the question, or nothing.
+
+    A rewrite is an enrichment, not a dependency: if the model is down the
+    original question still searches fine, so an outage narrows the result set
+    rather than failing the request. `strict` evaluation runs refuse that
+    silence, because a comparison that quietly dropped the rewrite would be
+    measuring the wrong thing.
+    """
+    try:
+        rewritten = rewrite_query(query)
+    except httpx.HTTPError:
+        if strict:
+            raise
+        log.warning("query rewrite unavailable; searching the original query only")
+        return []
+    return [rewritten] if rewritten else []
+
+
 def retrieve(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int,
     embedder: OllamaEmbedder | None = None,
     *, mode: str | None = None, strict: bool = False,
+    chunks_per_document: int | None = None, query_rewrite: bool | None = None,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -168,13 +240,13 @@ def retrieve(
         raise ValueError(f"unknown search mode: {mode}")
     if k < 1:
         raise ValueError("k must be positive")
-    ranked_lists = []
+    ranked_lists: list[tuple[list[dict], float]] = []
 
-    def add_response(response: dict, name: str) -> None:
+    def add_response(response: dict, name: str, weight: float = 1.0) -> None:
         _warn_on_partial_results(response, name)
         if strict and (response.get("_shards", {}).get("failed", 0) or response.get("timed_out")):
             raise RuntimeError(f"incomplete {name} search: {response.get('_shards')}")
-        ranked_lists.append(response["hits"]["hits"])
+        ranked_lists.append((response["hits"]["hits"], weight))
 
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
@@ -184,6 +256,14 @@ def retrieve(
             size=lexical_candidates, ignore_unavailable=not strict,
         )
         add_response(lexical, "lexical")
+        if query_rewrite is None:
+            query_rewrite = settings.search_query_rewrite
+        if query_rewrite:
+            for rewritten in _rewritten_queries(query, strict):
+                add_response(client.search(
+                    index=alias, body={"query": build_query(rewritten, as_of)},
+                    size=lexical_candidates, ignore_unavailable=not strict,
+                ), "rewrite", settings.search_query_rewrite_weight)
     try:
         if mode in ("vector", "hybrid"):
             vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
@@ -200,13 +280,13 @@ def retrieve(
         # Lexical search remains available during an embedding service outage.
         pass
 
-    if mode == "hybrid":
+    if len(ranked_lists) > 1:
         ranked = _rrf(ranked_lists, settings.search_hybrid_rrf_k)
     else:
         # Preserve the retriever's original scores, keeping its best chunk per parent.
         seen = set()
         ranked = []
-        for hit in ranked_lists[0]:
+        for hit in ranked_lists[0][0]:
             parent = hit["_source"].get("parent_id") or hit["_id"]
             if parent not in seen:
                 seen.add(parent)
@@ -221,7 +301,11 @@ def retrieve(
         }))
         if len(out) == k:
             break
-    return _with_current_editions(client, alias, out, k)
+    if chunks_per_document is None:
+        chunks_per_document = settings.search_chunks_per_document
+    return _with_passages(
+        _with_current_editions(client, alias, out, k), ranked_lists, chunks_per_document,
+    )
 
 
 def _current_editions(

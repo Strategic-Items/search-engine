@@ -1,5 +1,5 @@
 from search_engine.rag import guardrail
-from search_engine.search.results import SearchHit
+from search_engine.search.results import Passage, SearchHit
 
 
 def test_empty_context_skips_model_prompt():
@@ -18,3 +18,15 @@ def test_context_preserves_search_metadata_instead_of_generic_label():
     assert "검색 자료" not in prompt
     assert "시행일 2025-01-01" in prompt
     assert "대체됨: form-2" in prompt
+
+
+def test_passages_of_one_document_are_kept_apart():
+    """Two chunks of a document are not adjacent text, so they are not run together."""
+    hit = SearchHit(
+        id="c1", parent_id="doc-1", title="공고", body="첫 부분", source_type="공고",
+        passages=[Passage(id="c2", body="뒷 부분")],
+    )
+    context = guardrail.format_documents([hit])
+    assert context.count("[공고 · 공고 · 시행일 확인 필요]") == 1
+    assert "첫 부분" in context and "뒷 부분" in context
+    assert guardrail.PASSAGE_SEPARATOR in context

@@ -29,13 +29,20 @@ EMPTY_CONTEXT_ANSWER = (
 )
 
 
+# Passages of one document are separated rather than run together: they are not
+# adjacent in the source, and joining them silently would invite an answer that
+# reads across a gap as if it were continuous text.
+PASSAGE_SEPARATOR = "\n[같은 문서의 다른 부분]\n"
+
+
 def format_documents(documents: list[SearchHit]) -> str:
     parts = []
     for doc in documents:
         effective = doc.effective_from or "확인 필요"
         source = f" · 출처 {doc.source_url}" if doc.source_url else ""
         superseded = f" · 대체됨: {doc.superseded_by}" if doc.superseded_by else ""
-        body = doc.body or doc.title
+        bodies = [body for body in doc.bodies if body] or [doc.title]
+        body = PASSAGE_SEPARATOR.join(bodies)
         parts.append(
             f"[{doc.source_type} · {doc.title} · 시행일 {effective}{source}{superseded}]\n{body}"
         )

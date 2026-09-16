@@ -2,6 +2,9 @@ from datetime import date
 import logging
 from unittest.mock import Mock
 
+import httpx
+import pytest
+
 from search_engine.search import (
     GUIDE_TYPES,
     SOURCE_TYPE_WEIGHT,
@@ -137,3 +140,107 @@ def test_an_index_dropping_out_of_a_search_is_reported(monkeypatch, caplog):
 
     assert "search-documents-v1" in caplog.text
     assert "not knn_vector type" in caplog.text
+
+
+def test_a_document_carries_its_other_matching_chunks():
+    """The chunk that ranks a document is rarely the chunk that answers the question."""
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 8.0, "_source": {"parent_id": "doc-1", "body": "one"}},
+        {"_id": "c2", "_score": 7.0, "_source": {"parent_id": "doc-1", "body": "two"}},
+        {"_id": "c3", "_score": 6.0, "_source": {"parent_id": "doc-1", "body": "three"}},
+        {"_id": "c9", "_score": 5.0, "_source": {"parent_id": "doc-2", "body": "other"}},
+    ]}}
+    hits = retrieve(client, "search-documents", "수출허가", date.today(), 2,
+                    chunks_per_document=3)
+    assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
+    assert hits[0].chunk_ids == ["c1", "c2", "c3"]
+    assert hits[0].bodies == ["one", "two", "three"]
+    assert hits[1].chunk_ids == ["c9"]
+
+
+def test_one_chunk_per_document_keeps_the_single_chunk_shape():
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 8.0, "_source": {"parent_id": "doc-1", "body": "one"}},
+        {"_id": "c2", "_score": 7.0, "_source": {"parent_id": "doc-1", "body": "two"}},
+    ]}}
+    hits = retrieve(client, "search-documents", "수출허가", date.today(), 2,
+                    chunks_per_document=1)
+    assert [hit.chunk_ids for hit in hits] == [["c1"]]
+    assert hits[0].passages == []
+
+
+def test_extra_chunks_never_displace_another_document():
+    """Passages ride along with their document; they do not consume a result slot."""
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 9.0, "_source": {"parent_id": "doc-1", "body": "a"}},
+        {"_id": "c2", "_score": 8.0, "_source": {"parent_id": "doc-1", "body": "b"}},
+        {"_id": "c3", "_score": 7.0, "_source": {"parent_id": "doc-1", "body": "c"}},
+        {"_id": "c4", "_score": 6.0, "_source": {"parent_id": "doc-2", "body": "d"}},
+        {"_id": "c5", "_score": 5.0, "_source": {"parent_id": "doc-3", "body": "e"}},
+    ]}}
+    hits = retrieve(client, "search-documents", "수출허가", date.today(), 3,
+                    chunks_per_document=4)
+    assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2", "doc-3"]
+
+
+def lexical_hits(*pairs: tuple[str, str]) -> dict:
+    return {"hits": {"hits": [
+        {"_id": cid, "_score": 9.0 - i, "_source": {"parent_id": pid, "body": cid}}
+        for i, (cid, pid) in enumerate(pairs)
+    ]}}
+
+
+def test_a_rewrite_is_searched_alongside_the_question_not_instead_of_it(monkeypatch):
+    monkeypatch.setattr("search_engine.search.query.rewrite_query",
+                        lambda query: "수출자 서약서 폐지")
+    client = Mock()
+    client.search.side_effect = [
+        lexical_hits(("c1", "doc-1")),
+        lexical_hits(("c2", "doc-2")),
+    ]
+    hits = retrieve(client, "search-documents", "업체의 약속 문서", date.today(), 5,
+                    mode="bm25", query_rewrite=True, chunks_per_document=1)
+    searched = [call.kwargs["body"]["query"] for call in client.search.call_args_list]
+    assert "업체의 약속 문서" in str(searched[0])
+    assert "수출자 서약서 폐지" in str(searched[1])
+    assert {hit.parent_id for hit in hits} == {"doc-1", "doc-2"}
+
+
+def test_the_original_query_outranks_the_rewrite_at_the_same_rank(monkeypatch):
+    """A rewrite that went wrong may add a document; it may not displace the answer."""
+    monkeypatch.setattr("search_engine.search.query.rewrite_query", lambda query: "엉뚱한 말")
+    client = Mock()
+    client.search.side_effect = [
+        lexical_hits(("c1", "doc-original")),
+        lexical_hits(("c2", "doc-rewrite")),
+    ]
+    hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                    mode="bm25", query_rewrite=True, chunks_per_document=1)
+    assert [hit.parent_id for hit in hits] == ["doc-original", "doc-rewrite"]
+
+
+def test_a_rewrite_outage_narrows_the_search_instead_of_failing_it(monkeypatch, caplog):
+    def refuse(query):
+        raise httpx.ConnectError("no ollama")
+    monkeypatch.setattr("search_engine.search.query.rewrite_query", refuse)
+    client = Mock()
+    client.search.return_value = lexical_hits(("c1", "doc-1"))
+    with caplog.at_level(logging.WARNING):
+        hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                        mode="bm25", query_rewrite=True, chunks_per_document=1)
+    assert [hit.parent_id for hit in hits] == ["doc-1"]
+    assert "query rewrite unavailable" in caplog.text
+
+
+def test_an_evaluation_run_refuses_to_measure_without_the_rewrite(monkeypatch):
+    def refuse(query):
+        raise httpx.ConnectError("no ollama")
+    monkeypatch.setattr("search_engine.search.query.rewrite_query", refuse)
+    client = Mock()
+    client.search.return_value = lexical_hits(("c1", "doc-1"))
+    with pytest.raises(httpx.HTTPError):
+        retrieve(client, "search-documents", "질문", date.today(), 5,
+                 mode="bm25", query_rewrite=True, strict=True)

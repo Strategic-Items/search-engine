@@ -91,6 +91,24 @@ def reciprocal_rank_at(ranked: list[str], gold: list[str], k: int) -> float:
     return next((1 / rank for rank, doc in enumerate(ranked[:k], 1) if doc in set(gold)), 0.0)
 
 
+def precision_at(ranked: list[str], gold: list[str], k: int) -> float:
+    """Distinct relevant parents per k slots; unfilled slots count as misses."""
+    if k < 1 or not gold:
+        raise ValueError("positive k and nonempty gold are required")
+    return len(set(ranked[:k]) & set(gold)) / k
+
+
+def offered_within(ranked: list, k: int) -> set[str]:
+    """The ids the first k returned documents offer.
+
+    `returned` lists one parent id per document, while `returned_chunks` nests
+    that document's chunks. Cutting the nested list keeps @k a cutoff on
+    documents, so carrying more chunks per document never shrinks the window.
+    """
+    return {item for entry in ranked[:k]
+            for item in ([entry] if isinstance(entry, str) else entry)}
+
+
 def quality_metrics(rows: list[dict], k: int) -> dict:
     if not rows:
         raise ValueError("evaluation query set is empty")
@@ -100,8 +118,10 @@ def quality_metrics(rows: list[dict], k: int) -> dict:
     metrics = {
         "queries": n,
         "hit_at_1": sum(hit_at(r['returned'], r['gold'], 1) for r in rows) / n,
+        "precision_at_1": sum(precision_at(r['returned'], r['gold'], 1) for r in rows) / n,
         f"hit_at_{k}": sum(hit_at(r['returned'], r['gold'], k) for r in rows) / n,
         f"recall_at_{k}": sum(recall_at(r['returned'], r['gold'], k) for r in rows) / n,
+        f"precision_at_{k}": sum(precision_at(r['returned'], r['gold'], k) for r in rows) / n,
         f"micro_recall_at_{k}": found / relevant,
         f"mrr_at_{k}": sum(reciprocal_rank_at(r['returned'], r['gold'], k) for r in rows) / n,
     }
@@ -112,7 +132,7 @@ def quality_metrics(rows: list[dict], k: int) -> dict:
         eligible = [r for r in rows if r.get(field) and ranked_field in r]
         if not eligible:
             continue
-        recovered = [sum(bool(set(group) & set(r[ranked_field][:k])) for group in r[field])
+        recovered = [sum(bool(set(group) & offered_within(r[ranked_field], k)) for group in r[field])
                      for r in eligible]
         metrics.update({
             f"{prefix}_queries": len(eligible),
@@ -162,7 +182,10 @@ def evaluate(queries: list[dict], base_url: str, prepared_dir: Path, k: int = 5)
             "gold_missing_ids": sorted(set(gold) - known) if coverage_known else None,
             "review_status": row.get("review_status"),
             "returned": ranked[:k],
-            "returned_chunks": [hit["id"] for hit in result.get("hits", [])[:k] if "id" in hit],
+            "returned_chunks": [
+                [hit["id"], *(passage["id"] for passage in hit.get("passages", []))]
+                for hit in result.get("hits", [])[:k] if "id" in hit
+            ],
             **{key: row[key] for key in ("gold_groups", "evidence_groups") if key in row},
         })
 
@@ -220,7 +243,9 @@ def format_report(report: dict) -> str:
     lines.append("정답 검토 상태: " + ", ".join(
         f"{status}={count}" for status, count in sorted(report["reviewed"].items(), key=lambda pair: str(pair[0]))))
     metrics = report["metrics"]
-    lines.append(f"Recall@{k} (macro): {metrics[f'recall_at_{k}']:.4f}; "
+    lines.append(f"Precision@1 (macro): {metrics['precision_at_1']:.4f}; "
+                 f"Precision@{k} (macro): {metrics[f'precision_at_{k}']:.4f}; "
+                 f"Recall@{k} (macro): {metrics[f'recall_at_{k}']:.4f}; "
                  f"MRR@{k}: {metrics[f'mrr_at_{k}']:.4f}")
     if not report["coverage_known"]:
         lines.append("주의: 코퍼스 파일이 없어 정답 색인 여부는 확인하지 못했습니다.")

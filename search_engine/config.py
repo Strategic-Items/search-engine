@@ -31,12 +31,32 @@ class Settings(BaseSettings):
     ollama_chat_model: str = "qwen2.5:3b"
     # Keep the embedding model separate from the chat model: chat models are
     # usually much larger and may not expose Ollama's embedding endpoint.
-    ollama_embedding_model: str = "nomic-embed-text"
+    # Multilingual: the corpus and the questions are Korean, and an English-first
+    # model scores them close to randomly (docs/performance_history.md, stage 6).
+    ollama_embedding_model: str = "bge-m3"
     ollama_temperature: float = 0.4
+    # Ollama silently drops the front of a prompt that exceeds the context window,
+    # which would cut the grounding rules and leave the evidence, and the window
+    # covers the answer as well as the prompt. At four chunks per document the
+    # longest docs v2 prompt measured 7,695 tokens, so this leaves room to answer.
+    ollama_num_ctx: int = Field(default=16384, ge=512)
     ollama_timeout_seconds: float = Field(default=120.0, gt=0)
-    search_embedding_dimensions: int = Field(default=768, ge=1)
+    # Must match OLLAMA_EMBEDDING_MODEL exactly; changing either needs a reindex
+    # of every dataset, since the mapping fixes the vector width per index.
+    search_embedding_dimensions: int = Field(default=1024, ge=1)
     search_vector_candidates: int = Field(default=50, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
+    # Chunks carried per returned document. Ranking still returns one document
+    # per slot; this only decides how much of that document comes with it.
+    search_chunks_per_document: int = Field(default=4, ge=1, le=20)
+    # Search the question and a model-written rewrite of it, fused. Off by
+    # default: on docs v2 it buys one to two questions out of forty and costs
+    # roughly half a second per search, and it puts the chat model in the path
+    # of a search that otherwise has no model dependency at all.
+    search_query_rewrite: bool = False
+    # How much the rewrite's ranking counts against the original's. Below 1 so a
+    # rewrite that went wrong cannot outvote the question the user actually asked.
+    search_query_rewrite_weight: float = Field(default=0.5, gt=0.0, le=1.0)
     rag_top_k: int = Field(default=5, ge=1)
 
     @property

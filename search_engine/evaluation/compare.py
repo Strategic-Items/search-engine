@@ -88,7 +88,8 @@ def verify_gold(queries: list[dict], corpus: Path, known: set[str]) -> None:
 
 
 def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1, 5, 10),
-            repeats: int = 3, warmup: int = 1, as_of: date | None = None) -> dict:
+            repeats: int = 3, warmup: int = 1, as_of: date | None = None,
+            query_rewrite: bool = False) -> dict:
     if not queries or repeats < 1 or warmup < 0 or not ks or min(ks) < 1 or max(ks) > 20:
         raise ValueError("nonempty queries, positive repeats, nonnegative warmup, 1 <= k <= 20 required")
     as_of = as_of or date.today()
@@ -96,7 +97,8 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
     results = {mode: [] for mode in MODES}
     for _ in range(warmup):
         for mode in MODES:
-            retrieve(client, index, queries[0]["query"], as_of, depth, mode=mode, strict=True)
+            retrieve(client, index, queries[0]["query"], as_of, depth, mode=mode, strict=True,
+                     query_rewrite=query_rewrite)
     for position, row in enumerate(queries):
         samples = {mode: [] for mode in MODES}
         rankings = {mode: [] for mode in MODES}
@@ -106,10 +108,11 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
             offset = (position + repeat) % len(MODES)
             for mode in MODES[offset:] + MODES[:offset]:
                 start = perf_counter()
-                hits = retrieve(client, index, row["query"], as_of, depth, mode=mode, strict=True)
+                hits = retrieve(client, index, row["query"], as_of, depth, mode=mode,
+                                strict=True, query_rewrite=query_rewrite)
                 samples[mode].append((perf_counter() - start) * 1000)
                 rankings[mode].append([hit.parent_id for hit in hits])
-                chunk_rankings[mode].append([hit.id for hit in hits])
+                chunk_rankings[mode].append([hit.chunk_ids for hit in hits])
         for mode in MODES:
             results[mode].append({
                 **row, "returned": rankings[mode][0], "latency_ms": samples[mode],
@@ -138,18 +141,19 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
     return {"as_of": as_of.isoformat(), "ks": list(ks), "retrieval_depth": depth,
             "lexical_candidates": min(depth * 5, 100),
             "vector_candidates": min(max(depth * 5, get_settings().search_vector_candidates), 1000),
-            "repeats": repeats, "warmup_queries_per_mode": warmup, "modes": modes}
+            "repeats": repeats, "warmup_queries_per_mode": warmup,
+            "query_rewrite": query_rewrite, "modes": modes}
 
 
 def format_comparison(report: dict) -> str:
-    lines = ["| 방식 | Hit@1 | Hit@5 | Recall@5 | Recall@10 | MRR@5 | p50 ms | p95 ms |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = ["| 방식 | Precision@1 | Hit@5 | Precision@5 | Recall@5 | Recall@10 | MRR@5 | p50 ms | p95 ms |",
+             "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for mode, result in report["modes"].items():
         m5 = result["metrics"]["5"]
         m10 = result["metrics"]["10"]
         lat = result["latency"]
-        lines.append(f"| {mode} | {m5['hit_at_1']:.1%} | {m5['hit_at_5']:.1%} | "
-                     f"{m5['recall_at_5']:.1%} | {m10['recall_at_10']:.1%} | "
+        lines.append(f"| {mode} | {m5['precision_at_1']:.1%} | {m5['hit_at_5']:.1%} | "
+                     f"{m5['precision_at_5']:.1%} | {m5['recall_at_5']:.1%} | {m10['recall_at_10']:.1%} | "
                      f"{m5['mrr_at_5']:.4f} | {lat['p50_ms']:.1f} | {lat['p95_ms']:.1f} |")
     if any("group_queries" in result["metrics"]["5"] for result in report["modes"].values()):
         lines.extend(["", "| 방식 | 논리 문서 Recall@5 | 논리 문서 Recall@10 | 근거 Recall@5 | 모든 근거@5 |",
@@ -173,6 +177,9 @@ def main() -> None:
     parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--as-of", type=date.fromisoformat, default=date.today())
     parser.add_argument("--out", type=Path)
+    parser.add_argument("--rewrite", action="store_true",
+                        help="Also search a model-written rewrite of each query and fuse the "
+                             "rankings; overrides SEARCH_QUERY_REWRITE for this run")
     parser.add_argument("--validate-only", action="store_true",
                         help="Validate query labels and source quotes only; no OpenSearch/Ollama calls")
     args = parser.parse_args()
@@ -193,13 +200,14 @@ def main() -> None:
     known = set(corpus.pop("parent_ids"))
     verify_gold(queries, args.corpus, known)
     report = compare(queries, client, concrete, repeats=args.repeats,
-                     warmup=args.warmup, as_of=args.as_of)
+                     warmup=args.warmup, as_of=args.as_of, query_rewrite=args.rewrite)
     report.update({
         "created_at": datetime.now(timezone.utc).isoformat(), "corpus": corpus,
         "queries_sha256": hashlib.sha256(args.queries.read_bytes()).hexdigest(),
         "settings": {key: getattr(settings, key) for key in (
             "ollama_embedding_model", "search_embedding_dimensions", "search_vector_candidates",
-            "search_hybrid_rrf_k")},
+            "search_hybrid_rrf_k", "search_chunks_per_document",
+            "search_query_rewrite_weight", "ollama_chat_model")},
         "opensearch_version": client.info()["version"]["number"],
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),
@@ -207,7 +215,8 @@ def main() -> None:
         "methodology": "parent-level macro recall over source-reviewed gold; single-process "
             "retrieval latency including uncached Ollama query embedding, excluding HTTP/LLM; "
             "same candidate depth for all cutoffs; strict failures (no lexical fallback); "
-            "optional equivalent-parent group and final-returned-chunk evidence requirement recall; "
+            "optional equivalent-parent group and final-returned-chunk evidence requirement recall, "
+            "where @k cuts on documents and each document carries its returned chunks; "
             "unanswerable empty-gold queries excluded",
     })
     args.out.parent.mkdir(parents=True, exist_ok=True)

@@ -10,7 +10,8 @@ from search_engine.search.query import (
     retrieve,
     search_all,
 )
-from search_engine.search.results import HskHit, HskResults, SearchHit, SearchResults
+from search_engine.search.rewrite import rewrite_query
+from search_engine.search.results import HskHit, HskResults, Passage, SearchHit, SearchResults
 
 __all__ = [
     "FORM_TYPES",
@@ -18,12 +19,14 @@ __all__ = [
     "SOURCE_TYPE_WEIGHT",
     "HskHit",
     "HskResults",
+    "Passage",
     "SearchHit",
     "SearchResults",
     "build_query",
     "build_vector_query",
     "extract_hsk_code",
     "retrieve",
+    "rewrite_query",
     "retrieve_hsk",
     "search_all",
 ]

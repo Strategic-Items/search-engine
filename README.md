@@ -14,8 +14,9 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 
 - `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색과 Ollama 임베딩 HNSW
   벡터 검색을 RRF로 결합한 하이브리드 검색,
-  시행일 필터, 청크의 부모 문서 중복 제거. 검색어에 10자리 HSK 코드가 있으면 HSK
-  연계표도 함께 정확 조회한다.
+  시행일 필터, 청크의 부모 문서 중복 제거. 결과 한 건은 문서 하나이며, 그 문서에서
+  함께 검색된 다른 청크를 `passages`에 실어 보낸다. 검색어에 10자리 HSK 코드가
+  있으면 HSK 연계표도 함께 정확 조회한다.
 - `POST /v1/rag/stream`: 검색 근거가 있는 답변만 Ollama로 스트리밍하며, `fetch`로
   SSE 응답을 읽는다.
 - `search-index`: JSONL 문서를 새 인덱스에 색인하고 문서 수를 확인한 뒤 읽기 별칭을
@@ -30,8 +31,12 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 Python 3.11 이상, Docker와 Ollama가 필요하다. API와 Ollama는 로컬에서 실행하고
 OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실행하고
 `ollama pull qwen2.5:3b`(또는 `OLLAMA_CHAT_MODEL`에 지정한 모델)과
-`ollama pull nomic-embed-text`(또는 `OLLAMA_EMBEDDING_MODEL`)를 받아 둔다. 임베딩 모델의
-차원은 `SEARCH_EMBEDDING_DIMENSIONS`와 반드시 같아야 한다(기본 `nomic-embed-text`: 768).
+`ollama pull bge-m3`(또는 `OLLAMA_EMBEDDING_MODEL`)를 받아 둔다. 임베딩 모델의
+차원은 `SEARCH_EMBEDDING_DIMENSIONS`와 반드시 같아야 한다(기본 `bge-m3`: 1024).
+**모델이나 차원을 바꾸면 모든 데이터셋을 전부 재색인해야 한다.** 매핑이 인덱스마다
+벡터 폭을 고정하므로, 차원이 다른 기존 인덱스는 k-NN 결과에 전혀 기여하지 못한다.
+`bge-m3`는 다국어 모델이다. 영어 중심 모델은 이 한국어 코퍼스에서 문서 Recall@5가
+100%에서 22%로 떨어진다([검색 성능 이력](docs/performance_history.md) 6단계).
 
 ```bash
 cd /Users/jeongbin/git/searchEngine
@@ -86,6 +91,40 @@ HSK 조회를 끈다. 기존 인덱스를 삭제하거나 별칭을 다른 데�
 
 ### 검색 품질 비교와 Recall
 
+파서가 새 `data/chunks/docs.jsonl`을 만들었다면, 먼저 아래 명령으로 전용 별칭을
+새 인덱스로 교체한다. 새 인덱스가 완성된 뒤 별칭을 바꾸므로, 실패하면 기존 검색
+인덱스는 계속 유지된다.
+
+```bash
+cd /Users/jeongbin/git/searchEngine
+
+.venv/bin/search-index \
+  /Users/jeongbin/git/unstructured-doc-parser/data/chunks/docs.jsonl \
+  --dataset docs \
+  --manifest /Users/jeongbin/git/unstructured-doc-parser/data/chunks/manifest.json
+```
+
+그 다음 최신 파서 산출물로 세 검색 방식(BM25·벡터·하이브리드)을 비교한다. 이 명령은
+읽기 전용이며, 라이브 색인과 JSONL의 청크 ID·본문·벡터가 모두 일치하는지도 먼저
+검증한다. `--out` 파일에는 질문별 순위, Recall, 근거 청크 지표, 지연시간 원자료가 남는다.
+
+```bash
+cd /Users/jeongbin/git/searchEngine
+
+.venv/bin/search-compare data/queries_docs_v2.jsonl \
+  --corpus /Users/jeongbin/git/unstructured-doc-parser/data/chunks/docs.jsonl \
+  --alias search-docs-only \
+  --repeats 3 --as-of 2026-09-16 \
+  --out data/generated/docs-v2/comparison-parser-latest.json
+```
+
+결과는 표준 출력과 `comparison-parser-latest.json`에서 확인한다. `--repeats 3`은
+각 질문과 방식을 세 번 실행해 순위 안정성과 p50/p95 시간을 측정한다. 실행 날짜가
+달라지면 `--as-of`도 해당 기준일로 바꾼다. 이 비교는 `.env`의 `SEARCH_MODE`와 관계없이
+세 방식을 모두 실행하므로, 기본 모드를 바꾸기 전 판단 자료로 쓸 수 있다.
+`--rewrite`를 붙이면 질의 재작성을 켠 상태로 측정한다(`SEARCH_QUERY_REWRITE`보다 우선).
+평가 실행에서는 재작성 모델을 부르지 못하면 조용히 넘어가지 않고 실패한다.
+
 파서 전용 정답 세트는 `data/queries_docs_v1.jsonl`에 있다. 50개 질문의 정답을 원문
 근거로 작성했으며 `gold`는 원본 파일의 `parent_id`다. 각 정답에는 근거 청크·본문
 인용·원본 경로가 붙어 있다. **AI가 근거를 검토한 개발 평가셋이지, 사람이 독립 검수한
@@ -112,6 +151,9 @@ HSK 조회를 끈다. 기존 인덱스를 삭제하거나 별칭을 다른 데�
 평가를 중단한다. 하이브리드 운영 검색의 임베딩 장애 시 BM25 폴백은 유지한다.
 
 - Hit@k: 정답 문서를 하나라도 찾은 질문의 비율.
+- Precision@k: 질문마다 `찾은 정답 부모 수 / k`를 계산한 평균(macro).
+  중복 정답은 한 번만 세며, 반환이 k개보다 적어도 분모는 k다.
+  Precision@1은 1위 문서가 정답인 질문 비율이며 Hit@1과 같다.
 - Recall@k: 질문마다 `찾은 정답 부모 수 / 전체 정답 부모 수`를 계산한 평균(macro).
   모든 질문의 정답 수를 합산한 micro Recall도 JSON에 기록한다.
 - MRR@k: 첫 정답의 순위 역수 평균. k 안에 정답이 없으면 0.
@@ -122,21 +164,42 @@ HSK 조회를 끈다. 기존 인덱스를 삭제하거나 별칭을 다른 데�
 다를 수 있다. API 평가의 `--prepared`는 입력 파일 기준 색인 범위 확인이고, 비교 도구는
 실제 클러스터의 청크 ID·부모 ID·content hash·벡터 매핑까지 검증한다.
 
-실측 결과와 재현 절차: [docs 검색 평가](docs/docs_evaluation_v1.md).
+임베딩 모델 선택이 벡터 검색 품질을 좌우한다. 같은 코퍼스·질문에서 `nomic-embed-text`는
+문서 Recall@5 22.1%, `bge-m3`는 100.0%였다. 벡터가 약해 보이면 방식보다 모델을 먼저 의심한다.
+
+표현이 바뀐 질문("업체의 약속 문서" ↔ "수출자 서약서")은 `SEARCH_QUERY_REWRITE=true`로
+켜면 `OLLAMA_CHAT_MODEL`이 다시 쓴 검색어를 **원본과 함께** 검색해 순위를 가중 RRF로
+합친다. 원본을 대체하지 않으며, 재작성 가중치는 `SEARCH_QUERY_REWRITE_WEIGHT`(기본 0.5)다.
+기본값이 꺼짐인 이유는, `bge-m3`로 바꾼 뒤로는 **최선 구성에서 얻는 것이 없기 때문이다.**
+벡터 단독은 어휘 경로를 쓰지 않아 영향이 없고, 하이브리드는 Recall@5가 92.5%로 같은 채
+p50만 95.3ms → 687.4ms가 된다. 재작성이 보정하던 표현 변경 질문을 임베딩 모델이 이미
+해결했다. BM25 단독에서는 여전히 Hit@1을 72.5% → 77.5%로 올리므로 어휘 검색만 쓰는
+경우에 한해 켤 만하다. 모델을 부르지 못하면 원본 질의만으로 검색해 결과를 좁힐 뿐
+요청은 실패하지 않는다.
+
+문서를 찾는 것과 답이 적힌 청크를 고르는 것은 별개다. 후자는 문서당 반환 청크 수로
+조정하며, 기본값 4에서 v2 근거 Recall@5가 30.0% → 70.0%로 올랐고 문서 지표는 그대로다.
+근거를 더 담을수록 RAG 프롬프트가 길어지므로 `OLLAMA_NUM_CTX`(기본 16384)를 함께 본다.
+단계별 수치와 이 선택의 근거는 [검색 성능 이력](docs/performance_history.md)에 있다.
+
+단계별 실측과 재현 절차는 [검색 성능 이력](docs/performance_history.md)에 있다.
+[docs 검색 평가 v1](docs/docs_evaluation_v1.md)과 [v2](docs/docs_evaluation_v2.md)는
+`nomic-embed-text` 시점의 기록이며, 두 문서의 벡터·하이브리드 결론은 6단계에서 뒤집혔다.
+코퍼스·평가셋 변경에 따른 단계별 수치와 해석: [검색 성능 이력](docs/performance_history.md).
 
 ### 자연어 평가셋 v2 (검토 후 실험)
 
 v1은 키워드 기준선으로 유지했다. v2는 표현 변경 12개·상황 설명 22개·복수 근거
 6개의 질문과 별도 무응답 질문 8개다. 전체 질문·검토용 답안·원문 근거는
-[v2 검토 문서](docs/queries_docs_v2_review.md)에서 확인한다. 사람 검수 대기 초안이며
-v2 검색 실험은 아직 실행하지 않았다.
+[v2 검토 문서](docs/queries_docs_v2_review.md)에서 확인한다. 사람 검수 대기 초안이다.
 
 ```bash
 # 파일/정답/인용 검증만 수행; 검색이나 외부 서비스 호출 없음
 .venv/bin/search-compare data/queries_docs_v2.jsonl \
   --corpus data/generated/docs-v1/docs.jsonl --validate-only
 
-# 검토 후 비교; 기존 v1 결과를 덮어쓰지 않는다
+# 검토 후 비교; 기존 v1 결과를 덮어쓰지 않는다.
+# 최신 파서 산출물은 바로 위의 '검색 품질 비교와 Recall' 명령을 사용한다.
 .venv/bin/search-compare data/queries_docs_v2.jsonl \
   --corpus data/generated/docs-v1/docs.jsonl \
   --alias search-docs-only --repeats 3 --as-of 2026-09-16 \
@@ -203,13 +266,15 @@ Dashboards는 색인·데이터를 확인하는 관리 화면이며, 서비스 �
 ```
 config.py      환경변수 설정
 client.py      OpenSearch 클라이언트
+embeddings.py  Ollama 임베딩 (색인·검색 공용)
 codes.py       통제번호·법령 참조 정규화 (색인·검색 공용)
 
 api/           HTTP 표면 (uvicorn search_engine.api:app)
   routes.py      FastAPI 앱과 라우트
   schemas.py     요청 스키마
 search/        런타임 질의 경로
-  query.py       문서 질의 조립, 검색, HSK 병합(search_all)
+  query.py       문서 질의 조립, 검색, 순위 융합, HSK 병합(search_all)
+  rewrite.py     구어체 질문 → 문서 용어 검색어 재작성 (선택)
   hsk.py         HSK 코드 추출, 연계표 조회
   results.py     검색 응답 모델
 indexing/      오프라인 색인 파이프라인
@@ -242,6 +307,10 @@ JSONL 한 줄이 하나의 검색 문서다. `id`와 `title`은 필수다. `id`�
 
 검색 요청은 `query`만 담아야 한다. 서버는 현재 날짜 기준으로 유효한 문서를 검색하며,
 응답은 검색 청크의 `id`와 부모 `parent_id`, 제목·본문·출처·시행일을 반환한다.
+`passages`에는 같은 문서에서 함께 검색된 다른 청크가 순위대로 담긴다
+(`SEARCH_CHUNKS_PER_DOCUMENT` - 1개까지). 순위는 여전히 슬롯당 문서 하나이므로
+`passages`가 다른 문서를 결과에서 밀어내지 않는다. `SEARCH_CHUNKS_PER_DOCUMENT=1`이면
+`passages`는 항상 비어 있고 종전과 같은 응답이 된다.
 `query`에 10자리 HSK 코드(공백·하이픈 허용)가 있으면 `hsk` 필드에 연계표 결과도
 반환하고, 그 외에는 `hsk`가 `null`이다.
 
