@@ -1,8 +1,12 @@
 from datetime import date
 import re
+from collections.abc import Iterable
 
+import httpx
 from opensearchpy import OpenSearch
 
+from search_engine.config import get_settings
+from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.results import SearchHit, SearchResults
 
@@ -86,19 +90,73 @@ def build_query(query: str, as_of: date) -> dict:
                                "score_mode": "sum", "boost_mode": "sum"}}
 
 
+def _validity_filters(as_of: date) -> list[dict]:
+    """Filters duplicated for k-NN, whose query cannot use function_score."""
+    return [
+        {"bool": {"should": [
+            {"range": {"effective_from": {"lte": as_of.isoformat()}}},
+            {"bool": {"must_not": {"exists": {"field": "effective_from"}}}},
+        ], "minimum_should_match": 1}},
+        {"bool": {"should": [
+            {"range": {"effective_to": {"gt": as_of.isoformat()}}},
+            {"bool": {"must_not": {"exists": {"field": "effective_to"}}}},
+        ], "minimum_should_match": 1}},
+    ]
+
+
+def build_vector_query(vector: list[float], as_of: date, candidates: int) -> dict:
+    """Approximate HNSW cosine search, constrained to currently valid records."""
+    return {"knn": {"embedding": {
+        "vector": vector,
+        "k": candidates,
+        "filter": {"bool": {"filter": _validity_filters(as_of)}},
+    }}}
+
+
+def _rrf(hits_by_retriever: Iterable[list[dict]], rrf_k: int) -> list[dict]:
+    """Fuse rank lists without comparing BM25 scores to cosine similarities."""
+    fused: dict[str, tuple[float, dict]] = {}
+    for hits in hits_by_retriever:
+        seen_in_list: set[str] = set()
+        for rank, hit in enumerate(hits, 1):
+            source = hit["_source"]
+            parent_id = source.get("parent_id") or hit["_id"]
+            if parent_id in seen_in_list:
+                continue
+            seen_in_list.add(parent_id)
+            score, exemplar = fused.get(parent_id, (0.0, hit))
+            fused[parent_id] = (score + 1 / (rrf_k + rank), exemplar)
+    return [
+        {**hit, "_score": score}
+        for score, hit in sorted(fused.values(), key=lambda pair: (-pair[0], pair[1]["_id"]))
+    ]
+
+
 def retrieve(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int,
+    embedder: OllamaEmbedder | None = None,
 ) -> list[SearchHit]:
-    body = {"query": build_query(query, as_of)}
-    response = client.search(index=alias, body=body, size=min(k * 5, 100))
-    seen = set()
+    settings = get_settings()
+    lexical_candidates = min(k * 5, 100)
+    vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
+    lexical = client.search(index=alias, body={"query": build_query(query, as_of)}, size=lexical_candidates)
+    ranked_lists = [lexical["hits"]["hits"]]
+    try:
+        vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
+        semantic = client.search(
+            index=alias,
+            body={"query": build_vector_query(vector, as_of, vector_candidates)},
+            size=vector_candidates,
+        )
+        ranked_lists.append(semantic["hits"]["hits"])
+    except httpx.HTTPError:
+        # Lexical search remains available during an embedding service outage.
+        pass
+
     out = []
-    for hit in response["hits"]["hits"]:
+    for hit in _rrf(ranked_lists, settings.search_hybrid_rrf_k):
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
-        if parent_id in seen:
-            continue
-        seen.add(parent_id)
         out.append(SearchHit.model_validate({
             **{key: value for key, value in source.items() if value is not None},
             "id": hit["_id"], "parent_id": parent_id, "score": hit.get("_score"),

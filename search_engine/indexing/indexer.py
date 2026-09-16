@@ -12,14 +12,15 @@ from opensearchpy.helpers import streaming_bulk
 
 from search_engine.client import create_client
 from search_engine.config import get_settings
+from search_engine.embeddings import OllamaEmbedder, embedding_text
 from search_engine.indexing.documents import SearchDocument
-from search_engine.indexing.mapping import HSK_INDEX_BODY, INDEX_BODY
+from search_engine.indexing.mapping import HSK_INDEX_BODY, index_body
 from search_engine.indexing.synonyms import load_synonyms
 
 log = logging.getLogger(__name__)
 
 
-def document_actions(path: Path, index_name: str):
+def document_actions(path: Path, index_name: str, embedder: OllamaEmbedder | None = None):
     """Validate every line, refusing a file that repeats a document ID."""
     seen = set()
     with path.open(encoding="utf-8") as file:
@@ -33,8 +34,10 @@ def document_actions(path: Path, index_name: str):
             if doc.id in seen:
                 raise ValueError(f"duplicate document ID at line {line_no}: {doc.id}")
             seen.add(doc.id)
-            yield {"_op_type": "index", "_index": index_name, "_id": doc.id,
-                   "_source": doc.index_source()}
+            source = doc.index_source()
+            if embedder is not None:
+                source["embedding"] = embedder.embed([embedding_text(doc.title, doc.body)])[0]
+            yield {"_op_type": "index", "_index": index_name, "_id": doc.id, "_source": source}
 
 
 def current_alias_indexes(client, alias: str) -> list[str]:
@@ -71,7 +74,7 @@ def rebuild(
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     alias = settings.search_index_alias if dataset == "core" else settings.search_hsk_alias
     prefix = settings.search_index_prefix if dataset == "core" else settings.search_hsk_prefix
-    mapping = deepcopy(INDEX_BODY if dataset == "core" else HSK_INDEX_BODY)
+    mapping = deepcopy(index_body(settings.search_embedding_dimensions) if dataset == "core" else HSK_INDEX_BODY)
     mapping["settings"]["number_of_replicas"] = settings.search_number_of_replicas
     if dataset == "core":
         mapping["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"] = load_synonyms()
@@ -80,8 +83,9 @@ def rebuild(
     switched = False
     try:
         indexed = 0
+        embedder = OllamaEmbedder(settings) if dataset == "core" else None
         for ok, item in streaming_bulk(
-            client, document_actions(path, index_name),
+            client, document_actions(path, index_name, embedder),
             chunk_size=500, max_retries=3, raise_on_error=True,
         ):
             if not ok:

@@ -1,10 +1,13 @@
 """Index definitions. Synonyms expand at search time, so the dictionary can
 change without reindexing the documents themselves."""
 
-INDEX_BODY = {
+def index_body(embedding_dimensions: int = 768) -> dict:
+    """Core mapping, including an HNSW cosine vector index."""
+    return {
     "settings": {
         "number_of_shards": 1,
         "number_of_replicas": 0,
+        "index": {"knn": True},
         "analysis": {
             "filter": {
                 "domain_synonyms": {"type": "synonym_graph", "synonyms": []},
@@ -53,9 +56,20 @@ INDEX_BODY = {
             "effective_from": {"type": "date"},
             "effective_to": {"type": "date"},
             "content_hash": {"type": "keyword", "index": False},
+            "embedding": {
+                "type": "knn_vector",
+                "dimension": embedding_dimensions,
+                "method": {
+                    "name": "hnsw", "engine": "faiss", "space_type": "cosinesimil",
+                },
+            },
         },
     },
-}
+    }
+
+
+# Preserve a directly inspectable default mapping for callers and tests.
+INDEX_BODY = index_body()
 
 HSK_INDEX_BODY = {
     "settings": {
