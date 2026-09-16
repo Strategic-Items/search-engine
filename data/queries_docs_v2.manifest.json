@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "created_at": "2026-09-16",
+  "status": "draft_pending_user_review",
+  "queries_file": "queries_docs_v2.jsonl",
+  "queries_sha256": "b9c9a9e70029cbf4634341e2b94417e32b304142d5430efbdd764a0b1618cc0a",
+  "queries": 40,
+  "categories": {
+    "paraphrase": 12,
+    "scenario": 22,
+    "multi_evidence": 6
+  },
+  "negative_queries_file": "queries_docs_v2_unanswerable.jsonl",
+  "negative_queries_sha256": "01585dfe1f116ffd85e3c0a7abaeb62c999a8b2decdb2ccf30894f2b26cc06a8",
+  "negative_queries": 8,
+  "source_corpus_sha256": "7458213e938d3764cb86a19faa78a5a397d89e6d01bce34e383b1f6e32647a9b",
+  "source_corpus": "data/generated/docs-v1/docs.jsonl",
+  "source_chunks": 1041,
+  "total_source_parents": 36,
+  "labeled_parents": 21,
+  "evidence_requirements": 46,
+  "verified_quotes": 64,
+  "gold_unit": "parent_id",
+  "primary_document_metric": "group_recall_at_k",
+  "primary_answer_support_metric": "evidence_recall_at_k",
+  "human_review": "pending",
+  "v2_search_executed": false,
+  "baseline_preserved": "queries_docs_v1.jsonl",
+  "authoring_rules": [
+    "No full source-file titles, announcement identifiers or control numbers supplied in v2 questions.",
+    "Retain natural domain terms and enough business or historical context to make each question answerable; do not artificially remove all useful keywords.",
+    "Paraphrase asks in alternate expressions; scenario asks from an applicant/exporter/company situation; multi_evidence requires two separately labeled facts.",
+    "Use explicit years for historical recruitment and contest notices; distinguish proposals, planned dates and confirmed outcomes.",
+    "Reference answers and acceptable evidence chunks come from corpus bodies, not v2 retrieved rankings.",
+    "For each requirement enumerate every matching chunk in the labeled source parents, including overlap and equivalent-format copies.",
+    "Group equivalent decree formats into one logical relevant document; raw physical-parent recall remains available separately.",
+    "Separate unanswered fact requests from answerable ranking questions; empty-gold cases are not averaged into recall."
+  ],
+  "limitations": [
+    "AI-authored source-reviewed draft, not independently human-reviewed or a production acceptance benchmark.",
+    "V1 results were already known; V2 is a revised development benchmark, not a blind held-out test set.",
+    "Corpus-wide exhaustive relevance judgments are not established. Recall is relative to reviewed labels.",
+    "Some remaining words necessarily overlap the source to preserve the user's business context; the set does not guarantee equal lexical difficulty for each method.",
+    "Evidence matching uses labeled chunk IDs, not automated evaluation of generated answer correctness. Relevant unlabeled paraphrase chunks may require additional human judgments.",
+    "Current retrieval returns one exemplar per parent. Multiple evidence requirements in different chunks of one parent may not all be satisfiable with current output.",
+    "Negative examples are scope-relative drafts for manual abstention review; current search-compare/search-evaluate reject empty gold and do not score them.",
+    "Human edits change query fingerprints. Recompute hashes in this manifest when freezing a reviewed revision."
+  ]
+}

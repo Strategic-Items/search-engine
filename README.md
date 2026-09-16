@@ -72,6 +72,88 @@ python3 -m venv .venv
 검색은 `core`와 `docs`를 함께 조회한다(`Settings.document_aliases`). 연동 계약은
 [문서 파서 연동 기록](docs/doc_parser_import.md)에 있다.
 
+### 파서 데이터만 사용하기
+
+`.env`의 `SEARCH_DOCUMENT_DATASETS=docs`로 설정하고 API를 재시작하면 검색과 RAG가
+파서 문서만 조회한다. 이 모드에서는 10자리 HSK 질의도 외부 HSK 연계표를 조회하지
+않는다. `SEARCH_MODE`는 `bm25`, `vector`, `hybrid` 중 선택한다(기본 `hybrid`).
+`core,docs`와 `core`도 지원하며, `SEARCH_HSK_ENABLED=false`는 모든 모드에서
+HSK 조회를 끈다. 기존 인덱스를 삭제하거나 별칭을 다른 데이터셋으로 옮길 필요는 없다.
+
+현재 로컬 `.env`는 `docs` / `hybrid` / `search-docs-only` 전용 별칭을 사용한다.
+기존 `search-docs`·`search-documents`는 그대로 유지했다. 파서 산출물 갱신 후에는
+현재 `.env`로 `search-index --dataset docs`를 실행하면 전용 별칭만 교체된다.
+
+### 검색 품질 비교와 Recall
+
+파서 전용 정답 세트는 `data/queries_docs_v1.jsonl`에 있다. 50개 질문의 정답을 원문
+근거로 작성했으며 `gold`는 원본 파일의 `parent_id`다. 각 정답에는 근거 청크·본문
+인용·원본 경로가 붙어 있다. **AI가 근거를 검토한 개발 평가셋이지, 사람이 독립 검수한
+운영 승인 평가셋은 아니다.** 작성 범위와 한계는 같은 이름의 manifest에 기록했다.
+
+```bash
+# 세 가지 방식의 비교: 실제 색인과 파일의 일치 및 임베딩 전체 존재를 먼저 검증
+.venv/bin/python -m search_engine.evaluation.compare \
+  --corpus data/generated/docs-v1/docs.jsonl \
+  --alias search-docs-only \
+  --repeats 3 \
+  --out data/generated/docs-v1/comparison.json
+
+# 실행 중인 API의 기본 상위 5건 평가 (docs.jsonl이 있는 디렉터리를 전달)
+.venv/bin/search-evaluate data/queries_docs_v1.jsonl \
+  --base-url http://127.0.0.1:8092 \
+  --prepared data/generated/docs-v1 \
+  --k 5 --out data/generated/docs-v1/api-quality.json
+```
+
+`search-compare`도 같은 비교 명령이다(새 entry point는 `pip install -e .` 후 사용).
+비교에서는 한 번 가져온 상위 10개 부모 문서로 @1/@5/@10을 계산한다. 세 방식 모두
+같은 시행일·구체 인덱스·후보 깊이를 사용하며, 샤드 실패·타임아웃·임베딩 오류는
+평가를 중단한다. 하이브리드 운영 검색의 임베딩 장애 시 BM25 폴백은 유지한다.
+
+- Hit@k: 정답 문서를 하나라도 찾은 질문의 비율.
+- Recall@k: 질문마다 `찾은 정답 부모 수 / 전체 정답 부모 수`를 계산한 평균(macro).
+  모든 질문의 정답 수를 합산한 micro Recall도 JSON에 기록한다.
+- MRR@k: 첫 정답의 순위 역수 평균. k 안에 정답이 없으면 0.
+- p50/p95: 워밍업 후 단일 프로세스 검색 경로 시간. 벡터/하이브리드는 매번 Ollama
+  질의 임베딩을 포함하고 HTTP·LLM 답변 생성은 제외한다. 동시 부하/QPS 측정은 아니다.
+
+기본 API는 상위 5건이며 비교 도구는 상위 10건 요청으로 후보 수를 정하므로 두 결과가
+다를 수 있다. API 평가의 `--prepared`는 입력 파일 기준 색인 범위 확인이고, 비교 도구는
+실제 클러스터의 청크 ID·부모 ID·content hash·벡터 매핑까지 검증한다.
+
+실측 결과와 재현 절차: [docs 검색 평가](docs/docs_evaluation_v1.md).
+
+### 자연어 평가셋 v2 (검토 후 실험)
+
+v1은 키워드 기준선으로 유지했다. v2는 표현 변경 12개·상황 설명 22개·복수 근거
+6개의 질문과 별도 무응답 질문 8개다. 전체 질문·검토용 답안·원문 근거는
+[v2 검토 문서](docs/queries_docs_v2_review.md)에서 확인한다. 사람 검수 대기 초안이며
+v2 검색 실험은 아직 실행하지 않았다.
+
+```bash
+# 파일/정답/인용 검증만 수행; 검색이나 외부 서비스 호출 없음
+.venv/bin/search-compare data/queries_docs_v2.jsonl \
+  --corpus data/generated/docs-v1/docs.jsonl --validate-only
+
+# 검토 후 비교; 기존 v1 결과를 덮어쓰지 않는다
+.venv/bin/search-compare data/queries_docs_v2.jsonl \
+  --corpus data/generated/docs-v1/docs.jsonl \
+  --alias search-docs-only --repeats 3 --as-of 2026-09-16 \
+  --out data/generated/docs-v2/comparison.json
+```
+
+v2에는 대체 가능한 부모 파일 `gold_groups`와 사실별 대체 근거 청크
+`evidence_groups`를 추가했다. 비교 결과에 논리 문서 `group_recall_at_k`, 최종 반환
+청크의 `evidence_recall_at_k` 및 모든 근거를 찾은 `evidence_all_at_k`가 함께 기록된다.
+각 근거 그룹은 청크 하나라도 찾으면 충족하며, 같은 시행령의 다른 포맷은 문서
+그룹 하나로 취급한다. 기존 물리 부모 Recall도 유지한다. 유형별 결과는 JSON의
+`categories`에서 확인한다. 근거 지표는 생성 답변의 사실성 평가나 전체 후보 풀의
+청크 Recall이 아니며, 부모마다 청크 하나를 반환하는 현재 로직의 제한도 반영한다.
+
+`queries_docs_v2_unanswerable.jsonl`의 8개 질문은 정답이 없어 Recall 분모에 넣지
+않는다. 현재 비교 도구에는 자동 무응답 판정 기능이 없으므로 별도 사람이 검토한다.
+
 이번 초기 적재 범위와 검토 결과는 [import_v1 기록](docs/import_v1.md)에 있다.
 
 다른 터미널에서 검색한다.
