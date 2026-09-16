@@ -118,6 +118,8 @@ cd /Users/jeongbin/git/searchEngine
 각 질문과 방식을 세 번 실행해 순위 안정성과 p50/p95 시간을 측정한다. 실행 날짜가
 달라지면 `--as-of`도 해당 기준일로 바꾼다. 이 비교는 `.env`의 `SEARCH_MODE`와 관계없이
 세 방식을 모두 실행하므로, 기본 모드를 바꾸기 전 판단 자료로 쓸 수 있다.
+`--rewrite`를 붙이면 질의 재작성을 켠 상태로 측정한다(`SEARCH_QUERY_REWRITE`보다 우선).
+평가 실행에서는 재작성 모델을 부르지 못하면 조용히 넘어가지 않고 실패한다.
 
 파서 전용 정답 세트는 `data/queries_docs_v1.jsonl`에 있다. 50개 질문의 정답을 원문
 근거로 작성했으며 `gold`는 원본 파일의 `parent_id`다. 각 정답에는 근거 청크·본문
@@ -154,6 +156,13 @@ cd /Users/jeongbin/git/searchEngine
 기본 API는 상위 5건이며 비교 도구는 상위 10건 요청으로 후보 수를 정하므로 두 결과가
 다를 수 있다. API 평가의 `--prepared`는 입력 파일 기준 색인 범위 확인이고, 비교 도구는
 실제 클러스터의 청크 ID·부모 ID·content hash·벡터 매핑까지 검증한다.
+
+표현이 바뀐 질문("업체의 약속 문서" ↔ "수출자 서약서")은 `SEARCH_QUERY_REWRITE=true`로
+켜면 `OLLAMA_CHAT_MODEL`이 다시 쓴 검색어를 **원본과 함께** 검색해 순위를 가중 RRF로
+합친다. 원본을 대체하지 않으며, 재작성 가중치는 `SEARCH_QUERY_REWRITE_WEIGHT`(기본 0.5)다.
+기본값이 꺼짐인 이유는 대가 때문이다: v2에서 BM25 Hit@1이 72.5% → 77.5%로 오르지만 p50이
+15.8ms → 605.5ms가 되고, 지금까지 LLM 의존성이 없던 검색 경로가 채팅 모델에 묶인다.
+모델을 부르지 못하면 원본 질의만으로 검색해 결과를 좁힐 뿐 요청은 실패하지 않는다.
 
 문서를 찾는 것과 답이 적힌 청크를 고르는 것은 별개다. 후자는 문서당 반환 청크 수로
 조정하며, 기본값 4에서 v2 근거 Recall@5가 30.0% → 70.0%로 올랐고 문서 지표는 그대로다.
@@ -242,13 +251,15 @@ Dashboards는 색인·데이터를 확인하는 관리 화면이며, 서비스 �
 ```
 config.py      환경변수 설정
 client.py      OpenSearch 클라이언트
+embeddings.py  Ollama 임베딩 (색인·검색 공용)
 codes.py       통제번호·법령 참조 정규화 (색인·검색 공용)
 
 api/           HTTP 표면 (uvicorn search_engine.api:app)
   routes.py      FastAPI 앱과 라우트
   schemas.py     요청 스키마
 search/        런타임 질의 경로
-  query.py       문서 질의 조립, 검색, HSK 병합(search_all)
+  query.py       문서 질의 조립, 검색, 순위 융합, HSK 병합(search_all)
+  rewrite.py     구어체 질문 → 문서 용어 검색어 재작성 (선택)
   hsk.py         HSK 코드 추출, 연계표 조회
   results.py     검색 응답 모델
 indexing/      오프라인 색인 파이프라인

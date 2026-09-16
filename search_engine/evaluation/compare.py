@@ -88,7 +88,8 @@ def verify_gold(queries: list[dict], corpus: Path, known: set[str]) -> None:
 
 
 def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1, 5, 10),
-            repeats: int = 3, warmup: int = 1, as_of: date | None = None) -> dict:
+            repeats: int = 3, warmup: int = 1, as_of: date | None = None,
+            query_rewrite: bool = False) -> dict:
     if not queries or repeats < 1 or warmup < 0 or not ks or min(ks) < 1 or max(ks) > 20:
         raise ValueError("nonempty queries, positive repeats, nonnegative warmup, 1 <= k <= 20 required")
     as_of = as_of or date.today()
@@ -96,7 +97,8 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
     results = {mode: [] for mode in MODES}
     for _ in range(warmup):
         for mode in MODES:
-            retrieve(client, index, queries[0]["query"], as_of, depth, mode=mode, strict=True)
+            retrieve(client, index, queries[0]["query"], as_of, depth, mode=mode, strict=True,
+                     query_rewrite=query_rewrite)
     for position, row in enumerate(queries):
         samples = {mode: [] for mode in MODES}
         rankings = {mode: [] for mode in MODES}
@@ -106,7 +108,8 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
             offset = (position + repeat) % len(MODES)
             for mode in MODES[offset:] + MODES[:offset]:
                 start = perf_counter()
-                hits = retrieve(client, index, row["query"], as_of, depth, mode=mode, strict=True)
+                hits = retrieve(client, index, row["query"], as_of, depth, mode=mode,
+                                strict=True, query_rewrite=query_rewrite)
                 samples[mode].append((perf_counter() - start) * 1000)
                 rankings[mode].append([hit.parent_id for hit in hits])
                 chunk_rankings[mode].append([hit.chunk_ids for hit in hits])
@@ -138,7 +141,8 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
     return {"as_of": as_of.isoformat(), "ks": list(ks), "retrieval_depth": depth,
             "lexical_candidates": min(depth * 5, 100),
             "vector_candidates": min(max(depth * 5, get_settings().search_vector_candidates), 1000),
-            "repeats": repeats, "warmup_queries_per_mode": warmup, "modes": modes}
+            "repeats": repeats, "warmup_queries_per_mode": warmup,
+            "query_rewrite": query_rewrite, "modes": modes}
 
 
 def format_comparison(report: dict) -> str:
@@ -173,6 +177,9 @@ def main() -> None:
     parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--as-of", type=date.fromisoformat, default=date.today())
     parser.add_argument("--out", type=Path)
+    parser.add_argument("--rewrite", action="store_true",
+                        help="Also search a model-written rewrite of each query and fuse the "
+                             "rankings; overrides SEARCH_QUERY_REWRITE for this run")
     parser.add_argument("--validate-only", action="store_true",
                         help="Validate query labels and source quotes only; no OpenSearch/Ollama calls")
     args = parser.parse_args()
@@ -193,13 +200,14 @@ def main() -> None:
     known = set(corpus.pop("parent_ids"))
     verify_gold(queries, args.corpus, known)
     report = compare(queries, client, concrete, repeats=args.repeats,
-                     warmup=args.warmup, as_of=args.as_of)
+                     warmup=args.warmup, as_of=args.as_of, query_rewrite=args.rewrite)
     report.update({
         "created_at": datetime.now(timezone.utc).isoformat(), "corpus": corpus,
         "queries_sha256": hashlib.sha256(args.queries.read_bytes()).hexdigest(),
         "settings": {key: getattr(settings, key) for key in (
             "ollama_embedding_model", "search_embedding_dimensions", "search_vector_candidates",
-            "search_hybrid_rrf_k", "search_chunks_per_document")},
+            "search_hybrid_rrf_k", "search_chunks_per_document",
+            "search_query_rewrite_weight", "ollama_chat_model")},
         "opensearch_version": client.info()["version"]["number"],
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),

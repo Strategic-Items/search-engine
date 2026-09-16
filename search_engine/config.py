@@ -45,6 +45,14 @@ class Settings(BaseSettings):
     # Chunks carried per returned document. Ranking still returns one document
     # per slot; this only decides how much of that document comes with it.
     search_chunks_per_document: int = Field(default=4, ge=1, le=20)
+    # Search the question and a model-written rewrite of it, fused. Off by
+    # default: on docs v2 it buys one to two questions out of forty and costs
+    # roughly half a second per search, and it puts the chat model in the path
+    # of a search that otherwise has no model dependency at all.
+    search_query_rewrite: bool = False
+    # How much the rewrite's ranking counts against the original's. Below 1 so a
+    # rewrite that went wrong cannot outvote the question the user actually asked.
+    search_query_rewrite_weight: float = Field(default=0.5, gt=0.0, le=1.0)
     rag_top_k: int = Field(default=5, ge=1)
 
     @property
