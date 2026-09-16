@@ -33,10 +33,18 @@ class Settings(BaseSettings):
     # usually much larger and may not expose Ollama's embedding endpoint.
     ollama_embedding_model: str = "nomic-embed-text"
     ollama_temperature: float = 0.4
+    # Ollama silently drops the front of a prompt that exceeds the context window,
+    # which would cut the grounding rules and leave the evidence, and the window
+    # covers the answer as well as the prompt. At four chunks per document the
+    # longest docs v2 prompt measured 7,695 tokens, so this leaves room to answer.
+    ollama_num_ctx: int = Field(default=16384, ge=512)
     ollama_timeout_seconds: float = Field(default=120.0, gt=0)
     search_embedding_dimensions: int = Field(default=768, ge=1)
     search_vector_candidates: int = Field(default=50, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
+    # Chunks carried per returned document. Ranking still returns one document
+    # per slot; this only decides how much of that document comes with it.
+    search_chunks_per_document: int = Field(default=4, ge=1, le=20)
     rag_top_k: int = Field(default=5, ge=1)
 
     @property

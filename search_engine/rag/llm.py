@@ -17,6 +17,9 @@ async def stream_chat(prompt: str, temperature: float | None = None) -> AsyncIte
         "options": {
             # `or` would swallow an explicit 0.0, which is what compression asks for.
             "temperature": settings.ollama_temperature if temperature is None else temperature,
+            # Ollama defaults this low and then silently truncates the front of an
+            # over-long prompt -- the grounding rules -- rather than failing.
+            "num_ctx": settings.ollama_num_ctx,
         },
     }
     async with httpx.AsyncClient(timeout=settings.ollama_timeout_seconds) as client:

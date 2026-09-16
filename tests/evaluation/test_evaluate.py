@@ -8,6 +8,7 @@ from search_engine.evaluation.evaluate import (
     hit_at,
     indexed_ids,
     load_queries,
+    quality_metrics,
     ranked_ids,
 )
 
@@ -167,3 +168,24 @@ def test_http_evaluation_scores_actual_evidence_chunks(tmp_path, monkeypatch):
                       "http://example", tmp_path)
     assert report["metrics"]["group_recall_at_5"] == 1
     assert report["metrics"]["evidence_recall_at_5"] == .5
+
+
+def test_k_cuts_on_documents_even_when_each_carries_several_chunks():
+    """More chunks per document must widen the evidence window, never narrow it."""
+    rows = [{
+        "qid": "q1", "gold": ["doc-1"], "returned": ["doc-1", "doc-2"],
+        "returned_chunks": [["c1", "c2", "c3", "c4"], ["c9"]],
+        "evidence_groups": [["c4"]],
+    }]
+    metrics = quality_metrics(rows, 1)
+    assert metrics["evidence_recall_at_1"] == 1.0
+    assert metrics["evidence_all_at_1"] == 1.0
+
+
+def test_a_single_chunk_per_document_still_measures_the_same_way():
+    rows = [{
+        "qid": "q1", "gold": ["doc-1"], "returned": ["doc-1", "doc-2"],
+        "returned_chunks": [["c1"], ["c9"]],
+        "evidence_groups": [["c4"]],
+    }]
+    assert quality_metrics(rows, 2)["evidence_recall_at_2"] == 0.0

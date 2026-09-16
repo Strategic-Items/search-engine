@@ -9,7 +9,7 @@ from opensearchpy import OpenSearch
 from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
-from search_engine.search.results import SearchHit, SearchResults
+from search_engine.search.results import Passage, SearchHit, SearchResults
 
 log = logging.getLogger(__name__)
 
@@ -152,10 +152,54 @@ def _rrf(hits_by_retriever: Iterable[list[dict]], rrf_k: int) -> list[dict]:
     ]
 
 
+def _candidates_by_parent(ranked_lists: Iterable[list[dict]]) -> dict[str, list[dict]]:
+    """Group every candidate chunk under its parent, best rank first.
+
+    A retriever's own ranking orders the chunks within a parent; a hybrid search
+    then appends whatever only the other retriever found. Which parents come back
+    is already settled before this runs, so the ordering here only decides which
+    chunks of a parent are shown, never which documents.
+    """
+    by_parent: dict[str, list[dict]] = {}
+    seen: set[str] = set()
+    for hits in ranked_lists:
+        for hit in hits:
+            if hit["_id"] in seen:
+                continue
+            seen.add(hit["_id"])
+            parent = hit["_source"].get("parent_id") or hit["_id"]
+            by_parent.setdefault(parent, []).append(hit)
+    return by_parent
+
+
+def _with_passages(
+    hits: list[SearchHit], ranked_lists: Iterable[list[dict]], chunks_per_document: int,
+) -> list[SearchHit]:
+    """Carry the document's other matching chunks alongside the one that ranked it.
+
+    One chunk per document is the right unit for ranking documents but the wrong
+    unit for answering: on the docs v2 set the labelled evidence sat in a chunk
+    the deduplication dropped for 23 of 40 questions, even though its document
+    was already first. The extra chunks come out of the candidate pool the search
+    already fetched, so this costs no further round trip.
+    """
+    if chunks_per_document < 2:
+        return hits
+    by_parent = _candidates_by_parent(ranked_lists)
+    for hit in hits:
+        others = [c for c in by_parent.get(hit.parent_id, []) if c["_id"] != hit.id]
+        hit.passages = [
+            Passage(id=c["_id"], body=c["_source"].get("body", ""), score=c.get("_score"))
+            for c in others[:chunks_per_document - 1]
+        ]
+    return hits
+
+
 def retrieve(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int,
     embedder: OllamaEmbedder | None = None,
     *, mode: str | None = None, strict: bool = False,
+    chunks_per_document: int | None = None,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -221,7 +265,11 @@ def retrieve(
         }))
         if len(out) == k:
             break
-    return _with_current_editions(client, alias, out, k)
+    if chunks_per_document is None:
+        chunks_per_document = settings.search_chunks_per_document
+    return _with_passages(
+        _with_current_editions(client, alias, out, k), ranked_lists, chunks_per_document,
+    )
 
 
 def _current_editions(

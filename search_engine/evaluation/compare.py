@@ -109,7 +109,7 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
                 hits = retrieve(client, index, row["query"], as_of, depth, mode=mode, strict=True)
                 samples[mode].append((perf_counter() - start) * 1000)
                 rankings[mode].append([hit.parent_id for hit in hits])
-                chunk_rankings[mode].append([hit.id for hit in hits])
+                chunk_rankings[mode].append([hit.chunk_ids for hit in hits])
         for mode in MODES:
             results[mode].append({
                 **row, "returned": rankings[mode][0], "latency_ms": samples[mode],
@@ -199,7 +199,7 @@ def main() -> None:
         "queries_sha256": hashlib.sha256(args.queries.read_bytes()).hexdigest(),
         "settings": {key: getattr(settings, key) for key in (
             "ollama_embedding_model", "search_embedding_dimensions", "search_vector_candidates",
-            "search_hybrid_rrf_k")},
+            "search_hybrid_rrf_k", "search_chunks_per_document")},
         "opensearch_version": client.info()["version"]["number"],
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),
@@ -207,7 +207,8 @@ def main() -> None:
         "methodology": "parent-level macro recall over source-reviewed gold; single-process "
             "retrieval latency including uncached Ollama query embedding, excluding HTTP/LLM; "
             "same candidate depth for all cutoffs; strict failures (no lexical fallback); "
-            "optional equivalent-parent group and final-returned-chunk evidence requirement recall; "
+            "optional equivalent-parent group and final-returned-chunk evidence requirement recall, "
+            "where @k cuts on documents and each document carries its returned chunks; "
             "unanswerable empty-gold queries excluded",
     })
     args.out.parent.mkdir(parents=True, exist_ok=True)
