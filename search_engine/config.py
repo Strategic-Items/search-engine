@@ -1,6 +1,7 @@
 """Runtime settings, independent from the HTTP layer."""
 
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -22,6 +23,9 @@ class Settings(BaseSettings):
     search_docs_prefix: str = "search-docs-v"
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
+    search_document_datasets: Literal["core,docs", "docs", "core"] = "core,docs"
+    search_mode: Literal["bm25", "vector", "hybrid"] = "hybrid"
+    search_hsk_enabled: bool = True
     search_number_of_replicas: int = Field(default=0, ge=0)
     ollama_base_url: str = "http://localhost:11434"
     ollama_chat_model: str = "qwen2.5:3b"
@@ -37,13 +41,9 @@ class Settings(BaseSettings):
 
     @property
     def document_aliases(self) -> str:
-        """Every index the document search reads, as OpenSearch's index list.
-
-        Reading both corpora through one search keeps ranking a single fused
-        list. RRF compares ranks, not scores, so the per-index IDF difference
-        between the two does not distort the result.
-        """
-        return f"{self.search_index_alias},{self.search_docs_alias}"
+        """Selected document indexes; a single corpus never reads other aliases."""
+        aliases = {"core": self.search_index_alias, "docs": self.search_docs_alias}
+        return ",".join(dict.fromkeys(aliases[name] for name in self.search_document_datasets.split(",")))
 
 
 @lru_cache

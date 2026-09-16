@@ -107,3 +107,63 @@ def test_the_answerable_subset_excludes_gold_that_never_reached_the_index(tmp_pa
 
     assert report["totals"]["queries"] == 2
     assert report["answerable"] == {"queries": 1, "first": 1, "top_k": 1}
+
+
+def test_empty_docs_file_is_known_empty_coverage(tmp_path, monkeypatch):
+    (tmp_path / "docs.jsonl").write_text("")
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search", lambda *a, **kw: {"hits": []})
+    report = evaluate([{"qid": "q", "query": "q", "gold": ["a"]}], "http://example", tmp_path)
+    assert report["coverage_known"]
+    assert report["queries"][0]["gold_missing_ids"] == ["a"]
+    assert report["totals"]["gold_missing_from_index"] == 1
+
+
+def test_partial_gold_coverage_is_not_fully_answerable(tmp_path, monkeypatch):
+    (tmp_path / "docs.jsonl").write_text(json.dumps({"id": "a", "parent_id": "a"}))
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search", lambda *a, **kw: {
+        "hits": [{"parent_id": "a"}]})
+    report = evaluate([{"qid": "q", "query": "q", "gold": ["a", "b"]}], "http://example", tmp_path)
+    assert report["metrics"]["recall_at_5"] == .5
+    assert not report["queries"][0]["gold_indexed"]
+    assert report["queries"][0]["gold_missing_ids"] == ["b"]
+
+
+def test_api_cutoff_above_five_is_refused(tmp_path):
+    with pytest.raises(ValueError, match="at most 5"):
+        evaluate([{"qid": "q", "query": "q", "gold": ["a"]}], "http://example", tmp_path, k=10)
+
+
+@pytest.mark.parametrize("gold", ["a", [""], [1]])
+def test_malformed_gold_is_refused(tmp_path, gold):
+    with pytest.raises(ValueError, match="list of IDs"):
+        load_queries(write_queries(tmp_path, {"qid": "q", "query": "q", "gold": gold}))
+
+
+def test_duplicate_query_ids_are_refused(tmp_path):
+    row = {"qid": "q", "query": "q", "gold": ["a"]}
+    with pytest.raises(ValueError, match="duplicate qid"):
+        load_queries(write_queries(tmp_path, row, row))
+
+
+@pytest.mark.parametrize("groups", [[], [[]], "a", [[1]], [[""]]])
+def test_malformed_gold_groups_are_refused(tmp_path, groups):
+    row = {"qid": "q", "query": "q", "gold": ["a"], "gold_groups": groups}
+    with pytest.raises(ValueError, match="nonempty groups"):
+        load_queries(write_queries(tmp_path, row))
+
+
+@pytest.mark.parametrize("groups", [[["a"], ["a"]], [["b"]]])
+def test_groups_must_partition_gold(tmp_path, groups):
+    row = {"qid": "q", "query": "q", "gold": ["a"], "gold_groups": groups}
+    with pytest.raises(ValueError, match="partition gold"):
+        load_queries(write_queries(tmp_path, row))
+
+
+def test_http_evaluation_scores_actual_evidence_chunks(tmp_path, monkeypatch):
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search", lambda *a, **kw: {
+        "hits": [{"id": "a#0", "parent_id": "a"}]})
+    report = evaluate([{"qid": "q", "query": "q", "gold": ["a"],
+                        "gold_groups": [["a"]], "evidence_groups": [["a#0"], ["a#1"]]}],
+                      "http://example", tmp_path)
+    assert report["metrics"]["group_recall_at_5"] == 1
+    assert report["metrics"]["evidence_recall_at_5"] == .5

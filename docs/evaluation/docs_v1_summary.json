@@ -1,0 +1,453 @@
+{
+  "as_of": "2026-09-16",
+  "ks": [
+    1,
+    5,
+    10
+  ],
+  "retrieval_depth": 10,
+  "lexical_candidates": 50,
+  "vector_candidates": 50,
+  "repeats": 3,
+  "warmup_queries_per_mode": 1,
+  "modes": {
+    "bm25": {
+      "metrics": {
+        "1": {
+          "queries": 50,
+          "hit_at_1": 0.9,
+          "recall_at_1": 0.79,
+          "micro_recall_at_1": 0.6818181818181818,
+          "mrr_at_1": 0.9
+        },
+        "5": {
+          "queries": 50,
+          "hit_at_1": 0.9,
+          "hit_at_5": 0.98,
+          "recall_at_5": 0.98,
+          "micro_recall_at_5": 0.9848484848484849,
+          "mrr_at_5": 0.9266666666666667
+        },
+        "10": {
+          "queries": 50,
+          "hit_at_1": 0.9,
+          "hit_at_10": 1,
+          "recall_at_10": 1,
+          "micro_recall_at_10": 1,
+          "mrr_at_10": 0.93
+        }
+      },
+      "categories": {
+        "content": {
+          "1": {
+            "queries": 20,
+            "hit_at_1": 0.85,
+            "recall_at_1": 0.85,
+            "micro_recall_at_1": 0.85,
+            "mrr_at_1": 0.85
+          },
+          "5": {
+            "queries": 20,
+            "hit_at_1": 0.85,
+            "hit_at_5": 0.95,
+            "recall_at_5": 0.95,
+            "micro_recall_at_5": 0.95,
+            "mrr_at_5": 0.875
+          },
+          "10": {
+            "queries": 20,
+            "hit_at_1": 0.85,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 0.8833333333333334
+          }
+        },
+        "multi_document": {
+          "1": {
+            "queries": 4,
+            "hit_at_1": 0.75,
+            "recall_at_1": 0.375,
+            "micro_recall_at_1": 0.375,
+            "mrr_at_1": 0.75
+          },
+          "5": {
+            "queries": 4,
+            "hit_at_1": 0.75,
+            "hit_at_5": 1,
+            "recall_at_5": 1,
+            "micro_recall_at_5": 1,
+            "mrr_at_5": 0.8333333333333334
+          },
+          "10": {
+            "queries": 4,
+            "hit_at_1": 0.75,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 0.8333333333333334
+          }
+        },
+        "multi_format": {
+          "1": {
+            "queries": 6,
+            "hit_at_1": 1,
+            "recall_at_1": 0.3333333333333333,
+            "micro_recall_at_1": 0.3333333333333333,
+            "mrr_at_1": 1
+          },
+          "5": {
+            "queries": 6,
+            "hit_at_1": 1,
+            "hit_at_5": 1,
+            "recall_at_5": 1,
+            "micro_recall_at_5": 1,
+            "mrr_at_5": 1
+          },
+          "10": {
+            "queries": 6,
+            "hit_at_1": 1,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 1
+          }
+        },
+        "title": {
+          "1": {
+            "queries": 20,
+            "hit_at_1": 0.95,
+            "recall_at_1": 0.95,
+            "micro_recall_at_1": 0.95,
+            "mrr_at_1": 0.95
+          },
+          "5": {
+            "queries": 20,
+            "hit_at_1": 0.95,
+            "hit_at_5": 1,
+            "recall_at_5": 1,
+            "micro_recall_at_5": 1,
+            "mrr_at_5": 0.975
+          },
+          "10": {
+            "queries": 20,
+            "hit_at_1": 0.95,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 0.975
+          }
+        }
+      },
+      "latency": {
+        "samples": 150,
+        "p50_ms": 16.58533299632836,
+        "p95_ms": 30.39895799884107,
+        "mean_ms": 19.314426386748284
+      },
+      "unstable_queries": 0
+    },
+    "vector": {
+      "metrics": {
+        "1": {
+          "queries": 50,
+          "hit_at_1": 0.38,
+          "recall_at_1": 0.30333333333333334,
+          "micro_recall_at_1": 0.2878787878787879,
+          "mrr_at_1": 0.38
+        },
+        "5": {
+          "queries": 50,
+          "hit_at_1": 0.38,
+          "hit_at_5": 0.6,
+          "recall_at_5": 0.58,
+          "micro_recall_at_5": 0.6363636363636364,
+          "mrr_at_5": 0.4666666666666666
+        },
+        "10": {
+          "queries": 50,
+          "hit_at_1": 0.38,
+          "hit_at_10": 0.68,
+          "recall_at_10": 0.65,
+          "micro_recall_at_10": 0.696969696969697,
+          "mrr_at_10": 0.4756666666666667
+        }
+      },
+      "categories": {
+        "content": {
+          "1": {
+            "queries": 20,
+            "hit_at_1": 0.05,
+            "recall_at_1": 0.05,
+            "micro_recall_at_1": 0.05,
+            "mrr_at_1": 0.05
+          },
+          "5": {
+            "queries": 20,
+            "hit_at_1": 0.05,
+            "hit_at_5": 0.3,
+            "recall_at_5": 0.3,
+            "micro_recall_at_5": 0.3,
+            "mrr_at_5": 0.15416666666666667
+          },
+          "10": {
+            "queries": 20,
+            "hit_at_1": 0.05,
+            "hit_at_10": 0.4,
+            "recall_at_10": 0.4,
+            "micro_recall_at_10": 0.4,
+            "mrr_at_10": 0.16541666666666666
+          }
+        },
+        "multi_document": {
+          "1": {
+            "queries": 4,
+            "hit_at_1": 0.25,
+            "recall_at_1": 0.125,
+            "micro_recall_at_1": 0.125,
+            "mrr_at_1": 0.25
+          },
+          "5": {
+            "queries": 4,
+            "hit_at_1": 0.25,
+            "hit_at_5": 0.5,
+            "recall_at_5": 0.25,
+            "micro_recall_at_5": 0.25,
+            "mrr_at_5": 0.3125
+          },
+          "10": {
+            "queries": 4,
+            "hit_at_1": 0.25,
+            "hit_at_10": 0.75,
+            "recall_at_10": 0.375,
+            "micro_recall_at_10": 0.375,
+            "mrr_at_10": 0.34375
+          }
+        },
+        "multi_format": {
+          "1": {
+            "queries": 6,
+            "hit_at_1": 0.8333333333333334,
+            "recall_at_1": 0.27777777777777773,
+            "micro_recall_at_1": 0.2777777777777778,
+            "mrr_at_1": 0.8333333333333334
+          },
+          "5": {
+            "queries": 6,
+            "hit_at_1": 0.8333333333333334,
+            "hit_at_5": 1,
+            "recall_at_5": 1,
+            "micro_recall_at_5": 1,
+            "mrr_at_5": 0.9166666666666666
+          },
+          "10": {
+            "queries": 6,
+            "hit_at_1": 0.8333333333333334,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 0.9166666666666666
+          }
+        },
+        "title": {
+          "1": {
+            "queries": 20,
+            "hit_at_1": 0.6,
+            "recall_at_1": 0.6,
+            "micro_recall_at_1": 0.6,
+            "mrr_at_1": 0.6
+          },
+          "5": {
+            "queries": 20,
+            "hit_at_1": 0.6,
+            "hit_at_5": 0.8,
+            "recall_at_5": 0.8,
+            "micro_recall_at_5": 0.8,
+            "mrr_at_5": 0.675
+          },
+          "10": {
+            "queries": 20,
+            "hit_at_1": 0.6,
+            "hit_at_10": 0.85,
+            "recall_at_10": 0.85,
+            "micro_recall_at_10": 0.85,
+            "mrr_at_10": 0.6799999999999999
+          }
+        }
+      },
+      "latency": {
+        "samples": 150,
+        "p50_ms": 52.92654199729441,
+        "p95_ms": 88.80525000131456,
+        "mean_ms": 56.108670866475826
+      },
+      "unstable_queries": 0
+    },
+    "hybrid": {
+      "metrics": {
+        "1": {
+          "queries": 50,
+          "hit_at_1": 0.68,
+          "recall_at_1": 0.57,
+          "micro_recall_at_1": 0.5151515151515151,
+          "mrr_at_1": 0.68
+        },
+        "5": {
+          "queries": 50,
+          "hit_at_1": 0.68,
+          "hit_at_5": 0.88,
+          "recall_at_5": 0.87,
+          "micro_recall_at_5": 0.8939393939393939,
+          "mrr_at_5": 0.7523333333333333
+        },
+        "10": {
+          "queries": 50,
+          "hit_at_1": 0.68,
+          "hit_at_10": 1,
+          "recall_at_10": 0.99,
+          "micro_recall_at_10": 0.9848484848484849,
+          "mrr_at_10": 0.7695555555555554
+        }
+      },
+      "categories": {
+        "content": {
+          "1": {
+            "queries": 20,
+            "hit_at_1": 0.35,
+            "recall_at_1": 0.35,
+            "micro_recall_at_1": 0.35,
+            "mrr_at_1": 0.35
+          },
+          "5": {
+            "queries": 20,
+            "hit_at_1": 0.35,
+            "hit_at_5": 0.7,
+            "recall_at_5": 0.7,
+            "micro_recall_at_5": 0.7,
+            "mrr_at_5": 0.48916666666666664
+          },
+          "10": {
+            "queries": 20,
+            "hit_at_1": 0.35,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 0.5322222222222222
+          }
+        },
+        "multi_document": {
+          "1": {
+            "queries": 4,
+            "hit_at_1": 0.75,
+            "recall_at_1": 0.375,
+            "micro_recall_at_1": 0.375,
+            "mrr_at_1": 0.75
+          },
+          "5": {
+            "queries": 4,
+            "hit_at_1": 0.75,
+            "hit_at_5": 1,
+            "recall_at_5": 0.875,
+            "micro_recall_at_5": 0.875,
+            "mrr_at_5": 0.8125
+          },
+          "10": {
+            "queries": 4,
+            "hit_at_1": 0.75,
+            "hit_at_10": 1,
+            "recall_at_10": 0.875,
+            "micro_recall_at_10": 0.875,
+            "mrr_at_10": 0.8125
+          }
+        },
+        "multi_format": {
+          "1": {
+            "queries": 6,
+            "hit_at_1": 1,
+            "recall_at_1": 0.3333333333333333,
+            "micro_recall_at_1": 0.3333333333333333,
+            "mrr_at_1": 1
+          },
+          "5": {
+            "queries": 6,
+            "hit_at_1": 1,
+            "hit_at_5": 1,
+            "recall_at_5": 1,
+            "micro_recall_at_5": 1,
+            "mrr_at_5": 1
+          },
+          "10": {
+            "queries": 6,
+            "hit_at_1": 1,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 1
+          }
+        },
+        "title": {
+          "1": {
+            "queries": 20,
+            "hit_at_1": 0.9,
+            "recall_at_1": 0.9,
+            "micro_recall_at_1": 0.9,
+            "mrr_at_1": 0.9
+          },
+          "5": {
+            "queries": 20,
+            "hit_at_1": 0.9,
+            "hit_at_5": 1,
+            "recall_at_5": 1,
+            "micro_recall_at_5": 1,
+            "mrr_at_5": 0.9291666666666666
+          },
+          "10": {
+            "queries": 20,
+            "hit_at_1": 0.9,
+            "hit_at_10": 1,
+            "recall_at_10": 1,
+            "micro_recall_at_10": 1,
+            "mrr_at_10": 0.9291666666666666
+          }
+        }
+      },
+      "latency": {
+        "samples": 150,
+        "p50_ms": 71.26233400049387,
+        "p95_ms": 133.31250000192085,
+        "mean_ms": 80.91277773996505
+      },
+      "unstable_queries": 0
+    }
+  },
+  "created_at": "2026-09-16T06:40:15.524805+00:00",
+  "corpus": {
+    "path": "data/generated/docs-v1/docs.jsonl",
+    "sha256": "7458213e938d3764cb86a19faa78a5a397d89e6d01bce34e383b1f6e32647a9b",
+    "chunks": 1041,
+    "parents": 36,
+    "indexes": "search-docs-only-v20260916063510-8696c3"
+  },
+  "queries_sha256": "b4025107e54c40004fd874d2a0d6cabca782cebc2fcc9118eeb847407bc175a1",
+  "settings": {
+    "ollama_embedding_model": "nomic-embed-text",
+    "search_embedding_dimensions": 768,
+    "search_vector_candidates": 50,
+    "search_hybrid_rrf_k": 60
+  },
+  "opensearch_version": "3.8.0",
+  "code_sha256": {
+    "retrieval": "126167ce3dc409a7d68531451d3a5cbc9a52fac76999c292fc8931824a2b02ba",
+    "comparison": "600167d83761d49a4dbd42d3aa05c8b95f62adb1e0e67a7479525906e14cbcf1",
+    "metrics": "75c5833023ebdd75f8ca6e20e331788a0a870263ac7f8ed8aa22f8a15bd7d4db"
+  },
+  "methodology": "parent-level macro recall over source-reviewed gold; single-process retrieval latency including uncached Ollama query embedding, excluding HTTP/LLM; same candidate depth for all cutoffs; strict failures (no lexical fallback)",
+  "api_metrics": {
+    "queries": 50,
+    "hit_at_1": 0.68,
+    "hit_at_5": 0.96,
+    "recall_at_5": 0.95,
+    "micro_recall_at_5": 0.9545454545454546,
+    "mrr_at_5": 0.7759999999999999
+  }
+}

@@ -155,6 +155,7 @@ def _rrf(hits_by_retriever: Iterable[list[dict]], rrf_k: int) -> list[dict]:
 def retrieve(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int,
     embedder: OllamaEmbedder | None = None,
+    *, mode: str | None = None, strict: bool = False,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -162,30 +163,56 @@ def retrieve(
     been indexed should narrow the results, not fail the request.
     """
     settings = get_settings()
+    mode = mode or settings.search_mode
+    if mode not in ("bm25", "vector", "hybrid"):
+        raise ValueError(f"unknown search mode: {mode}")
+    if k < 1:
+        raise ValueError("k must be positive")
+    ranked_lists = []
+
+    def add_response(response: dict, name: str) -> None:
+        _warn_on_partial_results(response, name)
+        if strict and (response.get("_shards", {}).get("failed", 0) or response.get("timed_out")):
+            raise RuntimeError(f"incomplete {name} search: {response.get('_shards')}")
+        ranked_lists.append(response["hits"]["hits"])
+
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
-    lexical = client.search(
-        index=alias, body={"query": build_query(query, as_of)},
-        size=lexical_candidates, ignore_unavailable=True,
-    )
-    _warn_on_partial_results(lexical, "lexical")
-    ranked_lists = [lexical["hits"]["hits"]]
-    try:
-        vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
-        semantic = client.search(
-            index=alias,
-            body={"query": build_vector_query(vector, as_of, vector_candidates)},
-            size=vector_candidates,
-            ignore_unavailable=True,
+    if mode in ("bm25", "hybrid"):
+        lexical = client.search(
+            index=alias, body={"query": build_query(query, as_of)},
+            size=lexical_candidates, ignore_unavailable=not strict,
         )
-        _warn_on_partial_results(semantic, "vector")
-        ranked_lists.append(semantic["hits"]["hits"])
+        add_response(lexical, "lexical")
+    try:
+        if mode in ("vector", "hybrid"):
+            vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
+            semantic = client.search(
+                index=alias,
+                body={"query": build_vector_query(vector, as_of, vector_candidates)},
+                size=vector_candidates,
+                ignore_unavailable=not strict,
+            )
+            add_response(semantic, "vector")
     except httpx.HTTPError:
+        if strict or mode == "vector":
+            raise
         # Lexical search remains available during an embedding service outage.
         pass
 
+    if mode == "hybrid":
+        ranked = _rrf(ranked_lists, settings.search_hybrid_rrf_k)
+    else:
+        # Preserve the retriever's original scores, keeping its best chunk per parent.
+        seen = set()
+        ranked = []
+        for hit in ranked_lists[0]:
+            parent = hit["_source"].get("parent_id") or hit["_id"]
+            if parent not in seen:
+                seen.add(parent)
+                ranked.append(hit)
     out = []
-    for hit in _rrf(ranked_lists, settings.search_hybrid_rrf_k):
+    for hit in ranked:
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
         out.append(SearchHit.model_validate({
@@ -255,5 +282,8 @@ def search_all(
     """One user search: documents, plus HSK linkage when the query names a code."""
     hits = retrieve(client, alias, query, as_of, k)
     hsk_code = extract_hsk_code(query)
+    settings = get_settings()
+    if not settings.search_hsk_enabled or settings.search_document_datasets == "docs":
+        hsk_code = None
     linkage = retrieve_hsk(client, hsk_alias, hsk_code, None, k) if hsk_code else None
     return SearchResults(query=query, hits=hits, hsk=linkage)
