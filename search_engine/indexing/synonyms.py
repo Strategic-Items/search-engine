@@ -6,7 +6,9 @@ repository. One line is one group of mutually equivalent terms.
 
 from pathlib import Path
 
-SYNONYM_PATH = Path(__file__).resolve().parent.parent / "data" / "synonyms.txt"
+# parents[2] is the repository root: search_engine/indexing/synonyms.py -> repo.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SYNONYM_PATH = REPO_ROOT / "data" / "synonyms.txt"
 
 
 def load_synonyms(path: Path | None = None) -> list[str]:

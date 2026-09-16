@@ -18,7 +18,11 @@ class Settings(BaseSettings):
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
     search_number_of_replicas: int = Field(default=0, ge=0)
-    search_api_key: str = ""
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_chat_model: str = "qwen2.5:3b"
+    ollama_temperature: float = 0.4
+    ollama_timeout_seconds: float = Field(default=120.0, gt=0)
+    rag_top_k: int = Field(default=5, ge=1)
 
 
 @lru_cache

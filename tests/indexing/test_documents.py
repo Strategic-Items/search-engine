@@ -1,4 +1,4 @@
-from search_engine.documents import SearchDocument
+from search_engine.indexing.documents import SearchDocument
 
 
 def test_multiple_legal_codes_are_indexed_separately():

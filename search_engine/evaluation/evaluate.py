@@ -11,8 +11,6 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
-from search_engine.config import get_settings
-
 # The lab labels gold by parent document, except HSK rows, which are their own id.
 HSK_CATEGORY = "hsk"
 
@@ -61,27 +59,25 @@ def hit_at(ranked: list[str], gold: list[str], k: int) -> bool:
     return bool(set(ranked[:k]) & set(gold))
 
 
-def search(base_url: str, api_key: str, query: str, timeout: float = 30.0) -> dict:
+def search(base_url: str, query: str, timeout: float = 30.0) -> dict:
     request = urllib.request.Request(
         f"{base_url.rstrip('/')}/v1/search",
         data=json.dumps({"query": query}).encode("utf-8"),
-        headers={"Content-Type": "application/json", "X-API-Key": api_key},
+        headers={"Content-Type": "application/json"},
         method="POST",
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return json.loads(response.read())
 
 
-def evaluate(
-    queries: list[dict], base_url: str, api_key: str, prepared_dir: Path, k: int = 5,
-) -> dict:
+def evaluate(queries: list[dict], base_url: str, prepared_dir: Path, k: int = 5) -> dict:
     known = indexed_ids(prepared_dir)
     per_query = []
     for row in queries:
         category = row.get("category", "unknown")
         gold = row["gold"]
         try:
-            result = search(base_url, api_key, row["query"])
+            result = search(base_url, row["query"])
         except urllib.error.HTTPError as exc:
             raise RuntimeError(f"{row['qid']}: search failed with HTTP {exc.code}") from exc
         ranked = ranked_ids(result, category)
@@ -164,11 +160,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, help="Write the full per-query report as JSON")
     args = parser.parse_args()
 
-    api_key = get_settings().search_api_key
-    if not api_key:
-        raise SystemExit("SEARCH_API_KEY is not configured; the API would reject every request")
-    report = evaluate(load_queries(args.queries_jsonl), args.base_url, api_key,
-                      args.prepared, args.k)
+    report = evaluate(load_queries(args.queries_jsonl), args.base_url, args.prepared, args.k)
     if args.out:
         args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
                             encoding="utf-8")

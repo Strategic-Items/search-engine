@@ -14,7 +14,9 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 
 - `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색,
   시행일 필터, 청크의 부모 문서 중복 제거. 검색어에 10자리 HSK 코드가 있으면 HSK
-  연계표도 함께 정확 조회한다. `X-API-Key` 인증 필수.
+  연계표도 함께 정확 조회한다.
+- `POST /v1/rag/stream`: 검색 근거가 있는 답변만 Ollama로 스트리밍하며, `fetch`로
+  SSE 응답을 읽는다.
 - `search-index`: JSONL 문서를 새 인덱스에 색인하고 문서 수를 확인한 뒤 읽기 별칭을
   원자적으로 전환한다. 이전 인덱스는 롤백을 위해 보존한다.
 - `search-prepare`: 이전 실습 코퍼스에서 FAQ·안내·공지·서식과 HSK 연계표를
@@ -24,8 +26,9 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 
 ## 로컬 실행
 
-Python 3.11 이상과 Docker가 필요하다. API는 로컬에서 실행하고 OpenSearch와
-Dashboards를 Compose로 띄운다.
+Python 3.11 이상, Docker와 Ollama가 필요하다. API와 Ollama는 로컬에서 실행하고
+OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실행하고
+`ollama pull qwen2.5:3b`(또는 `OLLAMA_CHAT_MODEL`에 지정한 모델)을 받아 둔다.
 
 ```bash
 cd /Users/jeongbin/git/searchEngine
@@ -59,12 +62,8 @@ python3 -m venv .venv
 ```bash
 curl -sS http://127.0.0.1:8092/v1/search \
   -H 'Content-Type: application/json' \
-  -H 'X-API-Key: local-development-key-change-me' \
   -d '{"query":"자가판정 신청 방법"}'
 ```
-
-위 키는 `.env.example`의 로컬 실습 값이다. `.env`에서 키를 바꿨다면 요청 헤더에도
-같은 값을 사용한다. 외부에서 접근할 수 있게 배포하기 전에 반드시 비밀값으로 교체한다.
 
 일반 검색에 10자리 HSK 코드를 넣으면 문서 결과(`hits`)와 HSK 연계표 결과(`hsk`)를
 함께 반환한다. HSK 연계표는 전략물자 해당 여부의 확정 판정이 아니다.
@@ -72,6 +71,17 @@ curl -sS http://127.0.0.1:8092/v1/search \
 ```json
 {"query":"HSK 2826902000"}
 ```
+
+RAG는 검색 결과가 있을 때만 답변을 생성한다. 스트림 중 Ollama 오류는 HTTP 상태가 아니라
+`event: error` 프레임으로 전달되므로 클라이언트가 이 이벤트를 실패로 처리해야 한다.
+
+```bash
+curl -N http://127.0.0.1:8092/v1/rag/stream \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"자가판정 유효기간","session_id":"s1"}'
+```
+
+구현 결정과 제한은 [RAG v1 기록](docs/rag_v1.md)에 정리했다.
 
 `GET /health/live`는 앱 프로세스, `GET /health/ready`는 OpenSearch 연결을 확인한다.
 테스트는 `.venv/bin/pytest -q`로 실행한다.
@@ -88,21 +98,34 @@ Dashboards는 색인·데이터를 확인하는 관리 화면이며, 서비스 �
 
 ## 코드 구조
 
-`search_engine/` 아래 평평한 모듈 하나당 역할 하나다.
+`search_engine/` 아래는 의존 방향이 한쪽으로만 흐르는 계층이다.
+`api → rag → search → client/config`, `indexing → client/config`.
 
 ```
-api.py         FastAPI 앱과 요청 스키마
-search.py      문서 질의 조립, 검색, HSK 병합(search_all)
-hsk.py         HSK 코드 추출, 연계표 조회
-indexer.py     색인 재생성과 읽기 별칭 전환 (search-index)
-prepare.py     실습 코퍼스 → core/hsk 데이터셋 (search-prepare)
-documents.py   색인 입력 문서 모델
-results.py     검색 응답 모델
-codes.py       통제번호·법령 참조 정규화
-mapping.py     인덱스 매핑
-client.py      OpenSearch 클라이언트
 config.py      환경변수 설정
+client.py      OpenSearch 클라이언트
+codes.py       통제번호·법령 참조 정규화 (색인·검색 공용)
+
+api/           HTTP 표면 (uvicorn search_engine.api:app)
+  routes.py      FastAPI 앱과 라우트
+  schemas.py     요청 스키마
+search/        런타임 질의 경로
+  query.py       문서 질의 조립, 검색, HSK 병합(search_all)
+  hsk.py         HSK 코드 추출, 연계표 조회
+  results.py     검색 응답 모델
+indexing/      오프라인 색인 파이프라인
+  prepare.py     실습 코퍼스 → core/hsk 데이터셋 (search-prepare)
+  indexer.py     색인 재생성과 읽기 별칭 전환 (search-index)
+  documents.py   색인 입력 문서 모델
+  mapping.py     인덱스 매핑
+  synonyms.py    동의어 사전 로딩
+rag/           검색 기반 답변 파이프라인
+evaluation/    검색 품질 측정 (search-evaluate)
 ```
+
+`search`와 `indexing`은 서로를 부르지 않는다. 각 패키지의 `__init__.py`가 공개
+이름을 재수출하므로 `from search_engine.search import search_all`처럼 패키지
+단위로 임포트한다.
 
 ## 색인 입력 계약
 

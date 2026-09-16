@@ -3,8 +3,8 @@ import re
 
 from opensearchpy import OpenSearch
 
-from search_engine.hsk import extract_hsk_code, retrieve_hsk
-from search_engine.results import SearchHit, SearchResults
+from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
+from search_engine.search.results import SearchHit, SearchResults
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 
