@@ -70,7 +70,7 @@ def test_a_gold_document_that_was_never_indexed_is_reported_separately(tmp_path,
     monkeypatch.setattr("search_engine.evaluate.search",
                         lambda *a, **kw: {"hits": [{"parent_id": "doc-1"}], "hsk": None})
 
-    report = evaluate(queries, "http://127.0.0.1:8092", "secret", tmp_path)
+    report = evaluate(queries, "http://127.0.0.1:8092", tmp_path)
 
     assert report["totals"]["first"] == 1
     assert report["totals"]["gold_missing_from_index"] == 1
@@ -85,7 +85,7 @@ def test_scores_are_grouped_by_category(tmp_path, monkeypatch):
     monkeypatch.setattr("search_engine.evaluate.search", lambda *a, **kw: {
         "hits": [{"parent_id": "doc-2"}, {"parent_id": "doc-1"}], "hsk": None})
 
-    report = evaluate(queries, "http://127.0.0.1:8092", "secret", tmp_path)
+    report = evaluate(queries, "http://127.0.0.1:8092", tmp_path)
 
     assert report["categories"]["guide"] == {
         "queries": 1, "first": 0, "top_k": 1, "gold_missing_from_index": 0}
@@ -103,7 +103,7 @@ def test_the_answerable_subset_excludes_gold_that_never_reached_the_index(tmp_pa
     monkeypatch.setattr("search_engine.evaluate.search",
                         lambda *a, **kw: {"hits": [{"parent_id": "doc-1"}], "hsk": None})
 
-    report = evaluate(queries, "http://127.0.0.1:8092", "secret", tmp_path)
+    report = evaluate(queries, "http://127.0.0.1:8092", tmp_path)
 
     assert report["totals"]["queries"] == 2
     assert report["answerable"] == {"queries": 1, "first": 1, "top_k": 1}

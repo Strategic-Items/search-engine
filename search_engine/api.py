@@ -1,7 +1,9 @@
 from datetime import date
-from hmac import compare_digest
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from collections.abc import AsyncIterator
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from opensearchpy import OpenSearchException
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -9,6 +11,7 @@ from search_engine.client import create_client
 from search_engine.config import get_settings
 from search_engine.results import SearchResults
 from search_engine.search import search_all
+from search_engine.rag import pipeline
 
 app = FastAPI(title="Strategic Items Search", version="0.1.0")
 
@@ -27,12 +30,20 @@ class SearchRequest(BaseModel):
         return self
 
 
-def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
-    configured = get_settings().search_api_key
-    if not configured:
-        raise HTTPException(status_code=503, detail="search API key is not configured")
-    if x_api_key is None or not compare_digest(x_api_key, configured):
-        raise HTTPException(status_code=401, detail="invalid API key")
+class RagRequest(BaseModel):
+    """A grounded RAG request; extra fields are deliberately rejected."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    query: str = ""
+    session_id: str | None = None
+
+    @model_validator(mode="after")
+    def require_search_term(self):
+        if not self.query.strip():
+            raise ValueError("query is required")
+        return self
+
 
 
 @app.get("/health/live")
@@ -50,7 +61,7 @@ def ready() -> dict:
     return {"status": "ok"}
 
 
-@app.post("/v1/search", dependencies=[Depends(require_api_key)])
+@app.post("/v1/search")
 def search(request: SearchRequest) -> SearchResults:
     settings = get_settings()
     try:
@@ -60,3 +71,27 @@ def search(request: SearchRequest) -> SearchResults:
         )
     except OpenSearchException as exc:
         raise HTTPException(status_code=503, detail="search unavailable") from exc
+
+
+@app.post("/v1/rag/stream")
+async def rag_stream(request: RagRequest) -> StreamingResponse:
+    try:
+        turn = await pipeline.prepare_turn(request.query, request.session_id)
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="search unavailable") from exc
+    return StreamingResponse(
+        _as_sse(pipeline.stream_answer(turn)),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+async def _as_sse(chunks: AsyncIterator[str | pipeline.StreamError]) -> AsyncIterator[str]:
+    async for chunk in chunks:
+        if isinstance(chunk, pipeline.StreamError):
+            yield f"event: error\ndata: {chunk.message}\n\n"
+            return
+        # SSE requires each physical line to carry a data prefix.
+        payload = "\n".join(f"data: {line}" for line in chunk.splitlines() or [""])
+        yield f"{payload}\n\n"
+    yield "event: done\ndata: done\n\n"

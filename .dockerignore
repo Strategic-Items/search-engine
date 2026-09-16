@@ -5,3 +5,8 @@ tests
 __pycache__
 *.pyc
 *.egg-info
+rag
+data
+docs
+examples
+.pytest_cache

@@ -27,5 +27,13 @@ services:
       opensearch:
         condition: service_healthy
 
+  # The API is normally run on the host, so it reaches host Ollama at localhost.
+  # Containerizing it later requires a persistent multi-GB model volume and pull step.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   volumes:
+  #     - ollama-data:/root/.ollama
+
 volumes:
   opensearch-data:
+  # ollama-data:
