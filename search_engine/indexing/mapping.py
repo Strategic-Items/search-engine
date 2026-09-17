@@ -68,6 +68,29 @@ def index_body(embedding_dimensions: int) -> dict:
     }
 
 
+def callcenter_index_body(embedding_dimensions: int) -> dict:
+    """Search mapping for past consultations, isolated from official sources."""
+    body = index_body(embedding_dimensions)
+    body["mappings"]["properties"].update({
+        "call_id": {"type": "keyword"},
+        "seq": {"type": "integer"},
+        "call_inquiry": {"type": "text", "analyzer": "korean_nori"},
+        "categories": {"type": "keyword"},
+        "keywords": {"type": "keyword"},
+        "start_sec": {"type": "float"},
+        "end_sec": {"type": "float"},
+        "seg_ids": {"type": "keyword", "index": False},
+        # A nested mapping preserves type/value pairs for a future faceted UI.
+        "entities": {"type": "nested", "properties": {
+            "type": {"type": "keyword"},
+            "mention": {"type": "text", "analyzer": "korean_nori"},
+            "normalized": {"type": "keyword"},
+            "seg_ids": {"type": "keyword", "index": False},
+        }},
+    })
+    return body
+
+
 # Preserve a directly inspectable default mapping for callers and tests.
 HSK_INDEX_BODY = {
     "settings": {

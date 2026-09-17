@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     # rebuild replaces its whole index.
     search_docs_alias: str = "search-docs"
     search_docs_prefix: str = "search-docs-v"
+    # Past call-centre cases are deliberately excluded from the official
+    # knowledge/RAG aliases and queried only by their dedicated endpoint.
+    search_callcenter_alias: str = "search-callcenter"
+    search_callcenter_prefix: str = "search-callcenter-v"
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
     search_document_datasets: Literal["core,docs", "docs", "core"] = "core,docs"

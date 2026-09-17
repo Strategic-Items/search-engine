@@ -74,6 +74,14 @@ python3 -m venv .venv
   --manifest ../unstructured-doc-parser/data/chunks/manifest.json
 ```
 
+콜센터 사례는 공식 지식 및 RAG 근거와 분리된 `callcenter` 데이터셋으로 색인한다.
+입력은 제공받은 청크 원본 그대로이며, 색인 과정에서 검색용 제목·본문과 상담 메타데이터로
+정규화한다. **과거 상담 사례는 공식 근거나 RAG 답변의 근거로 사용되지 않는다.**
+
+```bash
+.venv/bin/search-index data/callcenter/chunks.jsonl --dataset callcenter
+```
+
 검색은 `core`와 `docs`를 함께 조회한다(`Settings.document_aliases`). 연동 계약은
 [문서 파서 연동 기록](docs/doc_parser_import.md)에 있다.
 

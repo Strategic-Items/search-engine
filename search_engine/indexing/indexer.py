@@ -13,8 +13,9 @@ from opensearchpy.helpers import streaming_bulk
 from search_engine.client import create_client
 from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder, embedding_text
+from search_engine.indexing.callcenter import CallCenterChunk
 from search_engine.indexing.documents import SearchDocument
-from search_engine.indexing.mapping import HSK_INDEX_BODY, index_body
+from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body
 from search_engine.indexing.synonyms import load_synonyms
 
 log = logging.getLogger(__name__)
@@ -27,12 +28,16 @@ DATASETS = {
              "mapping": "document", "embed": True},
     "docs": {"alias": "search_docs_alias", "prefix": "search_docs_prefix",
              "mapping": "document", "embed": True},
+    "callcenter": {"alias": "search_callcenter_alias", "prefix": "search_callcenter_prefix",
+                   "mapping": "callcenter", "embed": True},
     "hsk": {"alias": "search_hsk_alias", "prefix": "search_hsk_prefix",
             "mapping": "hsk", "embed": False},
 }
 
 
-def document_actions(path: Path, index_name: str, embedder: OllamaEmbedder | None = None):
+def document_actions(
+    path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
+):
     """Validate every line, refusing a file that repeats a document ID."""
     seen = set()
     with path.open(encoding="utf-8") as file:
@@ -40,16 +45,20 @@ def document_actions(path: Path, index_name: str, embedder: OllamaEmbedder | Non
             if not line.strip():
                 continue
             try:
-                doc = SearchDocument.model_validate_json(line)
+                doc = (CallCenterChunk.model_validate_json(line) if callcenter
+                       else SearchDocument.model_validate_json(line))
             except Exception as exc:
                 raise ValueError(f"invalid document at line {line_no}: {exc}") from exc
-            if doc.id in seen:
-                raise ValueError(f"duplicate document ID at line {line_no}: {doc.id}")
-            seen.add(doc.id)
+            doc_id = doc.chunk_id if callcenter else doc.id
+            if doc_id in seen:
+                raise ValueError(f"duplicate document ID at line {line_no}: {doc_id}")
+            seen.add(doc_id)
             source = doc.index_source()
             if embedder is not None:
-                source["embedding"] = embedder.embed([embedding_text(doc.title, doc.body)])[0]
-            yield {"_op_type": "index", "_index": index_name, "_id": doc.id, "_source": source}
+                source["embedding"] = embedder.embed([
+                    embedding_text(source["title"], source["body"])
+                ])[0]
+            yield {"_op_type": "index", "_index": index_name, "_id": doc_id, "_source": source}
 
 
 def current_alias_indexes(client, alias: str) -> list[str]:
@@ -87,9 +96,11 @@ def rebuild(
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     alias = getattr(settings, spec["alias"])
     prefix = getattr(settings, spec["prefix"])
-    is_document = spec["mapping"] == "document"
+    is_document = spec["mapping"] in ("document", "callcenter")
     mapping = deepcopy(
-        index_body(settings.search_embedding_dimensions) if is_document else HSK_INDEX_BODY
+        index_body(settings.search_embedding_dimensions) if spec["mapping"] == "document"
+        else callcenter_index_body(settings.search_embedding_dimensions)
+        if spec["mapping"] == "callcenter" else HSK_INDEX_BODY
     )
     mapping["settings"]["number_of_replicas"] = settings.search_number_of_replicas
     if is_document:
@@ -101,7 +112,7 @@ def rebuild(
         indexed = 0
         embedder = OllamaEmbedder(settings) if spec["embed"] else None
         for ok, item in streaming_bulk(
-            client, document_actions(path, index_name, embedder),
+            client, document_actions(path, index_name, embedder, callcenter=spec["mapping"] == "callcenter"),
             chunk_size=500, max_retries=3, raise_on_error=True,
         ):
             if not ok:

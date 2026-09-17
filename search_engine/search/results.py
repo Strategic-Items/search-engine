@@ -38,6 +38,14 @@ class SearchHit(BaseModel):
     # question is often in a different chunk of it, and that chunk used to be
     # dropped. `id`/`body` stay the document's primary chunk.
     passages: list[Passage] = []
+    # Present only for the isolated call-centre corpus.  Keeping these optional
+    # lets the shared retriever return a compact, useful case card without
+    # changing the official-document response contract.
+    call_id: str = ""
+    call_inquiry: str = ""
+    categories: list[str] = []
+    start_sec: float | None = None
+    end_sec: float | None = None
 
     @property
     def chunk_ids(self) -> list[str]:
@@ -90,3 +98,30 @@ class ModeComparison(BaseModel):
 
     query: str
     modes: list[ModeResults]
+
+
+class DocumentChunk(BaseModel):
+    """One chunk of a document, in the order the document was written."""
+
+    id: str
+    body: str = ""
+
+
+class Document(BaseModel):
+    """A whole document, reassembled from the chunks it was indexed as.
+
+    Search ranks chunks, so a hit shows a fragment torn out of the middle of a
+    공고문. Reading it in context means reading the document, and the document
+    only exists in the index as its chunks.
+    """
+
+    parent_id: str
+    title: str = ""
+    code: str = ""
+    source_type: str = "unknown"
+    source_url: str = ""
+    published_at: str | None = None
+    effective_from: str | None = None
+    effective_to: str | None = None
+    superseded_by: str | None = None
+    chunks: list[DocumentChunk] = []
