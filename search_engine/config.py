@@ -41,9 +41,12 @@ class Settings(BaseSettings):
     ollama_temperature: float = 0.4
     # Ollama silently drops the front of a prompt that exceeds the context window,
     # which would cut the grounding rules and leave the evidence, and the window
-    # covers the answer as well as the prompt. At four chunks per document the
-    # longest docs v2 prompt measured 7,695 tokens, so this leaves room to answer.
-    ollama_num_ctx: int = Field(default=16384, ge=512)
+    # covers the answer as well as the prompt. At six chunks per document the
+    # longest docs v2 prompt measured 14,068 tokens, which 16,384 would leave
+    # only about 2,300 tokens to answer within, so this leaves real headroom.
+    # Only the ollama provider reads this; an OpenAI-compatible server fixes its
+    # window at startup instead (vLLM's --max-model-len).
+    ollama_num_ctx: int = Field(default=24576, ge=512)
     ollama_timeout_seconds: float = Field(default=120.0, gt=0)
     # Where the chat model lives. "ollama" speaks Ollama's native API at
     # OLLAMA_BASE_URL; "openai" speaks the OpenAI-compatible protocol (vLLM,
