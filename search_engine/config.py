@@ -64,7 +64,11 @@ class Settings(BaseSettings):
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
     # Chunks carried per returned document. Ranking still returns one document
     # per slot; this only decides how much of that document comes with it.
-    search_chunks_per_document: int = Field(default=4, ge=1, le=20)
+    # 6 rather than 4: on docs v2's 120 questions the evidence a document was
+    # labelled for sat outside its first four candidate chunks in 9 questions,
+    # and every one of those chunks was already in the pool the search fetched.
+    # Evidence recall saturates at 16, but the context doubles to get there.
+    search_chunks_per_document: int = Field(default=6, ge=1, le=20)
     # Search the question and a model-written rewrite of it, fused. Off by
     # default: on docs v2 it buys one to two questions out of forty and costs
     # roughly half a second per search, and it puts the chat model in the path
