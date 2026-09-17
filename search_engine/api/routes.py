@@ -10,7 +10,12 @@ from search_engine.client import create_client
 from search_engine.config import get_settings
 from search_engine.api.schemas import RagRequest, SearchRequest
 from search_engine.rag import pipeline
-from search_engine.search import SearchResults, search_all
+from search_engine.search import (
+    ModeComparison,
+    SearchResults,
+    search_all,
+    search_modes,
+)
 
 app = FastAPI(title="Strategic Items Search", version="0.1.0")
 
@@ -37,6 +42,18 @@ def search(request: SearchRequest) -> SearchResults:
         return search_all(
             create_client(), settings.document_aliases, settings.search_hsk_alias,
             request.query, date.today(), 5,
+        )
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="search unavailable") from exc
+
+
+@app.post("/v1/search/compare")
+def search_compare(request: SearchRequest) -> ModeComparison:
+    """The same query through every mode at once, for comparing them by eye."""
+    settings = get_settings()
+    try:
+        return search_modes(
+            create_client(), settings.document_aliases, request.query, date.today(), 5,
         )
     except OpenSearchException as exc:
         raise HTTPException(status_code=503, detail="search unavailable") from exc

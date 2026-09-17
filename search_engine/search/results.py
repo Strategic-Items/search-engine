@@ -16,7 +16,12 @@ class SearchHit(BaseModel):
 
     id: str
     parent_id: str
+    # The retriever's own score, on whatever scale that retriever uses.
     score: float | None = None
+    # The same match on one 0-1 scale that means the same thing in every search
+    # mode, so a caller can compare or draw it without knowing which ran. None
+    # where score is: a replacement edition was fetched, not ranked.
+    relevance: float | None = None
     title: str = ""
     body: str = ""
     code: str = ""
@@ -66,3 +71,22 @@ class SearchResults(BaseModel):
     query: str
     hits: list[SearchHit]
     hsk: HskResults | None = None
+
+
+class ModeResults(BaseModel):
+    """What one search mode returned for a query, and what it cost to get it."""
+
+    mode: str
+    hits: list[SearchHit] = []
+    latency_ms: float = 0.0
+    # Set when this mode alone failed. A comparison whose whole request failed
+    # because one retriever was down would hide the very thing being compared,
+    # so a dead mode reports its own reason and the others still answer.
+    error: str = ""
+
+
+class ModeComparison(BaseModel):
+    """The same query run through every retrieval mode, for side-by-side reading."""
+
+    query: str
+    modes: list[ModeResults]
