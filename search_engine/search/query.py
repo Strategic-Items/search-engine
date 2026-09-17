@@ -1,16 +1,23 @@
 from datetime import date
 import logging
 import re
-from collections.abc import Iterable
+from time import perf_counter
+from collections.abc import Callable, Iterable
 
 import httpx
-from opensearchpy import OpenSearch
+from opensearchpy import OpenSearch, OpenSearchException
 
 from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.rewrite import rewrite_query
-from search_engine.search.results import Passage, SearchHit, SearchResults
+from search_engine.search.results import (
+    ModeComparison,
+    ModeResults,
+    Passage,
+    SearchHit,
+    SearchResults,
+)
 
 log = logging.getLogger(__name__)
 
@@ -132,6 +139,45 @@ def _warn_on_partial_results(response: dict, retriever: str) -> None:
     for failure in shards.get("failures", []):
         log.warning("%s search skipped index %s: %s", retriever, failure.get("index"),
                     failure.get("reason", {}).get("reason"))
+
+
+# BM25 has no upper bound, so a raw score cannot be read as a fraction of
+# anything. This is the score that maps to a relevance of 0.5 -- on the docs set
+# a first-place hit scores 13-19, so the band users actually see lands either
+# side of the midpoint instead of pinned against an end.
+BM25_HALF_RELEVANCE = 15.0
+
+
+def _cosine_relevance(score: float) -> float:
+    """Recover the cosine similarity the k-NN score folded into 0-1.
+
+    The engine reports (1+cosine)/2, which confines every score for related text
+    to a narrow band above 0.5 and halves the distance between them. Undoing it
+    gives back the similarity itself: a real quantity, spread over twice the
+    range, and directly comparable to the thresholds the evaluation set uses.
+    """
+    return 2 * score - 1
+
+
+def _relevance_scale(
+    ranked_lists: list[tuple[list[dict], float]], rrf_k: int, mode: str,
+) -> Callable[[float], float]:
+    """How to read this search's raw scores as a relevance between 0 and 1.
+
+    The three modes score on scales that share no unit -- an RRF score near
+    0.033, a cosine-derived 0.8 and an unbounded BM25 13.06 can all mean "the
+    best answer there is" -- so a caller comparing or drawing them needs one
+    number that means the same thing in each. Which scale applies is decided by
+    what actually ran, not by the mode asked for: a rewrite makes `bm25` fuse
+    two lists, and an embedding outage leaves `hybrid` with only the lexical one.
+    """
+    if len(ranked_lists) > 1:
+        # A document that topped every list scores the sum of their weights.
+        ceiling = sum(weight for _hits, weight in ranked_lists) / (rrf_k + 1)
+        return lambda score: score / ceiling
+    if mode == "vector":
+        return _cosine_relevance
+    return lambda score: score / (score + BM25_HALF_RELEVANCE)
 
 
 def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[dict]:
@@ -291,13 +337,16 @@ def retrieve(
             if parent not in seen:
                 seen.add(parent)
                 ranked.append(hit)
+    scale = _relevance_scale(ranked_lists, settings.search_hybrid_rrf_k, mode)
     out = []
     for hit in ranked:
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
+        score = hit.get("_score")
         out.append(SearchHit.model_validate({
             **{key: value for key, value in source.items() if value is not None},
-            "id": hit["_id"], "parent_id": parent_id, "score": hit.get("_score"),
+            "id": hit["_id"], "parent_id": parent_id, "score": score,
+            "relevance": None if score is None else min(1.0, max(0.0, scale(score))),
         }))
         if len(out) == k:
             break
@@ -358,6 +407,54 @@ def _with_current_editions(
             merged.append(replacement)
             present.add(replacement.parent_id)
     return merged[:k]
+
+
+MODES = ("bm25", "vector", "hybrid")
+
+
+class _SharedEmbedder:
+    """Embed a query once and lend the vector to every mode that asks for it.
+
+    Comparing modes should compare retrieval, not embedding: charging Ollama
+    twice for one question doubles the slowest part of the request, and a model
+    that is not bit-reproducible would hand `vector` and `hybrid` slightly
+    different vectors, so they could disagree for a reason that is not the mode.
+    """
+
+    def __init__(self, embedder: OllamaEmbedder):
+        self._embedder = embedder
+        self._cache: dict[str, list[float]] = {}
+
+    def embed_query(self, query: str) -> list[float]:
+        if query not in self._cache:
+            self._cache[query] = self._embedder.embed_query(query)
+        return self._cache[query]
+
+
+def search_modes(
+    client: OpenSearch, alias: str, query: str, as_of: date, k: int = 5,
+    modes: Iterable[str] = MODES,
+) -> ModeComparison:
+    """Run one query through every mode, so the modes can be read side by side.
+
+    Switching SEARCH_MODE and searching again compares two different moments as
+    much as it compares two modes -- the index may have been rebuilt, and nobody
+    reads a rank list from memory accurately. One request removes both problems.
+    """
+    embedder = _SharedEmbedder(OllamaEmbedder(get_settings()))
+    results = []
+    for mode in modes:
+        start = perf_counter()
+        try:
+            hits = retrieve(client, alias, query, as_of, k, embedder, mode=mode)
+            error = ""
+        except (OpenSearchException, httpx.HTTPError) as exc:
+            hits, error = [], f"{type(exc).__name__}: {exc}"
+        results.append(ModeResults(
+            mode=mode, hits=hits, error=error,
+            latency_ms=(perf_counter() - start) * 1000,
+        ))
+    return ModeComparison(query=query, modes=results)
 
 
 def search_all(
