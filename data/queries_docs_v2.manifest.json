@@ -3,12 +3,12 @@
   "created_at": "2026-09-16",
   "status": "draft_pending_user_review",
   "queries_file": "queries_docs_v2.jsonl",
-  "queries_sha256": "b9c9a9e70029cbf4634341e2b94417e32b304142d5430efbdd764a0b1618cc0a",
-  "queries": 40,
+  "queries_sha256": "d11b4dbe3cecc304e798be51adfbec966e9e1380b8819a3c659373870e03dd06",
+  "queries": 80,
   "categories": {
-    "paraphrase": 12,
-    "scenario": 22,
-    "multi_evidence": 6
+    "paraphrase": 24,
+    "scenario": 44,
+    "multi_evidence": 12
   },
   "negative_queries_file": "queries_docs_v2_unanswerable.jsonl",
   "negative_queries_sha256": "01585dfe1f116ffd85e3c0a7abaeb62c999a8b2decdb2ccf30894f2b26cc06a8",
@@ -17,9 +17,9 @@
   "source_corpus": "data/generated/docs-v1/docs.jsonl",
   "source_chunks": 1041,
   "total_source_parents": 36,
-  "labeled_parents": 21,
-  "evidence_requirements": 46,
-  "verified_quotes": 64,
+  "labeled_parents": 28,
+  "evidence_requirements": 92,
+  "verified_quotes": 119,
   "gold_unit": "parent_id",
   "primary_document_metric": "group_recall_at_k",
   "primary_answer_support_metric": "evidence_recall_at_k",
@@ -34,7 +34,8 @@
     "Reference answers and acceptable evidence chunks come from corpus bodies, not v2 retrieved rankings.",
     "For each requirement enumerate every matching chunk in the labeled source parents, including overlap and equivalent-format copies.",
     "Group equivalent decree formats into one logical relevant document; raw physical-parent recall remains available separately.",
-    "Separate unanswered fact requests from answerable ranking questions; empty-gold cases are not averaged into recall."
+    "Separate unanswered fact requests from answerable ranking questions; empty-gold cases are not averaged into recall.",
+    "Treat equivalent duplicate copies of the children-product notice as one logical relevant document."
   ],
   "limitations": [
     "AI-authored source-reviewed draft, not independently human-reviewed or a production acceptance benchmark.",
@@ -44,6 +45,13 @@
     "Evidence matching uses labeled chunk IDs, not automated evaluation of generated answer correctness. Relevant unlabeled paraphrase chunks may require additional human judgments.",
     "Current retrieval returns one exemplar per parent. Multiple evidence requirements in different chunks of one parent may not all be satisfiable with current output.",
     "Negative examples are scope-relative drafts for manual abstention review; current search-compare/search-evaluate reject empty gold and do not score them.",
-    "Human edits change query fingerprints. Recompute hashes in this manifest when freezing a reviewed revision."
-  ]
+    "Human edits change query fingerprints. Recompute hashes in this manifest when freezing a reviewed revision.",
+    "The 80-query revision and corrected labels have not been used to rerun retrieval; historical 40-query results refer to the earlier revision."
+  ],
+  "updated_at": "2026-09-17",
+  "source_review_date": "2026-09-17",
+  "existing_queries_reviewed": 40,
+  "existing_queries_corrected": 10,
+  "added_queries": 40,
+  "current_revision_search_executed": false
 }
