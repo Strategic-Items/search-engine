@@ -300,7 +300,76 @@ cd /Users/jeongbin/git/searchEngine
   --corpus /Users/jeongbin/git/unstructured-doc-parser/data/chunks/docs.jsonl \
   --alias search-docs-only --repeats 3 --as-of 2026-09-16 --rewrite \
   --out data/generated/docs-v2/comparison-bge-m3-rewrite.json   # 7단계
+
+SEARCH_CHUNKS_PER_DOCUMENT=6 .venv/bin/search-compare data/queries_docs_v2.jsonl \
+  --corpus data/generated/docs-v2/review-corpus/docs.jsonl \
+  --alias search-docs-only --repeats 3 --as-of 2026-09-17 \
+  --out data/generated/docs-v2/comparison-120q-chunks6.json   # 8단계
 ```
+
+## 8단계: 120문항 평가셋과 문서당 청크 6개 (2026-09-17)
+
+측정일 2026-09-17. 평가셋이 40문항에서 120문항으로, 코퍼스가
+`data/generated/docs-v2/review-corpus/docs.jsonl`(1,198청크 / 부모 52개)로 바뀌었다.
+따라서 아래 수치는 1~7단계와 직접 비교할 수 없다. 색인은
+`search-docs-only-v20260917072718-a0707d`, 기준일 2026-09-17, 재작성 꺼짐이다.
+
+| 방식 | P@1 | Recall@5 | Recall@10 | MRR@5 | 근거 Recall@5 (n=4 → n=6) | p50 |
+|---|---:|---:|---:|---:|---|---:|
+| BM25 | 80.8% | 95.8% | 97.5% | 0.8628 | 75.8% → 85.0% | 18.5ms |
+| **벡터** | **94.2%** | **99.2%** | **100.0%** | **0.9593** | 92.5% → **95.4%** | 74.6ms |
+| 하이브리드 | 92.5% | 98.3% | 99.2% | 0.9454 | 78.8% → 87.9% | 94.6ms |
+
+문서 지표는 `SEARCH_CHUNKS_PER_DOCUMENT`와 무관하게 세 방식 모두 동일했다. 4단계 설계대로
+순위 단위는 그대로고 반환 단위만 넓어지므로, 이 값을 바꿔도 문서 순위는 변하지 않는다.
+
+### 왜 6인가
+
+n=4에서 근거를 놓친 벡터 10문항의 근거 청크 순위를 후보 300개까지 확인한 결과,
+**후보 밖으로 나간 것은 0건**이었다. 9건은 부모 문서 안에서 5~15위, 즉 4개 컷 바로
+뒤에 있었다. 나머지 1건(docs-v2-019)은 근거 청크가 그 문서의 1위인데 문서 자체가
+상위 5에 못 든 경우로, 청크 선택이 아니라 검색의 문제다. Recall@5 99.2%의 그 1문항이다.
+
+n을 24까지 늘려 실제 프롬프트를 만들고 vLLM 토크나이저로 센 결과다. n=4·6은 위
+실측치와 일치한다.
+
+| n | 근거 R@5 | 모든 근거@5 | 평균 청크 | 평균 토큰 | 최장 토큰 |
+|---:|---:|---:|---:|---:|---:|
+| 4 | 92.5% | 91.7% | 16.5 | 6,736 | 10,124 |
+| **6 (채택)** | 95.4% | 94.2% | 21.3 | 8,542 | 14,068 |
+| 8 | 96.7% | 95.8% | 25.1 | 9,915 | 17,192 |
+| 10 | 97.5% | 96.7% | 27.8 | 10,901 | 18,740 |
+| 12 | 97.9% | 97.5% | 30.0 | 11,667 | 20,426 |
+| 16 | 99.2% | 99.2% | 32.8 | 12,613 | 22,814 |
+| 20 / 24 | 99.2% | 99.2% | 34.4 / 35.4 | 13,122 / 13,463 | 22,814 |
+
+n=16에서 포화한다. 후보 풀이 고갈되어 그 위로는 아무것도 변하지 않고, 남는 1문항은
+위의 docs-v2-019다. 8~16을 택하지 않은 이유는 컨텍스트 희석이다. 근거 Recall은 답이
+프롬프트에 들어 있는지를 재지, 모델이 그것을 찾아 쓰는지를 재지 않는다. n=16은 청크를
+33개까지 싣는데 생성 품질 평가셋이 없어 그 구간을 확인할 수 없었다. 8 이상은 생성 품질을
+측정할 수 있게 된 뒤에 다시 판단한다.
+
+### 리랭킹을 채택하지 않은 근거
+
+부모별 후보 청크를 완벽히 재정렬하는 오라클 리랭커의 상한도 근거 Recall@5 99.2%로,
+n=16과 같은 지점이다. 실제로 `BAAI/bge-reranker-v2-m3`을 붙인 40문항 측정
+(`data/generated/docs-v2/rerank-quality.json`)에서 하이브리드는 근거 78.8% → 86.3%로
+올랐지만, 같은 조건의 벡터 단독 91.2%에 미치지 못하면서 p50이 152ms → 1,611ms가 됐다.
+리랭커가 고친 것은 검색의 한계가 아니라 RRF 융합이 흐트러뜨린 문서 내 청크 순서였고,
+같은 개선을 이 단계에서 설정값 하나로 지연 증가 없이 얻었다. 리랭커에 남는 이점은
+정확도가 아니라 토큰 효율(n=4 + 리랭커 약 9k 토큰 vs n=16 약 12.6k)뿐이다.
+
+### 컨텍스트 길이 주의
+
+현재 `.env`는 `CHAT_PROVIDER=openai`이고 실제 서버는 `Qwen/Qwen3-VL-30B-A3B-Instruct-FP8`,
+`max_model_len=32,768`이라 n=6의 최장 14,068토큰이 넉넉히 들어간다. 그러나
+`CHAT_PROVIDER=ollama`로 되돌리면 `OLLAMA_NUM_CTX=16384`가 적용되어 답변 몫이 약
+2,300토큰만 남는다. Ollama는 넘치는 프롬프트의 앞부분, 즉 접지 규칙을 조용히 잘라내므로
+프로바이더를 되돌릴 때는 `OLLAMA_NUM_CTX`를 함께 올려야 한다.
+
+생성 지연은 8문항 표본에서 TTFT p50이 n=4 1,424ms, n=6 1,768ms, n=16 2,542ms였다.
+총 생성 시간의 차이는 표본이 작아 노이즈와 구분되지 않는다.
+
 
 3단계 수치를 다시 만들려면 `SEARCH_CHUNKS_PER_DOCUMENT=1`로 실행한다.
 
@@ -310,5 +379,7 @@ cd /Users/jeongbin/git/searchEngine
 `data/generated/docs-v2/comparison-chunks-per-doc-4.json`,
 `data/generated/docs-v2/comparison-query-rewrite.json`,
 `data/generated/docs-v2/comparison-bge-m3.json`,
-`data/generated/docs-v2/comparison-bge-m3-rewrite.json`에 보관한다.
+`data/generated/docs-v2/comparison-bge-m3-rewrite.json`,
+`data/generated/docs-v2/comparison-120q.json`(8단계 n=4),
+`data/generated/docs-v2/comparison-120q-chunks6.json`(8단계 n=6)에 보관한다.
 1~5단계 수치는 `nomic-embed-text` 색인에서 얻은 것이라, 현재 색인으로는 재현되지 않는다.
