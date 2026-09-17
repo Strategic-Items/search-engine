@@ -42,6 +42,21 @@ def test_document_actions_rejects_a_repeated_id(tmp_path: Path):
         list(document_actions(path, "new-index"))
 
 
+def test_callcenter_actions_normalize_raw_stt_chunks(tmp_path: Path):
+    path = write(tmp_path, {
+        "chunk_id": "sg01#c0", "call_id": "sg01", "seq": 0, "text": "공작기계 상담 내용",
+        "call_inquiry": "공작기계 판정 방법", "categories": ["판정"],
+        "entities": [{"type": "품목", "normalized": "공작기계"}],
+    })
+
+    action = next(document_actions(path, "call-index", callcenter=True))
+
+    assert action["_id"] == "sg01#c0"
+    assert action["_source"]["parent_id"] == "sg01"
+    assert action["_source"]["title"] == "콜센터 상담 사례 · 판정"
+    assert "문의 요약: 공작기계 판정 방법" in action["_source"]["body"]
+
+
 def test_rebuild_keeps_old_index_and_atomically_moves_alias(tmp_path, monkeypatch):
     path = write(tmp_path, {"id": "faq-1", "title": "허가"})
     client = Mock()

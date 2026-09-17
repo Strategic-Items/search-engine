@@ -11,8 +11,10 @@ from search_engine.config import get_settings
 from search_engine.api.schemas import RagRequest, SearchRequest
 from search_engine.rag import pipeline
 from search_engine.search import (
+    Document,
     ModeComparison,
     SearchResults,
+    fetch_document,
     search_all,
     search_modes,
 )
@@ -57,6 +59,50 @@ def search_compare(request: SearchRequest) -> ModeComparison:
         )
     except OpenSearchException as exc:
         raise HTTPException(status_code=503, detail="search unavailable") from exc
+
+
+@app.post("/v1/callcenter/search")
+def search_callcenter(request: SearchRequest) -> SearchResults:
+    """Search past consultation cases only; never mix them into official RAG."""
+    settings = get_settings()
+    try:
+        # Reuse the hybrid retriever, but the alias contains only the separate
+        # call-centre corpus and is not part of Settings.document_aliases.
+        return SearchResults(
+            query=request.query,
+            hits=search_all(
+                create_client(), settings.search_callcenter_alias, "", request.query,
+                date.today(), 10,
+            ).hits,
+        )
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="callcenter search unavailable") from exc
+
+
+@app.get("/v1/callcenter/calls/{call_id}")
+def read_callcenter_call(call_id: str) -> Document:
+    """Return all indexed chunks for one past consultation case."""
+    settings = get_settings()
+    try:
+        document = fetch_document(create_client(), settings.search_callcenter_alias, call_id)
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="callcenter search unavailable") from exc
+    if document is None:
+        raise HTTPException(status_code=404, detail="call not found")
+    return document
+
+
+@app.get("/v1/documents/{parent_id:path}")
+def read_document(parent_id: str) -> Document:
+    """The whole document a search hit came from, chunk by chunk in order."""
+    settings = get_settings()
+    try:
+        document = fetch_document(create_client(), settings.document_aliases, parent_id)
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="search unavailable") from exc
+    if document is None:
+        raise HTTPException(status_code=404, detail="document not found")
+    return document
 
 
 @app.post("/v1/rag/stream")
