@@ -16,9 +16,8 @@ docs/performance_history.md).
 import logging
 import re
 
-import httpx
-
 from search_engine.config import Settings, get_settings
+from search_engine.rag.llm import generate
 
 log = logging.getLogger(__name__)
 
@@ -65,18 +64,14 @@ def rewrite_query(query: str, settings: Settings | None = None) -> str | None:
     settings = settings or get_settings()
     if not query.strip():
         return None
-    response = httpx.post(
-        f"{settings.ollama_base_url.rstrip('/')}/api/generate",
-        json={
-            "model": settings.ollama_chat_model,
-            "prompt": PROMPT.format(query=query.strip()),
-            "stream": False,
-            "options": {"temperature": 0.0, "num_ctx": 4096, "num_predict": 64},
-        },
-        timeout=settings.ollama_timeout_seconds,
-    )
-    response.raise_for_status()
-    rewritten = (response.json().get("response") or "").strip()
+    rewritten = generate(
+        PROMPT.format(query=query.strip()),
+        temperature=0.0,
+        # A search query, not an answer: cap it so a model that starts
+        # explaining itself is cut off rather than paid for in full.
+        max_tokens=64,
+        settings=settings,
+    ).strip()
     if "<think>" in rewritten:
         rewritten = rewritten.split("</think>")[-1].strip()
     if not _is_usable(rewritten):

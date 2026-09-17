@@ -38,6 +38,26 @@ OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실�
 `bge-m3`는 다국어 모델이다. 영어 중심 모델은 이 한국어 코퍼스에서 문서 Recall@5가
 100%에서 22%로 떨어진다([검색 성능 이력](docs/performance_history.md) 6단계).
 
+### 채팅 모델을 다른 서버로 옮기기
+
+RAG 답변과 쿼리 재작성은 `CHAT_PROVIDER`로 백엔드를 고른다. 기본값 `ollama`는
+`OLLAMA_BASE_URL`의 네이티브 API를 쓰고, `openai`는 OpenAI 호환 서버(vLLM,
+SGLang, llama.cpp, LM Studio)를 쓴다.
+
+```bash
+CHAT_PROVIDER=openai
+CHAT_BASE_URL_OVERRIDE=http://spark-23b2.local:8000/v1
+CHAT_MODEL_OVERRIDE=qwen3-vl-30b-a3b
+CHAT_API_KEY=none
+```
+
+임베딩은 어느 쪽을 골라도 Ollama에 남는다. 매핑이 인덱스마다 벡터 폭을 고정하므로
+임베딩 모델을 옮기면 전체 재색인이 필요하고, 채팅 서버가 `bge-m3`를 제공하지도
+않는다. `OLLAMA_NUM_CTX`는 OpenAI 프로토콜에 대응 항목이 없어 무시된다. 컨텍스트
+창은 서버를 띄울 때 정해야 하며(vLLM의 `--max-model-len`), 프롬프트가 넘치면
+Ollama처럼 조용히 잘리는 대신 오류가 난다. 최소 `OLLAMA_NUM_CTX`(기본 16384)
+이상으로 잡는다.
+
 ```bash
 cd /Users/jeongbin/git/searchEngine
 colima start  # 이 Mac의 Docker 컨텍스트가 Colima인 경우
@@ -197,21 +217,31 @@ p50만 95.3ms → 687.4ms가 된다. 재작성이 보정하던 표현 변경 질
 
 ### 자연어 평가셋 v2 (검토 후 실험)
 
-v1은 키워드 기준선으로 유지했다. v2는 표현 변경 12개·상황 설명 22개·복수 근거
-6개의 질문과 별도 무응답 질문 8개다. 전체 질문·검토용 답안·원문 근거는
-[v2 검토 문서](docs/queries_docs_v2_review.md)에서 확인한다. 사람 검수 대기 초안이다.
+v1은 키워드 기준선으로 유지했다. v2는 표현 변경 34개·상황 설명 68개·복수 근거
+18개의 질문(총 **120개**)과 별도 무응답 질문 8개다. 새 파서 원본에서 작성한
+40개는 `docs-v2-081`–`docs-v2-120`으로 기존 v2에 추가했다.
+전체 질문·참고 답안·원문 근거는 [v2 검토 문서](docs/queries_docs_v2_review.md)에서
+확인한다. 사람 검수 대기 초안이다.
+
+통합 검토 코퍼스는 기존 36개 문서 스냅샷과 새 원본 11종(동일 사본 포함 16개
+파일)의 재파싱 결과를 합친 것이다. 실제 전체 색인의 스냅샷은 아니며, 최종 전체
+파서 산출물 및 실제 색인과의 일치는 아직 확인하지 않았다. 이전 40개·80개 성능
+수치를 현재 120개 평가 결과로 해석하면 안 된다.
 
 ```bash
-# 파일/정답/인용 검증만 수행; 검색이나 외부 서비스 호출 없음
+# 통합 검토 코퍼스로 파일/정답/인용 검증; 검색이나 외부 서비스 호출 없음
 .venv/bin/search-compare data/queries_docs_v2.jsonl \
-  --corpus data/generated/docs-v1/docs.jsonl --validate-only
+  --corpus data/generated/docs-v2/review-corpus/docs.jsonl --validate-only
 
-# 검토 후 비교; 기존 v1 결과를 덮어쓰지 않는다.
-# 최신 파서 산출물은 바로 위의 '검색 품질 비교와 Recall' 명령을 사용한다.
+# 최종 파서 산출물이 갱신되면 실제 청크 ID와 인용을 다시 검증
 .venv/bin/search-compare data/queries_docs_v2.jsonl \
-  --corpus data/generated/docs-v1/docs.jsonl \
-  --alias search-docs-only --repeats 3 --as-of 2026-09-16 \
-  --out data/generated/docs-v2/comparison.json
+  --corpus ../unstructured-doc-parser/data/chunks/docs.jsonl --validate-only
+
+# 전체 파서 산출물 검증 및 같은 코퍼스 색인 완료 후 비교
+.venv/bin/search-compare data/queries_docs_v2.jsonl \
+  --corpus ../unstructured-doc-parser/data/chunks/docs.jsonl \
+  --alias search-docs-only --repeats 3 --as-of 2026-09-17 \
+  --out data/generated/docs-v2/comparison-120q.json
 ```
 
 v2에는 대체 가능한 부모 파일 `gold_groups`와 사실별 대체 근거 청크

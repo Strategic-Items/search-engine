@@ -207,7 +207,7 @@ def main() -> None:
         "settings": {key: getattr(settings, key) for key in (
             "ollama_embedding_model", "search_embedding_dimensions", "search_vector_candidates",
             "search_hybrid_rrf_k", "search_chunks_per_document",
-            "search_query_rewrite_weight", "ollama_chat_model")},
+            "search_query_rewrite_weight", "chat_provider", "chat_model")},
         "opensearch_version": client.info()["version"]["number"],
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),

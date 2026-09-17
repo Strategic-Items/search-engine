@@ -15,11 +15,13 @@ from search_engine.config import get_settings
 
 @pytest.fixture(autouse=True)
 def isolate_local_corpus_settings(monkeypatch):
-    """A developer's docs-only .env must not change default contract tests."""
+    """A developer's corpus or chat .env must not change default contract tests."""
     for key, value in {
         "SEARCH_DOCUMENT_DATASETS": "core,docs", "SEARCH_MODE": "hybrid",
         "SEARCH_HSK_ENABLED": "true", "SEARCH_DOCS_ALIAS": "search-docs",
         "SEARCH_DOCS_PREFIX": "search-docs-v",
+        "CHAT_PROVIDER": "ollama", "CHAT_BASE_URL_OVERRIDE": "",
+        "CHAT_MODEL_OVERRIDE": "", "CHAT_API_KEY": "none",
     }.items():
         monkeypatch.setenv(key, value)
     get_settings.cache_clear()
