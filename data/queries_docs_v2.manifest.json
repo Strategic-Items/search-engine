@@ -3,23 +3,23 @@
   "created_at": "2026-09-16",
   "status": "draft_pending_user_review",
   "queries_file": "queries_docs_v2.jsonl",
-  "queries_sha256": "d11b4dbe3cecc304e798be51adfbec966e9e1380b8819a3c659373870e03dd06",
-  "queries": 80,
+  "queries_sha256": "3dfc9464ef0321d582e1f49448ccf7e0f9ff9926b9724f2e8fc780d804de5700",
+  "queries": 120,
   "categories": {
-    "paraphrase": 24,
-    "scenario": 44,
-    "multi_evidence": 12
+    "paraphrase": 34,
+    "scenario": 68,
+    "multi_evidence": 18
   },
   "negative_queries_file": "queries_docs_v2_unanswerable.jsonl",
   "negative_queries_sha256": "01585dfe1f116ffd85e3c0a7abaeb62c999a8b2decdb2ccf30894f2b26cc06a8",
   "negative_queries": 8,
-  "source_corpus_sha256": "7458213e938d3764cb86a19faa78a5a397d89e6d01bce34e383b1f6e32647a9b",
-  "source_corpus": "data/generated/docs-v1/docs.jsonl",
-  "source_chunks": 1041,
-  "total_source_parents": 36,
-  "labeled_parents": 28,
-  "evidence_requirements": 92,
-  "verified_quotes": 119,
+  "source_corpus_sha256": "568927cca485e4281d0486304544b61c611f3b6fe7d1f23fc57eef1f129d10fa",
+  "source_corpus": "data/generated/docs-v2/review-corpus/docs.jsonl",
+  "source_chunks": 1198,
+  "total_source_parents": 52,
+  "labeled_parents": 44,
+  "evidence_requirements": 140,
+  "verified_quotes": 191,
   "gold_unit": "parent_id",
   "primary_document_metric": "group_recall_at_k",
   "primary_answer_support_metric": "evidence_recall_at_k",
@@ -35,7 +35,8 @@
     "For each requirement enumerate every matching chunk in the labeled source parents, including overlap and equivalent-format copies.",
     "Group equivalent decree formats into one logical relevant document; raw physical-parent recall remains available separately.",
     "Separate unanswered fact requests from answerable ranking questions; empty-gold cases are not averaged into recall.",
-    "Treat equivalent duplicate copies of the children-product notice as one logical relevant document."
+    "Treat equivalent duplicate copies of the children-product notice as one logical relevant document.",
+    "Group byte-identical copies of the newly added parser sources as equivalent parents."
   ],
   "limitations": [
     "AI-authored source-reviewed draft, not independently human-reviewed or a production acceptance benchmark.",
@@ -43,15 +44,113 @@
     "Corpus-wide exhaustive relevance judgments are not established. Recall is relative to reviewed labels.",
     "Some remaining words necessarily overlap the source to preserve the user's business context; the set does not guarantee equal lexical difficulty for each method.",
     "Evidence matching uses labeled chunk IDs, not automated evaluation of generated answer correctness. Relevant unlabeled paraphrase chunks may require additional human judgments.",
-    "Current retrieval returns one exemplar per parent. Multiple evidence requirements in different chunks of one parent may not all be satisfiable with current output.",
     "Negative examples are scope-relative drafts for manual abstention review; current search-compare/search-evaluate reject empty gold and do not score them.",
     "Human edits change query fingerprints. Recompute hashes in this manifest when freezing a reviewed revision.",
-    "The 80-query revision and corrected labels have not been used to rerun retrieval; historical 40-query results refer to the earlier revision."
+    "The 120-query revision has not been used to rerun retrieval; historical 40- and 80-query results refer to earlier revisions.",
+    "The review corpus combines the prior 36-document snapshot with 16 regenerated new source files; it is not a snapshot of the complete live index.",
+    "Validate all chunk IDs and quotes against final full parser output before retrieval comparisons.",
+    "New-source relevance judgments cover 11 logical documents; other new sources may provide alternative evidence."
   ],
   "updated_at": "2026-09-17",
   "source_review_date": "2026-09-17",
   "existing_queries_reviewed": 40,
   "existing_queries_corrected": 10,
-  "added_queries": 40,
-  "current_revision_search_executed": false
+  "added_queries": 80,
+  "current_revision_search_executed": false,
+  "latest_added_queries": 40,
+  "previous_revision_queries": 80,
+  "latest_added_qid_range": [
+    "docs-v2-081",
+    "docs-v2-120"
+  ],
+  "source_parser_commit": "7d0888c06c9a7a2876533269ffc9738ae351f4dc",
+  "source_corpora": [
+    {
+      "path": "data/generated/docs-v1/docs.jsonl",
+      "sha256": "7458213e938d3764cb86a19faa78a5a397d89e6d01bce34e383b1f6e32647a9b",
+      "chunks": 1041,
+      "parents": 36,
+      "qid_range": [
+        "docs-v2-001",
+        "docs-v2-080"
+      ]
+    },
+    {
+      "path": "data/generated/docs-v2/added-sources/docs.jsonl",
+      "sha256": "c7f141b9a05417354a204dda2d028b85f741d4a0cc9a8f908f2c094df14ac50e",
+      "chunks": 157,
+      "parents": 16,
+      "qid_range": [
+        "docs-v2-081",
+        "docs-v2-120"
+      ],
+      "source_parser_commit": "7d0888c06c9a7a2876533269ffc9738ae351f4dc",
+      "source_files": [
+        {
+          "source_path": "hwp/(160309) 美 상무부, 中 중싱통신(ZTE)에 대한 미국산 제품 수출금지 부과 (1).hwp",
+          "sha256": "a0007f0485d941ce5f15f198739d7b5f1d7dd4ddfd95f197499ef26b4255179f"
+        },
+        {
+          "source_path": "hwp/(160309) 美 상무부, 中 중싱통신(ZTE)에 대한 미국산 제품 수출금지 부과.hwp",
+          "sha256": "a0007f0485d941ce5f15f198739d7b5f1d7dd4ddfd95f197499ef26b4255179f"
+        },
+        {
+          "source_path": "hwp/(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화 (1).hwp",
+          "sha256": "67170e86b95ae6979fcead46b058f92e13e9dfe9f0fa5a4890008fad9d8e4e84"
+        },
+        {
+          "source_path": "hwp/(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화.hwp",
+          "sha256": "67170e86b95ae6979fcead46b058f92e13e9dfe9f0fa5a4890008fad9d8e4e84"
+        },
+        {
+          "source_path": "hwp/WMD 개발 등에 사용될 우려가 큰 품목 리스트 (1).hwp",
+          "sha256": "6bc7bab1700ba59e19026f57e001cc71037b08f3b5dfae9cf704ff5d2a48e13c"
+        },
+        {
+          "source_path": "hwp/WMD 개발 등에 사용될 우려가 큰 품목 리스트.hwp",
+          "sha256": "6bc7bab1700ba59e19026f57e001cc71037b08f3b5dfae9cf704ff5d2a48e13c"
+        },
+        {
+          "source_path": "hwp/對이란 UN 결의안 2231호 동향.hwp",
+          "sha256": "42dad4024800b68208b8bf08b58c1188d5077d12ae4da665c3a8dbd0c9c07c15"
+        },
+        {
+          "source_path": "hwp/美 상무부, 中 화웨이社에 대한 행정명령장 발급.hwp",
+          "sha256": "4fcb1b7fb76512d915c46789f6edecc26ede60430551487f67a9629bdb1141c2"
+        },
+        {
+          "source_path": "hwp/국제체제_표3.hwp",
+          "sha256": "4e3927047de3ec9cb7f837f4ddce8dff0c2987f5859b5fe21aa2d49d5ee7c77a"
+        },
+        {
+          "source_path": "hwp/상무부 세미나 QnA.hwp",
+          "sha256": "83e86176c355ba41a4376678b63952a704abd589cf8c5285654cb48d5bf78552"
+        },
+        {
+          "source_path": "hwp/전략기술의 무형이전 통제.hwp",
+          "sha256": "838235c3b40879b176c080cdcadb98a8ae9053dbbc2561a41a46c71d8dabb826"
+        },
+        {
+          "source_path": "hwp/전략물자 확인의무 면제 대상.hwp",
+          "sha256": "98ced53b28a35f4f1e9e475a193a4e8b2d7a92e72229c2d04afe23925f3039d6"
+        },
+        {
+          "source_path": "hwp/전략물자업무 EDI 개발 업체안내문1 (1).hwp",
+          "sha256": "0d3b099ce3eb02a68f6ed84f5eb5677ca679ed71c2a83cb988d8eceb3edacb1f"
+        },
+        {
+          "source_path": "hwp/전략물자업무 EDI 개발 업체안내문1 (2).hwp",
+          "sha256": "0d3b099ce3eb02a68f6ed84f5eb5677ca679ed71c2a83cb988d8eceb3edacb1f"
+        },
+        {
+          "source_path": "hwp/전략물자업무 EDI 개발 업체안내문1.hwp",
+          "sha256": "0d3b099ce3eb02a68f6ed84f5eb5677ca679ed71c2a83cb988d8eceb3edacb1f"
+        },
+        {
+          "source_path": "hwp/한미양해각서11.hwp",
+          "sha256": "a288fdb1dc08beed54ca0c94b00b0e6ac9c6bc5f9cd92f98d990639d9b5396e5"
+        }
+      ]
+    }
+  ]
 }

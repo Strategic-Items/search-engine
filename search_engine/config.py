@@ -45,6 +45,18 @@ class Settings(BaseSettings):
     # longest docs v2 prompt measured 7,695 tokens, so this leaves room to answer.
     ollama_num_ctx: int = Field(default=16384, ge=512)
     ollama_timeout_seconds: float = Field(default=120.0, gt=0)
+    # Where the chat model lives. "ollama" speaks Ollama's native API at
+    # OLLAMA_BASE_URL; "openai" speaks the OpenAI-compatible protocol (vLLM,
+    # SGLang, llama.cpp, LM Studio) at CHAT_BASE_URL_OVERRIDE. Embeddings stay
+    # on Ollama either way: the mapping fixes the vector width, so moving them
+    # means a reindex of every dataset.
+    chat_provider: Literal["ollama", "openai"] = "ollama"
+    # Both fall back to the OLLAMA_* settings, so an Ollama-only deployment
+    # keeps configuring one URL and one model name.
+    chat_base_url_override: str = ""
+    chat_model_override: str = ""
+    # Local servers ignore the value but still want a well-formed header.
+    chat_api_key: str = "none"
     # Must match OLLAMA_EMBEDDING_MODEL exactly; changing either needs a reindex
     # of every dataset, since the mapping fixes the vector width per index.
     search_embedding_dimensions: int = Field(default=1024, ge=1)
@@ -62,6 +74,14 @@ class Settings(BaseSettings):
     # rewrite that went wrong cannot outvote the question the user actually asked.
     search_query_rewrite_weight: float = Field(default=0.5, gt=0.0, le=1.0)
     rag_top_k: int = Field(default=5, ge=1)
+
+    @property
+    def chat_base_url(self) -> str:
+        return self.chat_base_url_override or self.ollama_base_url
+
+    @property
+    def chat_model(self) -> str:
+        return self.chat_model_override or self.ollama_chat_model
 
     @property
     def document_aliases(self) -> str:

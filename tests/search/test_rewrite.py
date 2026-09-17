@@ -1,5 +1,3 @@
-from unittest.mock import Mock
-
 import httpx
 import pytest
 
@@ -9,8 +7,7 @@ from search_engine.search.rewrite import rewrite_query
 
 
 def answering(monkeypatch, text: str) -> None:
-    monkeypatch.setattr(rewrite_module.httpx, "post", lambda *a, **k: Mock(
-        raise_for_status=Mock(), json=Mock(return_value={"response": text})))
+    monkeypatch.setattr(rewrite_module, "generate", lambda *a, **k: text)
 
 
 def test_a_rewrite_that_reaches_the_document_wording_is_kept(monkeypatch):
@@ -43,14 +40,14 @@ def test_a_rewrite_identical_to_the_question_is_not_worth_a_second_search(monkey
 
 def test_an_empty_query_is_never_sent_to_the_model(monkeypatch):
     called = []
-    monkeypatch.setattr(rewrite_module.httpx, "post", lambda *a, **k: called.append(1))
+    monkeypatch.setattr(rewrite_module, "generate", lambda *a, **k: called.append(1))
     assert rewrite_query("   ", Settings()) is None
     assert not called
 
 
 def test_the_model_being_unreachable_is_raised_for_the_caller_to_decide(monkeypatch):
     def refuse(*a, **k):
-        raise httpx.ConnectError("no ollama")
-    monkeypatch.setattr(rewrite_module.httpx, "post", refuse)
+        raise httpx.ConnectError("no chat server")
+    monkeypatch.setattr(rewrite_module, "generate", refuse)
     with pytest.raises(httpx.HTTPError):
         rewrite_query("수출허가 신청 서류", Settings())
