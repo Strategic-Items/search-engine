@@ -15,9 +15,9 @@ from search_engine.config import get_settings
 from search_engine.evaluation.evaluate import load_queries, quality_metrics
 from search_engine.indexing.indexer import file_sha256
 from search_engine.indexing.documents import SearchDocument
-from search_engine.search.query import retrieve
+from search_engine.search.query import MODES as ALL_MODES, PRODUCTION_MODES, retrieve
 
-MODES = ("bm25", "vector", "hybrid")
+MODES = PRODUCTION_MODES
 
 
 def percentile(values: list[float], fraction: float) -> float:
@@ -51,6 +51,10 @@ def verify_corpus(client, alias: str, corpus: Path) -> tuple[str, dict]:
         "query": {"match_all": {}}, "_source": {"excludes": ["embedding"]},
     }, raise_on_error=True):
         source = hit["_source"]
+        # Derived from the body like the dense vector, and absent from the
+        # corpus file, so it is excluded from the identity check rather than
+        # being allowed to declare every sparse index stale.
+        source.pop("sparse_embedding", None)
         if hit["_id"] in actual:
             raise ValueError("duplicate chunk ID across indexes")
         actual[hit["_id"]] = source
@@ -89,31 +93,31 @@ def verify_gold(queries: list[dict], corpus: Path, known: set[str]) -> None:
 
 def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1, 5, 10),
             repeats: int = 3, warmup: int = 1, as_of: date | None = None,
-            query_rewrite: bool = False) -> dict:
+            query_rewrite: bool = False, modes: tuple[str, ...] = MODES) -> dict:
     if not queries or repeats < 1 or warmup < 0 or not ks or min(ks) < 1 or max(ks) > 20:
         raise ValueError("nonempty queries, positive repeats, nonnegative warmup, 1 <= k <= 20 required")
     as_of = as_of or date.today()
     depth = max(ks)
-    results = {mode: [] for mode in MODES}
+    results = {mode: [] for mode in modes}
     for _ in range(warmup):
-        for mode in MODES:
+        for mode in modes:
             retrieve(client, index, queries[0]["query"], as_of, depth, mode=mode, strict=True,
                      query_rewrite=query_rewrite)
     for position, row in enumerate(queries):
-        samples = {mode: [] for mode in MODES}
-        rankings = {mode: [] for mode in MODES}
-        chunk_rankings = {mode: [] for mode in MODES}
+        samples = {mode: [] for mode in modes}
+        rankings = {mode: [] for mode in modes}
+        chunk_rankings = {mode: [] for mode in modes}
         for repeat in range(repeats):
             # Rotate ordering to reduce warm-cache/order bias; never cache query embeddings.
-            offset = (position + repeat) % len(MODES)
-            for mode in MODES[offset:] + MODES[:offset]:
+            offset = (position + repeat) % len(modes)
+            for mode in modes[offset:] + modes[:offset]:
                 start = perf_counter()
                 hits = retrieve(client, index, row["query"], as_of, depth, mode=mode,
                                 strict=True, query_rewrite=query_rewrite)
                 samples[mode].append((perf_counter() - start) * 1000)
                 rankings[mode].append([hit.parent_id for hit in hits])
                 chunk_rankings[mode].append([hit.chunk_ids for hit in hits])
-        for mode in MODES:
+        for mode in modes:
             results[mode].append({
                 **row, "returned": rankings[mode][0], "latency_ms": samples[mode],
                 "rankings_stable": all(r == rankings[mode][0] for r in rankings[mode]),
@@ -122,11 +126,11 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
                 "repeat_chunks": chunk_rankings[mode],
                 "chunks_stable": all(ids == chunk_rankings[mode][0] for ids in chunk_rankings[mode]),
             })
-    modes = {}
+    summary = {}
     for mode, rows in results.items():
         latency = [sample for row in rows for sample in row["latency_ms"]]
         categories = sorted({r.get("category", "unknown") for r in rows})
-        modes[mode] = {
+        summary[mode] = {
             "metrics": {str(k): quality_metrics(rows, k) for k in ks},
             "categories": {
                 category: {str(k): quality_metrics(
@@ -142,7 +146,7 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
             "lexical_candidates": min(depth * 5, 100),
             "vector_candidates": min(max(depth * 5, get_settings().search_vector_candidates), 1000),
             "repeats": repeats, "warmup_queries_per_mode": warmup,
-            "query_rewrite": query_rewrite, "modes": modes}
+            "query_rewrite": query_rewrite, "modes": summary}
 
 
 def format_comparison(report: dict) -> str:
@@ -181,9 +185,15 @@ def main() -> None:
     parser.add_argument("--rewrite", action="store_true",
                         help="Also search a model-written rewrite of each query and fuse the "
                              "rankings; overrides SEARCH_QUERY_REWRITE for this run")
+    parser.add_argument("--modes", default=",".join(MODES),
+                        help="Comma-separated retrieval modes to compare; the sparse modes "
+                             f"need SPARSE_ENCODER_URL set. Known: {','.join(ALL_MODES)}")
     parser.add_argument("--validate-only", action="store_true",
                         help="Validate query labels and source quotes only; no OpenSearch/Ollama calls")
     args = parser.parse_args()
+    modes = tuple(name.strip() for name in args.modes.split(",") if name.strip())
+    if not modes or set(modes) - set(ALL_MODES):
+        parser.error(f"--modes must name known modes: {','.join(ALL_MODES)}")
     queries = load_queries(args.queries)
     if args.validate_only:
         known = {json.loads(line)["parent_id"] for line in args.corpus.read_text(encoding="utf-8").splitlines()
@@ -200,21 +210,26 @@ def main() -> None:
     concrete, corpus = verify_corpus(client, args.alias or settings.search_docs_alias, args.corpus)
     known = set(corpus.pop("parent_ids"))
     verify_gold(queries, args.corpus, known)
+    if set(modes) & {"sparse", "hybrid_sparse"} and not settings.sparse_encoder_url:
+        parser.error("the sparse modes need SPARSE_ENCODER_URL")
     report = compare(queries, client, concrete, repeats=args.repeats,
-                     warmup=args.warmup, as_of=args.as_of, query_rewrite=args.rewrite)
+                     warmup=args.warmup, as_of=args.as_of, query_rewrite=args.rewrite,
+                     modes=modes)
     report.update({
         "created_at": datetime.now(timezone.utc).isoformat(), "corpus": corpus,
         "queries_sha256": hashlib.sha256(args.queries.read_bytes()).hexdigest(),
         "settings": {key: getattr(settings, key) for key in (
             "ollama_embedding_model", "search_embedding_dimensions", "search_vector_candidates",
             "search_hybrid_rrf_k", "search_chunks_per_document",
-            "search_query_rewrite_weight", "chat_provider", "chat_model")},
+            "search_query_rewrite_weight", "chat_provider", "chat_model",
+            "search_sparse_candidates", "sparse_encoder_url")},
         "opensearch_version": client.info()["version"]["number"],
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),
                         "metrics": file_sha256(Path(quality_metrics.__code__.co_filename))},
         "methodology": "parent-level macro recall over source-reviewed gold; single-process "
-            "retrieval latency including uncached Ollama query embedding, excluding HTTP/LLM; "
+            "retrieval latency including uncached query encoding -- Ollama for dense, the "
+            "separately served bge-m3 sparse head for the sparse modes -- excluding HTTP/LLM; "
             "same candidate depth for all cutoffs; strict failures (no lexical fallback); "
             "optional equivalent-parent group and final-returned-chunk evidence requirement recall, "
             "where @k cuts on documents and each document carries its returned chunks; "

@@ -21,7 +21,12 @@
 
 | 문서 | 내용 |
 |---|---|
-| [performance_history](evaluation/performance_history.md) | **현재 기준 문서.** 단계별 측정 이력과 결론 |
+| [performance_history](evaluation/performance_history.md) | **여기부터 본다.** 단계별 측정 이력의 색인 |
+| [evaluation/stages/](evaluation/stages/) | 단계마다 문서 하나. 그 단계의 코퍼스·평가셋·판정 |
+| [measurement_conditions](evaluation/measurement_conditions.md) | 공통 측정 조건과 단계별 재현 명령 |
+| [stages_1_7_overview](evaluation/stages_1_7_overview.md) | 단계 1~7을 같은 표에서 비교 |
+| [evidence_chunk_metrics_v2](evaluation/evidence_chunk_metrics_v2.md) | 단계 2~7의 근거 청크 지표 |
+| [current_judgment](evaluation/current_judgment.md) | 지금까지 확정된 것과 아직 재지 않은 것 |
 | [cutoff_precision_sweep](evaluation/cutoff_precision_sweep.md) | 점수 컷오프 비율 스윕 (docs v2 120문항) |
 | [baseline_v1](evaluation/baseline_v1.md) | 자료 유형 가점 이전의 기준선 (2026-09-15) |
 | `docs_v1_summary.json`, `docs_v2_stages_summary.json` | 위 문서들이 인용하는 원자료 |

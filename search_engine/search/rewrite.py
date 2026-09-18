@@ -10,7 +10,7 @@ The rewrite never replaces the question. Both the original and the rewrite are
 searched and their rankings fused, with the original weighted higher, because a
 small model's rewrite is not reliable enough to be trusted alone: measured on
 its own it retrieves *worse* than the untouched question (see
-docs/evaluation/performance_history.md).
+docs/evaluation/stages/stage-05-query-rewrite.md).
 """
 
 import logging
