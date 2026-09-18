@@ -89,8 +89,9 @@ class Settings(BaseSettings):
     # only ever says "this is far worse than the best this search found", which
     # is a claim the scores do support. Calibrated on docs v2's 120 questions;
     # 1.0 keeps the top hit alone, 0.0 disables the cutoff. The top hit always
-    # survives, so a search never returns nothing: deciding that nothing is
-    # relevant needs evidence the score does not carry.
+    # survives a ratio, which measures every hit against the best one, so the
+    # ratio alone can never empty a result list. Emptying it is the absolute
+    # floor's job, below.
     search_cutoff_ratio_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
     search_cutoff_ratio_vector: float = Field(default=0.99, ge=0.0, le=1.0)
     search_cutoff_ratio_hybrid: float = Field(default=0.95, ge=0.0, le=1.0)
@@ -99,6 +100,37 @@ class Settings(BaseSettings):
     # away fast, so 0.90 still returns 1.40 documents at 86.5% precision, and
     # 0.95 is the knee -- 89.4% over 1.25 documents, holding Hit@5 at 91.9%.
     search_cutoff_ratio_sparse: float = Field(default=0.95, ge=0.0, le=1.0)
+    # An absolute floor under the ratio cutoff. The ratio only ever says "far
+    # worse than the best this search found", so it cannot empty a result list:
+    # the top hit is its own reference and always clears it. A floor can, which
+    # is the only way a search says "nothing here answers this".
+    #
+    # Applied per retriever before fusion, not after: RRF scores are built from
+    # ranks, so once the lists are fused no absolute value survives to test.
+    #
+    # Off by default, unlike the ratios above: a ratio is scale free, but these
+    # are raw scores, so a shipped number would encode one corpus's statistics.
+    # Measured on this deployment's corpus (docs v2, 135 answerable questions
+    # against 8 unanswerable and 12 out-of-domain), the lossless point is
+    # bm25 14.75 and vector 0.768 -- set there, every out-of-domain query
+    # returns nothing in all three modes and 1 of 8 unanswerable ones does.
+    # Those values live in .env, where a deployment's own measurement belongs.
+    #
+    # What this does NOT do is decide relevance. A single rare token can carry
+    # a document over the floor, and an in-domain question the corpus cannot
+    # answer still scores inside the answerable range -- the reason abstention
+    # needs a relevance judge, not a threshold. Raising these past the lossless
+    # point trades answered questions for refused ones.
+    #
+    # BM25 scores move with corpus statistics and vector scores with the
+    # embedding model, so BOTH MUST BE RE-MEASURED when either changes.
+    # 0.0 disables a floor.
+    search_score_floor_bm25: float = Field(default=0.0, ge=0.0)
+    search_score_floor_vector: float = Field(default=0.0, ge=0.0)
+    # RRF scores carry no relevance signal, so there is nothing to threshold
+    # here; the per-retriever floors above already gated what reached fusion.
+    search_score_floor_hybrid: float = Field(default=0.0, ge=0.0)
+    search_score_floor_sparse: float = Field(default=0.0, ge=0.0)
     # Where the learned-sparse query encoder lives. bge-m3's sparse head is not
     # served by Ollama, so it runs behind its own HTTP endpoint; empty disables
     # the sparse modes rather than failing a search that never asked for them.
@@ -112,6 +144,15 @@ class Settings(BaseSettings):
             "vector": self.search_cutoff_ratio_vector,
             "hybrid": self.search_cutoff_ratio_hybrid,
             "sparse": self.search_cutoff_ratio_sparse,
+        }[mode]
+
+    def score_floor(self, mode: str) -> float:
+        return {
+            "bm25": self.search_score_floor_bm25,
+            "vector": self.search_score_floor_vector,
+            "hybrid": self.search_score_floor_hybrid,
+            "hybrid_sparse": self.search_score_floor_hybrid,
+            "sparse": self.search_score_floor_sparse,
         }[mode]
 
     @property

@@ -306,6 +306,7 @@ def retrieve(
     *, mode: str | None = None, strict: bool = False,
     chunks_per_document: int | None = None, query_rewrite: bool | None = None,
     cutoff_ratio: float | None = None, sparse_encoder: "SparseEncoder | None" = None,
+    score_floor: float | None = None,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -320,11 +321,22 @@ def retrieve(
         raise ValueError("k must be positive")
     ranked_lists: list[tuple[list[dict], float]] = []
 
-    def add_response(response: dict, name: str, weight: float = 1.0) -> None:
+    def add_response(response: dict, name: str, retriever: str, weight: float = 1.0) -> None:
         _warn_on_partial_results(response, name)
         if strict and (response.get("_shards", {}).get("failed", 0) or response.get("timed_out")):
             raise RuntimeError(f"incomplete {name} search: {response.get('_shards')}")
-        ranked_lists.append((response["hits"]["hits"], weight))
+        hits = response["hits"]["hits"]
+        # Gate each retriever on its own scale before fusion. RRF scores are
+        # built from ranks, so once the lists are fused no absolute value
+        # survives to test -- a document only a single retriever believes in
+        # has to be dropped here or not at all.
+        gate = settings.score_floor(retriever) if score_floor is None else 0.0
+        if gate:
+            # A hit without a score cannot be judged against a floor, so it is
+            # kept -- the same rule the ratio cutoff below applies.
+            hits = [hit for hit in hits
+                    if hit.get("_score") is None or hit["_score"] >= gate]
+        ranked_lists.append((hits, weight))
 
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
@@ -333,7 +345,7 @@ def retrieve(
             index=alias, body={"query": build_query(query, as_of)},
             size=lexical_candidates, ignore_unavailable=not strict,
         )
-        add_response(lexical, "lexical")
+        add_response(lexical, "lexical", "bm25")
         if query_rewrite is None:
             query_rewrite = settings.search_query_rewrite
         if query_rewrite:
@@ -341,7 +353,7 @@ def retrieve(
                 add_response(client.search(
                     index=alias, body={"query": build_query(rewritten, as_of)},
                     size=lexical_candidates, ignore_unavailable=not strict,
-                ), "rewrite", settings.search_query_rewrite_weight)
+                ), "rewrite", "bm25", settings.search_query_rewrite_weight)
     try:
         if mode in ("vector", "hybrid"):
             vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
@@ -351,7 +363,7 @@ def retrieve(
                 size=vector_candidates,
                 ignore_unavailable=not strict,
             )
-            add_response(semantic, "vector")
+            add_response(semantic, "vector", "vector")
         if mode in ("sparse", "hybrid_sparse"):
             sparse_vector = (sparse_encoder or SparseEncoder(settings)).encode_query(query.strip())
             add_response(client.search(
@@ -359,13 +371,14 @@ def retrieve(
                 body={"query": build_sparse_query(sparse_vector, as_of)},
                 size=min(max(k * 5, settings.search_sparse_candidates), 1000),
                 ignore_unavailable=not strict,
-            ), "sparse")
+            ), "sparse", "sparse")
     except httpx.HTTPError:
         if strict or mode in ("vector", "sparse"):
             raise
         # Lexical search remains available during an embedding service outage.
         pass
 
+    ranked_lists = [(hits, weight) for hits, weight in ranked_lists if hits] or [([], 1.0)]
     if len(ranked_lists) > 1:
         ranked = _rrf(ranked_lists, settings.search_hybrid_rrf_k)
     else:
@@ -377,9 +390,15 @@ def retrieve(
             if parent not in seen:
                 seen.add(parent)
                 ranked.append(hit)
+    fused = mode if len(ranked_lists) == 1 else "hybrid"
     if cutoff_ratio is None:
-        cutoff_ratio = settings.cutoff_ratio(mode if len(ranked_lists) == 1 else "hybrid")
-    floor = _cutoff(ranked, cutoff_ratio)
+        cutoff_ratio = settings.cutoff_ratio(fused)
+    if score_floor is None:
+        score_floor = settings.score_floor(fused)
+    # The absolute floor is the only one of the two that can empty the list:
+    # the ratio measures every hit against the best hit, so the best hit always
+    # clears it. Taking the larger of the two applies whichever cuts deeper.
+    floor = max(_cutoff(ranked, cutoff_ratio), score_floor)
     out = []
     for hit in ranked:
         source = hit["_source"]

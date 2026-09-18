@@ -22,6 +22,11 @@ def isolate_local_corpus_settings(monkeypatch):
         "SEARCH_DOCS_PREFIX": "search-docs-v",
         "CHAT_PROVIDER": "ollama", "CHAT_BASE_URL_OVERRIDE": "",
         "CHAT_MODEL_OVERRIDE": "", "CHAT_API_KEY": "none",
+        # Score floors are raw scores calibrated on whatever corpus a developer
+        # happens to run, so a deployment's values would silently empty the
+        # result lists these tests assert on.
+        "SEARCH_SCORE_FLOOR_BM25": "0", "SEARCH_SCORE_FLOOR_VECTOR": "0",
+        "SEARCH_SCORE_FLOOR_HYBRID": "0", "SEARCH_SCORE_FLOOR_SPARSE": "0",
     }.items():
         monkeypatch.setenv(key, value)
     get_settings.cache_clear()

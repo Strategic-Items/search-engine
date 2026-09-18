@@ -1,9 +1,11 @@
 from datetime import date
 import logging
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import httpx
 import pytest
+
+from search_engine.config import Settings
 
 from search_engine.search import (
     GUIDE_TYPES,
@@ -348,3 +350,44 @@ def test_the_cutoff_reads_each_mode_on_its_own_scale():
     hits = retrieve(client, "search-documents", "질문", date.today(), 5,
                     mode="bm25", cutoff_ratio=0.95)
     assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
+
+
+def test_an_absolute_floor_can_empty_the_list():
+    """What the ratio cannot do: say that nothing found answers the question.
+
+    The ratio measures every hit against the best hit, so the best hit is its
+    own reference and always survives. Only a floor on the raw score can
+    return nothing.
+    """
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 0.01, "_source": {"parent_id": "doc-1"}},
+    ]}}
+    kept = retrieve(client, "search-documents", "질문", date.today(), 5,
+                    mode="bm25", cutoff_ratio=1.0, score_floor=0.0)
+    assert [hit.parent_id for hit in kept] == ["doc-1"]
+
+    emptied = retrieve(client, "search-documents", "질문", date.today(), 5,
+                       mode="bm25", cutoff_ratio=1.0, score_floor=0.5)
+    assert emptied == []
+
+
+def test_the_floor_gates_each_retriever_before_fusion():
+    """RRF scores are ranks, so a floor has to run before the lists are fused.
+
+    The lexical hit scores under the floor and the vector hit over it, so only
+    the vector document may reach the fused ranking.
+    """
+    client = Mock()
+    client.search.side_effect = [
+        {"hits": {"hits": [{"_id": "lex", "_score": 1.0, "_source": {"parent_id": "doc-lex"}}]}},
+        {"hits": {"hits": [{"_id": "vec", "_score": 0.9, "_source": {"parent_id": "doc-vec"}}]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1, 0.2]
+    with patch("search_engine.search.query.get_settings", lambda: Settings(
+        search_score_floor_bm25=5.0, search_score_floor_vector=0.5,
+    )):
+        hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                        mode="hybrid", embedder=embedder)
+    assert [hit.parent_id for hit in hits] == ["doc-vec"]
