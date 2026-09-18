@@ -36,7 +36,7 @@ OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실�
 **모델이나 차원을 바꾸면 모든 데이터셋을 전부 재색인해야 한다.** 매핑이 인덱스마다
 벡터 폭을 고정하므로, 차원이 다른 기존 인덱스는 k-NN 결과에 전혀 기여하지 못한다.
 `bge-m3`는 다국어 모델이다. 영어 중심 모델은 이 한국어 코퍼스에서 문서 Recall@5가
-100%에서 22%로 떨어진다([검색 성능 이력](docs/evaluation/performance_history.md) 6단계).
+100%에서 22%로 떨어진다([6단계: 임베딩 모델 교체](docs/evaluation/stages/stage-06-embedding-model.md)).
 
 ### 채팅 모델을 다른 서버로 옮기기
 
@@ -213,9 +213,9 @@ p50만 95.3ms → 687.4ms가 된다. 재작성이 보정하던 표현 변경 질
 문서를 찾는 것과 답이 적힌 청크를 고르는 것은 별개다. 후자는 문서당 반환 청크 수로
 조정하며, 기본값 4에서 v2 근거 Recall@5가 30.0% → 70.0%로 올랐고 문서 지표는 그대로다.
 근거를 더 담을수록 RAG 프롬프트가 길어지므로 `OLLAMA_NUM_CTX`(기본 16384)를 함께 본다.
-단계별 수치와 이 선택의 근거는 [검색 성능 이력](docs/evaluation/performance_history.md)에 있다.
+단계별 수치와 이 선택의 근거는 [검색 성능 이력](docs/evaluation/performance_history.md)에 색인돼 있다.
 
-단계별 실측과 재현 절차는 [검색 성능 이력](docs/evaluation/performance_history.md)에 있다.
+단계별 실측은 [검색 성능 이력](docs/evaluation/performance_history.md)에, 재현 절차는 [공통 측정 조건과 재현](docs/evaluation/measurement_conditions.md)에 있다.
 [docs 검색 평가 v1](docs/archive/docs_evaluation_v1.md)과 [v2](docs/archive/docs_evaluation_v2.md)는
 `nomic-embed-text` 시점의 기록이며, 두 문서의 벡터·하이브리드 결론은 6단계에서 뒤집혔다.
 코퍼스·평가셋 변경에 따른 단계별 수치와 해석: [검색 성능 이력](docs/evaluation/performance_history.md).
