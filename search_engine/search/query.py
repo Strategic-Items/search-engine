@@ -2,7 +2,7 @@ from datetime import date
 import logging
 import re
 from time import perf_counter
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 
 import httpx
 from opensearchpy import OpenSearch, OpenSearchException
@@ -139,45 +139,6 @@ def _warn_on_partial_results(response: dict, retriever: str) -> None:
     for failure in shards.get("failures", []):
         log.warning("%s search skipped index %s: %s", retriever, failure.get("index"),
                     failure.get("reason", {}).get("reason"))
-
-
-# BM25 has no upper bound, so a raw score cannot be read as a fraction of
-# anything. This is the score that maps to a relevance of 0.5 -- on the docs set
-# a first-place hit scores 13-19, so the band users actually see lands either
-# side of the midpoint instead of pinned against an end.
-BM25_HALF_RELEVANCE = 15.0
-
-
-def _cosine_relevance(score: float) -> float:
-    """Recover the cosine similarity the k-NN score folded into 0-1.
-
-    The engine reports (1+cosine)/2, which confines every score for related text
-    to a narrow band above 0.5 and halves the distance between them. Undoing it
-    gives back the similarity itself: a real quantity, spread over twice the
-    range, and directly comparable to the thresholds the evaluation set uses.
-    """
-    return 2 * score - 1
-
-
-def _relevance_scale(
-    ranked_lists: list[tuple[list[dict], float]], rrf_k: int, mode: str,
-) -> Callable[[float], float]:
-    """How to read this search's raw scores as a relevance between 0 and 1.
-
-    The three modes score on scales that share no unit -- an RRF score near
-    0.033, a cosine-derived 0.8 and an unbounded BM25 13.06 can all mean "the
-    best answer there is" -- so a caller comparing or drawing them needs one
-    number that means the same thing in each. Which scale applies is decided by
-    what actually ran, not by the mode asked for: a rewrite makes `bm25` fuse
-    two lists, and an embedding outage leaves `hybrid` with only the lexical one.
-    """
-    if len(ranked_lists) > 1:
-        # A document that topped every list scores the sum of their weights.
-        ceiling = sum(weight for _hits, weight in ranked_lists) / (rrf_k + 1)
-        return lambda score: score / ceiling
-    if mode == "vector":
-        return _cosine_relevance
-    return lambda score: score / (score + BM25_HALF_RELEVANCE)
 
 
 def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[dict]:
@@ -337,7 +298,6 @@ def retrieve(
             if parent not in seen:
                 seen.add(parent)
                 ranked.append(hit)
-    scale = _relevance_scale(ranked_lists, settings.search_hybrid_rrf_k, mode)
     out = []
     for hit in ranked:
         source = hit["_source"]
@@ -346,7 +306,6 @@ def retrieve(
         out.append(SearchHit.model_validate({
             **{key: value for key, value in source.items() if value is not None},
             "id": hit["_id"], "parent_id": parent_id, "score": score,
-            "relevance": None if score is None else min(1.0, max(0.0, scale(score))),
         }))
         if len(out) == k:
             break

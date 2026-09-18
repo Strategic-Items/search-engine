@@ -247,57 +247,18 @@ def test_an_evaluation_run_refuses_to_measure_without_the_rewrite(monkeypatch):
                  mode="bm25", query_rewrite=True, strict=True)
 
 
-def test_every_mode_reports_the_best_match_on_the_same_scale(monkeypatch):
-    """0.033, 0.80 and 13.06 all mean "the best answer there is"; relevance says so."""
-    monkeypatch.setattr("search_engine.search.query.OllamaEmbedder",
-                        lambda settings: Mock(embed_query=lambda text: [0.1, 0.2]))
-    client = Mock()
-    client.search.side_effect = [
-        lexical_hits(("c1", "doc-1")),
-        {"hits": {"hits": [
-            {"_id": "c1", "_score": 1.0, "_source": {"parent_id": "doc-1"}},
-        ]}},
-    ]
-    hybrid = retrieve(client, "search-documents", "질문", date.today(), 5, mode="hybrid")
-
-    client.search.side_effect = None
-    client.search.return_value = {"hits": {"hits": [
-        {"_id": "c1", "_score": 1.0, "_source": {"parent_id": "doc-1"}},
-    ]}}
-    vector = retrieve(client, "search-documents", "질문", date.today(), 5, mode="vector")
-
-    # An RRF top of both lists and a cosine of 1.0 are each as good as it gets.
-    assert hybrid[0].relevance == pytest.approx(1.0)
-    assert vector[0].relevance == pytest.approx(1.0)
-
-
-def test_an_unbounded_bm25_score_still_lands_inside_the_scale():
+def test_an_unbounded_bm25_score_is_reported_as_the_retriever_gave_it():
+    """Scores stay on the retriever's own scale; nothing rescales them."""
     client = Mock()
     client.search.return_value = {"hits": {"hits": [
         {"_id": "c1", "_score": 15.0, "_source": {"parent_id": "doc-1"}},
         {"_id": "c2", "_score": 900.0, "_source": {"parent_id": "doc-2"}},
     ]}}
     hits = retrieve(client, "search-documents", "질문", date.today(), 5, mode="bm25")
-    assert hits[0].relevance == pytest.approx(0.5)
-    assert hits[1].relevance < 1.0
     assert [hit.score for hit in hits] == [15.0, 900.0]
 
 
-def test_a_rewrite_raises_the_bar_the_original_alone_is_measured_against(monkeypatch):
-    """Fusing a third list moves the ceiling, so relevance tracks it rather than rank."""
-    monkeypatch.setattr("search_engine.search.query.rewrite_query", lambda query: "다른 말")
-    client = Mock()
-    client.search.side_effect = [
-        lexical_hits(("c1", "doc-1")),
-        lexical_hits(("c2", "doc-2")),
-    ]
-    hits = retrieve(client, "search-documents", "질문", date.today(), 5,
-                    mode="bm25", query_rewrite=True, chunks_per_document=1)
-    # Top of the original list only, out of a possible original plus rewrite.
-    assert hits[0].relevance == pytest.approx(1 / 1.5)
-
-
-def test_a_replacement_edition_is_offered_without_a_relevance_it_never_earned():
+def test_a_replacement_edition_is_offered_without_a_score_it_never_earned():
     client = Mock()
     client.search.side_effect = [
         {"hits": {"hits": [
@@ -310,8 +271,8 @@ def test_a_replacement_edition_is_offered_without_a_relevance_it_never_earned():
     ]
     hits = retrieve(client, "search-documents", "질문", date.today(), 5, mode="bm25")
     assert [hit.parent_id for hit in hits] == ["doc-old", "doc-new"]
-    assert hits[0].relevance is not None
-    assert hits[1].relevance is None
+    assert hits[0].score == 9.0
+    assert hits[1].score is None
 
 
 def test_comparing_modes_embeds_the_question_once(monkeypatch):
