@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
     search_document_datasets: Literal["core,docs", "docs", "core"] = "core,docs"
-    search_mode: Literal["bm25", "vector", "hybrid"] = "hybrid"
+    search_mode: Literal["bm25", "vector", "hybrid", "sparse", "hybrid_sparse"] = "hybrid"
     search_hsk_enabled: bool = True
     search_number_of_replicas: int = Field(default=0, ge=0)
     ollama_base_url: str = "http://localhost:11434"
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # Keep the embedding model separate from the chat model: chat models are
     # usually much larger and may not expose Ollama's embedding endpoint.
     # Multilingual: the corpus and the questions are Korean, and an English-first
-    # model scores them close to randomly (docs/evaluation/performance_history.md, stage 6).
+    # model scores them close to randomly (docs/evaluation/stages/stage-06-embedding-model.md).
     ollama_embedding_model: str = "bge-m3"
     ollama_temperature: float = 0.4
     # Ollama silently drops the front of a prompt that exceeds the context window,
@@ -94,6 +94,16 @@ class Settings(BaseSettings):
     search_cutoff_ratio_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
     search_cutoff_ratio_vector: float = Field(default=0.99, ge=0.0, le=1.0)
     search_cutoff_ratio_hybrid: float = Field(default=0.95, ge=0.0, le=1.0)
+    # Learned-sparse scores are dot products over rank_features, on a scale of
+    # their own again. Calibrated on docs v2's 135 questions: sparse scores fall
+    # away fast, so 0.90 still returns 1.40 documents at 86.5% precision, and
+    # 0.95 is the knee -- 89.4% over 1.25 documents, holding Hit@5 at 91.9%.
+    search_cutoff_ratio_sparse: float = Field(default=0.95, ge=0.0, le=1.0)
+    # Where the learned-sparse query encoder lives. bge-m3's sparse head is not
+    # served by Ollama, so it runs behind its own HTTP endpoint; empty disables
+    # the sparse modes rather than failing a search that never asked for them.
+    sparse_encoder_url: str = ""
+    search_sparse_candidates: int = Field(default=50, ge=1, le=1_000)
     rag_top_k: int = Field(default=5, ge=1)
 
     def cutoff_ratio(self, mode: str) -> float:
@@ -101,6 +111,7 @@ class Settings(BaseSettings):
             "bm25": self.search_cutoff_ratio_bm25,
             "vector": self.search_cutoff_ratio_vector,
             "hybrid": self.search_cutoff_ratio_hybrid,
+            "sparse": self.search_cutoff_ratio_sparse,
         }[mode]
 
     @property

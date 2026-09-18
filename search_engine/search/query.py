@@ -7,7 +7,7 @@ from collections.abc import Iterable
 import httpx
 from opensearchpy import OpenSearch, OpenSearchException
 
-from search_engine.config import get_settings
+from search_engine.config import Settings, get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.rewrite import rewrite_query
@@ -122,6 +122,53 @@ def build_vector_query(vector: list[float], as_of: date, candidates: int) -> dic
         "k": candidates,
         "filter": {"bool": {"filter": _validity_filters(as_of)}},
     }}}
+
+
+class SparseEncoder:
+    """bge-m3's learned-sparse head, behind the same kind of HTTP hop as dense.
+
+    The head is not part of Ollama's embedding API, so it is served separately.
+    Keeping it remote also keeps the comparison honest: the dense path pays for
+    an HTTP round trip per query, and an in-process sparse encoder would be
+    credited with a latency the deployed shape would never have.
+    """
+
+    def __init__(self, settings: Settings | None = None):
+        self.settings = settings or get_settings()
+
+    def encode_query(self, query: str) -> dict[str, float]:
+        url = self.settings.sparse_encoder_url
+        if not url:
+            raise RuntimeError("SPARSE_ENCODER_URL is not configured")
+        response = httpx.post(
+            url.rstrip("/") + "/encode", json={"texts": [query]},
+            timeout=self.settings.ollama_timeout_seconds,
+        )
+        response.raise_for_status()
+        vectors = response.json().get("vectors")
+        if not isinstance(vectors, list) or len(vectors) != 1 or not isinstance(vectors[0], dict):
+            raise ValueError("sparse encoder returned an invalid response")
+        return {str(token): float(weight) for token, weight in vectors[0].items()}
+
+
+def build_sparse_query(vector: dict[str, float], as_of: date) -> dict:
+    """Dot product over the indexed rank_features, constrained to valid records.
+
+    One rank_feature clause per query token: `linear` makes each clause score
+    the stored weight times the query weight, so the bool sum is the dot
+    product the sparse model is trained to produce.
+    """
+    if not vector:
+        raise ValueError("sparse query vector is empty")
+    return {"bool": {
+        "should": [
+            {"rank_feature": {"field": f"sparse_embedding.{token}",
+                              "boost": weight, "linear": {}}}
+            for token, weight in vector.items()
+        ],
+        "minimum_should_match": 1,
+        "filter": _validity_filters(as_of),
+    }}
 
 
 def _warn_on_partial_results(response: dict, retriever: str) -> None:
@@ -246,12 +293,19 @@ def _rewritten_queries(query: str, strict: bool) -> list[str]:
     return [rewritten] if rewritten else []
 
 
+# Every mode retrieve() accepts. The sparse pair needs a separately served
+# encoder, so the endpoints that fan out over modes stay on the three that
+# a default deployment can actually answer with.
+MODES = ("bm25", "vector", "hybrid", "sparse", "hybrid_sparse")
+PRODUCTION_MODES = ("bm25", "vector", "hybrid")
+
+
 def retrieve(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int,
     embedder: OllamaEmbedder | None = None,
     *, mode: str | None = None, strict: bool = False,
     chunks_per_document: int | None = None, query_rewrite: bool | None = None,
-    cutoff_ratio: float | None = None,
+    cutoff_ratio: float | None = None, sparse_encoder: "SparseEncoder | None" = None,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -260,7 +314,7 @@ def retrieve(
     """
     settings = get_settings()
     mode = mode or settings.search_mode
-    if mode not in ("bm25", "vector", "hybrid"):
+    if mode not in MODES:
         raise ValueError(f"unknown search mode: {mode}")
     if k < 1:
         raise ValueError("k must be positive")
@@ -274,7 +328,7 @@ def retrieve(
 
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
-    if mode in ("bm25", "hybrid"):
+    if mode in ("bm25", "hybrid", "hybrid_sparse"):
         lexical = client.search(
             index=alias, body={"query": build_query(query, as_of)},
             size=lexical_candidates, ignore_unavailable=not strict,
@@ -298,8 +352,16 @@ def retrieve(
                 ignore_unavailable=not strict,
             )
             add_response(semantic, "vector")
+        if mode in ("sparse", "hybrid_sparse"):
+            sparse_vector = (sparse_encoder or SparseEncoder(settings)).encode_query(query.strip())
+            add_response(client.search(
+                index=alias,
+                body={"query": build_sparse_query(sparse_vector, as_of)},
+                size=min(max(k * 5, settings.search_sparse_candidates), 1000),
+                ignore_unavailable=not strict,
+            ), "sparse")
     except httpx.HTTPError:
-        if strict or mode == "vector":
+        if strict or mode in ("vector", "sparse"):
             raise
         # Lexical search remains available during an embedding service outage.
         pass
@@ -390,9 +452,6 @@ def _with_current_editions(
     return merged[:k]
 
 
-MODES = ("bm25", "vector", "hybrid")
-
-
 class _SharedEmbedder:
     """Embed a query once and lend the vector to every mode that asks for it.
 
@@ -414,7 +473,7 @@ class _SharedEmbedder:
 
 def search_modes(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int = 5,
-    modes: Iterable[str] = MODES,
+    modes: Iterable[str] = PRODUCTION_MODES,
 ) -> ModeComparison:
     """Run one query through every mode, so the modes can be read side by side.
 
