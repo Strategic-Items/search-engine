@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # Keep the embedding model separate from the chat model: chat models are
     # usually much larger and may not expose Ollama's embedding endpoint.
     # Multilingual: the corpus and the questions are Korean, and an English-first
-    # model scores them close to randomly (docs/performance_history.md, stage 6).
+    # model scores them close to randomly (docs/evaluation/performance_history.md, stage 6).
     ollama_embedding_model: str = "bge-m3"
     ollama_temperature: float = 0.4
     # Ollama silently drops the front of a prompt that exceeds the context window,

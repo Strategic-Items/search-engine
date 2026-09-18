@@ -6,7 +6,7 @@
 
 정답 질의는 `data/queries_v1.jsonl`로 가져와 여기서 관리한다. 실습 저장소에서는
 git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출처와 원본 체크섬은
-`data/queries_v1.manifest.json`에, 재판정 내역은 [gold_review_v1](docs/gold_review_v1.md)에
+`data/queries_v1.manifest.json`에, 재판정 내역은 [gold_review_v1](docs/datasets/gold_review_v1.md)에
 있다. 코퍼스 원본은 여전히 실습 저장소에 있고, `search-prepare`의 출력은
 `data/generated/`에만 두며 Git에 넣지 않는다.
 
@@ -36,7 +36,7 @@ OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실�
 **모델이나 차원을 바꾸면 모든 데이터셋을 전부 재색인해야 한다.** 매핑이 인덱스마다
 벡터 폭을 고정하므로, 차원이 다른 기존 인덱스는 k-NN 결과에 전혀 기여하지 못한다.
 `bge-m3`는 다국어 모델이다. 영어 중심 모델은 이 한국어 코퍼스에서 문서 Recall@5가
-100%에서 22%로 떨어진다([검색 성능 이력](docs/performance_history.md) 6단계).
+100%에서 22%로 떨어진다([검색 성능 이력](docs/evaluation/performance_history.md) 6단계).
 
 ### 채팅 모델을 다른 서버로 옮기기
 
@@ -103,7 +103,7 @@ python3 -m venv .venv
 ```
 
 검색은 `core`와 `docs`를 함께 조회한다(`Settings.document_aliases`). 연동 계약은
-[문서 파서 연동 기록](docs/doc_parser_import.md)에 있다.
+[문서 파서 연동 기록](docs/design/doc_parser_import.md)에 있다.
 
 ### 파서 데이터만 사용하기
 
@@ -208,19 +208,19 @@ p50만 95.3ms → 687.4ms가 된다. 재작성이 보정하던 표현 변경 질
 문서를 찾는 것과 답이 적힌 청크를 고르는 것은 별개다. 후자는 문서당 반환 청크 수로
 조정하며, 기본값 4에서 v2 근거 Recall@5가 30.0% → 70.0%로 올랐고 문서 지표는 그대로다.
 근거를 더 담을수록 RAG 프롬프트가 길어지므로 `OLLAMA_NUM_CTX`(기본 16384)를 함께 본다.
-단계별 수치와 이 선택의 근거는 [검색 성능 이력](docs/performance_history.md)에 있다.
+단계별 수치와 이 선택의 근거는 [검색 성능 이력](docs/evaluation/performance_history.md)에 있다.
 
-단계별 실측과 재현 절차는 [검색 성능 이력](docs/performance_history.md)에 있다.
-[docs 검색 평가 v1](docs/docs_evaluation_v1.md)과 [v2](docs/docs_evaluation_v2.md)는
+단계별 실측과 재현 절차는 [검색 성능 이력](docs/evaluation/performance_history.md)에 있다.
+[docs 검색 평가 v1](docs/archive/docs_evaluation_v1.md)과 [v2](docs/archive/docs_evaluation_v2.md)는
 `nomic-embed-text` 시점의 기록이며, 두 문서의 벡터·하이브리드 결론은 6단계에서 뒤집혔다.
-코퍼스·평가셋 변경에 따른 단계별 수치와 해석: [검색 성능 이력](docs/performance_history.md).
+코퍼스·평가셋 변경에 따른 단계별 수치와 해석: [검색 성능 이력](docs/evaluation/performance_history.md).
 
 ### 자연어 평가셋 v2 (검토 후 실험)
 
 v1은 키워드 기준선으로 유지했다. v2는 표현 변경 34개·상황 설명 68개·복수 근거
 18개의 질문(총 **120개**)과 별도 무응답 질문 8개다. 새 파서 원본에서 작성한
 40개는 `docs-v2-081`–`docs-v2-120`으로 기존 v2에 추가했다.
-전체 질문·참고 답안·원문 근거는 [v2 검토 문서](docs/queries_docs_v2_review.md)에서
+전체 질문·참고 답안·원문 근거는 [v2 검토 문서](docs/datasets/queries_docs_v2_review.md)에서
 확인한다. 사람 검수 대기 초안이다.
 
 통합 검토 코퍼스는 기존 36개 문서 스냅샷과 새 원본 11종(동일 사본 포함 16개
@@ -255,7 +255,7 @@ v2에는 대체 가능한 부모 파일 `gold_groups`와 사실별 대체 근거
 `queries_docs_v2_unanswerable.jsonl`의 8개 질문은 정답이 없어 Recall 분모에 넣지
 않는다. 현재 비교 도구에는 자동 무응답 판정 기능이 없으므로 별도 사람이 검토한다.
 
-이번 초기 적재 범위와 검토 결과는 [import_v1 기록](docs/import_v1.md)에 있다.
+이번 초기 적재 범위와 검토 결과는 [import_v1 기록](docs/design/import_v1.md)에 있다.
 
 다른 터미널에서 검색한다.
 
@@ -281,7 +281,7 @@ curl -N http://127.0.0.1:8092/v1/rag/stream \
   -d '{"query":"자가판정 유효기간","session_id":"s1"}'
 ```
 
-구현 결정과 제한은 [RAG v1 기록](docs/rag_v1.md)에 정리했다.
+구현 결정과 제한은 [RAG v1 기록](docs/design/rag_v1.md)에 정리했다.
 
 `GET /health/live`는 앱 프로세스, `GET /health/ready`는 OpenSearch 연결을 확인한다.
 테스트는 `.venv/bin/pytest -q`로 실행한다.
