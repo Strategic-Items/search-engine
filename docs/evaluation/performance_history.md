@@ -20,6 +20,7 @@
 - [9. 식별자 질의 15문항 추가](stages/stage-09-identifier-queries.md) — 식별자 구간에서 하이브리드가 무너지고, 컷오프가 정답을 잘라낸다
 - [10. 학습형 sparse(bge-m3)를 어휘 경로로](stages/stage-10-learned-sparse.md) — 정밀도를 맞추면 벡터와 동률이다. 같은 비율로 모드를 비교하면 안 된다
 - [11. Qwen3-Embedding-0.6B는 bge-m3를 넘는가](stages/stage-11-qwen3-embedding.md) — 넘지 못한다. 남은 구멍은 임베딩 모델의 문제가 아니다
+- [12. 구어체 어미가 검색을 망가뜨린다](stages/stage-12-auxiliary-verb-stoptags.md) — 보조용언이 검색 토큰으로 남아 엉뚱한 1위를 만들고, 컷오프가 정답을 잘라낸다
 
 ## 단계에 걸친 문서
 

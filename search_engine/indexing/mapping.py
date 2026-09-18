@@ -1,6 +1,29 @@
 """Index definitions. Synonyms expand at search time, so the dictionary can
 change without reindexing the documents themselves."""
 
+# Lucene's defaults keep VX, VCP and VCN, so a conversational ending survives
+# as a search term: "알려줘" tokenizes to 알리(VV) + 어(EC) + 주(VX) + 어(EC),
+# and the 주 it leaves behind matches the "주 :" that heads a table note.
+# Because 주 is rare in titles its IDF is high, so that one token can outscore
+# a real match on every content word and then push the ratio cutoff above the
+# documents that did match. Auxiliary verbs and copulas carry no topic.
+KOREAN_POS_FILTER = {
+    "type": "nori_part_of_speech",
+    # Lucene's default list, spelled out -- "E" and "J" are abstract categories
+    # this version rejects, so the concrete endings and particles are named --
+    # plus VX, VCP and VCN.
+    "stoptags": [
+        # verbal endings and particles: Lucene's defaults
+        "EC", "EF", "EP", "ETM", "ETN",
+        "JC", "JKB", "JKC", "JKG", "JKO", "JKQ", "JKS", "JKV", "JX",
+        "IC", "MAG", "MAJ", "MM", "SP", "SSC", "SSO", "SC", "SE",
+        "XPN", "XSA", "XSN", "XSV", "UNA", "NA", "VSV",
+        # added here: auxiliary verbs and copulas carry no topic
+        "VX", "VCP", "VCN",
+    ],
+}
+
+
 def index_body(embedding_dimensions: int) -> dict:
     """Core mapping, including an HNSW cosine vector index."""
     return {
@@ -11,12 +34,13 @@ def index_body(embedding_dimensions: int) -> dict:
         "analysis": {
             "filter": {
                 "domain_synonyms": {"type": "synonym_graph", "synonyms": []},
+                "korean_pos": KOREAN_POS_FILTER,
             },
             "analyzer": {
                 "korean_nori": {
                     "type": "custom",
                     "tokenizer": "nori_tokenizer",
-                    "filter": ["nori_part_of_speech", "lowercase"],
+                    "filter": ["korean_pos", "lowercase"],
                 },
                 # Synonyms expand before the part-of-speech filter: that filter
                 # drops tokens, leaving position gaps a synonym graph cannot be
@@ -24,7 +48,7 @@ def index_body(embedding_dimensions: int) -> dict:
                 "korean_nori_search": {
                     "type": "custom",
                     "tokenizer": "nori_tokenizer",
-                    "filter": ["lowercase", "domain_synonyms", "nori_part_of_speech"],
+                    "filter": ["lowercase", "domain_synonyms", "korean_pos"],
                 },
             }
         }
@@ -97,11 +121,12 @@ HSK_INDEX_BODY = {
         "number_of_shards": 1,
         "number_of_replicas": 0,
         "analysis": {
+            "filter": {"korean_pos": KOREAN_POS_FILTER},
             "analyzer": {
                 "korean_nori": {
                     "type": "custom",
                     "tokenizer": "nori_tokenizer",
-                    "filter": ["nori_part_of_speech", "lowercase"],
+                    "filter": ["korean_pos", "lowercase"],
                 }
             }
         }
