@@ -78,7 +78,7 @@ def test_the_replacement_follows_the_retired_document_it_names():
         ]}},
     ]
 
-    hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 5)
+    hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 5, cutoff_ratio=0)
 
     assert [hit.parent_id for hit in hits] == ["form-old", "form-new", "other"]
     assert hits[0].superseded_by == "form-new"
@@ -93,7 +93,7 @@ def test_a_replacement_already_in_the_results_is_not_repeated():
         {"_id": "form-new", "_score": 8.0, "_source": {"parent_id": "form-new", "title": "현행"}},
     ]}}
 
-    hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 5)
+    hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 5, cutoff_ratio=0)
 
     assert [hit.parent_id for hit in hits] == ["form-old", "form-new"]
     assert client.search.call_count == 1
@@ -112,7 +112,7 @@ def test_following_a_pointer_never_returns_more_than_asked_for():
         ]}},
     ]
 
-    hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 2)
+    hits = retrieve(client, "search-documents", "전문판정 신청서", date.today(), 2, cutoff_ratio=0)
 
     assert [hit.parent_id for hit in hits] == ["form-old", "form-new"]
 

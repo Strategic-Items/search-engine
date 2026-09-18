@@ -41,7 +41,7 @@ def test_retrieve_returns_unique_parent_documents():
         {"_id": "chunk-2", "_score": 7.0, "_source": {"parent_id": "doc-1", "title": "A"}},
         {"_id": "doc-2", "_score": 6.0, "_source": {"title": "B"}},
     ]}}
-    hits = retrieve(client, "search-documents", "수출허가", date.today(), 2)
+    hits = retrieve(client, "search-documents", "수출허가", date.today(), 2, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
     assert client.search.call_args.kwargs["size"] == 10
 
@@ -137,7 +137,7 @@ def test_an_index_dropping_out_of_a_search_is_reported(monkeypatch, caplog):
     embedder.embed_query.return_value = [0.1] * 768
 
     with caplog.at_level(logging.WARNING):
-        retrieve(client, "search-documents,search-docs", "허가", date(2026, 9, 16), 5, embedder)
+        retrieve(client, "search-documents,search-docs", "허가", date(2026, 9, 16), 5, embedder, cutoff_ratio=0)
 
     assert "search-documents-v1" in caplog.text
     assert "not knn_vector type" in caplog.text
@@ -153,7 +153,7 @@ def test_a_document_carries_its_other_matching_chunks():
         {"_id": "c9", "_score": 5.0, "_source": {"parent_id": "doc-2", "body": "other"}},
     ]}}
     hits = retrieve(client, "search-documents", "수출허가", date.today(), 2,
-                    chunks_per_document=3)
+                    chunks_per_document=3, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
     assert hits[0].chunk_ids == ["c1", "c2", "c3"]
     assert hits[0].bodies == ["one", "two", "three"]
@@ -167,7 +167,7 @@ def test_one_chunk_per_document_keeps_the_single_chunk_shape():
         {"_id": "c2", "_score": 7.0, "_source": {"parent_id": "doc-1", "body": "two"}},
     ]}}
     hits = retrieve(client, "search-documents", "수출허가", date.today(), 2,
-                    chunks_per_document=1)
+                    chunks_per_document=1, cutoff_ratio=0)
     assert [hit.chunk_ids for hit in hits] == [["c1"]]
     assert hits[0].passages == []
 
@@ -183,7 +183,7 @@ def test_extra_chunks_never_displace_another_document():
         {"_id": "c5", "_score": 5.0, "_source": {"parent_id": "doc-3", "body": "e"}},
     ]}}
     hits = retrieve(client, "search-documents", "수출허가", date.today(), 3,
-                    chunks_per_document=4)
+                    chunks_per_document=4, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2", "doc-3"]
 
 
@@ -203,7 +203,7 @@ def test_a_rewrite_is_searched_alongside_the_question_not_instead_of_it(monkeypa
         lexical_hits(("c2", "doc-2")),
     ]
     hits = retrieve(client, "search-documents", "업체의 약속 문서", date.today(), 5,
-                    mode="bm25", query_rewrite=True, chunks_per_document=1)
+                    mode="bm25", query_rewrite=True, chunks_per_document=1, cutoff_ratio=0)
     searched = [call.kwargs["body"]["query"] for call in client.search.call_args_list]
     assert "업체의 약속 문서" in str(searched[0])
     assert "수출자 서약서 폐지" in str(searched[1])
@@ -219,7 +219,7 @@ def test_the_original_query_outranks_the_rewrite_at_the_same_rank(monkeypatch):
         lexical_hits(("c2", "doc-rewrite")),
     ]
     hits = retrieve(client, "search-documents", "질문", date.today(), 5,
-                    mode="bm25", query_rewrite=True, chunks_per_document=1)
+                    mode="bm25", query_rewrite=True, chunks_per_document=1, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-original", "doc-rewrite"]
 
 
@@ -231,7 +231,7 @@ def test_a_rewrite_outage_narrows_the_search_instead_of_failing_it(monkeypatch, 
     client.search.return_value = lexical_hits(("c1", "doc-1"))
     with caplog.at_level(logging.WARNING):
         hits = retrieve(client, "search-documents", "질문", date.today(), 5,
-                        mode="bm25", query_rewrite=True, chunks_per_document=1)
+                        mode="bm25", query_rewrite=True, chunks_per_document=1, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-1"]
     assert "query rewrite unavailable" in caplog.text
 
@@ -244,7 +244,7 @@ def test_an_evaluation_run_refuses_to_measure_without_the_rewrite(monkeypatch):
     client.search.return_value = lexical_hits(("c1", "doc-1"))
     with pytest.raises(httpx.HTTPError):
         retrieve(client, "search-documents", "질문", date.today(), 5,
-                 mode="bm25", query_rewrite=True, strict=True)
+                 mode="bm25", query_rewrite=True, strict=True, cutoff_ratio=0)
 
 
 def test_an_unbounded_bm25_score_is_reported_as_the_retriever_gave_it():
@@ -254,7 +254,7 @@ def test_an_unbounded_bm25_score_is_reported_as_the_retriever_gave_it():
         {"_id": "c1", "_score": 15.0, "_source": {"parent_id": "doc-1"}},
         {"_id": "c2", "_score": 900.0, "_source": {"parent_id": "doc-2"}},
     ]}}
-    hits = retrieve(client, "search-documents", "질문", date.today(), 5, mode="bm25")
+    hits = retrieve(client, "search-documents", "질문", date.today(), 5, mode="bm25", cutoff_ratio=0)
     assert [hit.score for hit in hits] == [15.0, 900.0]
 
 
@@ -269,7 +269,7 @@ def test_a_replacement_edition_is_offered_without_a_score_it_never_earned():
             {"_id": "new", "_score": 1.0, "_source": {"parent_id": "doc-new"}},
         ]}},
     ]
-    hits = retrieve(client, "search-documents", "질문", date.today(), 5, mode="bm25")
+    hits = retrieve(client, "search-documents", "질문", date.today(), 5, mode="bm25", cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-old", "doc-new"]
     assert hits[0].score == 9.0
     assert hits[1].score is None
@@ -308,3 +308,43 @@ def test_a_dead_retriever_reports_itself_without_blanking_the_comparison(monkeyp
     assert by_mode["vector"].hits == []
     # Hybrid keeps its lexical half rather than failing with the embedder.
     assert [hit.parent_id for hit in by_mode["hybrid"].hits] == ["doc-1"]
+
+
+def test_a_hit_far_behind_the_best_is_not_offered():
+    """Ten results padded out with near misses is what the cutoff exists to stop."""
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 20.0, "_source": {"parent_id": "doc-1"}},
+        {"_id": "c2", "_score": 19.0, "_source": {"parent_id": "doc-2"}},
+        {"_id": "c3", "_score": 4.0, "_source": {"parent_id": "doc-3"}},
+    ]}}
+    hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                    mode="bm25", cutoff_ratio=0.9)
+    assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
+
+
+def test_the_best_hit_survives_any_cutoff():
+    """A score says which document fits best, never whether any document answers,
+    so the cutoff trims the tail and never empties the list."""
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 0.01, "_source": {"parent_id": "doc-1"}},
+        {"_id": "c2", "_score": 0.009, "_source": {"parent_id": "doc-2"}},
+    ]}}
+    hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                    mode="bm25", cutoff_ratio=1.0)
+    assert [hit.parent_id for hit in hits] == ["doc-1"]
+
+
+def test_the_cutoff_reads_each_mode_on_its_own_scale():
+    """A BM25 20.0 and an RRF 0.03 are both "the best there is"; the ratio is
+    what lets one threshold mean the same thing in either."""
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": [
+        {"_id": "c1", "_score": 0.0328, "_source": {"parent_id": "doc-1"}},
+        {"_id": "c2", "_score": 0.0320, "_source": {"parent_id": "doc-2"}},
+        {"_id": "c3", "_score": 0.0160, "_source": {"parent_id": "doc-3"}},
+    ]}}
+    hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                    mode="bm25", cutoff_ratio=0.95)
+    assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]

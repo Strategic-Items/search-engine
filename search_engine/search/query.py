@@ -141,6 +141,22 @@ def _warn_on_partial_results(response: dict, retriever: str) -> None:
                     failure.get("reason", {}).get("reason"))
 
 
+def _cutoff(ranked: list[dict], ratio: float) -> float:
+    """The score below which a hit is too far behind this search's best to show.
+
+    Taken from the best score rather than a fixed number: the modes score on
+    scales that share no unit, and a score's absolute value says nothing about
+    whether the document answers the question -- on docs v2 the unanswerable
+    questions' best hits outscored plenty of answerable ones. What a score does
+    support is a comparison within one search, which is all this makes.
+    """
+    top = next((hit["_score"] for hit in ranked if hit.get("_score") is not None), None)
+    # A negative or zero best score would make the ratio meaningless; keep everything.
+    if not ratio or top is None or top <= 0:
+        return float("-inf")
+    return top * ratio
+
+
 def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[dict]:
     """Fuse weighted rank lists without comparing BM25 scores to cosine similarities.
 
@@ -235,6 +251,7 @@ def retrieve(
     embedder: OllamaEmbedder | None = None,
     *, mode: str | None = None, strict: bool = False,
     chunks_per_document: int | None = None, query_rewrite: bool | None = None,
+    cutoff_ratio: float | None = None,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -298,11 +315,16 @@ def retrieve(
             if parent not in seen:
                 seen.add(parent)
                 ranked.append(hit)
+    if cutoff_ratio is None:
+        cutoff_ratio = settings.cutoff_ratio(mode if len(ranked_lists) == 1 else "hybrid")
+    floor = _cutoff(ranked, cutoff_ratio)
     out = []
     for hit in ranked:
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
         score = hit.get("_score")
+        if score is not None and score < floor:
+            break
         out.append(SearchHit.model_validate({
             **{key: value for key, value in source.items() if value is not None},
             "id": hit["_id"], "parent_id": parent_id, "score": score,

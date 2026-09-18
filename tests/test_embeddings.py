@@ -62,7 +62,7 @@ def test_hybrid_search_fuses_bm25_and_vector_rankings(monkeypatch):
     ]
     embedder = Mock()
     embedder.embed_query.return_value = [0.1, 0.2]
-    hits = retrieve(client, "documents", "의미 검색", date(2026, 9, 15), 3, embedder)
+    hits = retrieve(client, "documents", "의미 검색", date(2026, 9, 15), 3, embedder, cutoff_ratio=0)
     assert [hit.id for hit in hits] == ["both", "lex", "semantic"]
     vector_call = client.search.call_args_list[1]
     assert vector_call.kwargs["body"]["query"] == build_vector_query([0.1, 0.2], date(2026, 9, 15), 15)
