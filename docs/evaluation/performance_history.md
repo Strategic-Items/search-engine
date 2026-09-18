@@ -22,6 +22,7 @@
 - [11. Qwen3-Embedding-0.6B는 bge-m3를 넘는가](stages/stage-11-qwen3-embedding.md) — 넘지 못한다. 남은 구멍은 임베딩 모델의 문제가 아니다
 - [12. 구어체 어미가 검색을 망가뜨린다](stages/stage-12-auxiliary-verb-stoptags.md) — 보조용언이 검색 토큰으로 남아 엉뚱한 1위를 만들고, 컷오프가 정답을 잘라낸다
 - [13. dragonkue/BGE-m3-ko는 bge-m3를 넘는가](stages/stage-13-bge-m3-ko.md) — 넘는다. 포화라고 봤던 구간이 실은 다국어 모델의 천장이었다
+- [14. 절대 바닥값으로 한 번 더 자르기](stages/stage-14-absolute-score-floor.md) — 도메인 밖은 전부 거르지만, 도메인 안의 무응답은 여전히 못 거른다
 
 ## 단계에 걸친 문서
 
