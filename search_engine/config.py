@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # Keep the embedding model separate from the chat model: chat models are
     # usually much larger and may not expose Ollama's embedding endpoint.
     # Multilingual: the corpus and the questions are Korean, and an English-first
-    # model scores them close to randomly (docs/performance_history.md, stage 6).
+    # model scores them close to randomly (docs/evaluation/performance_history.md, stage 6).
     ollama_embedding_model: str = "bge-m3"
     ollama_temperature: float = 0.4
     # Ollama silently drops the front of a prompt that exceeds the context window,
@@ -80,7 +80,28 @@ class Settings(BaseSettings):
     # How much the rewrite's ranking counts against the original's. Below 1 so a
     # rewrite that went wrong cannot outvote the question the user actually asked.
     search_query_rewrite_weight: float = Field(default=0.5, gt=0.0, le=1.0)
+    # Drop every hit scoring below this fraction of the search's own best score,
+    # so a list of ten pads out with near misses no more. A ratio rather than an
+    # absolute floor because the three modes score on scales that share no unit,
+    # and because the absolute value of a score turned out to carry no signal:
+    # on docs v2 the unanswerable questions' best hits scored inside -- often
+    # above -- the answerable ones' range, so no floor separates them. The ratio
+    # only ever says "this is far worse than the best this search found", which
+    # is a claim the scores do support. Calibrated on docs v2's 120 questions;
+    # 1.0 keeps the top hit alone, 0.0 disables the cutoff. The top hit always
+    # survives, so a search never returns nothing: deciding that nothing is
+    # relevant needs evidence the score does not carry.
+    search_cutoff_ratio_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
+    search_cutoff_ratio_vector: float = Field(default=0.99, ge=0.0, le=1.0)
+    search_cutoff_ratio_hybrid: float = Field(default=0.95, ge=0.0, le=1.0)
     rag_top_k: int = Field(default=5, ge=1)
+
+    def cutoff_ratio(self, mode: str) -> float:
+        return {
+            "bm25": self.search_cutoff_ratio_bm25,
+            "vector": self.search_cutoff_ratio_vector,
+            "hybrid": self.search_cutoff_ratio_hybrid,
+        }[mode]
 
     @property
     def chat_base_url(self) -> str:

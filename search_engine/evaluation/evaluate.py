@@ -92,10 +92,31 @@ def reciprocal_rank_at(ranked: list[str], gold: list[str], k: int) -> float:
 
 
 def precision_at(ranked: list[str], gold: list[str], k: int) -> float:
-    """Distinct relevant parents per k slots; unfilled slots count as misses."""
+    """Distinct relevant parents per k slots; unfilled slots count as misses.
+
+    Kept for `precision_at_1` and for reading older reports. Do not use it at
+    k > 1: with a cutoff the list is usually shorter than k, and most queries
+    have a single gold parent, so the fixed denominator caps the average near
+    1/k and the metric cannot move when ranking or the cutoff changes.
+    """
     if k < 1 or not gold:
         raise ValueError("positive k and nonempty gold are required")
     return len(set(ranked[:k]) & set(gold)) / k
+
+
+def precision_returned_at(ranked: list[str], gold: list[str], k: int) -> float:
+    """Distinct relevant parents per document actually returned, capped at k.
+
+    This is the precision a reader experiences: of the documents the search put
+    in front of them, how many were relevant. Both sides count distinct parents,
+    so a repeated parent cannot inflate the denominator. Unlike `precision_at`, it responds to the
+    score cutoff, which shortens the list rather than reordering it. A search
+    that returns nothing scores 0.
+    """
+    if k < 1 or not gold:
+        raise ValueError("positive k and nonempty gold are required")
+    shown = set(ranked[:k])
+    return len(shown & set(gold)) / len(shown) if shown else 0.0
 
 
 def offered_within(ranked: list, k: int) -> set[str]:
@@ -121,7 +142,9 @@ def quality_metrics(rows: list[dict], k: int) -> dict:
         "precision_at_1": sum(precision_at(r['returned'], r['gold'], 1) for r in rows) / n,
         f"hit_at_{k}": sum(hit_at(r['returned'], r['gold'], k) for r in rows) / n,
         f"recall_at_{k}": sum(recall_at(r['returned'], r['gold'], k) for r in rows) / n,
-        f"precision_at_{k}": sum(precision_at(r['returned'], r['gold'], k) for r in rows) / n,
+        f"precision_returned_at_{k}": sum(
+            precision_returned_at(r['returned'], r['gold'], k) for r in rows) / n,
+        f"mean_returned_at_{k}": sum(len(r['returned'][:k]) for r in rows) / n,
         f"micro_recall_at_{k}": found / relevant,
         f"mrr_at_{k}": sum(reciprocal_rank_at(r['returned'], r['gold'], k) for r in rows) / n,
     }
@@ -244,7 +267,8 @@ def format_report(report: dict) -> str:
         f"{status}={count}" for status, count in sorted(report["reviewed"].items(), key=lambda pair: str(pair[0]))))
     metrics = report["metrics"]
     lines.append(f"Precision@1 (macro): {metrics['precision_at_1']:.4f}; "
-                 f"Precision@{k} (macro): {metrics[f'precision_at_{k}']:.4f}; "
+                 f"Precision@{k} (반환분 기준, macro): {metrics[f'precision_returned_at_{k}']:.4f} "
+                 f"(평균 {metrics[f'mean_returned_at_{k}']:.2f}건); "
                  f"Recall@{k} (macro): {metrics[f'recall_at_{k}']:.4f}; "
                  f"MRR@{k}: {metrics[f'mrr_at_{k}']:.4f}")
     if not report["coverage_known"]:

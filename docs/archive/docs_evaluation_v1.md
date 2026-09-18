@@ -3,7 +3,7 @@
 > **임베딩 모델이 `nomic-embed-text`(768차원)이던 시점의 기록이다.** 색인은 그 뒤
 > `bge-m3`(1024차원)로 교체했고, 벡터·하이브리드 수치는 더 이상 유효하지 않다.
 > BM25 수치는 임베딩과 무관하므로 그대로 유효하다. 현재 결론과 단계별 이력은
-> [검색 성능 이력](performance_history.md)에 있다.
+> [검색 성능 이력](../evaluation/performance_history.md)에 있다.
 
 ## 결과
 
@@ -117,8 +117,8 @@ cd /Users/jeongbin/git/searchEngine
 `search-index ... --dataset docs --manifest ...`를 실행한다. 그 산출물 경로를
 `--corpus`와 `--prepared`에 전달한다. 코퍼스가 다르면 새 평가 실행으로 기록한다.
 
-요약·코드/데이터 체크섬: [docs_v1_summary.json](evaluation/docs_v1_summary.json).
-질문 작성 범위·한계: [정답 세트 manifest](../data/queries_docs_v1.manifest.json).
+요약·코드/데이터 체크섬: [docs_v1_summary.json](../evaluation/docs_v1_summary.json).
+질문 작성 범위·한계: [정답 세트 manifest](../../data/queries_docs_v1.manifest.json).
 구현 검증: 검색엔진 테스트 122개 통과, CLI 설치/도움말 및 HTTP docs-only/HSK 제외 확인.
 
 다음 단계는 원문 기준 독립 검수와 평가셋 확대다. 이후 입력 정리·모델·후보 수·RRF를

@@ -1,12 +1,12 @@
 # 검색 품질 baseline — 2026-09-15
 
 > 이 문서의 표는 자료 유형 가점을 넣기 **전**의 기준선이다.
-> 가점 이후 수치는 [질의 유형 가점](query_intent_boost.md)에 있다.
+> 가점 이후 수치는 [질의 유형 가점](../design/query_intent_boost.md)에 있다.
 
 `search-evaluate`로 실행 중인 `/v1/search`를 실습 저장소의 검토 중인 정답 질의
 93건(`/Users/jeongbin/git/search-engine/data/queries_project_v1_reviewed.jsonl`)에
 대해 측정한 결과다. 평가셋은 실습 저장소에 두고 경로로 읽으며 이 저장소에 복사하지
-않는다. 색인은 [import_v1](import_v1.md)의 스냅샷(`search-documents` 3,499,
+않는다. 색인은 [import_v1](../design/import_v1.md)의 스냅샷(`search-documents` 3,499,
 `search-hsk` 18,673)이다.
 
 ```bash
@@ -28,7 +28,7 @@
 | **합계** | 93 | 46 / 93 | 59 / 93 | 22 |
 
 정답이 색인된 71건만 보면 첫 결과 46, 상위 5건 59다. FAQ·서식·안내·공지·HSK 수치는
-[import_v1](import_v1.md)의 기록과 일치하므로, 이 러너는 그 측정을 재현한다.
+[import_v1](../design/import_v1.md)의 기록과 일치하므로, 이 러너는 그 측정을 재현한다.
 
 이 숫자는 독립 운영 품질 지표가 아니다. 93건 중 정답 검토가 끝난 것은 HSK 18건
 (`structured_source_verified`)뿐이고, 67건이 `needs_co_gold_review`, 5건이

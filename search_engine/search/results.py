@@ -18,10 +18,6 @@ class SearchHit(BaseModel):
     parent_id: str
     # The retriever's own score, on whatever scale that retriever uses.
     score: float | None = None
-    # The same match on one 0-1 scale that means the same thing in every search
-    # mode, so a caller can compare or draw it without knowing which ran. None
-    # where score is: a replacement edition was fetched, not ranked.
-    relevance: float | None = None
     title: str = ""
     body: str = ""
     code: str = ""

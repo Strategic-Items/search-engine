@@ -10,6 +10,7 @@ from search_engine.evaluation.evaluate import (
     load_queries,
     quality_metrics,
     precision_at,
+    precision_returned_at,
     ranked_ids,
 )
 
@@ -48,12 +49,25 @@ def test_precision_uses_k_slots_and_counts_duplicate_parents_once():
         precision_at(["a"], ["a"], 0)
 
 
+def test_precision_returned_divides_by_what_was_shown_not_by_k():
+    # The whole point of the cutoff: a shorter, cleaner list must score better.
+    assert precision_returned_at(["a"], ["a"], 5) == 1.0
+    assert precision_at(["a"], ["a"], 5) == .2
+    # 같은 부모가 두 번 나와도 분모를 부풀리지 않는다: {a, x, b, y} 중 {a, b}.
+    assert precision_returned_at(["a", "a", "x", "b", "y", "c"], ["a", "b", "c"], 5) == .5
+    assert precision_returned_at([], ["a"], 5) == 0
+    with pytest.raises(ValueError):
+        precision_returned_at(["a"], ["a"], 0)
+
+
 def test_precision_and_mrr_average_queries_including_misses():
     metrics = quality_metrics([
         {"returned": ["x", "a", "b"], "gold": ["a", "b"]},
         {"returned": [], "gold": ["c"]},
     ], 5)
-    assert metrics["precision_at_5"] == .2
+    # 3건 중 2건 적중, 그리고 아무것도 못 낸 질의는 0.
+    assert metrics["precision_returned_at_5"] == pytest.approx(1 / 3)
+    assert metrics["mean_returned_at_5"] == 1.5
     assert metrics["precision_at_1"] == 0
     assert metrics["mrr_at_5"] == .25
 

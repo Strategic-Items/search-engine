@@ -146,14 +146,15 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
 
 
 def format_comparison(report: dict) -> str:
-    lines = ["| 방식 | Precision@1 | Hit@5 | Precision@5 | Recall@5 | Recall@10 | MRR@5 | p50 ms | p95 ms |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = ["| 방식 | Precision@1 | Hit@5 | Precision@5 (반환분) | 평균 반환 | Recall@5 | Recall@10 | MRR@5 | p50 ms | p95 ms |",
+             "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for mode, result in report["modes"].items():
         m5 = result["metrics"]["5"]
         m10 = result["metrics"]["10"]
         lat = result["latency"]
         lines.append(f"| {mode} | {m5['precision_at_1']:.1%} | {m5['hit_at_5']:.1%} | "
-                     f"{m5['precision_at_5']:.1%} | {m5['recall_at_5']:.1%} | {m10['recall_at_10']:.1%} | "
+                     f"{m5['precision_returned_at_5']:.1%} | {m5['mean_returned_at_5']:.2f} | "
+                     f"{m5['recall_at_5']:.1%} | {m10['recall_at_10']:.1%} | "
                      f"{m5['mrr_at_5']:.4f} | {lat['p50_ms']:.1f} | {lat['p95_ms']:.1f} |")
     if any("group_queries" in result["metrics"]["5"] for result in report["modes"].values()):
         lines.extend(["", "| 방식 | 논리 문서 Recall@5 | 논리 문서 Recall@10 | 근거 Recall@5 | 모든 근거@5 |",

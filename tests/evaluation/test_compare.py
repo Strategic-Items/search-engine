@@ -214,9 +214,12 @@ def test_validate_only_does_not_connect_to_services(tmp_path, monkeypatch, capsy
 def test_v2_questions_have_answer_level_evidence():
     root = Path(__file__).resolve().parents[2]
     rows = [json.loads(line) for line in (root / "data/queries_docs_v2.jsonl").read_text().splitlines()]
-    assert len(rows) == 120
+    assert len(rows) == 135
     assert len({r["qid"] for r in rows}) == len(rows)
-    assert {r["category"] for r in rows} == {"paraphrase", "scenario", "multi_evidence"}
+    assert {r["category"] for r in rows} == {
+        "paraphrase", "scenario", "multi_evidence",
+        # 식별자를 일부러 넣은 질의. 어휘 정확 일치 경로를 검증한다.
+        "identifier_number", "identifier_article", "identifier_mixed"}
     for r in rows:
         assert r["reference_answer"] and r["human_review"] == "pending"
         assert r["evidence_requirements"]

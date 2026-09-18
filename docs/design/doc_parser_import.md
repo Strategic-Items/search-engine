@@ -1,7 +1,7 @@
 # 문서 파서 연동 — 2026-09-16
 
 원본 문서(HWP/HWPX/PDF)를 파싱해 검색 색인에 넣는 경로를 붙였다. 파싱은
-[`unstructured-doc-parser`](../../unstructured-doc-parser)가, 임베딩과 색인·검색은
+[`unstructured-doc-parser`](../../../unstructured-doc-parser)가, 임베딩과 색인·검색은
 이 저장소가 맡는다.
 
 ## 연결 지점은 파일이다
