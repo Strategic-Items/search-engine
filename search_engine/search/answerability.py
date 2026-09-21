@@ -29,8 +29,18 @@ log = logging.getLogger(__name__)
 
 # The rules go in their own turn. Folded into the user turn instead, the same
 # model rejected 20.7% of answerable questions against 14.8% here.
+#
+# The second rule is about polarity. Without it the judge refused questions
+# whose answer it had just quoted: asked whether identical specifications
+# oblige a US licence, it answered that no such statement was present "and in
+# fact the text says a licence need not be applied for on those grounds" --
+# and returned answerable: false. Asking "is the fact this question asks for
+# written down" invites reading the question's premise as that fact, so a
+# document that denies the premise looks like a document that is silent on
+# it. Every question this lost was a yes/no one whose answer is no.
 SYSTEM = """당신은 검색 결과를 검수한다. 주어진 발췌문만 보고, 질문이 요구하는 사실이 그 안에 실제로 적혀 있는지 판단한다.
 - 주제가 같아도 요구된 사실이 없으면 답할 수 없는 것이다.
+- 질문이 어떤 내용의 성립 여부를 묻고 발췌문이 그것을 부정하고 있으면, 답할 수 있는 것이다. 질문의 전제를 뒤집는 근거도 근거다.
 - 집계 결과, 실시간 현황, 개인별 처리 상태처럼 문서가 담지 않는 종류는 답할 수 없다.
 - 추측하거나 상식으로 보충하지 않는다.
 JSON만 출력한다: {"answerable": true|false, "confidence": 0.0~1.0, "reason": "한 문장"}"""
