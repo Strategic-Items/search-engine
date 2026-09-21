@@ -150,6 +150,37 @@ class Settings(BaseSettings):
     # this is opt-in rather than a default
     # (docs/evaluation/stages/stage-18-llm-answerability-judge.md).
     search_answerability_judge: bool = False
+    # Re-order each returned document's own chunks against the query, so the
+    # chunk carrying the answer is the one a reader (or the judge, or the RAG
+    # prompt) sees first. Documents are already ranked when this runs; it never
+    # changes which documents come back.
+    #
+    # Off by default: it adds roughly 1.2s to a search that takes a tenth of
+    # one, the same trade as query rewrite and the judge above.
+    #
+    # Worth it only under hybrid. Vector search picked its chunks with the same
+    # embedding, so their within-document order is already right and re-ranking
+    # moves evidence recall@6 by 0.0p. RRF fuses on ranks and scrambles that
+    # order -- hybrid's rank-1 evidence recall sits 24.6p below vector's, and
+    # re-ranking buys it back and then some
+    # (docs/evaluation/stages/stage-19-chunk-rerank-within-document.md).
+    search_rerank_chunks: bool = False
+    # An HTTP sidecar, like embeddings and chat: the cross-encoder stays out of
+    # this process. Any endpoint taking {model, query, documents} and returning
+    # a score per document works.
+    search_rerank_base_url: str = "http://localhost:8080"
+    # The base model, not the Korean-tuned one. On this Korean corpus
+    # `bge-reranker-v2-m3-ko` was 9.0p worse at rank 1 and 0.7p better at rank
+    # 6 -- one requirement -- the opposite of what Korean tuning did for the
+    # embedding in stage 13. Korean tuning helped the bi-encoder and hurt the
+    # cross-encoder here; re-measure before swapping either.
+    search_rerank_model: str = "BAAI/bge-reranker-v2-m3"
+    # How many of a document's candidates are scored; the rest keep their order.
+    # A ceiling on the worst case rather than a latency knob -- a document
+    # carries 8 candidates at the median, so this touches about 1% of them,
+    # leaves p50 unchanged and cuts p95 by a quarter.
+    search_rerank_depth: int = Field(default=20, ge=2)
+    search_rerank_timeout_seconds: float = Field(default=30.0, gt=0)
     rag_top_k: int = Field(default=5, ge=1)
 
     def cutoff_ratio(self, mode: str) -> float:
