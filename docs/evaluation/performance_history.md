@@ -28,6 +28,8 @@
 - [17. BM25 대신 sparse를 섞으면](stages/stage-17-sparse-instead-of-bm25.md) — 어휘 짝으로는 낫지만, 융합이 강점을 평균 내버린다
 - [18. 도메인 안 무응답을 거를 수 있는가](stages/stage-18-llm-answerability-judge.md) — 리랭커는 0/8, LLM 판정은 7/8. 관련도가 아니라 사실의 유무를 물어야 한다
 - [19. 문서는 맞는데 청크가 틀렸다](stages/stage-19-chunk-rerank-within-document.md) — 판정자 거짓 거절의 절반은 근거가 문서 내 7~21위로 밀려 안 보인 것이었다. 문서 내 재정렬로 14.8% → 7.4%
+- [20. 진단이 맞으면 해법은 공짜였다](stages/stage-20-dense-order-inside-documents.md) — 같은 진단이 cross-encoder 대신 밀집 순서를 가리키고 있었다. 지연 0으로 근거 `@1` +23.3p
+- [21. 컷오프가 융합을 투표로 바꿔 놓고 있었다](stages/stage-21-fusion-cutoff-and-judge-polarity.md) — RRF 점수에 비율 컷오프는 "두 검색기 모두에 있어야 한다"는 뜻이었다. P@1 +3.0p, Hit@5 +3.7p, 지연 0. 판정자 폴라리티 규칙 한 줄로 거짓 거절 5.9% → 3.7%
 
 ## 단계에 걸친 문서
 

@@ -51,4 +51,27 @@ SEARCH_CHUNKS_PER_DOCUMENT=6 .venv/bin/search-compare data/queries_docs_v2.jsonl
   --corpus data/generated/docs-v2/review-corpus/docs.jsonl \
   --alias search-docs-only --repeats 3 --as-of 2026-09-17 \
   --out data/generated/docs-v2/comparison-120q-chunks6.json   # 8단계
+
+SEARCH_CHUNKS_PER_DOCUMENT=6 .venv/bin/search-compare data/queries_docs_v2.jsonl \
+  --corpus data/generated/docs-v2/review-corpus/docs.jsonl \
+  --alias search-docs-only --repeats 3 --as-of 2026-09-17 --modes hybrid,vector \
+  --out data/generated/docs-v2/comparison-135q-fusion-trim.json   # 21단계
 ```
+
+## 판정자 측정
+
+18·20·21단계의 무응답 포착과 거짓 거절은 `search-compare`가 아니라 별도 실행이다.
+CLI가 없어 매번 스크립트를 쓴다. 질문 세트는 `data/queries_docs_v2.jsonl` 135건과
+`data/queries_docs_v2_unanswerable.jsonl` 26건이고, 각 질의를 `mode="hybrid"`,
+`chunks_per_document=6`, `k=5`로 검색한 뒤 `is_unanswerable`에 건다. 기록하는 것은
+질의마다 `gold_retrieved`와 `judge_rejected` 둘이다.
+
+거짓 거절은 **`gold_retrieved`가 참인 거절만** 센다. 문서를 못 가져와서 거절한 것은
+판정자가 옳은 것이므로 따로 센다 — 21단계가 20단계의 4건을 다시 열게 된 것이 이
+구분에서 나왔다.
+
+**조건당 1회 실행이고, 판정자에는 실행 간 변동이 1~2건 폭으로 있다.** 같은 코드로
+다시 재면 목록이 달라진다. 1~2건 차이로 조건을 가르면 안 된다.
+
+원자료: `judge-dense-ordered-chunks.json`(20단계),
+`judge-fusion-trim.json`·`judge-fusion-trim-polarity.json`·`judge-fusion-trim-judge-rules.json`(21단계).
