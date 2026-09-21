@@ -1,8 +1,6 @@
-"""Normalization for the STT call-centre chunk export.
+"""STT 콜센터 청크 내보내기의 정규화.
 
-The source export deliberately keeps its STT and analysis fields.  This model
-turns one search-sized chunk into the stable shape used by the search engine
-without pretending that a past consultation is an official source.
+원본 내보내기에서는 의도적으로 STT와 분석 필드를 유지한다. 이 모델은 과거 상담이 공식 소스인 것처럼 가장하지 않고, 검색 크기의 청크 하나를 검색 엔진에서 사용하는 안정적인 형태로 바꾼다.
 """
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -33,8 +31,8 @@ class CallCenterChunk(BaseModel):
     def index_source(self) -> dict:
         category = self.categories[0] if self.categories else "기타"
         inquiry = self.call_inquiry.strip() or "상담 내용"
-        # The inquiry is useful retrieval context, but the raw STT stays intact
-        # below it so a result can always be inspected as a past case.
+        # 문의는 유용한 검색 맥락이지만, 원시 STT는 그대로 유지된다
+        # 아래에 있으므로 결과는 항상 과거 사례로 검사할 수 있다.
         body = f"문의 요약: {inquiry}\n\n상담 내용: {self.text}"
         return {
             "id": self.chunk_id,

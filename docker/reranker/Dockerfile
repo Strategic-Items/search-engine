@@ -1,7 +1,6 @@
 FROM python:3.12-slim
 
-# CPU wheels only: this runs beside OpenSearch on a dev machine, and the CUDA
-# variants pull gigabytes that never get used.
+# CPU용 휠만: 이는 개발 환경에서 OpenSearch와 함께 실행되며, CUDA 버전은 사용되지 않는 수 GB의 데이터를 다운로드한다.
 RUN pip install --no-cache-dir \
       --extra-index-url https://download.pytorch.org/whl/cpu \
       torch transformers fastapi uvicorn
@@ -9,8 +8,7 @@ RUN pip install --no-cache-dir \
 COPY app.py /app/app.py
 WORKDIR /app
 
-# Weights come from the mounted HF cache rather than the image, so the image
-# stays small and switching MODEL_ID needs no rebuild.
+# 가중치는 이미지가 아닌 마운트된 HF 캐시에서 가져오므로, 이미지는 작게 유지되고 MODEL_ID를 변경할 때 재ビルド가 필요하지 않다.
 ENV HF_HOME=/hf MODEL_ID=BAAI/bge-reranker-v2-m3 HF_HUB_OFFLINE=1
 EXPOSE 8080
 

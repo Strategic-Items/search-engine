@@ -28,6 +28,9 @@
 - [17. BM25 대신 sparse를 섞으면](stages/stage-17-sparse-instead-of-bm25.md) — 어휘 짝으로는 낫지만, 융합이 강점을 평균 내버린다
 - [18. 도메인 안 무응답을 거를 수 있는가](stages/stage-18-llm-answerability-judge.md) — 리랭커는 0/8, LLM 판정은 7/8. 관련도가 아니라 사실의 유무를 물어야 한다
 - [19. 문서는 맞는데 청크가 틀렸다](stages/stage-19-chunk-rerank-within-document.md) — 판정자 거짓 거절의 절반은 근거가 문서 내 7~21위로 밀려 안 보인 것이었다. 문서 내 재정렬로 14.8% → 7.4%
+- [20. 진단이 맞으면 해법은 공짜였다](stages/stage-20-dense-order-inside-documents.md) — 같은 진단이 cross-encoder 대신 밀집 순서를 가리키고 있었다. 지연 0으로 근거 `@1` +23.3p
+- [21. 컷오프가 융합을 투표로 바꿔 놓고 있었다](stages/stage-21-fusion-cutoff-and-judge-polarity.md) — RRF 점수에 비율 컷오프는 "두 검색기 모두에 있어야 한다"는 뜻이었다. P@1 +3.0p, Hit@5 +3.7p, 지연 0. 판정자 폴라리티 규칙 한 줄로 거짓 거절 5.9% → 3.7%
+- [22. 어휘 검색이 본문 근거를 버리고 있었다](stages/stage-22-most-fields-instead-of-best-fields.md) — `best_fields`가 문서를 단일 최고 필드로만 점수 내고 있었다. `most_fields` 한 단어로 Hit@5 +1.5p, 반환분 정밀도 +4.1p, 반환 수는 감소. bm25 단독은 17단계 sparse와 동률이 된다
 
 ## 단계에 걸친 문서
 
@@ -35,5 +38,6 @@
 - [단계 1~7 한눈에 보기](stages_1_7_overview.md) — 일곱 단계를 같은 표에서 비교한다
 - [단계 2~7 근거 청크 지표](evidence_chunk_metrics_v2.md) — 문서가 아니라 답이 적힌 청크가 반환됐는지를 따로 측정한다
 - [현재 판단과 다음 측정](current_judgment.md) — 지금까지 확정된 것과 아직 재지 않은 것
+- [판정자 프롬프트 스윕](judge_prompt_sweep.md) — 다섯 프롬프트로 거짓 거절 8→1까지 움직였지만 무응답 포착은 22/26에서 꿈쩍하지 않는다. 채택한 것은 없다
 - [컷오프 비율 스윕](cutoff_precision_sweep.md) — 비율별 반환분 정밀도 곡선
 - [v1 기준선](baseline_v1.md) — v1 평가셋 자체의 기록

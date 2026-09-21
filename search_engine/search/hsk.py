@@ -9,7 +9,7 @@ HSK_CODE = re.compile(r"(?<!\d)(?:\d[\s-]?){9}\d(?!\d)")
 
 
 def extract_hsk_code(text: str) -> str | None:
-    """Return the first 10-digit HSK code in text, allowing spaces or hyphens."""
+    """텍스트에서 공백이나 하이픈을 허용하는 10자리 HSK 코드 중 첫 번째를 반환한다."""
     match = HSK_CODE.search(text)
     if not match:
         return None

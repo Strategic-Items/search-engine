@@ -1,4 +1,4 @@
-"""Extract structured control numbers and legal references consistently."""
+"""구조화된 제어 번호와 법적 참조를 일관되게 추출한다."""
 
 import re
 
@@ -26,5 +26,5 @@ def extract(text: str) -> list[str]:
 
 
 def normalize_control(value: str) -> str:
-    """Keep internal hierarchy dots while ignoring casing, spaces and final dot."""
+    """내부 계층 구조의 점을 유지하면서 대소문자, 공백 및 마지막 점은 무시한다."""
     return normalize(value).rstrip(".")

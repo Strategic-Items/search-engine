@@ -1,4 +1,4 @@
-"""Ollama embeddings shared by the offline indexer and search path."""
+"""오프라인 인덱서와 검색 경로에서 공유하는 Ollama 임베딩."""
 
 from collections.abc import Sequence
 
@@ -8,7 +8,7 @@ from search_engine.config import Settings, get_settings
 
 
 def embedding_text(title: str, body: str) -> str:
-    """Produce the labelled document representation sent to the embedding model."""
+    """임베딩 모델에 보내는 레이블링된 문서 표현을 생성한다."""
     return f"제목: {title}\n\n본문: {body}".strip()
 
 

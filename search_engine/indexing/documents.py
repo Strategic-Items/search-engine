@@ -6,7 +6,7 @@ from search_engine.codes import extract, normalize_control
 
 
 class SearchDocument(BaseModel):
-    """Stable source ID and validity dates are required for operational indexing."""
+    """운영 인덱싱을 위해 안정적인 소스 ID와 유효 기간이 필요하다."""
 
     model_config = ConfigDict(extra="allow")
 

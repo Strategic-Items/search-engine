@@ -1,4 +1,4 @@
-"""Compression, retrieval, guardrail construction, and answer streaming."""
+"""압축, 검색, 가드레일 구축, 그리고 답변 스트리밍."""
 
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -19,7 +19,7 @@ class Turn:
 
 @dataclass
 class StreamError:
-    """A post-header failure that the SSE adapter renders as an error event."""
+    """SSE 어댑터가 오류 이벤트로 렌더링하는 헤더 이후의 실패."""
 
     message: str = "answer generation unavailable"
 

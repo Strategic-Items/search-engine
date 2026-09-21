@@ -1,4 +1,4 @@
-"""Grounded-answer prompt and the no-context response."""
+"""근거 기반 답변 프롬프트와 맥락 없는 응답."""
 
 from search_engine.search.results import SearchHit
 
@@ -12,7 +12,7 @@ ANSWER_TEMPLATE = """당신은 전략물자 수출통제 상담을 지원하는 
    "해당한다" / "해당하지 않는다" 로 끝내지 말고, 근거와 함께 확인이 필요한 지점을 밝힌다.
 4. 답변 말미에 다음을 항상 덧붙인다:
    "자세한 사항은 전략물자관리시스템(yesTrade)을 통해 확인하시기 바랍니다."
-   
+
 근거 자료:
 ---------------------
 {context}
@@ -29,9 +29,9 @@ EMPTY_CONTEXT_ANSWER = (
 )
 
 
-# Passages of one document are separated rather than run together: they are not
-# adjacent in the source, and joining them silently would invite an answer that
-# reads across a gap as if it were continuous text.
+# 한 문서의 패스aggio는 서로 연결되지 않고 분리되어 전달된다: 그들은
+# 소스에서 인접한, 그리고 그들을 조용히 연결하면 갭을 가로질러 연속된 텍스트인 것처럼 읽는 답변을 유도할 수 있다.
+# 갭을 가로질러 연속된 텍스트인 것처럼 읽는 답변을 유도할 수 있다.
 PASSAGE_SEPARATOR = "\n[같은 문서의 다른 부분]\n"
 
 

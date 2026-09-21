@@ -1,4 +1,4 @@
-"""Offline pipeline: source documents into an OpenSearch index."""
+"""오프라인 파이프라인: 소스 문서를 OpenSearch 인덱스로 가져온다."""
 
 from search_engine.indexing.documents import SearchDocument
 from search_engine.indexing.mapping import HSK_INDEX_BODY, index_body

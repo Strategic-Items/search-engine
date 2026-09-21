@@ -1,4 +1,4 @@
-"""Runtime query path: turn a user query into ranked results."""
+"""런타임 쿼리 경로: 사용자 쿼리를 정렬된 결과로 변환한다."""
 
 from search_engine.search.document import fetch_document
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk

@@ -21,7 +21,7 @@ def test_context_preserves_search_metadata_instead_of_generic_label():
 
 
 def test_passages_of_one_document_are_kept_apart():
-    """Two chunks of a document are not adjacent text, so they are not run together."""
+    """문서의 두 조각은 인접한 텍스트가 아니므로, 함께 연결되지 않는다."""
     hit = SearchHit(
         id="c1", parent_id="doc-1", title="공고", body="첫 부분", source_type="공고",
         passages=[Passage(id="c2", body="뒷 부분")],

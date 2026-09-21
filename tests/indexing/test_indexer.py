@@ -17,7 +17,7 @@ def write(tmp_path: Path, *rows: dict, name: str = "docs.jsonl") -> Path:
 
 
 def patch_cluster(monkeypatch, client: Mock, bulk_results=((True, {}),), **settings) -> Mock:
-    """Point rebuild at a mock cluster whose bulk writes report bulk_results."""
+    """모의 클러스터를 가리키도록 재구성하라. 이 클러스터의 대량 쓰기 작업은 bulk_results를 보고한다."""
     client.ping.return_value = True
     monkeypatch.setattr("search_engine.indexing.indexer.get_settings", lambda: Settings(**settings))
     monkeypatch.setattr("search_engine.indexing.indexer.create_client", lambda settings: client)
@@ -139,7 +139,7 @@ def test_rebuild_refuses_input_that_does_not_match_its_manifest_checksum(tmp_pat
 
 
 def test_rebuild_never_deletes_an_index_that_is_already_serving(tmp_path, monkeypatch):
-    """If the alias swap succeeds but the call reports failure, the index must survive."""
+    """별칭 교체가 성공했지만 호출이 실패를 보고하면, 인덱스는 살아남아야 한다."""
     path = write(tmp_path, {"id": "faq-1", "title": "허가"})
     client = Mock()
     client.count.return_value = {"count": 1}
@@ -226,7 +226,7 @@ def test_the_hsk_index_carries_no_synonyms(tmp_path, monkeypatch):
 
 
 def test_rebuild_docs_uses_its_own_alias_but_the_document_mapping(tmp_path, monkeypatch):
-    """The docs corpus is indexed separately yet stays searchable alongside core."""
+    """문서 코퍼스는 별도로 인덱싱되지만 핵심과 함께 검색 가능하게 유지된다."""
     path = write(tmp_path, {"id": "notice-1#0000", "title": "공고문",
                             "parent_id": "notice-1", "source_type": "공고문"},
                  name="docs.jsonl")
@@ -248,7 +248,7 @@ def test_rebuild_docs_uses_its_own_alias_but_the_document_mapping(tmp_path, monk
 
 
 def test_rebuilding_docs_leaves_the_core_alias_alone(tmp_path, monkeypatch):
-    """Separate datasets exist so one corpus cannot drop the other."""
+    """별도의 데이터셋이 존재하므로 한 코퍼스가 다른 코퍼스를 떨어뜨릴 수 없다."""
     path = write(tmp_path, {"id": "notice-1#0000", "title": "공고문"}, name="docs.jsonl")
     client = Mock()
     client.count.return_value = {"count": 1}
@@ -265,7 +265,7 @@ def test_rebuilding_docs_leaves_the_core_alias_alone(tmp_path, monkeypatch):
 
 
 def test_docs_are_embedded_like_core(tmp_path, monkeypatch):
-    """Both document corpora are read through one hybrid search, so both need vectors."""
+    """두 문서 코퍼스는 하나의 하이브리드 검색을 통해 읽히므로, 둘 다 벡터가 필요하다."""
     path = write(tmp_path, {"id": "notice-1#0000", "title": "공고문"}, name="docs.jsonl")
     client = Mock()
     client.count.return_value = {"count": 1}
