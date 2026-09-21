@@ -106,7 +106,16 @@ class Settings(BaseSettings):
     # floor's job, below.
     search_cutoff_ratio_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
     search_cutoff_ratio_vector: float = Field(default=0.99, ge=0.0, le=1.0)
-    search_cutoff_ratio_hybrid: float = Field(default=0.95, ge=0.0, le=1.0)
+    # The hybrid ratio applies to RRF scores, where the same reasoning does not
+    # hold: a rank-built score says how many lists found a document as loudly
+    # as it says how far behind it ranked, so a strict ratio alone reads as
+    # "both retrievers must have found it" (see `_ratio_cut`). Two things
+    # carry it here instead. The lists are trimmed on their own scales before
+    # fusion, and a document that leads a list of its own is exempt from this
+    # ratio -- which is what keeps the number of lists out of the decision.
+    # With that exemption the value itself stops mattering much: 0.80 and 0.90
+    # scored the same on docs v2's 135 to within 0.4p of returned precision.
+    search_cutoff_ratio_hybrid: float = Field(default=0.90, ge=0.0, le=1.0)
     # An absolute floor under the ratio cutoff. The ratio only ever says "far
     # worse than the best this search found", so it cannot empty a result list:
     # the top hit is its own reference and always clears it. A floor can, which
@@ -182,6 +191,23 @@ class Settings(BaseSettings):
     search_rerank_depth: int = Field(default=20, ge=2)
     search_rerank_timeout_seconds: float = Field(default=30.0, gt=0)
     rag_top_k: int = Field(default=5, ge=1)
+
+    # How much of each retriever's list enters the fusion. Separate from the
+    # cutoff ratios above because it answers a different question: not "is
+    # this worth showing" but "is this worth letting the other retriever vote
+    # against". Vector's own 0.99 is far too tight for that -- cosine scores
+    # sit close together, so it admits a single chunk and the dense ranking
+    # RRF exists to read never reaches the fusion. On docs v2's 135, moving
+    # the dense trim from 0.99 to 0.97 took P@1 from 93.3% to 94.1% and Hit@5
+    # from 96.3% to 97.0%; 0.90 gave up both (91.1% / 93.3%).
+    search_fusion_trim_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
+    search_fusion_trim_vector: float = Field(default=0.97, ge=0.0, le=1.0)
+
+    def fusion_trim_ratio(self, retriever: str) -> float:
+        return {
+            "bm25": self.search_fusion_trim_bm25,
+            "vector": self.search_fusion_trim_vector,
+        }.get(retriever, 0.0)
 
     def cutoff_ratio(self, mode: str) -> float:
         return {

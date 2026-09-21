@@ -391,3 +391,92 @@ def test_the_floor_gates_each_retriever_before_fusion():
         hits = retrieve(client, "search-documents", "질문", date.today(), 5,
                         mode="hybrid", embedder=embedder)
     assert [hit.parent_id for hit in hits] == ["doc-vec"]
+
+
+def test_a_document_only_the_dense_retriever_found_can_still_be_returned():
+    """The ratio cutoff used to make the hybrid a vote rather than a ranking.
+
+    An RRF score is a sum of `1/(k+rank)` terms, so a document both lists
+    found opens at twice the score of one only a single list found: with k=60,
+    `2/61` against `1/61`. Measured as a ratio against the best hit that is
+    0.5, and the hybrid ratio was 0.95 -- so whenever the leading document was
+    in both lists, which was 132 of docs v2's 135 questions, nothing either
+    retriever found alone could survive. Three questions lost their answer
+    this way with the dense retriever holding it at rank 1.
+    """
+    client = Mock()
+    client.search.side_effect = [
+        {"hits": {"hits": [
+            {"_id": "l1", "_score": 20.0, "_source": {"parent_id": "doc-both"}},
+        ]}},
+        {"hits": {"hits": [
+            {"_id": "v1", "_score": 0.90, "_source": {"parent_id": "doc-dense-only"}},
+            {"_id": "v2", "_score": 0.89, "_source": {"parent_id": "doc-both"}},
+        ]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1, 0.2]
+    with patch("search_engine.search.query.get_settings", lambda: Settings(
+        search_score_floor_bm25=0.0, search_score_floor_vector=0.0,
+    )):
+        hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                        mode="hybrid", embedder=embedder)
+    # doc-both leads the lexical list and is second in the dense one, so it
+    # scores 1/61 + 1/62 against doc-dense-only's 1/61: a ratio of 0.497.
+    assert [hit.parent_id for hit in hits] == ["doc-both", "doc-dense-only"]
+
+
+def test_fusion_ties_are_broken_on_the_dense_order_not_the_chunk_id():
+    """Two documents each ranked first in a different list score identically.
+
+    Ties are the normal case after the lists are trimmed, not an edge case, so
+    what breaks them decides P@1. Here the chunk ids would put the lexical
+    document first; the dense order is what the pipeline trusts.
+    """
+    client = Mock()
+    client.search.side_effect = [
+        {"hits": {"hits": [
+            {"_id": "aaa", "_score": 20.0, "_source": {"parent_id": "doc-lexical"}},
+        ]}},
+        {"hits": {"hits": [
+            {"_id": "zzz", "_score": 0.90, "_source": {"parent_id": "doc-dense"}},
+        ]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1, 0.2]
+    with patch("search_engine.search.query.get_settings", lambda: Settings(
+        search_score_floor_bm25=0.0, search_score_floor_vector=0.0,
+    )):
+        hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                        mode="hybrid", embedder=embedder)
+    assert [hit.parent_id for hit in hits] == ["doc-dense", "doc-lexical"]
+
+
+def test_trimming_for_fusion_leaves_the_passage_pool_whole():
+    """The trim decides what votes, not what a returned document may carry.
+
+    The candidates a document's passages are chosen from are the same lists
+    the fusion reads, so trimming them in place would take chunks away from
+    documents that do get returned -- the pool stage 20 depends on.
+    """
+    client = Mock()
+    client.search.side_effect = [
+        {"hits": {"hits": [
+            {"_id": "l1", "_score": 20.0, "_source": {"parent_id": "doc-1", "body": "a"}},
+            {"_id": "l2", "_score": 2.0, "_source": {"parent_id": "doc-1", "body": "b"}},
+        ]}},
+        {"hits": {"hits": [
+            {"_id": "v1", "_score": 0.90, "_source": {"parent_id": "doc-1", "body": "c"}},
+            {"_id": "v2", "_score": 0.40, "_source": {"parent_id": "doc-1", "body": "d"}},
+        ]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1, 0.2]
+    with patch("search_engine.search.query.get_settings", lambda: Settings(
+        search_score_floor_bm25=0.0, search_score_floor_vector=0.0,
+    )):
+        hits = retrieve(client, "search-documents", "질문", date.today(), 5,
+                        mode="hybrid", embedder=embedder, chunks_per_document=4,
+                        rerank_chunks=False)
+    # l2 and v2 are both well under their retriever's trim and neither voted.
+    assert sorted(hits[0].chunk_ids) == ["l1", "l2", "v1", "v2"]

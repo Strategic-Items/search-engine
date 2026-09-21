@@ -23,6 +23,9 @@ from search_engine.search.results import (
 
 log = logging.getLogger(__name__)
 
+# Marks a fused hit that was ranked first by one of the lists behind it.
+LEADS_A_LIST = "_leads_a_list"
+
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 
 # The request carries only a query, so the kind of document a user is asking for
@@ -159,15 +162,63 @@ def _cutoff(ranked: list[dict], ratio: float) -> float:
     return top * ratio
 
 
-def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[dict]:
+def _ratio_cut(hits: list[dict], ratio: float) -> list[dict]:
+    """Drop the tail of one retriever's list, measured against its own best hit.
+
+    This runs before fusion, and the ratio it takes is not the one that mode
+    would use to cut its own final results. Its job here is to decide what
+    each retriever is confident enough about to put into the fusion, which is
+    why the two jobs are configured separately -- reusing the vector mode's
+    own 0.99 narrows the dense list to a single chunk and throws away the
+    ranking RRF is there to read.
+
+    A ratio cannot do this job after fusion at all. RRF builds a score out of
+    ranks -- `1/(k+rank)` summed over the lists that found the document -- so
+    a document two retrievers found starts at twice the score of one only a
+    single retriever found, whatever either of them believed. With k=60 the
+    best a single-list document can reach is `1/61` against a dual-list
+    leader's `2/61`: a ratio of 0.5. Any cutoff above that deletes every
+    document the other retriever missed, which on docs v2 was three questions
+    whose answer the dense retriever had ranked first. What such a ratio
+    measures is not the rank gap it is meant to measure; it is how many lists
+    found the document.
+    """
+    if not ratio or not hits:
+        return hits
+    top = next((hit["_score"] for hit in hits if hit.get("_score") is not None), None)
+    if top is None or top <= 0:
+        return hits
+    kept = []
+    for hit in hits:
+        score = hit.get("_score")
+        if score is not None and score < top * ratio:
+            break
+        kept.append(hit)
+    return kept
+
+
+def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> list[dict]:
     """Fuse weighted rank lists without comparing BM25 scores to cosine similarities.
 
     The weight is what keeps an unreliable list from outvoting a reliable one: a
     rewritten query contributes at a fraction of the original's, so a rewrite that
     went wrong can add a document but cannot push the original's best answer down.
+
+    Ties are broken on the dense retriever's rank. They are common rather than
+    freakish once the lists are trimmed: a score is a sum of `1/(k+rank)`
+    terms, so two documents each ranked first in a different list hold exactly
+    the same score. Falling back on the chunk id, as sorting by `_id` did,
+    decided those on a hash. The dense order is the one the rest of the
+    pipeline already trusts for the same reason it trusts it inside a document
+    (stage 20).
     """
     fused: dict[str, tuple[float, dict]] = {}
-    for hits, weight in ranked_lists:
+    dense_rank: dict[str, int] = {}
+    # Documents that lead a list of their own. Marked here because after
+    # fusion there is no way back to the fact: the ratio cutoff has to know
+    # which hits it is not entitled to judge.
+    leaders: set[str] = set()
+    for hits, weight, retriever in ranked_lists:
         seen_in_list: set[str] = set()
         for rank, hit in enumerate(hits, 1):
             source = hit["_source"]
@@ -175,11 +226,22 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[d
             if parent_id in seen_in_list:
                 continue
             seen_in_list.add(parent_id)
+            if retriever == "vector":
+                dense_rank.setdefault(parent_id, rank)
+            if rank == 1:
+                leaders.add(parent_id)
             score, exemplar = fused.get(parent_id, (0.0, hit))
             fused[parent_id] = (score + weight / (rrf_k + rank), exemplar)
+
+    def order(item: tuple[str, tuple[float, dict]]) -> tuple:
+        parent_id, (score, hit) = item
+        # A document the dense retriever never returned sorts after every one
+        # it did, rather than ahead of them all at rank 0.
+        return -score, dense_rank.get(parent_id, len(fused) + 1), hit["_id"]
+
     return [
-        {**hit, "_score": score}
-        for score, hit in sorted(fused.values(), key=lambda pair: (-pair[0], pair[1]["_id"]))
+        {**hit, "_score": score, LEADS_A_LIST: parent_id in leaders}
+        for parent_id, (score, hit) in sorted(fused.items(), key=order)
     ]
 
 
@@ -365,8 +427,17 @@ def retrieve(
         return []
     ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
     if len(ranked_lists) > 1:
-        ranked = _rrf([(hits, weight) for hits, weight, _ in ranked_lists],
-                      settings.search_hybrid_rrf_k)
+        # Cut each list on its own retriever's calibrated ratio first. An
+        # explicit `cutoff_ratio` overrides the whole cutoff policy -- a sweep
+        # passing 0 to see the uncut ranking must get it -- so it skips this
+        # too. `ranked_lists` itself is left whole: it is also the pool the
+        # per-document passages are chosen from, and trimming that would take
+        # chunks away from documents that do get returned.
+        fusable = ranked_lists if cutoff_ratio is not None else [
+            (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
+            for hits, weight, retriever in ranked_lists
+        ]
+        ranked = _rrf(fusable, settings.search_hybrid_rrf_k)
     else:
         # Preserve the retriever's original scores, keeping its best chunk per parent.
         seen = set()
@@ -395,8 +466,17 @@ def retrieve(
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
         score = hit.get("_score")
+        # A document some retriever ranked first is kept whatever the ratio
+        # says. Against a leader both lists found it scores half as much for
+        # having been found once, not for ranking worse, and no ratio can tell
+        # those apart after fusion. `continue` rather than `break`, because
+        # such a document sorts below hits the ratio does cut.
         if score is not None and score < floor:
-            break
+            if not hit.get(LEADS_A_LIST):
+                continue
+            # The absolute floor is not the ratio and still binds.
+            if score < score_floor:
+                continue
         out.append(SearchHit.model_validate({
             **{key: value for key, value in source.items() if value is not None},
             "id": hit["_id"], "parent_id": parent_id, "score": score,
