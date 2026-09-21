@@ -35,9 +35,21 @@ class Settings(BaseSettings):
     ollama_chat_model: str = "qwen2.5:3b"
     # Keep the embedding model separate from the chat model: chat models are
     # usually much larger and may not expose Ollama's embedding endpoint.
-    # Multilingual: the corpus and the questions are Korean, and an English-first
-    # model scores them close to randomly (docs/evaluation/stages/stage-06-embedding-model.md).
-    ollama_embedding_model: str = "bge-m3"
+    # Korean-specialised: the corpus and the questions are Korean. An
+    # English-first model scores them close to randomly
+    # (docs/evaluation/stages/stage-06-embedding-model.md), and the multilingual
+    # bge-m3 that replaced it turned out to be its own ceiling -- a Korean
+    # finetune of the same architecture takes vector MRR@5 0.9074 -> 0.9407
+    # (docs/evaluation/stages/stage-13-bge-m3-ko.md).
+    #
+    # Served as GGUF so Ollama runs it like any other model. The conversion is
+    # third-party, so it was checked against the original safetensors before
+    # adoption: cosine 0.99998 or better over 25 queries
+    # (docs/evaluation/stages/stage-15-adopt-bge-m3-ko.md).
+    #
+    # Changing this needs a reindex of every dataset AND a re-measurement of
+    # SEARCH_SCORE_FLOOR_VECTOR, which is a raw cosine on this model's scale.
+    ollama_embedding_model: str = "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16"
     ollama_temperature: float = 0.4
     # Ollama silently drops the front of a prompt that exceeds the context window,
     # which would cut the grounding rules and leave the evidence, and the window
