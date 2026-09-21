@@ -17,8 +17,22 @@ import httpx
 from search_engine.config import Settings, get_settings
 
 
+def _messages(prompt: str, system: str | None) -> list[dict]:
+    """A system turn when one is given, because models follow it differently.
+
+    Folding the rules into the user turn is not equivalent: the answerability
+    judge rejected 20.7% of answerable questions that way against 14.8% with
+    the rules in their own turn.
+    """
+    messages = [{"role": "user", "content": prompt}]
+    if system:
+        messages.insert(0, {"role": "system", "content": system})
+    return messages
+
+
 def _ollama_payload(settings: Settings, prompt: str, temperature: float,
-                    max_tokens: int | None, stream: bool) -> dict:
+                    max_tokens: int | None, stream: bool,
+                    system: str | None = None, json_object: bool = False) -> dict:
     options = {
         "temperature": temperature,
         # Ollama defaults this low and then silently truncates the front of an
@@ -27,40 +41,49 @@ def _ollama_payload(settings: Settings, prompt: str, temperature: float,
     }
     if max_tokens is not None:
         options["num_predict"] = max_tokens
-    return {
+    payload = {
         "model": settings.chat_model,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": _messages(prompt, system),
         "stream": stream,
         "options": options,
     }
+    if json_object:
+        payload["format"] = "json"
+    return payload
 
 
 def _openai_payload(settings: Settings, prompt: str, temperature: float,
-                    max_tokens: int | None, stream: bool) -> dict:
+                    max_tokens: int | None, stream: bool,
+                    system: str | None = None, json_object: bool = False) -> dict:
     # No num_ctx equivalent: the context window is fixed when the server starts
     # (vLLM's --max-model-len), so an over-long prompt errors instead of being
     # silently cut. Size the window there to match OLLAMA_NUM_CTX or above.
     payload = {
         "model": settings.chat_model,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": _messages(prompt, system),
         "stream": stream,
         "temperature": temperature,
     }
     if max_tokens is not None:
         payload["max_tokens"] = max_tokens
+    if json_object:
+        payload["response_format"] = {"type": "json_object"}
     return payload
 
 
 def _request(settings: Settings, prompt: str, temperature: float,
-             max_tokens: int | None, stream: bool) -> tuple[str, dict, dict]:
+             max_tokens: int | None, stream: bool,
+             system: str | None = None, json_object: bool = False) -> tuple[str, dict, dict]:
     """URL, JSON body and headers for one call to the configured provider."""
     base = settings.chat_base_url.rstrip("/")
     if settings.chat_provider == "openai":
         headers = {"Authorization": f"Bearer {settings.chat_api_key}"}
         url = f"{base}/chat/completions" if base.endswith("/v1") else f"{base}/v1/chat/completions"
-        return url, _openai_payload(settings, prompt, temperature, max_tokens, stream), headers
+        return url, _openai_payload(settings, prompt, temperature, max_tokens, stream,
+                                    system, json_object), headers
     return (f"{base}/api/chat",
-            _ollama_payload(settings, prompt, temperature, max_tokens, stream), {})
+            _ollama_payload(settings, prompt, temperature, max_tokens, stream,
+                            system, json_object), {})
 
 
 def _content(settings: Settings, line: str) -> tuple[str, bool]:
@@ -112,14 +135,16 @@ async def complete(prompt: str, temperature: float = 0.0) -> str:
 
 
 def generate(prompt: str, temperature: float = 0.0, max_tokens: int | None = None,
-             settings: Settings | None = None) -> str:
+             settings: Settings | None = None, *, system: str | None = None,
+             json_object: bool = False) -> str:
     """Blocking single-shot completion, for the synchronous search path.
 
     Raises httpx.HTTPError if the model is unreachable; the caller decides
     whether that should degrade its work or fail it.
     """
     settings = settings or get_settings()
-    url, payload, headers = _request(settings, prompt, temperature, max_tokens, stream=False)
+    url, payload, headers = _request(settings, prompt, temperature, max_tokens,
+                                     stream=False, system=system, json_object=json_object)
     response = httpx.post(url, json=payload, headers=headers,
                           timeout=settings.ollama_timeout_seconds)
     response.raise_for_status()

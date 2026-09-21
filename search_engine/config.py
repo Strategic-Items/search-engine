@@ -137,6 +137,19 @@ class Settings(BaseSettings):
     # RRF scores carry no relevance signal, so there is nothing to threshold
     # here; the per-retriever floors above already gated what reached fusion.
     search_score_floor_hybrid: float = Field(default=0.0, ge=0.0)
+    # Ask the chat model whether the retrieved text actually answers the
+    # question, and return nothing when it says no. Off by default for the same
+    # reason query rewrite is: it puts the chat model in the path of a search
+    # that otherwise has no model dependency, and costs about two seconds
+    # against a search that takes a tenth of one.
+    #
+    # This is the only thing measured that separates an in-domain question the
+    # corpus cannot answer from one it can. Score floors rejected 0 of 8 and
+    # cross-encoder rerankers 0 of 8; the judge rejected 7. The price is that
+    # it also refuses 14.8% of questions the corpus can answer, which is why
+    # this is opt-in rather than a default
+    # (docs/evaluation/stages/stage-18-llm-answerability-judge.md).
+    search_answerability_judge: bool = False
     rag_top_k: int = Field(default=5, ge=1)
 
     def cutoff_ratio(self, mode: str) -> float:
