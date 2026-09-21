@@ -15,9 +15,7 @@ from search_engine.config import get_settings
 from search_engine.evaluation.evaluate import load_queries, quality_metrics
 from search_engine.indexing.indexer import file_sha256
 from search_engine.indexing.documents import SearchDocument
-from search_engine.search.query import MODES as ALL_MODES, PRODUCTION_MODES, retrieve
-
-MODES = PRODUCTION_MODES
+from search_engine.search.query import MODES, retrieve
 
 
 def percentile(values: list[float], fraction: float) -> float:
@@ -51,10 +49,6 @@ def verify_corpus(client, alias: str, corpus: Path) -> tuple[str, dict]:
         "query": {"match_all": {}}, "_source": {"excludes": ["embedding"]},
     }, raise_on_error=True):
         source = hit["_source"]
-        # Derived from the body like the dense vector, and absent from the
-        # corpus file, so it is excluded from the identity check rather than
-        # being allowed to declare every sparse index stale.
-        source.pop("sparse_embedding", None)
         if hit["_id"] in actual:
             raise ValueError("duplicate chunk ID across indexes")
         actual[hit["_id"]] = source
@@ -186,14 +180,13 @@ def main() -> None:
                         help="Also search a model-written rewrite of each query and fuse the "
                              "rankings; overrides SEARCH_QUERY_REWRITE for this run")
     parser.add_argument("--modes", default=",".join(MODES),
-                        help="Comma-separated retrieval modes to compare; the sparse modes "
-                             f"need SPARSE_ENCODER_URL set. Known: {','.join(ALL_MODES)}")
+                        help=f"Comma-separated retrieval modes to compare. Known: {','.join(MODES)}")
     parser.add_argument("--validate-only", action="store_true",
                         help="Validate query labels and source quotes only; no OpenSearch/Ollama calls")
     args = parser.parse_args()
     modes = tuple(name.strip() for name in args.modes.split(",") if name.strip())
-    if not modes or set(modes) - set(ALL_MODES):
-        parser.error(f"--modes must name known modes: {','.join(ALL_MODES)}")
+    if not modes or set(modes) - set(MODES):
+        parser.error(f"--modes must name known modes: {','.join(MODES)}")
     queries = load_queries(args.queries)
     if args.validate_only:
         known = {json.loads(line)["parent_id"] for line in args.corpus.read_text(encoding="utf-8").splitlines()
@@ -210,8 +203,6 @@ def main() -> None:
     concrete, corpus = verify_corpus(client, args.alias or settings.search_docs_alias, args.corpus)
     known = set(corpus.pop("parent_ids"))
     verify_gold(queries, args.corpus, known)
-    if set(modes) & {"sparse", "hybrid_sparse"} and not settings.sparse_encoder_url:
-        parser.error("the sparse modes need SPARSE_ENCODER_URL")
     report = compare(queries, client, concrete, repeats=args.repeats,
                      warmup=args.warmup, as_of=args.as_of, query_rewrite=args.rewrite,
                      modes=modes)
@@ -221,15 +212,13 @@ def main() -> None:
         "settings": {key: getattr(settings, key) for key in (
             "ollama_embedding_model", "search_embedding_dimensions", "search_vector_candidates",
             "search_hybrid_rrf_k", "search_chunks_per_document",
-            "search_query_rewrite_weight", "chat_provider", "chat_model",
-            "search_sparse_candidates", "sparse_encoder_url")},
+            "search_query_rewrite_weight", "chat_provider", "chat_model")},
         "opensearch_version": client.info()["version"]["number"],
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),
                         "metrics": file_sha256(Path(quality_metrics.__code__.co_filename))},
         "methodology": "parent-level macro recall over source-reviewed gold; single-process "
-            "retrieval latency including uncached query encoding -- Ollama for dense, the "
-            "separately served bge-m3 sparse head for the sparse modes -- excluding HTTP/LLM; "
+            "retrieval latency including uncached Ollama query embedding, excluding HTTP/LLM; "
             "same candidate depth for all cutoffs; strict failures (no lexical fallback); "
             "optional equivalent-parent group and final-returned-chunk evidence requirement recall, "
             "where @k cuts on documents and each document carries its returned chunks; "
