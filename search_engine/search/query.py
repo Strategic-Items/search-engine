@@ -11,7 +11,7 @@ from search_engine.config import Settings, get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.answerability import is_unanswerable
-from search_engine.search.rerank import rerank_passages
+from search_engine.search.rerank import select_passages
 from search_engine.search.rewrite import rewrite_query
 from search_engine.search.results import (
     ModeComparison,
@@ -186,15 +186,26 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[d
 def _candidates_by_parent(
     ranked_lists: Iterable[tuple[list[dict], float, str]],
 ) -> dict[str, list[dict]]:
-    """Group every candidate chunk under its parent, best rank first.
+    """Group every candidate chunk under its parent, the dense retriever's order first.
 
-    A retriever's own ranking orders the chunks within a parent; a hybrid search
-    then appends whatever only the other retriever found. Which parents come back
-    is already settled before this runs, so the ordering here only decides which
-    chunks of a parent are shown, never which documents.
+    Which parents come back is already settled before this runs, so the ordering
+    here only decides which chunks of a parent are shown, never which documents.
+
+    The dense retriever leads because it is the only one that orders chunks well.
+    Fusion settles documents on ranks, and the within-document order it leaves
+    behind is nobody's: on docs v2 the labelled evidence led its document for
+    41.9% of requirements under hybrid against 66.5% under vector alone. Taking
+    the chunk order from the dense list and keeping fusion for the documents
+    closes that -- evidence recall goes to 65.2% at rank 1 and 90.3% by rank 6,
+    which is where a cross-encoder over the same pool lands (67.7% / 90.3%) for
+    1.5s more (docs/evaluation/stages/stage-19-chunk-rerank-within-document.md).
+
+    Lexical candidates still follow, so a chunk only BM25 found is carried rather
+    than dropped. Under bm25 or vector alone there is one list and nothing moves.
     """
     by_parent: dict[str, list[dict]] = {}
     seen: set[str] = set()
+    ranked_lists = sorted(ranked_lists, key=lambda entry: entry[2] != "vector")
     for hits, *_ in ranked_lists:
         for hit in hits:
             if hit["_id"] in seen:
@@ -206,25 +217,37 @@ def _candidates_by_parent(
 
 
 def _with_passages(
-    hits: list[SearchHit], ranked_lists: Iterable[tuple[list[dict], float, str]],
-    chunks_per_document: int,
+    hits: list[SearchHit], by_parent: dict[str, list[dict]], chunks_per_document: int,
 ) -> list[SearchHit]:
-    """Carry the document's other matching chunks alongside the one that ranked it.
+    """Carry a document's best chunks, in the order `by_parent` put them.
 
     One chunk per document is the right unit for ranking documents but the wrong
     unit for answering: on the docs v2 set the labelled evidence sat in a chunk
     the deduplication dropped for 23 of 40 questions, even though its document
     was already first. The extra chunks come out of the candidate pool the search
     already fetched, so this costs no further round trip.
+
+    The leading chunk comes from that order too, rather than staying whichever
+    chunk fusion happened to rank the document by. It is the chunk a reader sees
+    first and the one a generator weights most, and leaving it to fusion pins
+    rank-1 evidence recall at 41.9% while the rest of the selection improves
+    around it (docs/evaluation/stages/stage-20-dense-order-inside-documents.md).
     """
     if chunks_per_document < 2:
         return hits
-    by_parent = _candidates_by_parent(ranked_lists)
     for hit in hits:
-        others = [c for c in by_parent.get(hit.parent_id, []) if c["_id"] != hit.id]
+        pool = list(by_parent.get(hit.parent_id, []))
+        # The chunk that ranked the document belongs in the pool even if no
+        # retriever list carried it here; it just no longer leads by default.
+        if not any(c["_id"] == hit.id for c in pool):
+            pool.insert(0, {"_id": hit.id, "_source": {"body": hit.body}, "_score": hit.score})
+        chosen = pool[:chunks_per_document]
+        lead = chosen[0]
+        hit.id = lead["_id"]
+        hit.body = lead["_source"].get("body", "")
         hit.passages = [
             Passage(id=c["_id"], body=c["_source"].get("body", ""), score=c.get("_score"))
-            for c in others[:chunks_per_document - 1]
+            for c in chosen[1:]
         ]
     return hits
 
@@ -382,17 +405,20 @@ def retrieve(
             break
     if chunks_per_document is None:
         chunks_per_document = settings.search_chunks_per_document
-    hits = _with_passages(
-        _with_current_editions(client, alias, out, k), ranked_lists, chunks_per_document,
-    )
+    hits = _with_current_editions(client, alias, out, k)
+    by_parent = _candidates_by_parent(ranked_lists)
     if rerank_chunks is None:
         rerank_chunks = settings.search_rerank_chunks
-    # Before the judge, so the judge reads the chunks a reader would. Half the
-    # answerable questions it refused were ones whose evidence had been buried
-    # here: reordering alone took its false rejections from 14.8% to 7.4%
-    # without touching the judge.
-    if rerank_chunks:
-        hits = rerank_passages(query, hits, settings)
+    # Selection and ordering are one decision, so this replaces _with_passages
+    # rather than running after it. Cutting the pool to six first and re-ordering
+    # those six recovers nothing: every requirement the reranker recovers sat at
+    # rank 7 to 21 of its document. It also runs before the judge, so the judge
+    # reads the chunks a reader would -- half the answerable questions it refused
+    # were ones whose evidence had been buried here.
+    if not (rerank_chunks
+            and chunks_per_document >= 2
+            and select_passages(query, hits, by_parent, chunks_per_document, settings)):
+        hits = _with_passages(hits, by_parent, chunks_per_document)
     if answerability is None:
         answerability = settings.search_answerability_judge
     # Judged last, on the passages that would actually be handed to a reader:

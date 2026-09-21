@@ -27,6 +27,7 @@
 - [16. 어휘 바닥값을 걷고 벡터에 주제 판정을 맡긴다](stages/stage-16-vector-decides-topicality.md) — BM25 바닥값은 관련성이 아니라 질의 길이를 재고 있었다. 해제는 되돌렸고, 노이즈 게이트로만 남긴다
 - [17. BM25 대신 sparse를 섞으면](stages/stage-17-sparse-instead-of-bm25.md) — 어휘 짝으로는 낫지만, 융합이 강점을 평균 내버린다
 - [18. 도메인 안 무응답을 거를 수 있는가](stages/stage-18-llm-answerability-judge.md) — 리랭커는 0/8, LLM 판정은 7/8. 관련도가 아니라 사실의 유무를 물어야 한다
+- [19. 문서는 맞는데 청크가 틀렸다](stages/stage-19-chunk-rerank-within-document.md) — 판정자 거짓 거절의 절반은 근거가 문서 내 7~21위로 밀려 안 보인 것이었다. 문서 내 재정렬로 14.8% → 7.4%
 
 ## 단계에 걸친 문서
 

@@ -16,11 +16,17 @@ from pydantic import BaseModel, Field
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 MODEL = os.environ.get("MODEL_ID", "BAAI/bge-reranker-v2-m3")
+# In the container this is always cpu -- Docker Desktop passes no accelerator
+# through. Set it when running this file directly on a host that has one; that
+# is the only way to measure a latency that means anything.
+DEVICE = os.environ.get("DEVICE") or (
+    "cuda" if torch.cuda.is_available()
+    else "mps" if torch.backends.mps.is_available() else "cpu")
 MAX_LENGTH = int(os.environ.get("MAX_LENGTH", "512"))
 BATCH = int(os.environ.get("BATCH_SIZE", "16"))
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL).eval()
+model = AutoModelForSequenceClassification.from_pretrained(MODEL).to(DEVICE).eval()
 torch.set_num_threads(int(os.environ.get("TORCH_THREADS", str(os.cpu_count() or 4))))
 
 app = FastAPI(title="reranker")
@@ -34,7 +40,7 @@ class RerankRequest(BaseModel):
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "model": MODEL}
+    return {"status": "ok", "model": MODEL, "device": DEVICE}
 
 
 @app.post("/rerank")
@@ -45,7 +51,7 @@ def rerank(request: RerankRequest) -> list[dict]:
         pairs = [[request.query, document]
                  for document in request.documents[start:start + BATCH]]
         batch = tokenizer(pairs, padding=True, truncation=True,
-                          max_length=MAX_LENGTH, return_tensors="pt")
-        scores += model(**batch).logits.view(-1).float().tolist()
+                          max_length=MAX_LENGTH, return_tensors="pt").to(DEVICE)
+        scores += model(**batch).logits.view(-1).float().cpu().tolist()
     # TEI's shape. The caller reads `index`, so the order of this list is free.
     return [{"index": index, "score": score} for index, score in enumerate(scores)]

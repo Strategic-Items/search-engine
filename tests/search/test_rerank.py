@@ -3,16 +3,17 @@ from unittest.mock import patch
 import pytest
 
 from search_engine.config import Settings
-from search_engine.search.rerank import rerank_passages
+from search_engine.search.rerank import select_passages
 from search_engine.search.results import Passage, SearchHit
 
 
+def candidate(chunk_id, body):
+    return {"_id": chunk_id, "_source": {"body": body}, "_score": 1.0}
+
+
 def hit(**kwargs):
-    return SearchHit.model_validate({
-        "id": "c0", "parent_id": "p", "title": "제목", "body": "본문0",
-        "passages": [Passage(id="c1", body="본문1"), Passage(id="c2", body="본문2")],
-        **kwargs,
-    })
+    return SearchHit.model_validate(
+        {"id": "c0", "parent_id": "p", "title": "제목", "body": "본문0", **kwargs})
 
 
 def respond(payload, status=200):
@@ -27,48 +28,71 @@ def respond(payload, status=200):
     return Response()
 
 
-class TestRerankPassages:
-    def test_orders_passages_by_score(self):
-        # the document's own body scores worst, so both passages move ahead of it
-        with patch("httpx.post", return_value=respond([0.1, 0.2, 0.9])):
-            hits = rerank_passages("질문", [hit()], Settings())
-        assert [p.id for p in hits[0].passages] == ["c2", "c1"]
+POOL = {"p": [candidate(f"c{i}", f"본문{i}") for i in range(8)]}
+
+
+class TestSelectPassages:
+    def test_selects_from_the_whole_pool_not_the_carried_chunks(self):
+        # the evidence sits at position 7 of the pool -- past any cut of six
+        scores = [0.0] * 8
+        scores[7] = 9.0
+        with patch("httpx.post", return_value=respond(scores)):
+            hits = [hit()]
+            assert select_passages("질문", hits, POOL, 6, Settings()) is True
+        assert hits[0].id == "c7"
+        assert hits[0].chunk_ids[0] == "c7"
+
+    def test_promotes_the_best_chunk_over_the_one_ranking_chose(self):
+        scores = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9]
+        with patch("httpx.post", return_value=respond(scores)):
+            hits = [hit()]
+            select_passages("질문", hits, POOL, 3, Settings())
+        assert hits[0].id == "c7" and hits[0].body == "본문7"
+        assert [p.id for p in hits[0].passages] == ["c6", "c5"]
+
+    def test_carries_exactly_chunks_per_document(self):
+        with patch("httpx.post", return_value=respond([float(i) for i in range(8)])):
+            hits = [hit()]
+            select_passages("질문", hits, POOL, 4, Settings())
+        assert len(hits[0].chunk_ids) == 4
+
+    def test_scores_every_document_in_one_request(self):
+        pool = {"p": POOL["p"], "q": [candidate("d0", "다0"), candidate("d1", "다1")]}
+        hits = [hit(), hit(id="d0", parent_id="q", body="다0")]
+        with patch("httpx.post", return_value=respond([1.0] * 10)) as post:
+            select_passages("질문", hits, pool, 6, Settings())
+        assert post.call_count == 1
+        assert len(post.call_args.kwargs["json"]["documents"]) == 10
 
     def test_accepts_the_index_score_shape(self):
-        with patch("httpx.post", return_value=respond(
-                {"results": [{"index": 0, "score": 0.1},
-                             {"index": 1, "score": 0.9},
-                             {"index": 2, "score": 0.2}]})):
-            hits = rerank_passages("질문", [hit()], Settings())
-        assert [p.id for p in hits[0].passages] == ["c1", "c2"]
+        payload = {"results": [{"index": i, "score": float(i)} for i in range(8)]}
+        with patch("httpx.post", return_value=respond(payload)):
+            hits = [hit()]
+            select_passages("질문", hits, POOL, 2, Settings())
+        assert hits[0].id == "c7"
 
-    def test_keeps_order_when_the_sidecar_is_unreachable(self):
-        with patch("httpx.post", side_effect=OSError("refused")):
-            hits = rerank_passages("질문", [hit()], Settings())
-        assert [p.id for p in hits[0].passages] == ["c1", "c2"]
-
-    def test_keeps_order_when_the_sidecar_miscounts(self):
-        with patch("httpx.post", return_value=respond([0.9])):
-            hits = rerank_passages("질문", [hit()], Settings())
-        assert [p.id for p in hits[0].passages] == ["c1", "c2"]
-
-    def test_scores_only_up_to_the_depth_and_keeps_the_tail(self):
-        passages = [Passage(id=f"c{i}", body=f"본문{i}") for i in range(1, 5)]
+    def test_depth_caps_the_pool(self):
         settings = Settings(search_rerank_depth=3)
-        with patch("httpx.post", return_value=respond([0.1, 0.2, 0.9])) as post:
-            hits = rerank_passages("질문", [hit(passages=passages)], settings)
+        with patch("httpx.post", return_value=respond([0.1, 0.9, 0.2])) as post:
+            hits = [hit()]
+            select_passages("질문", hits, POOL, 3, settings)
         assert len(post.call_args.kwargs["json"]["documents"]) == 3
-        # c2 and c1 are reordered; c3 and c4 were never scored and keep their order
-        assert [p.id for p in hits[0].passages] == ["c2", "c1", "c3", "c4"]
+        assert hits[0].id == "c1"
 
-    def test_leaves_a_document_with_no_extra_chunks_alone(self):
-        with patch("httpx.post") as post:
-            rerank_passages("질문", [hit(passages=[])], Settings())
-        post.assert_not_called()
+    def test_reports_failure_so_the_caller_can_fall_back(self):
+        with patch("httpx.post", side_effect=OSError("refused")):
+            hits = [hit()]
+            assert select_passages("질문", hits, POOL, 6, Settings()) is False
+        assert hits[0].id == "c0" and hits[0].passages == []
+
+    def test_reports_failure_when_the_sidecar_miscounts(self):
+        with patch("httpx.post", return_value=respond([0.9])):
+            hits = [hit()]
+            assert select_passages("질문", hits, POOL, 6, Settings()) is False
 
     def test_no_hits_is_not_a_request(self):
         with patch("httpx.post") as post:
-            assert rerank_passages("질문", [], Settings()) == []
+            assert select_passages("질문", [], {}, 6, Settings()) is True
         post.assert_not_called()
 
 
