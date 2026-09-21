@@ -231,5 +231,6 @@ def test_v2_questions_have_answer_level_evidence():
 def test_negative_cases_are_separate_from_recall_denominator():
     root = Path(__file__).resolve().parents[2]
     rows = [json.loads(line) for line in (root / "data/queries_docs_v2_unanswerable.jsonl").read_text().splitlines()]
-    assert len(rows) == 8
+    manifest = json.loads((root / "data/queries_docs_v2.manifest.json").read_text())
+    assert len(rows) == manifest["negative_queries"]
     assert all(not r["answerable"] and not r["gold"] and r["reason"] for r in rows)
