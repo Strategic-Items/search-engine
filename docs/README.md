@@ -8,6 +8,7 @@
 
 | 문서 | 내용 |
 |---|---|
+| [retrieval_v1](design/retrieval_v1.md) | **검색 경로 전체.** 두 검색기, 융합, 컷오프, 주제 판정 |
 | [import_v1](design/import_v1.md) | 이전 실습 코퍼스 초기 적재와 체크섬 검증 경로 |
 | [doc_parser_import](design/doc_parser_import.md) | `unstructured-doc-parser`와의 연동 계약 |
 | [supersession](design/supersession_v1.md) | 폐지·대체 서식을 가려내는 방식 |
