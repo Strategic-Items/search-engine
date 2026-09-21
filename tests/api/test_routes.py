@@ -11,6 +11,16 @@ def test_search_rejects_blank_query():
     assert client.post("/v1/search", json={"query": " "}).status_code == 422
 
 
+def test_evaluation_questions_include_answerable_and_abstention_cases():
+    body = TestClient(app).get("/v1/evaluation/questions").json()
+
+    assert body["total"] == 155
+    assert sum(row["answerable"] for row in body["questions"]) == 135
+    assert {row["group"] for row in body["questions"]} == {
+        "answerable", "unanswerable", "out_of_domain",
+    }
+
+
 def test_search_returns_hits_from_alias(monkeypatch):
     os_client = Mock()
     os_client.search.return_value = {"hits": {"hits": [

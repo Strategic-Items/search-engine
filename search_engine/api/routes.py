@@ -1,4 +1,6 @@
 from datetime import date
+import json
+from pathlib import Path
 
 from collections.abc import AsyncIterator
 
@@ -21,6 +23,8 @@ from search_engine.search import (
 
 app = FastAPI(title="Strategic Items Search", version="0.1.0")
 
+EVALUATION_DATA = Path(__file__).resolve().parents[2] / "data"
+
 
 @app.get("/health/live")
 def live() -> dict:
@@ -35,6 +39,35 @@ def ready() -> dict:
     except OpenSearchException as exc:
         raise HTTPException(status_code=503, detail="OpenSearch unavailable") from exc
     return {"status": "ok"}
+
+
+@app.get("/v1/evaluation/questions")
+def evaluation_questions() -> dict:
+    """Return the presentation question bank, including abstention cases."""
+    groups = (
+        ("answerable", EVALUATION_DATA / "queries_docs_v2.jsonl"),
+        ("unanswerable", EVALUATION_DATA / "queries_docs_v2_unanswerable.jsonl"),
+        ("out_of_domain", EVALUATION_DATA / "queries_docs_v2_out_of_domain.jsonl"),
+    )
+    questions = []
+    for group, path in groups:
+        with path.open(encoding="utf-8") as rows:
+            for line in rows:
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                questions.append({
+                    "id": row["qid"],
+                    "group": group,
+                    "category": row.get("category", ""),
+                    "question": row["query"],
+                    "answerable": row.get("answerable", bool(row.get("gold"))),
+                    "reference_answer": row.get("reference_answer", ""),
+                    "gold": row.get("gold", []),
+                    "reason": row.get("reason", ""),
+                    "expected_behavior": row.get("expected_behavior", ""),
+                })
+    return {"total": len(questions), "questions": questions}
 
 
 @app.post("/v1/search")
