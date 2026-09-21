@@ -25,6 +25,7 @@
 - [14. 절대 바닥값으로 한 번 더 자르기](stages/stage-14-absolute-score-floor.md) — 도메인 밖은 전부 거르지만, 도메인 안의 무응답은 여전히 못 거른다
 - [15. BGE-m3-ko 채택](stages/stage-15-adopt-bge-m3-ko.md) — 변환본을 검증해 Ollama로 서빙하고, 바닥값을 다시 쟀다
 - [16. 어휘 바닥값을 걷고 벡터에 주제 판정을 맡긴다](stages/stage-16-vector-decides-topicality.md) — BM25 바닥값은 관련성이 아니라 질의 길이를 재고 있었다
+- [17. BM25 대신 sparse를 섞으면](stages/stage-17-sparse-instead-of-bm25.md) — 어휘 짝으로는 낫지만, 융합이 강점을 평균 내버린다
 
 ## 단계에 걸친 문서
 
