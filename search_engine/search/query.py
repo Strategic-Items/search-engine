@@ -229,7 +229,7 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float]], rrf_k: int) -> list[d
 
 
 def _candidates_by_parent(
-    ranked_lists: Iterable[tuple[list[dict], float]],
+    ranked_lists: Iterable[tuple[list[dict], float, str]],
 ) -> dict[str, list[dict]]:
     """Group every candidate chunk under its parent, best rank first.
 
@@ -240,7 +240,7 @@ def _candidates_by_parent(
     """
     by_parent: dict[str, list[dict]] = {}
     seen: set[str] = set()
-    for hits, _weight in ranked_lists:
+    for hits, *_ in ranked_lists:
         for hit in hits:
             if hit["_id"] in seen:
                 continue
@@ -251,7 +251,7 @@ def _candidates_by_parent(
 
 
 def _with_passages(
-    hits: list[SearchHit], ranked_lists: Iterable[tuple[list[dict], float]],
+    hits: list[SearchHit], ranked_lists: Iterable[tuple[list[dict], float, str]],
     chunks_per_document: int,
 ) -> list[SearchHit]:
     """Carry the document's other matching chunks alongside the one that ranked it.
@@ -319,7 +319,18 @@ def retrieve(
         raise ValueError(f"unknown search mode: {mode}")
     if k < 1:
         raise ValueError("k must be positive")
-    ranked_lists: list[tuple[list[dict], float]] = []
+    # (hits, weight, retriever): the retriever is carried so that a search
+    # left with one list can be cut on that retriever's own calibration.
+    ranked_lists: list[tuple[list[dict], float, str]] = []
+    # Set when the dense retriever ran and its floor rejected everything it
+    # found. Cosine is the only one of these scales on which a short but
+    # real query and an off-topic one separate -- BM25 sums per-term
+    # contributions, so a two-word question scores under an out-of-domain
+    # sentence and no lexical floor can tell them apart. So the dense
+    # retriever decides whether anything here is on topic, and the lexical
+    # one only ranks within that. Inert until a vector floor is configured.
+    # A one-slot list rather than a bool because add_response closes over it.
+    off_topic: list[bool] = []
 
     def add_response(response: dict, name: str, retriever: str, weight: float = 1.0) -> None:
         _warn_on_partial_results(response, name)
@@ -334,9 +345,12 @@ def retrieve(
         if gate:
             # A hit without a score cannot be judged against a floor, so it is
             # kept -- the same rule the ratio cutoff below applies.
-            hits = [hit for hit in hits
+            kept = [hit for hit in hits
                     if hit.get("_score") is None or hit["_score"] >= gate]
-        ranked_lists.append((hits, weight))
+            if retriever == "vector" and hits and not kept:
+                off_topic.append(True)
+            hits = kept
+        ranked_lists.append((hits, weight, retriever))
 
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
@@ -378,9 +392,14 @@ def retrieve(
         # Lexical search remains available during an embedding service outage.
         pass
 
-    ranked_lists = [(hits, weight) for hits, weight in ranked_lists if hits] or [([], 1.0)]
+    # The dense retriever found nothing on topic, so nothing here answers the
+    # question, whatever the lexical half turned up.
+    if off_topic:
+        return []
+    ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
     if len(ranked_lists) > 1:
-        ranked = _rrf(ranked_lists, settings.search_hybrid_rrf_k)
+        ranked = _rrf([(hits, weight) for hits, weight, _ in ranked_lists],
+                      settings.search_hybrid_rrf_k)
     else:
         # Preserve the retriever's original scores, keeping its best chunk per parent.
         seen = set()
@@ -390,7 +409,12 @@ def retrieve(
             if parent not in seen:
                 seen.add(parent)
                 ranked.append(hit)
-    fused = mode if len(ranked_lists) == 1 else "hybrid"
+    # One list left means no fusion happened, so the scores are that
+    # retriever's own -- cut them on its ratio and floor, not on the requested
+    # mode's. A hybrid search whose lexical half was gated away otherwise reads
+    # raw cosine scores against a ratio calibrated for RRF, and returns a
+    # longer list than the same retriever would have returned alone.
+    fused = ranked_lists[0][2] if len(ranked_lists) == 1 else "hybrid"
     if cutoff_ratio is None:
         cutoff_ratio = settings.cutoff_ratio(fused)
     if score_floor is None:
