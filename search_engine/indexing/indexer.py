@@ -20,9 +20,9 @@ from search_engine.indexing.synonyms import load_synonyms
 
 log = logging.getLogger(__name__)
 
-# Each dataset is its own index with its own alias, rebuilt independently.
-# "core" and "docs" share the document mapping so one search can read both;
-# "hsk" is an exact-lookup table with no vectors.
+# 각 데이터셋은 자체 인덱스와 자체 별칭을 가지며 독립적으로 재구성된다.
+# "core"와 "docs"는 문서 매핑을 공유하므로 한 번의 검색으로 둘 다 읽을 수 있다;
+# "hsk"는 벡터가 없는 정확한 조회 테이블이다.
 DATASETS = {
     "core": {"alias": "search_index_alias", "prefix": "search_index_prefix",
              "mapping": "document", "embed": True},
@@ -38,7 +38,7 @@ DATASETS = {
 def document_actions(
     path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
 ):
-    """Validate every line, refusing a file that repeats a document ID."""
+    """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
     seen = set()
     with path.open(encoding="utf-8") as file:
         for line_no, line in enumerate(file, 1):
@@ -80,7 +80,7 @@ def rebuild(
     path: Path, dataset: str = "core", expected_count: int | None = None,
     expected_sha256: str | None = None,
 ) -> tuple[str, int]:
-    """Build a complete new index, verify it, then atomically move the read alias."""
+    """완전히 새로운 인덱스를 구축하고 검증한 후 원자적으로 읽기 별칭을 이동한다."""
     if not path.is_file():
         raise FileNotFoundError(path)
     spec = DATASETS.get(dataset)
@@ -137,8 +137,8 @@ def rebuild(
         return index_name, indexed
     finally:
         if not switched:
-            # A transport error after a successful alias update is ambiguous.
-            # Never delete an index that may already be serving reads.
+            # 성공적인 별칭 업데이트 후 발생한 전송 오류는 모호하다.
+            # 이미 읽기 요청을 처리하고 있을 수 있는 인덱스는 절대 삭제하지 않는다.
             try:
                 published = index_name in current_alias_indexes(client, alias)
             except Exception:

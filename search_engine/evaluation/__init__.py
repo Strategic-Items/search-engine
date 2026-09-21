@@ -1,1 +1,1 @@
-"""Offline retrieval-quality measurement."""
+"""오프라인 검색 품질 측정."""

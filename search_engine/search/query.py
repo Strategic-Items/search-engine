@@ -23,14 +23,14 @@ from search_engine.search.results import (
 
 log = logging.getLogger(__name__)
 
-# Marks a fused hit that was ranked first by one of the lists behind it.
+# 하나의 리스트 뒤에 있는 히트 중에서 가장 먼저 순위付け된 융합 히트를 나타냅니다.
 LEADS_A_LIST = "_leads_a_list"
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 
-# The request carries only a query, so the kind of document a user is asking for
-# has to be read from the text. These lift a kind rather than filter to it: a
-# misread costs some rank, never the answer itself.
+# 요청에는 쿼리만 포함되므로, 사용자가 요청하는 문서의 종류
+# 텍스트에서 읽어야 한다. 이들은 필터가 아니라 종류를 들어 올리는 것이다: a
+# 잘못 읽는 비용은 순위에 영향을 주지만, 결코 답 자체에는 영향을 주지 않는다.
 GUIDE_TYPES = ("판정 안내", "허가 안내", "이용 안내")
 FORM_TYPES = ("민원서식",)
 INTENT_HINTS = (
@@ -38,13 +38,13 @@ INTENT_HINTS = (
     (FORM_TYPES, re.compile(r"서식|양식|신청서|서약서|진술서|별표|별지|내려받기|다운로드")),
 )
 SOURCE_TYPE_WEIGHT = 14
-# A form that a newer edition replaced stays searchable -- people ask for an
-# earlier edition by its year -- but the current one answers first by default.
+# 더 새로운 판본이 대체한 양식은 검색 가능해야 한다 -- 사람들이 요청한다
+# 이전 판은 연도로 구분되지만, 기본적으로는 현재 판이 먼저 답변한다.
 CURRENT_EDITION_WEIGHT = 4
 
 
 def _requested_period(query: str) -> tuple[str, str] | None:
-    """Return the half-open date range a "2024년 3월" style query asks for."""
+    """'2024년 3월' 형식의 질의가 요구하는 반개구간 날짜 범위를 반환한다."""
     match = PERIOD.search(query)
     if not match:
         return None
@@ -59,7 +59,7 @@ def _requested_period(query: str) -> tuple[str, str] | None:
 
 
 def _intent_boosts(query: str) -> list[dict]:
-    """Boost the document kinds the query asks for, in the words users use."""
+    """쿼리가 요구하는 문서 종류를 사용자가 사용하는 단어로 강화한다."""
     return [
         {"filter": {"terms": {"source_type": list(types)}}, "weight": SOURCE_TYPE_WEIGHT}
         for types, hint in INTENT_HINTS if hint.search(query)
@@ -71,19 +71,19 @@ def build_query(query: str, as_of: date) -> dict:
     if query.strip():
         should.append({"multi_match": {
             "query": query.strip(),
-            # `most_fields`, not `best_fields`, because the parser appends a
-            # section heading to each chunk's title -- "대외무역법 시행령 — 1.
-            # 수출허가를 받은 물품등의 최종..." -- which makes the title a short
-            # second body carrying content words. `best_fields` scores a
-            # document on its single best field, so two generic words in that
-            # short, thrice-boosted title beat five specific ones in the body
-            # and the body's evidence is discarded rather than added:
+            # `most_fields`는 `best_fields`가 아니라, 파서가 각 청크의 제목에 섹션 제목을 추가하기 때문
+            # 섹션 제목을 각 청크의 제목에 추가하기 때문에 -- "대외무역법 시행령 — 1.
+            # 수출허가를 받은 물품등의 최종..." -- 이는 제목을 짧은
+            # 두 번째 본문으로 만들어 content words를 담는다. `best_fields`는
+            # 문서를 단일 최고 필드로 평가하므로, 그
+            # 짧은 제목에 있는 두 개의 일반적인 단어가 본문에 있는 다섯 개의 구체적인 단어보다 높은 점수를 받는다
+            # 그리고 본문의 증거는 추가되지 않고 버려진다:
             # 받(7.03) + 허가(4.43) = 11.46 outscored 의견 + 러시아 + 보내 +
-            # 허가 + 있 = 7.80, and 러시아 is the most discriminating term in
-            # this corpus. Summing the fields puts the two on the same side of
-            # the lexical floor. The boost stays at 3 -- lowering it loses the
-            # identifier queries the title is there to serve, and 3 was also
-            # the best of the values swept under `most_fields`.
+            # 허가 + 있 = 7.80, 그리고 러시아는 이 코퍼스에서 가장 차별적인 용어이다. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
+            # 이 코퍼스에서. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
+            # 부스트는 3으로 유지된다 -- 이를 낮추면 식별자 쿼리가 제대로 작동하지 않으며, 3은 `most_fields` 아래에서 탐색된 값들 중 최고였다.
+            # 식별자 쿼리가 제대로 작동하도록 제목을 쿼리에 포함시키며, 3은 또한 `most_fields` 아래에서 탐색된 값들 중 최고였다.
+            # 식별자 쿼리가 제대로 작동하도록 제목을 쿼리에 포함시키며, 3은 또한 `most_fields` 아래에서 탐색된 값들 중 최고였다.
             "fields": ["title^3", "body", "title.standard^1.5", "body.standard^0.5"],
             "type": "most_fields",
         }})
@@ -120,7 +120,7 @@ def build_query(query: str, as_of: date) -> dict:
 
 
 def _validity_filters(as_of: date) -> list[dict]:
-    """Filters duplicated for k-NN, whose query cannot use function_score."""
+    """k-NN에서 중복된 필터링, 쿼리가 function_score를 사용할 수 없기 때문에."""
     return [
         {"bool": {"should": [
             {"range": {"effective_from": {"lte": as_of.isoformat()}}},
@@ -134,7 +134,7 @@ def _validity_filters(as_of: date) -> list[dict]:
 
 
 def build_vector_query(vector: list[float], as_of: date, candidates: int) -> dict:
-    """Approximate HNSW cosine search, constrained to currently valid records."""
+    """근사적 HNSW 코사인 검색, 현재 유효한 레코드에 제한됨."""
     return {"knn": {"embedding": {
         "vector": vector,
         "k": candidates,
@@ -143,13 +143,9 @@ def build_vector_query(vector: list[float], as_of: date, candidates: int) -> dic
 
 
 def _warn_on_partial_results(response: dict, retriever: str) -> None:
-    """Say so when an index drops out of a search instead of losing it quietly.
+    """색인 하나가 검색에서 제외될 때 조용히 사라지기보다는 이를 명시적으로 알림.
 
-    Searching several indexes at once returns 200 even when a shard fails, so a
-    whole index can vanish from a rank list with no visible error -- an index
-    built before the vector mapping contributes nothing to k-NN, and RRF then
-    buries every document in it. That is a reindex, not a query bug, and it is
-    only actionable if it is visible.
+    여러 샤드를 동시에 검색할 때 샤드가 실패하더라도 200을 반환하므로, 색인이 순위 목록에서 완전히 사라질 수 있으며 이는 눈에 띄는 오류 없이 발생할 수 있다. 벡터 매핑보다 먼저 생성된 색인은 k-NN에 아무런 기여도 하지 않으며, RRF는 그 안의 모든 문서를 묻어버린다. 이것은 재색인 문제이며, 쿼리 버그가 아니라, 이를 확인할 수 있어야만 조치할 수 있다.
     """
     shards = response.get("_shards", {})
     if not shards.get("failed"):
@@ -160,42 +156,24 @@ def _warn_on_partial_results(response: dict, retriever: str) -> None:
 
 
 def _cutoff(ranked: list[dict], ratio: float) -> float:
-    """The score below which a hit is too far behind this search's best to show.
+    """이 검색의 최고 점수보다 너무 뒤처져서 보여주기 어려운 히트의 점수 이하.
 
-    Taken from the best score rather than a fixed number: the modes score on
-    scales that share no unit, and a score's absolute value says nothing about
-    whether the document answers the question -- on docs v2 the unanswerable
-    questions' best hits outscored plenty of answerable ones. What a score does
-    support is a comparison within one search, which is all this makes.
-    """
+단위가 공유되지 않는 스케일에서 모드의 점수를 기준으로 최고 점수를 취한다. 점수의 절대값은 문서가 질문에 답하는지에 대해 아무런 정보를 주지 않는다. 문서 v2에서는 답할 수 없는 질문의 최고 히트가 많은 답할 수 있는 질문의 점수를 초과했다. 점수는 한 검색 내에서의 비교를 지원할 뿐이며, 이는 이 코드가 하는 일에만 해당한다.
+"""
     top = next((hit["_score"] for hit in ranked if hit.get("_score") is not None), None)
-    # A negative or zero best score would make the ratio meaningless; keep everything.
+    # 음수 또는 0인 최고 점수는 비율을 의미 없게 만든다. 모든 것을 유지한다.
     if not ratio or top is None or top <= 0:
         return float("-inf")
     return top * ratio
 
 
 def _ratio_cut(hits: list[dict], ratio: float) -> list[dict]:
-    """Drop the tail of one retriever's list, measured against its own best hit.
+    """한 리트리버의 목록 끝을 자신의 최고 히트에 비추어 잘라낸다.
 
-    This runs before fusion, and the ratio it takes is not the one that mode
-    would use to cut its own final results. Its job here is to decide what
-    each retriever is confident enough about to put into the fusion, which is
-    why the two jobs are configured separately -- reusing the vector mode's
-    own 0.99 narrows the dense list to a single chunk and throws away the
-    ranking RRF is there to read.
+이것은 퓨전 이전에 실행되며, 이 비율은 모드가 자신의 최종 결과를 잘라내는 데 사용하는 비율이 아니다. 여기서의 임무는 각 리트리버가 퓨전에 넣기에 충분히 자신감을 갖고 있는지를 결정하는 것이다. 이것이 두 작업이 별도로 구성된 이유이다. 벡터 모드의 0.99를 재사용하면 디ensa 목록이 단일 청크로 좁혀지고 RRF가 읽어야 할 랭킹 정보를 버리게 된다.
 
-    A ratio cannot do this job after fusion at all. RRF builds a score out of
-    ranks -- `1/(k+rank)` summed over the lists that found the document -- so
-    a document two retrievers found starts at twice the score of one only a
-    single retriever found, whatever either of them believed. With k=60 the
-    best a single-list document can reach is `1/61` against a dual-list
-    leader's `2/61`: a ratio of 0.5. Any cutoff above that deletes every
-    document the other retriever missed, which on docs v2 was three questions
-    whose answer the dense retriever had ranked first. What such a ratio
-    measures is not the rank gap it is meant to measure; it is how many lists
-    found the document.
-    """
+비율은 퓨전 이후에는 이 작업을 전혀 수행할 수 없다. RRF는 순위에서 점수를 구성한다. 즉, 문서를 찾은 리스트들에 대해 `1/(k+rank)`를 합산한다. 따라서 두 리트리버가 발견한 문서는 단일 리트리버만 발견한 문서보다 점수가 두 배가 된다. 이 둘 중 어느 쪽이 믿었든 상관없이 말이다. k=60일 때 단일 리스트 문서가 도달할 수 있는 최고 점수는 `1/61`이고, 이중 리스트 리더의 점수는 `2/61`이다. 즉, 비율은 0.5이다. 이보다 높은 컷오프는 다른 리트리버가 놓친 모든 문서를 삭제한다. 문서 v2에서는 디ensa 리트리버가 첫 번째로 랭크한 세 개의 질문이 이에 해당했다. 이러한 비율이 측정하는 것은 그 비율이 측정하려는 순위 갭이 아니라, 문서를 발견한 리스트의 수이다.
+"""
     if not ratio or not hits:
         return hits
     top = next((hit["_score"] for hit in hits if hit.get("_score") is not None), None)
@@ -211,25 +189,17 @@ def _ratio_cut(hits: list[dict], ratio: float) -> list[dict]:
 
 
 def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> list[dict]:
-    """Fuse weighted rank lists without comparing BM25 scores to cosine similarities.
+    """BM25 점수를 코사인 유사도와 비교하지 않고 가중된 랭크 목록을 퓨전한다.
 
-    The weight is what keeps an unreliable list from outvoting a reliable one: a
-    rewritten query contributes at a fraction of the original's, so a rewrite that
-    went wrong can add a document but cannot push the original's best answer down.
+가중치는 신뢰할 수 없는 목록이 신뢰할 수 있는 목록을 압도하지 못하게 하는 역할을 한다. 재작성된 쿼리는 원래 쿼리의 일부만 기여하므로, 잘못된 재작성은 문서를 추가할 수는 있지만 원래 최고 답변을 밀어내지는 못한다.
 
-    Ties are broken on the dense retriever's rank. They are common rather than
-    freakish once the lists are trimmed: a score is a sum of `1/(k+rank)`
-    terms, so two documents each ranked first in a different list hold exactly
-    the same score. Falling back on the chunk id, as sorting by `_id` did,
-    decided those on a hash. The dense order is the one the rest of the
-    pipeline already trusts for the same reason it trusts it inside a document
-    (stage 20).
-    """
+동점은 디ensa 리트리버의 랭크로 처리한다. 목록이 잘려나간 후에는 동점이 드문 일이 아니라 흔한 일이다. 점수는 `1/(k+rank)` 항들의 합이므로, 두 문서가 각각 다른 목록에서 1위로 랭크되면 정확히 동일한 점수를 갖는다. `_id`로 정렬하던 것처럼 청크 ID로 되돌아가면 해시에 따라 결정된다. 디ensa 순서는 파이프라인의 나머지 부분이 이미 같은 이유로 신뢰하는 순서이며, 문서 내부(단계 20)에서도 신뢰하는 순서이다.
+"""
     fused: dict[str, tuple[float, dict]] = {}
     dense_rank: dict[str, int] = {}
-    # Documents that lead a list of their own. Marked here because after
-    # fusion there is no way back to the fact: the ratio cutoff has to know
-    # which hits it is not entitled to judge.
+    # 자신의 목록을 이끄는 문서들. 퓨전 이후에는 그 사실로 돌아갈 수 없기 때문에 여기에 표시한다.
+    # 퓨전 이후에는 비율 컷오프가 판단할 자격이 없는 히트를 알 수 있어야 한다.
+    # 디ensa 리트리버가 반환하지 않은 문서는 모든 문서보다 뒤에 정렬된다.
     leaders: set[str] = set()
     for hits, weight, retriever in ranked_lists:
         seen_in_list: set[str] = set()
@@ -248,8 +218,8 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> l
 
     def order(item: tuple[str, tuple[float, dict]]) -> tuple:
         parent_id, (score, hit) = item
-        # A document the dense retriever never returned sorts after every one
-        # it did, rather than ahead of them all at rank 0.
+        # 밀집 검색기가 반환하지 않은 문서는 모든 문서 뒤에 정렬된다
+        # 그것이 일어났지, rank 0에서 모두보다 앞서서가 아니라.
         return -score, dense_rank.get(parent_id, len(fused) + 1), hit["_id"]
 
     return [
@@ -261,23 +231,16 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> l
 def _candidates_by_parent(
     ranked_lists: Iterable[tuple[list[dict], float, str]],
 ) -> dict[str, list[dict]]:
-    """Group every candidate chunk under its parent, the dense retriever's order first.
+    """각 후보 청크를 그 부모 아래에 그룹화한다. 밀집 검색기의 순서가 먼저다.
 
-    Which parents come back is already settled before this runs, so the ordering
-    here only decides which chunks of a parent are shown, never which documents.
+어떤 부모가 돌아오는지는 이 실행 전에 이미 결정되어 있으므로, 여기서의 순서는
+부모의 청크 중 어떤 것이 표시되는지를 결정할 뿐, 어떤 문서를 보여주는지를 결정하지 않는다.
 
-    The dense retriever leads because it is the only one that orders chunks well.
-    Fusion settles documents on ranks, and the within-document order it leaves
-    behind is nobody's: on docs v2 the labelled evidence led its document for
-    41.9% of requirements under hybrid against 66.5% under vector alone. Taking
-    the chunk order from the dense list and keeping fusion for the documents
-    closes that -- evidence recall goes to 65.2% at rank 1 and 90.3% by rank 6,
-    which is where a cross-encoder over the same pool lands (67.7% / 90.3%) for
-    1.5s more (docs/evaluation/stages/stage-19-chunk-rerank-within-document.md).
+밀집 검색기가 선도하는 이유는 그것이 유일하게 청크를 잘 정렬하기 때문이다.
+퓨전은 문서를 랭크로 결정하고, 그 안에서 문서 내 순서를 남긴다. 이 순서는 누구의 것도 아니다: docs v2에서 레이블링된 증거는 하이브리드 기준으로 41.9%의 요구사항에서 문서를 이끌었고, 벡터만 사용할 때는 66.5%였다. 밀집 리스트의 청크 순서를 가져와서 문서에 대해 퓨전을 유지하면 이 차이를 좁힐 수 있다. 증거 재발견률은 랭크 1에서 65.2%로 올라가고, 랭크 6까지는 90.3%에 도달한다. 이는 같은 풀에 대해 크로스엔코더가 도달하는 수준(67.7% / 90.3%)과 비슷하며, 1.5초 더 오래 걸린다 (docs/evaluation/stages/stage-19-chunk-rerank-within-document.md).
 
-    Lexical candidates still follow, so a chunk only BM25 found is carried rather
-    than dropped. Under bm25 or vector alone there is one list and nothing moves.
-    """
+어휘적 후보는 여전히 뒤따르므로, 청크 하나만 BM25가 찾은 경우 버려지지 않고 유지된다. bm25 또는 벡터만 사용할 때는 하나의 리스트가 있고, 아무것도 움직이지 않는다.
+"""
     by_parent: dict[str, list[dict]] = {}
     seen: set[str] = set()
     ranked_lists = sorted(ranked_lists, key=lambda entry: entry[2] != "vector")
@@ -294,26 +257,18 @@ def _candidates_by_parent(
 def _with_passages(
     hits: list[SearchHit], by_parent: dict[str, list[dict]], chunks_per_document: int,
 ) -> list[SearchHit]:
-    """Carry a document's best chunks, in the order `by_parent` put them.
+    """문서의 최고 청크를 `by_parent`가 정한 순서대로 유지한다.
 
-    One chunk per document is the right unit for ranking documents but the wrong
-    unit for answering: on the docs v2 set the labelled evidence sat in a chunk
-    the deduplication dropped for 23 of 40 questions, even though its document
-    was already first. The extra chunks come out of the candidate pool the search
-    already fetched, so this costs no further round trip.
+문서를 랭킹하는 데에는 문서당 하나의 청크가 적절한 단위이지만, 답변하는 데에는 부적절하다: docs v2 세트에서 레이블링된 증거는 40개 질문 중 23개에서 중복 제거로 인해 버려진 청크에 있었고, 그 문서는 이미 1위였음에도 불구하고. 이 추가 청크들은 이미 검색이 가져온 후보 풀에서 나온 것이므로, 이는 추가적인 라운드 트립 비용을 들이지 않는다.
 
-    The leading chunk comes from that order too, rather than staying whichever
-    chunk fusion happened to rank the document by. It is the chunk a reader sees
-    first and the one a generator weights most, and leaving it to fusion pins
-    rank-1 evidence recall at 41.9% while the rest of the selection improves
-    around it (docs/evaluation/stages/stage-20-dense-order-inside-documents.md).
-    """
+주도 청크는 그 순서에서 오기도 하며, 퓨전이 문서를 랭킹한 청크가 그대로 유지되는 것이 아니라. 이는 독자가 처음 보는 청크이자 생성기가 가장 많이 가중치를 주는 청크이며, 퓨전에 맡기면 랭크 1 증거 재발견률이 41.9%에 머물고, 그 외의 선택은 그 주변에서 개선된다 (docs/evaluation/stages/stage-20-dense-order-inside-documents.md).
+"""
     if chunks_per_document < 2:
         return hits
     for hit in hits:
         pool = list(by_parent.get(hit.parent_id, []))
-        # The chunk that ranked the document belongs in the pool even if no
-        # retriever list carried it here; it just no longer leads by default.
+        # 문서를 랭크한 청크는 아무것도 없더라도 풀에 포함되어야 한다.
+        # 검색기 리스트가 그것을 여기로 가져오지 않더라도; 단지 더 이상 기본적으로 선도하지 않을 뿐이다.
         if not any(c["_id"] == hit.id for c in pool):
             pool.insert(0, {"_id": hit.id, "_source": {"body": hit.body}, "_score": hit.score})
         chosen = pool[:chunks_per_document]
@@ -328,14 +283,10 @@ def _with_passages(
 
 
 def _rewritten_queries(query: str, strict: bool) -> list[str]:
-    """The rewrite to search alongside the question, or nothing.
+    """질문과 함께 검색하거나, 아무것도 하지 않도록 재작성한다.
 
-    A rewrite is an enrichment, not a dependency: if the model is down the
-    original question still searches fine, so an outage narrows the result set
-    rather than failing the request. `strict` evaluation runs refuse that
-    silence, because a comparison that quietly dropped the rewrite would be
-    measuring the wrong thing.
-    """
+재작성은 부가적인 정보이며, 의존성은 아니다: 모델이 다운되면 원래 질문은 여전히 잘 검색되므로, 장애는 결과 집합을 좁히는 것으로, 요청을 실패시키는 것이 아니다. `strict` 평가 실행은 이 침묵을 거부한다. 왜냐하면, 조용히 재작성을 버린 비교는 잘못된 것을 측정하고 있기 때문이다.
+"""
     try:
         rewritten = rewrite_query(query)
     except httpx.HTTPError:
@@ -358,28 +309,27 @@ def retrieve(
     score_floor: float | None = None, answerability: bool | None = None,
     rerank_chunks: bool | None = None,
 ) -> list[SearchHit]:
-    """Retrieve from `alias`, which may name several indexes, comma separated.
+    """`alias`에서 검색한다. 이는 여러 인덱스를 쉼표로 구분하여 명명할 수 있다.
 
-    Searches ignore an index that does not exist yet: a corpus that has never
-    been indexed should narrow the results, not fail the request.
-    """
+검색은 존재하지 않는 인덱스를 무시한다: 아직 인덱싱되지 않은 코퍼스는 결과를 좁히는 것이지, 요청을 실패시키는 것이 아니다.
+"""
     settings = get_settings()
     mode = mode or settings.search_mode
     if mode not in MODES:
         raise ValueError(f"unknown search mode: {mode}")
     if k < 1:
         raise ValueError("k must be positive")
-    # (hits, weight, retriever): the retriever is carried so that a search
-    # left with one list can be cut on that retriever's own calibration.
+    # (hits, weight, retriever): 검색기 정보는 유지되어야 하므로, 검색에서
+    # 한 개의 리스트만 남아 있으면 해당 리트리버의 캘리브레이션에서 잘릴 수 있다.
     ranked_lists: list[tuple[list[dict], float, str]] = []
-    # Set when the dense retriever ran and its floor rejected everything it
-    # found. Cosine is the only one of these scales on which a short but
-    # real query and an off-topic one separate -- BM25 sums per-term
-    # contributions, so a two-word question scores under an out-of-domain
-    # sentence and no lexical floor can tell them apart. So the dense
-    # retriever decides whether anything here is on topic, and the lexical
-    # one only ranks within that. Inert until a vector floor is configured.
-    # A one-slot list rather than a bool because add_response closes over it.
+    # 밀집형 리트리버가 실행되었을 때, 그 바닥값이 모든 것을 거부했을 때 설정됨.
+    # 코사인은 이 스케일들 중에서 짧지만 실제 쿼리와 주제와 관련 없는 쿼리가 구분되는 유일한 스케일이다. -- BM25는 각 항목별 기여도를 합산하므로, 두 단어 질문은 주제 외의 문장보다 낮은 점수를 받고, 단어적 바닥값은 이들을 구분할 수 없다.
+    # 코사인은 이 스케일들 중에서 짧지만 실제 쿼리와 주제와 관련 없는 쿼리가 구분되는 유일한 스케일이다. -- BM25는 각 항목별 기여도를 합산하므로, 두 단어 질문은 주제 외의 문장보다 낮은 점수를 받고, 단어적 바닥값은 이들을 구분할 수 없다.
+    # 코사인은 이 스케일들 중에서 짧지만 실제 쿼리와 주제와 관련 없는 쿼리가 구분되는 유일한 스케일이다. -- BM25는 각 항목별 기여도를 합산하므로, 두 단어 질문은 주제 외의 문장보다 낮은 점수를 받고, 단어적 바닥값은 이들을 구분할 수 없다.
+    # 코사인은 이 스케일들 중에서 짧지만 실제 쿼리와 주제와 관련 없는 쿼리가 구분되는 유일한 스케일이다. -- BM25는 각 항목별 기여도를 합산하므로, 두 단어 질문은 주제 외의 문장보다 낮은 점수를 받고, 단어적 바닥값은 이들을 구분할 수 없다.
+    # 밀집형 리트리버는 여기에 주제와 관련된 것이 있는지 결정하고, 단어적 리트리버는 그 안에서만 순위를 매긴다. 벡터 바닥값이 구성될 때까지 비활성 상태이다.
+    # 밀집형 리트리버는 여기에 주제와 관련된 것이 있는지 결정하고, 단어적 리트리버는 그 안에서만 순위를 매긴다. 벡터 바닥값이 구성될 때까지 비활성 상태이다.
+    # bool이 아닌 one-slot 리스트인 이유는 add_response가 이를 클로저로 사용하기 때문입니다.
     off_topic: list[bool] = []
 
     def add_response(response: dict, name: str, retriever: str, weight: float = 1.0) -> None:
@@ -387,14 +337,14 @@ def retrieve(
         if strict and (response.get("_shards", {}).get("failed", 0) or response.get("timed_out")):
             raise RuntimeError(f"incomplete {name} search: {response.get('_shards')}")
         hits = response["hits"]["hits"]
-        # Gate each retriever on its own scale before fusion. RRF scores are
-        # built from ranks, so once the lists are fused no absolute value
-        # survives to test -- a document only a single retriever believes in
-        # has to be dropped here or not at all.
+        # 각 검색기를 융합하기 전에 개별 스케일에서 게이트를 적용합니다. RRF 점수는 순위에서 구성되므로, 리스트가 융합된 후에는 절대값이 남아 있지 않습니다.
+        # 테스트를 위해 -- 단 하나의 검색기만 신뢰하는 문서는 여기서 버려야 하거나 아예 버려야 합니다.
+        # 점수가 없는 히트는 바닥선과 비교할 수 없으므로 유지됩니다. 아래의 비율 컷오프가 적용되는 동일한 규칙입니다.
+        # 임베딩 서비스 장애 중에도 어휘 검색은 계속 사용 가능합니다.
         gate = settings.score_floor(retriever) if score_floor is None else 0.0
         if gate:
-            # A hit without a score cannot be judged against a floor, so it is
-            # kept -- the same rule the ratio cutoff below applies.
+            # 점수가 없는 히트는 바닥과 비교할 수 없으므로
+            # 유지됨 -- 동일한 규칙, 아래의 비율 컷오프가 적용됨.
             kept = [hit for hit in hits
                     if hit.get("_score") is None or hit["_score"] >= gate]
             if retriever == "vector" and hits and not kept:
@@ -431,28 +381,28 @@ def retrieve(
     except httpx.HTTPError:
         if strict or mode == "vector":
             raise
-        # Lexical search remains available during an embedding service outage.
+        # 텍스트 검색은 임베딩 서비스 장애 중에도 계속 사용 가능하다.
         pass
 
-    # The dense retriever found nothing on topic, so nothing here answers the
-    # question, whatever the lexical half turned up.
+    # 밀집 검색기가 주제에 대해 아무것도 찾지 못했으므로, 여기에는 질문에 답하는 것이 없다.
+    # 어쨌든 어휘 반쪽이 찾아낸 것은 무엇이든.
     if off_topic:
         return []
     ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
     if len(ranked_lists) > 1:
-        # Cut each list on its own retriever's calibrated ratio first. An
-        # explicit `cutoff_ratio` overrides the whole cutoff policy -- a sweep
-        # passing 0 to see the uncut ranking must get it -- so it skips this
-        # too. `ranked_lists` itself is left whole: it is also the pool the
-        # per-document passages are chosen from, and trimming that would take
-        # chunks away from documents that do get returned.
+        # 각 목록을 각각의 검색기의 교정된 비율로 먼저 자른다. 명시적인 `cutoff_ratio`는 전체 절단 정책을 덮어쓴다 -- 0을 전달하여 절단되지 않은 순위를 보려면 그것을 가져와야 하므로, 이 또한 건너뛴다.
+        # `ranked_lists` 자체는 그대로 남는다: 그것이 문서별 패스워드가 선택되는 풀이기도 하며, 그것을 줄이면 반환되는 문서에서 조각을 제거하게 된다.
+        # 0을 전달하여 잘린 순위를 보지 않도록 하려면 이를 가져와야 하므로 이 부분을 건너뛴다
+        # too. `ranked_lists` 자체는 그대로 유지됨: 또한 이는
+        # 문서별 패스aggio는 선택되며, 이 과정에서 잘라내기 작업이 수행된다
+        # 문서에서 반환되지 않는 청크들로부터의 거리.
         fusable = ranked_lists if cutoff_ratio is not None else [
             (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
             for hits, weight, retriever in ranked_lists
         ]
         ranked = _rrf(fusable, settings.search_hybrid_rrf_k)
     else:
-        # Preserve the retriever's original scores, keeping its best chunk per parent.
+        # 리트리버의 원래 점수를 유지하고, 각 부모에 대해 최고의 청크만 유지한다.
         seen = set()
         ranked = []
         for hit in ranked_lists[0][0]:
@@ -460,34 +410,34 @@ def retrieve(
             if parent not in seen:
                 seen.add(parent)
                 ranked.append(hit)
-    # One list left means no fusion happened, so the scores are that
-    # retriever's own -- cut them on its ratio and floor, not on the requested
-    # mode's. A hybrid search whose lexical half was gated away otherwise reads
-    # raw cosine scores against a ratio calibrated for RRF, and returns a
-    # longer list than the same retriever would have returned alone.
+    # 한 개의 리스트만 남아 있다는 것은 융합이 일어나지 않았음을 의미하므로, 점수는 그대로이다.
+    # 리트리버 자신의 점수는 요청된 방식이 아닌, 그 자체의 비율과 바닥값으로 잘라낸다.
+    # 그렇지 않으면 어두운 부분이 차단된 하이브리드 검색은
+    # RRF에 맞게 조정된 비율에 대해 원시 코사인 점수를 읽고,
+    # 같은 리트리버가 단독으로 반환했을 때보다 더 긴 리스트를 반환한다.
     fused = ranked_lists[0][2] if len(ranked_lists) == 1 else "hybrid"
     if cutoff_ratio is None:
         cutoff_ratio = settings.cutoff_ratio(fused)
     if score_floor is None:
         score_floor = settings.score_floor(fused)
-    # The absolute floor is the only one of the two that can empty the list:
-    # the ratio measures every hit against the best hit, so the best hit always
-    # clears it. Taking the larger of the two applies whichever cuts deeper.
+    # 절대 바닥값은 두 가지 중에서 리스트를 비울 수 있는 유일한 값이다:
+    # 비율은 모든 히트를 최고 히트와 비교하여 측정하므로, 최고 히트는 항상
+    # 지운다. 두 값 중 더 큰 값을 취하면 더 깊게 잘라내는 것을 적용한다.
     floor = max(_cutoff(ranked, cutoff_ratio), score_floor)
     out = []
     for hit in ranked:
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
         score = hit.get("_score")
-        # A document some retriever ranked first is kept whatever the ratio
-        # says. Against a leader both lists found it scores half as much for
-        # having been found once, not for ranking worse, and no ratio can tell
-        # those apart after fusion. `continue` rather than `break`, because
-        # such a document sorts below hits the ratio does cut.
+        # 어떤 검색기에서 첫 번째로 순위付け된 문서는 비율에 관계없이 유지된다.
+        # 리더에 대해 두 목록 모두에서 발견된 경우, 한 번 발견된 것에 대해 점수를 반으로 줄인다.
+        # 순위가 더 낮기 때문이 아니라 발견된 횟수 때문이며, 융합 후에는 어떤 비율도 이를 구분할 수 없다.
+        # `break`보다는 `continue`를 사용한다. 왜냐하면 그러한 문서는 비율이 잘라내는 것보다 아래로 정렬되기 때문이다.
+        # 절대적인 하한은 비율이 아니며 여전히 적용된다.
         if score is not None and score < floor:
             if not hit.get(LEADS_A_LIST):
                 continue
-            # The absolute floor is not the ratio and still binds.
+            # 선택과 정렬은 하나의 결정이므로, 이는 _with_passages를 대체한다.
             if score < score_floor:
                 continue
         out.append(SearchHit.model_validate({
@@ -502,21 +452,21 @@ def retrieve(
     by_parent = _candidates_by_parent(ranked_lists)
     if rerank_chunks is None:
         rerank_chunks = settings.search_rerank_chunks
-    # Selection and ordering are one decision, so this replaces _with_passages
-    # rather than running after it. Cutting the pool to six first and re-ordering
-    # those six recovers nothing: every requirement the reranker recovers sat at
-    # rank 7 to 21 of its document. It also runs before the judge, so the judge
-    # reads the chunks a reader would -- half the answerable questions it refused
-    # were ones whose evidence had been buried here.
+    # 선택과 순서는 하나의 결정이므로, 이는 _with_passages를 대체한다
+    # 그것을 추적하는 대신. 풀을 처음에 여섯 개로 줄이고 재정렬한다.
+    # 그 여섯 개를 복구하면 아무것도 복구되지 않는다: 재랭커가 복구하는 모든 요구사항은
+    # 문서의 순위 7에서 21 사이에 있었다. 또한 판사보다 먼저 실행되므로 판사는
+    # 독자가 읽을 것과 같은 방식으로 조각을 읽는다 -- 판사가 거부한 반의 질문들 중
+    # 증거가 여기에 묻혀 있었던 것들이다.
     if not (rerank_chunks
             and chunks_per_document >= 2
             and select_passages(query, hits, by_parent, chunks_per_document, settings)):
         hits = _with_passages(hits, by_parent, chunks_per_document)
     if answerability is None:
         answerability = settings.search_answerability_judge
-    # Judged last, on the passages that would actually be handed to a reader:
-    # asking earlier would put the question to a different text than the one
-    # the search returns.
+    # 실제로 독자에게 전달될 문장들에 대해 마지막으로 판단한다:
+    # 더 일찍 묻는다면 검색이 반환하는 텍스트와 다른 텍스트에 질문을 던지게 된다.
+    #
     if answerability and is_unanswerable(query, hits, settings):
         return []
     return hits
@@ -525,12 +475,9 @@ def retrieve(
 def _current_editions(
     client: OpenSearch, alias: str, hits: list[SearchHit],
 ) -> dict[str, SearchHit]:
-    """The editions that replaced any superseded hit, keyed by what they replace.
+    """수정된 히트를 대체한 에디션들, 대체한 것에 따라 키가 지정됨.
 
-    A retired form keeps its old title while the current one may have been
-    renamed -- the 38th revision rewrote several into English -- so a query in
-    the old words reaches only the retired document. Following the pointer is
-    the only way those words reach the form now in force.
+    퇴역한 형태는 이전 제목을 유지하지만, 현재 형태는 이름이 변경될 수 있음 -- 38번째 개정판은 여러 개를 영어로 재작성함 -- 따라서 이전 단어로 검색하면 퇴역한 문서에만 도달함. 포인터를 따라가야만 이 단어들이 현재 유효한 형태에 도달할 수 있음.
     """
     wanted = {hit.superseded_by for hit in hits if hit.superseded_by}
     wanted -= {hit.parent_id for hit in hits}
@@ -559,7 +506,7 @@ def _current_editions(
 def _with_current_editions(
     client: OpenSearch, alias: str, hits: list[SearchHit], k: int,
 ) -> list[SearchHit]:
-    """Put each replacement right behind the retired document that names it."""
+    """각 대체 항목을 그 이름을 가진 퇴역 문서 바로 뒤에 배치하라."""
     editions = _current_editions(client, alias, hits)
     if not editions:
         return hits
@@ -575,12 +522,9 @@ def _with_current_editions(
 
 
 class _SharedEmbedder:
-    """Embed a query once and lend the vector to every mode that asks for it.
+    """한 번만 쿼리를 임베딩하고, 이를 요청하는 모든 모드에 벡터를 빌려주라.
 
-    Comparing modes should compare retrieval, not embedding: charging Ollama
-    twice for one question doubles the slowest part of the request, and a model
-    that is not bit-reproducible would hand `vector` and `hybrid` slightly
-    different vectors, so they could disagree for a reason that is not the mode.
+    모드 간 비교는 검색을 비교해야 함, embedding을 비교하면 안 됨: Ollama를 한 질문에 두 번 호출하면 요청에서 가장 느린 부분이 두 배가 되고, 비트 재현성이 없는 모델은 `vector`와 `hybrid`에 약간 다른 벡터를 제공할 수 있으므로, 모드가 아닌 이유로 의견이 다를 수 있음.
     """
 
     def __init__(self, embedder: OllamaEmbedder):
@@ -597,11 +541,9 @@ def search_modes(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int = 5,
     modes: Iterable[str] = MODES,
 ) -> ModeComparison:
-    """Run one query through every mode, so the modes can be read side by side.
+    """모든 모드를 통해 한 번의 쿼리를 실행하라, 그래서 모드들을 나란히 읽을 수 있게 하라.
 
-    Switching SEARCH_MODE and searching again compares two different moments as
-    much as it compares two modes -- the index may have been rebuilt, and nobody
-    reads a rank list from memory accurately. One request removes both problems.
+    SEARCH_MODE를 전환하고 다시 검색하면 두 가지 모드를 비교하는 것만큼 두 시점을 비교함 -- 인덱스가 재구축되었을 수 있고, 누구도 메모리에서 순위 목록을 정확하게 읽지 않음. 한 요청이 두 문제를 모두 제거함.
     """
     embedder = _SharedEmbedder(OllamaEmbedder(get_settings()))
     results = []
@@ -622,7 +564,7 @@ def search_modes(
 def search_all(
     client: OpenSearch, alias: str, hsk_alias: str, query: str, as_of: date, k: int = 5,
 ) -> SearchResults:
-    """One user search: documents, plus HSK linkage when the query names a code."""
+    """한 사용자 검색: 문서들, 그리고 쿼리가 코드를 명명할 때 HSK 연결 정보."""
     hits = retrieve(client, alias, query, as_of, k)
     hsk_code = extract_hsk_code(query)
     settings = get_settings()

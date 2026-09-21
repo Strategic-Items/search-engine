@@ -1,31 +1,30 @@
-"""Index definitions. Synonyms expand at search time, so the dictionary can
-change without reindexing the documents themselves."""
+"""인덱스 정의. 동의어는 검색 시에 확장되므로 문서 자체를 다시 인덱싱하지 않고 사전을 변경할 수 있다."""
 
-# Lucene's defaults keep VX, VCP and VCN, so a conversational ending survives
-# as a search term: "알려줘" tokenizes to 알리(VV) + 어(EC) + 주(VX) + 어(EC),
-# and the 주 it leaves behind matches the "주 :" that heads a table note.
-# Because 주 is rare in titles its IDF is high, so that one token can outscore
-# a real match on every content word and then push the ratio cutoff above the
-# documents that did match. Auxiliary verbs and copulas carry no topic.
+# Lucene의 기본값은 VX, VCP 및 VCN을 유지하므로 대화형 종결어는
+# "알려줘"와 같이 검색어로 남는다: 알리(VV) + 어(EC) + 주(VX) + 어(EC),
+# 그리고 남아 있는 주는 표 주석의 "주 :"로 시작하는 것을 매칭한다.
+# 주가 제목에서 드물기 때문에 IDF가 높고, 이는 한 토큰이 모든 내용어에 대한 실제 매칭보다 높은 점수를 얻을 수 있게 하며
+# 그 후 비율 컷오프를 매칭한 문서들보다 높게 올린다.
+# 보조 동사와 연결사에는 주제가 없다.
 KOREAN_POS_FILTER = {
     "type": "nori_part_of_speech",
-    # Lucene's default list, spelled out -- "E" and "J" are abstract categories
-    # this version rejects, so the concrete endings and particles are named --
-    # plus VX, VCP and VCN.
+    # Lucene의 기본 목록, 명시적으로 작성된 것 -- "E"와 "J"는 추상 범주이다
+    # 이 버전은 거부하므로 구체적인 종결어미와 조사가 명명된다 --
+    # plus VX, VCP 및 VCN.
     "stoptags": [
-        # verbal endings and particles: Lucene's defaults
+        # 동사 종결어미와 조사: Lucene의 기본값
         "EC", "EF", "EP", "ETM", "ETN",
         "JC", "JKB", "JKC", "JKG", "JKO", "JKQ", "JKS", "JKV", "JX",
         "IC", "MAG", "MAJ", "MM", "SP", "SSC", "SSO", "SC", "SE",
         "XPN", "XSA", "XSN", "XSV", "UNA", "NA", "VSV",
-        # added here: auxiliary verbs and copulas carry no topic
+        # 여기에 추가: 보조동사와 연결사에는 주제가 없다
         "VX", "VCP", "VCN",
     ],
 }
 
 
 def index_body(embedding_dimensions: int) -> dict:
-    """Core mapping, including an HNSW cosine vector index."""
+    """핵심 매핑, HNSW 코사인 벡터 인덱스 포함."""
     return {
     "settings": {
         "number_of_shards": 1,
@@ -42,9 +41,9 @@ def index_body(embedding_dimensions: int) -> dict:
                     "tokenizer": "nori_tokenizer",
                     "filter": ["korean_pos", "lowercase"],
                 },
-                # Synonyms expand before the part-of-speech filter: that filter
-                # drops tokens, leaving position gaps a synonym graph cannot be
-                # built from (자가판정 -> 자_0, 판정_2).
+# 동의어는 품사 필터 전에 확장된다: 그 필터
+# 토큰을 제거하여 위치 갭을 남긴다. 동의어 그래프는 생성할 수 없다
+# 따라서 동의어 그래프를 만들 수 없다(자가판정 -> 자_0, 판정_2).
                 "korean_nori_search": {
                     "type": "custom",
                     "tokenizer": "nori_tokenizer",
@@ -58,9 +57,9 @@ def index_body(embedding_dimensions: int) -> dict:
         "properties": {
             "id": {"type": "keyword"},
             "parent_id": {"type": "keyword"},
-            # Titles stay literal: form queries name a document's title almost
-            # word for word, and expanding those turns a precise match into a
-            # fuzzy one. Bodies carry the vocabulary gap, so they expand.
+            # 제목은 문자 그대로 유지된다: 형태 쿼리가 문서 제목을 거의 명명한다
+            # 단어별로, 그리고 그들을 확장하면 정확한 일치가 흐릿한 일치로 바뀐다. 몸체는 어휘 격차를 carrying하므로 확장된다.
+            # 몸체는 어휘 격차를 carrying하므로 확장된다.
             "title": {
                 "type": "text", "analyzer": "korean_nori",
                 "fields": {"standard": {"type": "text", "analyzer": "standard"}},
@@ -93,7 +92,7 @@ def index_body(embedding_dimensions: int) -> dict:
 
 
 def callcenter_index_body(embedding_dimensions: int) -> dict:
-    """Search mapping for past consultations, isolated from official sources."""
+    """과거 상담에 대한 검색 매핑, 공식 출처와 분리된 상태로."""
     body = index_body(embedding_dimensions)
     body["mappings"]["properties"].update({
         "call_id": {"type": "keyword"},
@@ -104,7 +103,7 @@ def callcenter_index_body(embedding_dimensions: int) -> dict:
         "start_sec": {"type": "float"},
         "end_sec": {"type": "float"},
         "seg_ids": {"type": "keyword", "index": False},
-        # A nested mapping preserves type/value pairs for a future faceted UI.
+        # 중첩된 매핑은 향후 피벗형 UI를 위해 유형/값 쌍을 보존한다.
         "entities": {"type": "nested", "properties": {
             "type": {"type": "keyword"},
             "mention": {"type": "text", "analyzer": "korean_nori"},
@@ -115,7 +114,7 @@ def callcenter_index_body(embedding_dimensions: int) -> dict:
     return body
 
 
-# Preserve a directly inspectable default mapping for callers and tests.
+# 호출자와 테스트를 위해 직접 검사 가능한 기본 매핑을 보존한다.
 HSK_INDEX_BODY = {
     "settings": {
         "number_of_shards": 1,

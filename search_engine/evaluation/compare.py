@@ -1,4 +1,4 @@
-"""Read-only, strict comparison of the production retrieval paths on one corpus."""
+"""읽기 전용이며, 하나의 코퍼스에 대한 프로덕션 검색 경로를 엄격하게 비교한다."""
 
 import argparse
 import hashlib
@@ -19,12 +19,12 @@ from search_engine.search.query import MODES, retrieve
 
 
 def percentile(values: list[float], fraction: float) -> float:
-    """Nearest-rank percentile; latency samples remain in the JSON report."""
+    """가장 가까운 순위 백분위수; 지연 시간 샘플은 JSON 보고서에 남아 있다."""
     return sorted(values)[max(0, math.ceil(len(values) * fraction) - 1)]
 
 
 def verify_corpus(client, alias: str, corpus: Path) -> tuple[str, dict]:
-    """Pin concrete indexes and refuse stale or partially embedded corpora."""
+    """구체적인 인덱스를 고정하고 오래된 또는 부분적으로 임베딩된 코퍼스를 거부한다."""
     rows = [json.loads(line) for line in corpus.read_text(encoding="utf-8").splitlines()
             if line.strip()]
     expected = {r["id"]: SearchDocument.model_validate(r).index_source() for r in rows}
@@ -102,7 +102,7 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
         rankings = {mode: [] for mode in modes}
         chunk_rankings = {mode: [] for mode in modes}
         for repeat in range(repeats):
-            # Rotate ordering to reduce warm-cache/order bias; never cache query embeddings.
+            # 웜 캐시/순서 편향을 줄이기 위해 순서를 회전; 쿼리 임베딩은 절대 캐시하지 않음.
             offset = (position + repeat) % len(modes)
             for mode in modes[offset:] + modes[:offset]:
                 start = perf_counter()

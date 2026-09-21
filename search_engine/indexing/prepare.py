@@ -1,4 +1,4 @@
-"""Prepare the reviewed lab snapshot for separate core and HSK indexes."""
+"""검토된 실험실 스냅샷을 별도의 핵심 및 HSK 인덱스를 위해 준비한다."""
 
 import argparse
 import hashlib
@@ -28,12 +28,12 @@ GOSI_REVISION = re.compile(r"제\s*\d+\s*차\s*[^\n]*?고시\s*개정")
 # 날짜 순서로는 현행을 가릴 수 있다. 초안은 언제 올라오든 현행이 아니다.
 GOSI_DRAFT = re.compile(r"고시[^\n]*?(?:행정예고|입법예고)|(?:행정예고|입법예고)[^\n]*?고시")
 HSK_TYPE = "HSK 연계표"
-# Lab review found that this undated FAQ conflicts with the current self-judgement guide.
+# 실험실 검토 결과, 이 날짜가 표시되지 않은 FAQ는 현재 자기 평가 가이드와 충돌한다.
 EXCLUDED_CORE_IDS = {"faq-042": "conflicts_with_current_self_judgement_guide"}
 
 
 def form_slot(title: str) -> tuple[str, str] | None:
-    """The 별지/별표 slot a form occupies, or None when it is not one."""
+    """서식이 차지하는 별지/별표 위치를 반환하고, 해당하지 않으면 None을 반환한다."""
     if OTHER_STATUTE.search(title):
         return None
     match = FORM_SLOT.search(title)
@@ -44,11 +44,9 @@ def form_slot(title: str) -> tuple[str, str] | None:
 
 
 def document_slot(source_type: str, title: str) -> tuple[str, str] | None:
-    """The place a document occupies in a numbered series, if it occupies one.
+    """문서가 숫자로 구성된 시리즈에서 차지하는 위치, 만약 그 위치를 차지한다면.
 
-    A form sits in a 별지/별표 slot. A 고시 개정 notice carries the whole text
-    of that edition, and the next edition replaces it. Both series publish in
-    order, so the newest publication date in a slot is the one in force.
+    한 양식은 별지/별표 자리에 위치한다. 고시 개정 공고는 그 판의 전체 텍스트를 담고, 다음 판은 그것을 대체한다. 두 시리즈 모두 순서대로 출판되므로, 자리에 있는 최신 출판일이 적용 중인 것이다.
     """
     if source_type == FORM_TYPE:
         return form_slot(title)
@@ -58,17 +56,17 @@ def document_slot(source_type: str, title: str) -> tuple[str, str] | None:
 
 
 def is_gosi_draft(source_type: str, title: str) -> bool:
-    """A 고시 draft out for comment. It is never the text in force."""
+    """의견 수렴 중인 고시 초안인지 판별한다. 초안은 현행 본문이 아니다."""
     return source_type == NOTICE_TYPE and bool(GOSI_DRAFT.search(title))
 
 
 def supersessions(rows: list[dict]) -> dict[str, str]:
-    """Map each replaced document to the newest one in the same slot.
+    """각 대체된 문서를 같은 슬롯에 있는 가장 최신 문서로 매핑한다.
 
-    Replaced documents are kept and indexed. The published record is public and
-    people do ask for an earlier edition by its year; search demotes them
-    instead of hiding them.
-    """
+대체된 문서는 유지되고 인덱싱된다. 게시된 레코드는 공개적이며,
+사람들은 연도를 기준으로 이전 판을 요청한다; 검색은 이를 숨기기보다는
+낮추어 표시한다.
+"""
     slots = {}
     for row in rows:
         slot = document_slot(row.get("source_type", FORM_TYPE), row["title"])
@@ -83,8 +81,8 @@ def supersessions(rows: list[dict]) -> dict[str, str]:
             if published < newest_date and parent_id != newest_id:
                 superseded[parent_id] = newest_id
 
-    # A draft is replaced by whatever is actually in force, whenever it was
-    # published: a draft for the next edition arrives after the current one.
+    # 초안은 언제든지 실제로 시행 중인 것으로 대체된다.
+    # 게시됨: 현재 판 이후 다음 판의 초안이 도착한다.
     enacted = slots.get(("고시", "전략물자수출입고시"))
     if enacted:
         in_force = enacted[-1][1]
@@ -125,7 +123,7 @@ def _prepare_row(row: dict, source_type: str) -> dict:
 
 
 def _serial_parents(source_path: Path) -> list[dict]:
-    """One row per parent that sits in a numbered series, read ahead of writing."""
+    """숫자 순서에 따라 위치하는 부모 각각에 대해 한 행씩, 쓰기 전에 미리 읽는다."""
     seen = {}
     with source_path.open(encoding="utf-8") as file:
         for line in file:

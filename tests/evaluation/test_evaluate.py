@@ -50,7 +50,7 @@ def test_precision_uses_k_slots_and_counts_duplicate_parents_once():
 
 
 def test_precision_returned_divides_by_what_was_shown_not_by_k():
-    # The whole point of the cutoff: a shorter, cleaner list must score better.
+    # 컷오프의 핵심은: 더 짧고 깔끔한 목록이 더 높은 점수를 받아야 한다.
     assert precision_returned_at(["a"], ["a"], 5) == 1.0
     assert precision_at(["a"], ["a"], 5) == .2
     # 같은 부모가 두 번 나와도 분모를 부풀리지 않는다: {a, x, b, y} 중 {a, b}.
@@ -214,7 +214,7 @@ def test_http_evaluation_scores_actual_evidence_chunks(tmp_path, monkeypatch):
 
 
 def test_k_cuts_on_documents_even_when_each_carries_several_chunks():
-    """More chunks per document must widen the evidence window, never narrow it."""
+    """문서당 더 많은 조각이 있으면 증거 창이 넓어져야 하며, 좁아져서는 안 된다."""
     rows = [{
         "qid": "q1", "gold": ["doc-1"], "returned": ["doc-1", "doc-2"],
         "returned_chunks": [["c1", "c2", "c3", "c4"], ["c9"]],

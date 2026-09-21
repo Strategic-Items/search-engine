@@ -33,7 +33,7 @@ POOL = {"p": [candidate(f"c{i}", f"본문{i}") for i in range(8)]}
 
 class TestSelectPassages:
     def test_selects_from_the_whole_pool_not_the_carried_chunks(self):
-        # the evidence sits at position 7 of the pool -- past any cut of six
+        # 증거는 풀의 7번째 위치에 있다 -- 여섯 개의 절단을 넘은 곳
         scores = [0.0] * 8
         scores[7] = 9.0
         with patch("httpx.post", return_value=respond(scores)):

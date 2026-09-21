@@ -1,7 +1,7 @@
-"""Measure the live /v1/search against the reviewed query set.
+"""live /v1/search를 검토된 쿼리 세트에 대해 측정한다.
 
-The set is `data/queries_v1.jsonl`, copied from the lab repository and
-corrected here; `data/queries_v1.manifest.json` records where it came from.
+세트는 `data/queries_v1.jsonl`이며, 실험실 저장소에서 복사하여
+여기서 수정한 것이다; `data/queries_v1.manifest.json`은 그것이 어디에서 왔는지 기록한다.
 """
 
 import argparse
@@ -11,7 +11,7 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
-# The lab labels gold by parent document, except HSK rows, which are their own id.
+# 실험실 레이블은 부모 문서에 따라 골드를 지정하며, HSK 행을 제외하고는 그 자체가 id이다.
 HSK_CATEGORY = "hsk"
 
 
@@ -50,7 +50,7 @@ def load_queries(path: Path) -> list[dict]:
 
 
 def indexed_ids(prepared_dir: Path) -> set[str]:
-    """Every id and parent_id the prepared datasets would put in the index."""
+    """준비된 데이터셋이 인덱스에 넣을 모든 id와 parent_id."""
     ids = set()
     for name in ("core.jsonl", "docs.jsonl", "hsk.jsonl"):
         path = prepared_dir / name
@@ -67,7 +67,7 @@ def indexed_ids(prepared_dir: Path) -> set[str]:
 
 
 def ranked_ids(result: dict, category: str) -> list[str]:
-    """The ids this result offers, in rank order, in the unit the gold uses."""
+    """이 결과가 제공하는 id들, 골드가 사용하는 단위에서 순위 순서로."""
     if category == HSK_CATEGORY:
         linkage = result.get("hsk") or {}
         return [hit["id"] for hit in linkage.get("hits", [])]
@@ -75,12 +75,12 @@ def ranked_ids(result: dict, category: str) -> list[str]:
 
 
 def hit_at(ranked: list[str], gold: list[str], k: int) -> bool:
-    """A query counts as answered when any of its gold ids appears in the top k."""
+    """골드 id 중 하나가 상위 k에 포함되면 쿼리가 답변된 것으로 간주한다."""
     return bool(set(ranked[:k]) & set(gold))
 
 
 def recall_at(ranked: list[str], gold: list[str], k: int) -> float:
-    """Fraction of distinct relevant parents retrieved, not any-hit accuracy."""
+    """중복되지 않는 관련 부모 문서의 추출 비율, 단일 출현 정확도가 아니다."""
     if k < 1 or not gold:
         raise ValueError("positive k and nonempty gold are required")
     relevant = set(gold)
@@ -92,12 +92,9 @@ def reciprocal_rank_at(ranked: list[str], gold: list[str], k: int) -> float:
 
 
 def precision_at(ranked: list[str], gold: list[str], k: int) -> float:
-    """Distinct relevant parents per k slots; unfilled slots count as misses.
+    """k 슬롯당 고유한 관련 부모; 채워지지 않은 슬롯은 실수로 간주.
 
-    Kept for `precision_at_1` and for reading older reports. Do not use it at
-    k > 1: with a cutoff the list is usually shorter than k, and most queries
-    have a single gold parent, so the fixed denominator caps the average near
-    1/k and the metric cannot move when ranking or the cutoff changes.
+    precision_at_1에 사용되며 이전 보고서를 읽을 때 사용된다. k > 1에서는 사용하지 마라: 컷오프를 사용하면 목록이 보통 k보다 짧아지고, 대부분의 쿼리에는 단일 골드 부모가 있으므로 고정된 분모는 평균을 거의 1/k로 제한하고, 순위나 컷오프가 변경되더라도 지표가 움직이지 않는다.
     """
     if k < 1 or not gold:
         raise ValueError("positive k and nonempty gold are required")
@@ -105,13 +102,9 @@ def precision_at(ranked: list[str], gold: list[str], k: int) -> float:
 
 
 def precision_returned_at(ranked: list[str], gold: list[str], k: int) -> float:
-    """Distinct relevant parents per document actually returned, capped at k.
+    """실제로 반환된 문서당 고유한 관련 부모 수, k로 제한.
 
-    This is the precision a reader experiences: of the documents the search put
-    in front of them, how many were relevant. Both sides count distinct parents,
-    so a repeated parent cannot inflate the denominator. Unlike `precision_at`, it responds to the
-    score cutoff, which shortens the list rather than reordering it. A search
-    that returns nothing scores 0.
+    이는 검색이 사용자 앞에 놓은 문서 중 얼마나 많은 문서가 관련 있는지를 나타내는 정밀도이다. 양쪽 모두 고유한 부모를 세므로 반복된 부모가 분모를 부풀릴 수 없다. `precision_at`과 달리 점수 컷오프에 반응하며, 이는 목록을 재정렬하는 것이 아니라 단축시킨다. 아무것도 반환하지 않는 검색은 0점을 받는다.
     """
     if k < 1 or not gold:
         raise ValueError("positive k and nonempty gold are required")
@@ -120,11 +113,9 @@ def precision_returned_at(ranked: list[str], gold: list[str], k: int) -> float:
 
 
 def offered_within(ranked: list, k: int) -> set[str]:
-    """The ids the first k returned documents offer.
+    """처음 k개의 반환된 문서가 제공하는 ID들.
 
-    `returned` lists one parent id per document, while `returned_chunks` nests
-    that document's chunks. Cutting the nested list keeps @k a cutoff on
-    documents, so carrying more chunks per document never shrinks the window.
+    `returned`은 각 문서당 하나의 부모 ID를 나열하지만, `returned_chunks`는 그 문서의 청크를 중첩한다. 중첩된 목록을 자르면 @k가 문서에 대한 컷오프가 되므로, 문서당 더 많은 청크를 포함해도 창을 줄이지 않는다.
     """
     return {item for entry in ranked[:k]
             for item in ([entry] if isinstance(entry, str) else entry)}
@@ -200,7 +191,7 @@ def evaluate(queries: list[dict], base_url: str, prepared_dir: Path, k: int = 5)
             "gold": gold,
             "first": hit_at(ranked, gold, 1),
             "top_k": hit_at(ranked, gold, k),
-            # A gold document the index never received is a coverage gap, not a ranking miss.
+            # 인덱스가 결코 받지 못한 골드 문서는 커버리지 갭이며, 순위 실수는 아니다.
             "gold_indexed": (not coverage_known) or set(gold) <= known,
             "gold_missing_ids": sorted(set(gold) - known) if coverage_known else None,
             "review_status": row.get("review_status"),
@@ -222,7 +213,7 @@ def evaluate(queries: list[dict], base_url: str, prepared_dir: Path, k: int = 5)
     totals = Counter()
     for bucket in categories.values():
         totals.update(bucket)
-    # Ranking can only be judged where the gold document actually reached the index.
+    # 순위는 골드 문서가 실제로 인덱스에 도달한 곳에서만 판단할 수 있다.
     answerable = Counter()
     for entry in per_query:
         if entry["gold_indexed"]:

@@ -1,4 +1,4 @@
-"""Which chunks of a document get carried, and which one leads."""
+"""문서의 어떤 청크가 전달되고, 어떤 청크가 선도하는가."""
 
 from search_engine.search.query import _candidates_by_parent, _with_passages
 from search_engine.search.results import SearchHit
@@ -18,7 +18,7 @@ class TestCandidatesByParent:
     def test_the_dense_list_orders_the_chunks(self):
         lexical = ([chunk("lex1"), chunk("lex2")], 1.0, "bm25")
         dense = ([chunk("vec1"), chunk("vec2")], 1.0, "vector")
-        # fusion hands them over lexical-first; the dense order is the one kept
+        # 퓨전은 그들을 어휘 우선으로 넘긴다; 밀집된 순서가 유지된다
         assert [c["_id"] for c in _candidates_by_parent([lexical, dense])["p"]] == [
             "vec1", "vec2", "lex1", "lex2"]
 
@@ -36,7 +36,7 @@ class TestCandidatesByParent:
 class TestWithPassages:
     def test_the_leading_chunk_comes_from_the_pool_not_from_ranking(self):
         pool = {"p": [chunk("vec1"), chunk("vec2"), chunk("lex1")]}
-        # ranking picked lex1 for this document; the dense pool leads with vec1
+        # ranking은 이 문서에 대해 lex1을 선택함; 밀집 풀은 vec1으로 선도함
         hits = _with_passages([hit("lex1")], pool, 3)
         assert hits[0].id == "vec1"
         assert hits[0].body == "본문 vec1"

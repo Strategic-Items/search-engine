@@ -23,7 +23,7 @@ def test_a_rewrite_that_reaches_the_document_wording_is_kept(monkeypatch):
     "설명 " * 100,
 ])
 def test_the_ways_a_small_model_fails_are_discarded(monkeypatch, reply):
-    """A rejected rewrite leaves the original question, which already searches."""
+    """거부된 리라이트는 원래 질문을 그대로 남기며, 이는 이미 검색 중이다."""
     answering(monkeypatch, reply)
     assert rewrite_query("수출허가 신청 서류", Settings()) is None
 

@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class SearchRequest(BaseModel):
-    """The public search request. Users provide only a natural-language query."""
+    """공개 검색 요청. 사용자는 자연어 쿼리만 제공한다."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -16,7 +16,7 @@ class SearchRequest(BaseModel):
 
 
 class RagRequest(BaseModel):
-    """A grounded RAG request; extra fields are deliberately rejected."""
+    """지면 기반 RAG 요청; 추가 필드는 의도적으로 거부됨."""
 
     model_config = ConfigDict(extra="forbid")
 

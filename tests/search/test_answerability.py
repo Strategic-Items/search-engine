@@ -18,13 +18,9 @@ def judging(reply):
 
 
 def test_the_confidence_the_model_reports_is_ignored():
-    """It looked usable in one run and did not reproduce.
+    """한 번 실행에서는 사용 가능해 보였지만 재현되지 않았다.
 
-    Correct refusals came back near 0.10 and mistaken ones near 0.85, which
-    would have cut false rejections from 14.8% to 2.2% -- but the same query
-    over the same passages returned 0.10 in one run and 0.85 in the next, since
-    the served model's output moves with how requests are batched. The verdict
-    was stable across every repeat, so only the verdict is read.
+정확한 거절은 약 0.10에, 잘못된 거절은 약 0.85에 돌아왔으며, 이는 거짓 거절률을 14.8%에서 2.2%로 낮추었을 것이다. 그러나 같은 쿼리가 같은 패스워드에서 실행되었을 때, 한 번은 0.10, 다음 번에는 0.85가 나왔는데, 이는 제공되는 모델의 출력이 요청이 배치되는 방식에 따라 변하기 때문이다. 판결은 모든 반복에서 안정적이었으므로, 오직 판결만 읽는다.
     """
     for confidence in (0.0, 0.1, 0.85, 0.95):
         with judging(json.dumps({"answerable": False, "confidence": confidence, "reason": ""})):
@@ -38,13 +34,13 @@ def test_an_answerable_verdict_keeps_the_results():
 
 @pytest.mark.parametrize("reply", ["", "not json", json.dumps({"confidence": 0.0})])
 def test_an_unreadable_verdict_keeps_the_results(reply):
-    """A judge that did not answer is not a verdict."""
+    """대답하지 않은 판사는 판결이 아니다."""
     with judging(reply):
         assert is_unanswerable("질문", [hit()], Settings()) is False
 
 
 def test_an_unreachable_judge_keeps_the_results():
-    """A search that already found something must not fail on a second opinion."""
+    """이미 무언가를 찾은 검색은 두 번째 의견에서 실패해서는 안 된다."""
     def boom(*args, **kwargs):
         raise RuntimeError("chat model down")
 
@@ -61,8 +57,8 @@ def test_nothing_retrieved_is_not_sent_to_the_judge():
 
 
 def test_the_judge_sees_the_passages_not_just_the_ranked_chunk():
-    """Cutting the context to a third took false rejections from 26 to 51 of 135:
-    the evidence often sits outside the chunk that ranked the document."""
+    """컨텍스트를 세 번째로 줄이면 거짓 거절이 135개 중 26개에서 51개로 증가했다:
+    증거는 종종 문서를 순위 매긴 청크 밖에 위치해 있다."""
     seen = {}
 
     def capture(prompt, **kwargs):

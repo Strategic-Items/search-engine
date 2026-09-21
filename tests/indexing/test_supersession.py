@@ -17,7 +17,7 @@ def test_both_title_spellings_name_the_same_slot():
 
 
 def test_a_form_of_another_statute_is_not_the_same_slot():
-    """행정절차법 별지 제2호 numbers its own forms, not the export-control ones."""
+    """행정절차법 별지 제2호는 전략물자 서식과 별개의 자체 서식 번호를 사용한다."""
     assert form_slot("[행정절차법 별지 제2호] 지위승계 통지서") is None
     assert form_slot("전략물자 수출거래 보고서") is None
 
@@ -39,7 +39,7 @@ def test_forms_in_different_slots_never_supersede_each_other():
 
 
 def test_editions_published_the_same_day_do_not_supersede_each_other():
-    """The 38th revision put two variants of one slot out together."""
+    """38번째 개정판은 한 슬롯의 두 가지 변형을 함께 출시했다."""
     rows = [
         form("form-a", "[38차 개정, 26.9.1] 별지 2의3. END-USER STATEMENT", "2026-09-04"),
         form("form-b", "[38차 개정, 26.9.1] 별지 2의3. END-USER STATEMENT(for Wassenaar)",
@@ -141,7 +141,7 @@ def test_the_later_gosi_edition_replaces_the_earlier_one():
 
 
 def test_a_draft_is_never_the_text_in_force_even_when_it_is_the_newest():
-    """A draft for the next edition is published after the current one."""
+    """현재 판 이후 다음 판의 초안이 출판된다."""
     rows = [
         notice("n-38", "제38차 전략물자수출입고시 개정 안내(9.1 시행)", "2026-09-01"),
         notice("n-draft", "｢전략물자 수출입고시｣ 일부개정(안) 행정예고", "2026-10-01"),

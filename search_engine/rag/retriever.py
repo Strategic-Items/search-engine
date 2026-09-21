@@ -1,4 +1,5 @@
-"""In-process retrieval over the search engine."""
+"""검색 엔진에 대한 실시간 검색.
+"""
 
 from datetime import date
 

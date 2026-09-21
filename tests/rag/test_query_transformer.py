@@ -39,8 +39,8 @@ async def test_compression_removes_thinking_and_rejects_answer_like_output(monke
 
 
 async def test_a_rewrite_that_borrows_nothing_from_the_history_is_discarded(monkeypatch):
-    # Small models copy a noun out of the few-shot examples when the real history
-    # runs long, inventing a subject the conversation never mentioned.
+    # 작은 모델은 실제 히스토리에서 few-shot 예제에서 명사를 복사한다.
+    # 길게 실행되며, 대화에서 언급되지 않은 주제를 발명한다.
     history = [Message(role="user", content="자가판정 유효기간"),
                Message(role="assistant", content="자가판정 유효기간은 2026년 9월 1일부터 시행됩니다.")]
 

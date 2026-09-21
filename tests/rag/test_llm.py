@@ -47,7 +47,7 @@ OPENAI = dict(chat_provider="openai", chat_base_url_override="http://spark.test/
 
 
 def serving(monkeypatch, handler):
-    """Point both the async and the sync client at a mock transport."""
+    """비동기 및 동기 클라이언트 모두를 모킹 트랜스포트로 지정한다."""
     transport = httpx.MockTransport(handler)
     original = httpx.AsyncClient
     monkeypatch.setattr(llm.httpx, "AsyncClient",
@@ -84,7 +84,7 @@ async def test_the_openai_path_posts_to_chat_completions_without_doubling_v1(mon
     assert seen["url"] == "http://spark.test/v1/chat/completions"
     assert seen["body"]["model"] == "qwen3-vl-30b-a3b"
     assert seen["body"]["temperature"] == 0.0
-    # num_ctx has no OpenAI equivalent; the server fixes the window at startup.
+    # num_ctx는 OpenAI와 동등한 것이 없으며, 서버가 시작 시점에 창 크기를 고정한다.
     assert "options" not in seen["body"]
     assert seen["auth"] == "Bearer none"
 

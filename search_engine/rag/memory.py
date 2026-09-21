@@ -1,4 +1,4 @@
-"""Bounded, process-local conversation memory."""
+"""제한된 프로세스 로컬 대화 메모리."""
 
 from collections import OrderedDict
 

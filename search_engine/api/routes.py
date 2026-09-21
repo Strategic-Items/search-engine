@@ -28,7 +28,7 @@ EVALUATION_REPORT = EVALUATION_DATA / "generated/docs-v2/comparison-135q-koemb-g
 
 
 def _retrieval_outcomes() -> dict[str, dict]:
-    """Published hybrid @5 outcomes used by the evaluation browser."""
+    """평가 브라우저에서 사용하는 공개된 하이브리드 @5 결과."""
     if not EVALUATION_REPORT.is_file():
         return {}
     report = json.loads(EVALUATION_REPORT.read_text(encoding="utf-8"))
@@ -66,7 +66,7 @@ def ready() -> dict:
 
 @app.get("/v1/evaluation/questions")
 def evaluation_questions() -> dict:
-    """Return the presentation question bank, including abstention cases."""
+    """기권 사례를 포함한 프레젠테이션 질문 은행을 반환한다."""
     groups = (
         ("answerable", EVALUATION_DATA / "queries_docs_v2.jsonl"),
         ("unanswerable", EVALUATION_DATA / "queries_docs_v2_unanswerable.jsonl"),
@@ -109,7 +109,7 @@ def search(request: SearchRequest) -> SearchResults:
 
 @app.post("/v1/search/compare")
 def search_compare(request: SearchRequest) -> ModeComparison:
-    """The same query through every mode at once, for comparing them by eye."""
+    """모든 모드에서 동시에 동일한 쿼리를 수행하여 눈으로 비교한다."""
     settings = get_settings()
     try:
         return search_modes(
@@ -121,11 +121,11 @@ def search_compare(request: SearchRequest) -> ModeComparison:
 
 @app.post("/v1/callcenter/search")
 def search_callcenter(request: SearchRequest) -> SearchResults:
-    """Search past consultation cases only; never mix them into official RAG."""
+    """과거 상담 사례만 검색; 공식 RAG에 혼합하지 않는다."""
     settings = get_settings()
     try:
-        # Reuse the hybrid retriever, but the alias contains only the separate
-        # call-centre corpus and is not part of Settings.document_aliases.
+# 하이브리드 검색기를 재사용하지만, 별칭에는 별도의
+# 콜센터 코퍼스만 포함되며 Settings.document_aliases의 일부가 아니다.
         return SearchResults(
             query=request.query,
             hits=search_all(
@@ -139,7 +139,7 @@ def search_callcenter(request: SearchRequest) -> SearchResults:
 
 @app.get("/v1/callcenter/calls/{call_id}")
 def read_callcenter_call(call_id: str) -> Document:
-    """Return all indexed chunks for one past consultation case."""
+    """한 과거 상담 사례에 대한 모든 인덱싱된 청크를 반환한다."""
     settings = get_settings()
     try:
         document = fetch_document(create_client(), settings.search_callcenter_alias, call_id)
@@ -152,7 +152,7 @@ def read_callcenter_call(call_id: str) -> Document:
 
 @app.get("/v1/documents/{parent_id:path}")
 def read_document(parent_id: str) -> Document:
-    """The whole document a search hit came from, chunk by chunk in order."""
+    """검색 결과가 나온 전체 문서를 청크별로 순서대로 제공한다."""
     settings = get_settings()
     try:
         document = fetch_document(create_client(), settings.document_aliases, parent_id)
@@ -181,7 +181,7 @@ async def _as_sse(chunks: AsyncIterator[str | pipeline.StreamError]) -> AsyncIte
         if isinstance(chunk, pipeline.StreamError):
             yield f"event: error\ndata: {chunk.message}\n\n"
             return
-        # SSE requires each physical line to carry a data prefix.
+        # SSE는 각 물리 라인에 데이터 접두사를 포함해야 한다.
         payload = "\n".join(f"data: {line}" for line in chunk.splitlines() or [""])
         yield f"{payload}\n\n"
     yield "event: done\ndata: done\n\n"

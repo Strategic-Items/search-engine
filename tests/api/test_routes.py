@@ -63,7 +63,7 @@ def test_search_includes_hsk_linkage_for_an_hsk_code_query(monkeypatch):
 
 
 def test_search_tolerates_a_corpus_that_has_never_been_indexed(monkeypatch):
-    """A document index only exists once something has been indexed into it."""
+    """문서 인덱스는 무언가가 인덱싱된 이후에만 존재한다."""
     os_client = Mock()
     os_client.search.return_value = {"hits": {"hits": []}}
     monkeypatch.setattr("search_engine.api.routes.create_client", lambda: os_client)
@@ -140,7 +140,7 @@ def test_document_reports_a_parent_that_is_not_indexed(monkeypatch):
 
 
 def test_document_reads_an_id_that_contains_a_slash(monkeypatch):
-    """Parent ids are built from source paths, so some carry a separator."""
+    """부모 ID는 소스 경로에서 생성되므로 일부는 구분자를 포함한다."""
     os_client = Mock()
     os_client.search.return_value = {"hits": {"hits": [
         {"_id": "hwpx/공고.hwpx#0001", "_source": {"parent_id": "hwpx/공고.hwpx", "body": "본문"}},

@@ -1,21 +1,10 @@
-"""Ask the chat model whether the retrieved text actually answers the question.
+"""채팅 모델에게 검색된 텍스트가 실제로 질문에 답하는지 묻는다.
 
-The score cutoffs cannot do this. A question the corpus has no answer for still
-retrieves the document it is about, and scores it inside the range answered
-questions occupy -- on docs v2 the eight in-domain unanswerable questions were
-rejected 0 of 8 by an absolute floor, 0 of 8 by a cross-encoder reranker, and
-were indistinguishable from answered ones by score margin or result count. What
-separates them is not relevance, which they have, but whether the fact being
-asked for is written down in the passages. Only a reader can tell.
+점수 기준값은 이를 할 수 없다. 코퍼스가 답할 수 없는 질문은 여전히 그것에 관한 문서를 검색하고, 답이 있는 질문들이 차지하는 범위 내에서 점수를 매긴다 -- docs v2에서 8개의 도메인 내 비답할 수 있는 질문 중 0개가 절대 하한선에 의해 거부되었고, 0개가 크로스엔코더 재순위付け 랭커에 의해 거부되었으며, 점수 갭이나 결과 수로는 답이 있는 질문들과 구별되지 않았다. 그들을 구분하는 것은 관련성(그들은 관련성이 있다)이 아니라, 질문이 요구하는 사실이 조각들에 기록되어 있는지 여부이다. 오직 독자만이 이를 알 수 있다.
 
-So the question put to the model is not "is this relevant" but "is the fact this
-question asks for present in this text". Measured that way it rejected 7 of the
-8, at the cost of refusing 14.8% of questions the corpus can answer
-(docs/evaluation/stages/stage-18-llm-answerability-judge.md).
+따라서 모델에게 제기되는 질문은 "이것이 관련이 있는가?"가 아니라 "이 질문이 요구하는 사실이 이 텍스트에 존재하는가?"이다. 그렇게 측정했을 때, 8개 중 7개를 거부했으며, 그代价로 코퍼스가 답할 수 있는 질문의 14.8%를 거부했다 (docs/evaluation/stages/stage-18-llm-answerability-judge.md).
 
-Off by default. It puts the chat model in the path of a search that otherwise
-has no model dependency, and costs about two seconds against a search that takes
-a tenth of one -- the same trade that keeps query rewrite off.
+기본적으로 비활성화되어 있다. 이는 검색 경로에 채팅 모델을 포함시키는 것이며, 그렇지 않으면 모델 의존성이 없는 검색에 비해 약 2초의 비용이 든다 -- 이는 쿼리 리라이트를 비활성화하는 것과 동일한 Trade-off이다.
 """
 
 import json
@@ -27,17 +16,17 @@ from search_engine.search.results import SearchHit
 
 log = logging.getLogger(__name__)
 
-# The rules go in their own turn. Folded into the user turn instead, the same
-# model rejected 20.7% of answerable questions against 14.8% here.
+# 규칙은 각각의 턴에 들어간다. 사용자 턴에 접혀지면, 동일하다
+# 모델은 14.8%에 비해 20.7%의 답할 수 있는 질문을 거부했다.
 #
-# The second rule is about polarity. Without it the judge refused questions
-# whose answer it had just quoted: asked whether identical specifications
-# oblige a US licence, it answered that no such statement was present "and in
-# fact the text says a licence need not be applied for on those grounds" --
-# and returned answerable: false. Asking "is the fact this question asks for
-# written down" invites reading the question's premise as that fact, so a
-# document that denies the premise looks like a document that is silent on
-# it. Every question this lost was a yes/no one whose answer is no.
+# 두 번째 규칙은 극성에 관한 것이다. 이 규칙이 없으면 판독자는 질문을 거부했다
+# 그 질문의 답변을 방금 인용한 질문을
+# 동일한 사양이 미국 라이선스를 요구하는지 묻는다면, 그 답변은 "그러한 진술이 존재하지 않는다"라고 했고, 그리고
+# 사실은 텍스트가 그 근거로 라이선스를 신청할 필요가 없다고 말한다" --
+# 그리고 응답 가능한: false. "이 사실이 이 질문이 요구하는가?"
+# "쓰여진다"는 것은 질문의 전제를 그 사실로 읽도록 유도하므로, 하나의
+# 전제를 부정하는 문서는 그것에 대해 침묵하는 문서처럼 보인다.
+# 이 잃어버린 모든 질문은 예/아니오 질문이었고 그 답은 아니었다.
 SYSTEM = """당신은 검색 결과를 검수한다. 주어진 발췌문만 보고, 질문이 요구하는 사실이 그 안에 실제로 적혀 있는지 판단한다.
 - 주제가 같아도 요구된 사실이 없으면 답할 수 없는 것이다.
 - 질문이 어떤 내용의 성립 여부를 묻고 발췌문이 그것을 부정하고 있으면, 답할 수 있는 것이다. 질문의 전제를 뒤집는 근거도 근거다.
@@ -50,10 +39,10 @@ PROMPT = """질문: {query}
 발췌문:
 {context}"""
 
-# How much of each document the judge sees. Trimming this is not a neutral
-# knob: cutting the context to a third raised false rejections from 26 to 51
-# of 135, because the evidence a document was labelled for often sits outside
-# its first chunks -- the same reason the pipeline carries six per document.
+# 판사가 각 문서의 얼마나 많은 부분을 보는가. 이것을 잘라내는 것은 중립적인
+# 조절 장치가 아니다: 맥락을 3분의 1로 줄이면 거짓 거부율이 135개 중 26개에서 51개로 상승한다.
+# 왜냐하면 문서가 라벨링된 증거가 종종 그 밖에 위치하기 때문이다
+# 첫 번째 청크들 -- 파이프라인이 문서당 여섯 개를 유지하는 이유와 동일하다.
 DOCUMENTS_JUDGED = 3
 BODY_CHARS = 1500
 PASSAGES_PER_DOCUMENT = 5
@@ -74,20 +63,13 @@ def _context(hits: list[SearchHit]) -> str:
 def is_unanswerable(
     query: str, hits: list[SearchHit], settings: Settings | None = None,
 ) -> bool:
-    """True when the model says nothing in the retrieved text answers the question.
+    """모델이 검색된 텍스트에서 질문에 대한 답변을 하지 않는다고 말할 때 참이다.
 
-    The verdict is taken as it comes. The model also rates its own confidence,
-    and in one run those numbers looked usable -- correct refusals near 0.10,
-    mistaken ones near 0.85, and honouring only the low ones would have cut
-    false rejections from 14.8% to 2.2%. It did not reproduce: the same query
-    against the same passages came back 0.10 in one run and 0.85 in the next,
-    because the served model's output shifts with how requests are batched. The
-    verdict itself was stable across every repeat. So the boolean is used and
-    the number is ignored.
+    판결은 그대로 받아들여진다. 모델은 자신의 신뢰도를 평가하며,
+    한 실행에서 그 수치는 사용 가능해 보였다 -- 정확한 거절은 약 0.10,
+    잘못된 거절은 약 0.85이며, 낮은 수치만을 존중하면 거짓 거절을 14.8%에서 2.2%로 줄일 수 있었다. 그러나 이는 재현되지 않았다. 동일한 쿼리가 동일한 패스를 대상으로 한 번은 0.10, 다음 실행에서는 0.85로 돌아왔기 때문이다. 제공되는 모델의 출력은 요청이 배치되는 방식에 따라 변하기 때문이다. 판결 자체는 모든 반복에서 안정적이었다. 따라서 불리언 값이 사용되며 수치는 무시된다.
 
-    Never raises. A judge that cannot be reached is not a verdict, and a search
-    that already found something should not fail because a second opinion was
-    unavailable.
+    결코 예외를 발생시키지 않는다. 도달할 수 없는 판사가 판결이 아니며, 이미 무언가를 찾은 검색은 두 번째 의견이 없어서 실패해서는 안 된다.
     """
     settings = settings or get_settings()
     if not hits:
