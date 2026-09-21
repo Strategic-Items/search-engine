@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
     search_document_datasets: Literal["core,docs", "docs", "core"] = "core,docs"
-    search_mode: Literal["bm25", "vector", "hybrid", "sparse", "hybrid_sparse"] = "hybrid"
+    search_mode: Literal["bm25", "vector", "hybrid"] = "hybrid"
     search_hsk_enabled: bool = True
     search_number_of_replicas: int = Field(default=0, ge=0)
     ollama_base_url: str = "http://localhost:11434"
@@ -107,11 +107,6 @@ class Settings(BaseSettings):
     search_cutoff_ratio_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
     search_cutoff_ratio_vector: float = Field(default=0.99, ge=0.0, le=1.0)
     search_cutoff_ratio_hybrid: float = Field(default=0.95, ge=0.0, le=1.0)
-    # Learned-sparse scores are dot products over rank_features, on a scale of
-    # their own again. Calibrated on docs v2's 135 questions: sparse scores fall
-    # away fast, so 0.90 still returns 1.40 documents at 86.5% precision, and
-    # 0.95 is the knee -- 89.4% over 1.25 documents, holding Hit@5 at 91.9%.
-    search_cutoff_ratio_sparse: float = Field(default=0.95, ge=0.0, le=1.0)
     # An absolute floor under the ratio cutoff. The ratio only ever says "far
     # worse than the best this search found", so it cannot empty a result list:
     # the top hit is its own reference and always clears it. A floor can, which
@@ -142,12 +137,6 @@ class Settings(BaseSettings):
     # RRF scores carry no relevance signal, so there is nothing to threshold
     # here; the per-retriever floors above already gated what reached fusion.
     search_score_floor_hybrid: float = Field(default=0.0, ge=0.0)
-    search_score_floor_sparse: float = Field(default=0.0, ge=0.0)
-    # Where the learned-sparse query encoder lives. bge-m3's sparse head is not
-    # served by Ollama, so it runs behind its own HTTP endpoint; empty disables
-    # the sparse modes rather than failing a search that never asked for them.
-    sparse_encoder_url: str = ""
-    search_sparse_candidates: int = Field(default=50, ge=1, le=1_000)
     rag_top_k: int = Field(default=5, ge=1)
 
     def cutoff_ratio(self, mode: str) -> float:
@@ -155,7 +144,6 @@ class Settings(BaseSettings):
             "bm25": self.search_cutoff_ratio_bm25,
             "vector": self.search_cutoff_ratio_vector,
             "hybrid": self.search_cutoff_ratio_hybrid,
-            "sparse": self.search_cutoff_ratio_sparse,
         }[mode]
 
     def score_floor(self, mode: str) -> float:
@@ -163,8 +151,6 @@ class Settings(BaseSettings):
             "bm25": self.search_score_floor_bm25,
             "vector": self.search_score_floor_vector,
             "hybrid": self.search_score_floor_hybrid,
-            "hybrid_sparse": self.search_score_floor_hybrid,
-            "sparse": self.search_score_floor_sparse,
         }[mode]
 
     @property
