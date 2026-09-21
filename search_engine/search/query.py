@@ -71,8 +71,21 @@ def build_query(query: str, as_of: date) -> dict:
     if query.strip():
         should.append({"multi_match": {
             "query": query.strip(),
+            # `most_fields`, not `best_fields`, because the parser appends a
+            # section heading to each chunk's title -- "대외무역법 시행령 — 1.
+            # 수출허가를 받은 물품등의 최종..." -- which makes the title a short
+            # second body carrying content words. `best_fields` scores a
+            # document on its single best field, so two generic words in that
+            # short, thrice-boosted title beat five specific ones in the body
+            # and the body's evidence is discarded rather than added:
+            # 받(7.03) + 허가(4.43) = 11.46 outscored 의견 + 러시아 + 보내 +
+            # 허가 + 있 = 7.80, and 러시아 is the most discriminating term in
+            # this corpus. Summing the fields puts the two on the same side of
+            # the lexical floor. The boost stays at 3 -- lowering it loses the
+            # identifier queries the title is there to serve, and 3 was also
+            # the best of the values swept under `most_fields`.
             "fields": ["title^3", "body", "title.standard^1.5", "body.standard^0.5"],
-            "type": "best_fields",
+            "type": "most_fields",
         }})
     if not should:
         raise ValueError("query is required")

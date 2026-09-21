@@ -30,6 +30,7 @@
 - [19. 문서는 맞는데 청크가 틀렸다](stages/stage-19-chunk-rerank-within-document.md) — 판정자 거짓 거절의 절반은 근거가 문서 내 7~21위로 밀려 안 보인 것이었다. 문서 내 재정렬로 14.8% → 7.4%
 - [20. 진단이 맞으면 해법은 공짜였다](stages/stage-20-dense-order-inside-documents.md) — 같은 진단이 cross-encoder 대신 밀집 순서를 가리키고 있었다. 지연 0으로 근거 `@1` +23.3p
 - [21. 컷오프가 융합을 투표로 바꿔 놓고 있었다](stages/stage-21-fusion-cutoff-and-judge-polarity.md) — RRF 점수에 비율 컷오프는 "두 검색기 모두에 있어야 한다"는 뜻이었다. P@1 +3.0p, Hit@5 +3.7p, 지연 0. 판정자 폴라리티 규칙 한 줄로 거짓 거절 5.9% → 3.7%
+- [22. 어휘 검색이 본문 근거를 버리고 있었다](stages/stage-22-most-fields-instead-of-best-fields.md) — `best_fields`가 문서를 단일 최고 필드로만 점수 내고 있었다. `most_fields` 한 단어로 Hit@5 +1.5p, 반환분 정밀도 +4.1p, 반환 수는 감소. bm25 단독은 17단계 sparse와 동률이 된다
 
 ## 단계에 걸친 문서
 
