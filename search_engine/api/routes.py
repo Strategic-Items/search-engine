@@ -24,6 +24,29 @@ from search_engine.search import (
 app = FastAPI(title="Strategic Items Search", version="0.1.0")
 
 EVALUATION_DATA = Path(__file__).resolve().parents[2] / "data"
+EVALUATION_REPORT = EVALUATION_DATA / "generated/docs-v2/comparison-135q-koemb-gguf.json"
+
+
+def _retrieval_outcomes() -> dict[str, dict]:
+    """Published hybrid @5 outcomes used by the evaluation browser."""
+    if not EVALUATION_REPORT.is_file():
+        return {}
+    report = json.loads(EVALUATION_REPORT.read_text(encoding="utf-8"))
+    rows = report.get("modes", {}).get("hybrid", {}).get("queries", [])
+    outcomes = {}
+    for row in rows:
+        returned = row.get("returned", [])[:5]
+        gold = set(row.get("gold", []))
+        rank = next((index for index, parent in enumerate(returned, 1) if parent in gold), None)
+        offered = {chunk for document in row.get("returned_chunks", [])[:5] for chunk in document}
+        evidence_groups = row.get("evidence_groups", [])
+        evidence_found = bool(evidence_groups) and all(set(group) & offered for group in evidence_groups)
+        outcomes[row["qid"]] = {
+            "evaluation_status": "search_miss" if rank is None else
+                "evidence_miss" if not evidence_found else "pass",
+            "evaluation_rank": rank,
+        }
+    return outcomes
 
 
 @app.get("/health/live")
@@ -50,6 +73,7 @@ def evaluation_questions() -> dict:
         ("out_of_domain", EVALUATION_DATA / "queries_docs_v2_out_of_domain.jsonl"),
     )
     questions = []
+    outcomes = _retrieval_outcomes()
     for group, path in groups:
         with path.open(encoding="utf-8") as rows:
             for line in rows:
@@ -66,6 +90,7 @@ def evaluation_questions() -> dict:
                     "gold": row.get("gold", []),
                     "reason": row.get("reason", ""),
                     "expected_behavior": row.get("expected_behavior", ""),
+                    **outcomes.get(row["qid"], {}),
                 })
     return {"total": len(questions), "questions": questions}
 

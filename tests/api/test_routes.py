@@ -1,3 +1,4 @@
+from collections import Counter
 from unittest.mock import Mock
 
 from fastapi.testclient import TestClient
@@ -14,11 +15,16 @@ def test_search_rejects_blank_query():
 def test_evaluation_questions_include_answerable_and_abstention_cases():
     body = TestClient(app).get("/v1/evaluation/questions").json()
 
-    assert body["total"] == 155
-    assert sum(row["answerable"] for row in body["questions"]) == 135
+    groups = Counter(row["group"] for row in body["questions"])
+    assert body["total"] == sum(groups.values())
+    assert sum(row["answerable"] for row in body["questions"]) == groups["answerable"] == 135
+    assert groups["unanswerable"] >= 8
     assert {row["group"] for row in body["questions"]} == {
         "answerable", "unanswerable", "out_of_domain",
     }
+    answerable = [row for row in body["questions"] if row["answerable"]]
+    assert Counter(row["evaluation_status"] for row in answerable)["search_miss"] == 8
+    assert all("evaluation_rank" in row for row in answerable)
 
 
 def test_search_returns_hits_from_alias(monkeypatch):

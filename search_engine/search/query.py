@@ -10,6 +10,8 @@ from opensearchpy import OpenSearch, OpenSearchException
 from search_engine.config import Settings, get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
+from search_engine.search.answerability import is_unanswerable
+from search_engine.search.rerank import rerank_passages
 from search_engine.search.rewrite import rewrite_query
 from search_engine.search.results import (
     ModeComparison,
@@ -255,7 +257,8 @@ def retrieve(
     *, mode: str | None = None, strict: bool = False,
     chunks_per_document: int | None = None, query_rewrite: bool | None = None,
     cutoff_ratio: float | None = None,
-    score_floor: float | None = None,
+    score_floor: float | None = None, answerability: bool | None = None,
+    rerank_chunks: bool | None = None,
 ) -> list[SearchHit]:
     """Retrieve from `alias`, which may name several indexes, comma separated.
 
@@ -379,9 +382,25 @@ def retrieve(
             break
     if chunks_per_document is None:
         chunks_per_document = settings.search_chunks_per_document
-    return _with_passages(
+    hits = _with_passages(
         _with_current_editions(client, alias, out, k), ranked_lists, chunks_per_document,
     )
+    if rerank_chunks is None:
+        rerank_chunks = settings.search_rerank_chunks
+    # Before the judge, so the judge reads the chunks a reader would. Half the
+    # answerable questions it refused were ones whose evidence had been buried
+    # here: reordering alone took its false rejections from 14.8% to 7.4%
+    # without touching the judge.
+    if rerank_chunks:
+        hits = rerank_passages(query, hits, settings)
+    if answerability is None:
+        answerability = settings.search_answerability_judge
+    # Judged last, on the passages that would actually be handed to a reader:
+    # asking earlier would put the question to a different text than the one
+    # the search returns.
+    if answerability and is_unanswerable(query, hits, settings):
+        return []
+    return hits
 
 
 def _current_editions(

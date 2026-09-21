@@ -27,6 +27,36 @@ services:
       opensearch:
         condition: service_healthy
 
+  # Re-orders a document's own chunks against the query; see
+  # docs/evaluation/stages/stage-19-chunk-rerank-within-document.md.
+  # Nothing uses it until SEARCH_RERANK_CHUNKS=true.
+  #
+  # text-embeddings-inference serves the same /rerank contract and is the better
+  # choice on amd64 or with a GPU -- swap the build for
+  # `image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7` plus
+  # `command: --model-id ${SEARCH_RERANK_MODEL}`. It publishes no arm64 build,
+  # so on Apple silicon it would run emulated and its latency would not be the
+  # model's.
+  #
+  # THIS CONTAINER'S LATENCY IS NOT THE MODEL'S EITHER. Docker Desktop hands it
+  # 2 CPUs and no GPU, which puts a search at p50 17s against 0.5s with the
+  # re-ranker off. The same model and the same weights run about 1.2s on the
+  # host's MPS. Neither number is a deployment figure: one is a cross-encoder on
+  # two cores, the other is a device this container cannot reach. Measure the
+  # latency where it will actually be served -- the mistake stage 13 recorded,
+  # comparing a GGUF model against a PyTorch one and reading the gap as quality.
+  # Raising the VM's CPU allocation helps and does not close the gap.
+  reranker:
+    build: ./docker/reranker
+    environment:
+      MODEL_ID: BAAI/bge-reranker-v2-m3
+    ports:
+      - "127.0.0.1:8080:8080"
+    # The host's Hugging Face cache, so the weights are not baked into the image
+    # and not downloaded again. Read-only: the container never writes them.
+    volumes:
+      - ${HF_HOME:-~/.cache/huggingface}:/hf:ro
+
   # The API is normally run on the host, so it reaches host Ollama at localhost.
   # Containerizing it later requires a persistent multi-GB model volume and pull step.
   # ollama:

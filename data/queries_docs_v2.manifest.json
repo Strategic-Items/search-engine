@@ -14,8 +14,8 @@
     "identifier_mixed": 5
   },
   "negative_queries_file": "queries_docs_v2_unanswerable.jsonl",
-  "negative_queries_sha256": "01585dfe1f116ffd85e3c0a7abaeb62c999a8b2decdb2ccf30894f2b26cc06a8",
-  "negative_queries": 8,
+  "negative_queries_sha256": "43ee8d8a5ee64885926bf63cd881a2051587e2ea3ef0e6555f21755fd6ff53f8",
+  "negative_queries": 26,
   "source_corpus_sha256": "568927cca485e4281d0486304544b61c611f3b6fe7d1f23fc57eef1f129d10fa",
   "source_corpus": "data/generated/docs-v2/review-corpus/docs.jsonl",
   "source_chunks": 1198,
@@ -40,7 +40,8 @@
     "Separate unanswered fact requests from answerable ranking questions; empty-gold cases are not averaged into recall.",
     "Treat equivalent duplicate copies of the children-product notice as one logical relevant document.",
     "Group byte-identical copies of the newly added parser sources as equivalent parents.",
-    "Exception for docs-v2-121..135 (identifier_* categories): these questions DO supply announcement identifiers and article numbers on purpose, to exercise the lexical exact-match path that the first 120 questions never touch. Do not mix their scores into paraphrase/scenario trends."
+    "Exception for docs-v2-121..135 (identifier_* categories): these questions DO supply announcement identifiers and article numbers on purpose, to exercise the lexical exact-match path that the first 120 questions never touch. Do not mix their scores into paraphrase/scenario trends.",
+    "Negative (unanswerable) questions name a document the corpus does hold and ask for a fact it does not record, so that topicality alone cannot separate them; each one carries the failure mode it exercises."
   ],
   "limitations": [
     "AI-authored source-reviewed draft, not independently human-reviewed or a production acceptance benchmark.",
@@ -54,9 +55,10 @@
     "The review corpus combines the prior 36-document snapshot with 16 regenerated new source files; it is not a snapshot of the complete live index.",
     "Validate all chunk IDs and quotes against final full parser output before retrieval comparisons.",
     "New-source relevance judgments cover 11 logical documents; other new sources may provide alternative evidence.",
-    "docs-v2-121..135 quote identifiers that mostly occur once in the review corpus, so the gold is near-unique by construction; they are a regression guard for identifier lookup, not a difficulty test."
+    "docs-v2-121..135 quote identifiers that mostly occur once in the review corpus, so the gold is near-unique by construction; they are a regression guard for identifier lookup, not a difficulty test.",
+    "docs-v2-neg-009..026 are newly authored against the review corpus and have not been run through retrieval or the answerability judge; the 18단계 numbers still refer to the first eight."
   ],
-  "updated_at": "2026-09-18",
+  "updated_at": "2026-09-21",
   "source_review_date": "2026-09-17",
   "existing_queries_reviewed": 40,
   "existing_queries_corrected": 10,
@@ -157,5 +159,23 @@
         }
       ]
     }
-  ]
+  ],
+  "negative_query_failure_modes": {
+    "amendment_history": 1,
+    "column_absent": 1,
+    "consequence_not_stated": 1,
+    "cost_not_stated": 1,
+    "current_status": 1,
+    "draft_not_enacted": 1,
+    "followup_outcome": 2,
+    "impact_not_stated": 1,
+    "individual_case": 1,
+    "not_disclosed": 1,
+    "operational_statistic": 1,
+    "outcome_of_notice": 2,
+    "outcome_of_permission": 1,
+    "outcome_of_proposal": 1,
+    "personal_attribution": 1,
+    "planned_not_fixed": 1
+  }
 }
