@@ -38,5 +38,6 @@
 - [단계 1~7 한눈에 보기](stages_1_7_overview.md) — 일곱 단계를 같은 표에서 비교한다
 - [단계 2~7 근거 청크 지표](evidence_chunk_metrics_v2.md) — 문서가 아니라 답이 적힌 청크가 반환됐는지를 따로 측정한다
 - [현재 판단과 다음 측정](current_judgment.md) — 지금까지 확정된 것과 아직 재지 않은 것
+- [판정자 프롬프트 스윕](judge_prompt_sweep.md) — 다섯 프롬프트로 거짓 거절 8→1까지 움직였지만 무응답 포착은 22/26에서 꿈쩍하지 않는다. 채택한 것은 없다
 - [컷오프 비율 스윕](cutoff_precision_sweep.md) — 비율별 반환분 정밀도 곡선
 - [v1 기준선](baseline_v1.md) — v1 평가셋 자체의 기록
