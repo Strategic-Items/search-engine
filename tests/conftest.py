@@ -21,6 +21,9 @@ def isolate_local_corpus_settings(monkeypatch):
         "SEARCH_DOCS_PREFIX": "search-docs-v",
         "CHAT_PROVIDER": "ollama", "CHAT_BASE_URL_OVERRIDE": "",
         "CHAT_MODEL_OVERRIDE": "", "CHAT_API_KEY": "none",
+        # 판정자는 켜져 있으면 결과 목록을 통째로 비울 수 있고, 개발자의 .env는
+        # 켜 두는 일이 있다. 배포 기본값이 꺼짐이므로 기본 계약 테스트도 꺼짐에서 잰다.
+        "SEARCH_ANSWERABILITY_JUDGE": "false",
         # 점수 하한선은 개발자가 실행하는 어떤 코퍼스에 따라 조정된 원시 점수이므로
         # 배포 시의 값이 조용히 결과 목록을 비우게 될 수 있다
         # 이 테스트들이 확인하는 결과 목록
