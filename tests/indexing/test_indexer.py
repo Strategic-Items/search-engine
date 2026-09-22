@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from search_engine.config import Settings
+from search_engine.embeddings import embedding_text
 from search_engine.indexing.indexer import document_actions, rebuild
 from search_engine.config import get_settings
 from search_engine.indexing.mapping import index_body
@@ -300,3 +301,34 @@ def test_indexing_drops_download_copies_and_carries_the_period_hint(tmp_path: Pa
     assert actions[0]["_source"]["period_hint"] == "2016-03-08"
     # 발행일을 아는 문서는 추정으로 덮지 않는다.
     assert "period_hint" not in actions[1]["_source"]
+
+
+class _CountingEmbedder:
+    """묶음마다 부른 횟수와 받은 텍스트를 남기는 가짜 임베더."""
+
+    def __init__(self):
+        self.calls = []
+
+    def embed(self, texts):
+        self.calls.append(list(texts))
+        # 본문을 그대로 벡터 자리에 넣어 어느 문서 것인지 확인할 수 있게 한다.
+        return [[float(len(text)), text] for text in texts]
+
+
+def test_batched_embeddings_stay_with_their_own_document(tmp_path: Path):
+    """묶어 보내도 벡터가 제 문서에 붙어야 한다. 짝이 어긋나면 조용히 오답이 된다."""
+    path = tmp_path / "corpus.jsonl"
+    rows = [{"id": f"d{i}", "parent_id": f"d{i}", "title": f"제목{i}",
+             "body": "본" * (i + 1), "source_type": "공지사항", "chunk_index": 0}
+            for i in range(7)]
+    path.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n",
+                    encoding="utf-8")
+    embedder = _CountingEmbedder()
+    actions = list(document_actions(path, "idx", embedder, batch=3))
+
+    assert [a["_id"] for a in actions] == [f"d{i}" for i in range(7)]
+    for action in actions:
+        source = action["_source"]
+        assert source["embedding"][1] == embedding_text(source["title"], source["body"])
+    # 7건을 3묶음으로: 3 + 3 + 1
+    assert [len(call) for call in embedder.calls] == [3, 3, 1]
