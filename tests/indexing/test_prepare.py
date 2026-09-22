@@ -1,8 +1,10 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from search_engine.indexing.indexer import file_sha256
-from search_engine.indexing.prepare import download_copies, period_hint, prepare
+from search_engine.indexing.prepare import _parents, download_copies, period_hint, prepare
 
 
 def test_prepare_separates_core_and_hsk_and_checks_manifest(tmp_path: Path):
@@ -117,3 +119,29 @@ def test_prepare_fills_the_period_hint_only_where_the_date_is_unknown(tmp_path: 
     assert core["n-1"]["period_hint"] == "2016-03-08"
     assert "period_hint" not in core["n-2"]
     assert manifest["datasets"]["core"]["period_hint"] == 1
+
+
+def test_chunk_index_must_start_at_zero(tmp_path):
+    """1부터 매긴 코퍼스는 조용히 앞머리를 잃는 대신 준비 단계에서 멈춘다."""
+    source = tmp_path / "corpus.jsonl"
+    source.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in [
+        {"id": "p1#1", "parent_id": "p1", "title": "가", "body": "가", "code": "",
+         "source_type": "공지사항", "chunk_index": 1},
+        {"id": "p1#2", "parent_id": "p1", "title": "가", "body": "나", "code": "",
+         "source_type": "공지사항", "chunk_index": 2},
+    ]) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="chunk_index must run 0"):
+        prepare(source, tmp_path / "out")
+
+
+def test_zero_based_chunks_give_the_parent_its_head(tmp_path):
+    """0번 청크가 앞머리가 된다 -- 시점 힌트는 여기서만 나온다."""
+    source = tmp_path / "corpus.jsonl"
+    source.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in [
+        {"id": "p1#0000", "parent_id": "p1", "title": "가", "body": "2016. 3. 8. 공고",
+         "source_type": "공지사항", "chunk_index": 0},
+        {"id": "p1#0001", "parent_id": "p1", "title": "가", "body": "뒤",
+         "source_type": "공지사항", "chunk_index": 1},
+    ]) + "\n", encoding="utf-8")
+    parents = _parents(source)
+    assert parents[0]["head"].startswith("2016. 3. 8.")

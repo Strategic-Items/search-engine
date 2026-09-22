@@ -11,7 +11,8 @@ from pathlib import Path
 from uuid import uuid4
 
 from search_engine.indexing.documents import SearchDocument
-from search_engine.indexing.identity import download_copies, period_hint
+from search_engine.indexing.identity import (FIRST_CHUNK_INDEX, check_chunk_indices, chunk_index,
+                                             download_copies, period_hint)
 from search_engine.indexing.indexer import file_sha256
 
 FORM_TYPE = "민원서식"
@@ -30,6 +31,9 @@ GOSI_DRAFT = re.compile(r"고시[^\n]*?(?:행정예고|입법예고)|(?:행정�
 HSK_TYPE = "HSK 연계표"
 # 실험실 검토 결과, 이 날짜가 표시되지 않은 FAQ는 현재 자기 평가 가이드와 충돌한다.
 EXCLUDED_CORE_IDS = {"faq-042": "conflicts_with_current_self_judgement_guide"}
+def excluded_reason(row: dict) -> str | None:
+    """제외 대상이면 그 사유. 제외는 문서 단위라 청크 ID가 아니라 부모로 본다."""
+    return EXCLUDED_CORE_IDS.get(row.get("parent_id") or row.get("id") or "")
 
 
 def form_slot(title: str) -> tuple[str, str] | None:
@@ -129,12 +133,13 @@ def _parents(source_path: Path) -> list[dict]:
     첫 청크를 들고 다니는 것은 본문 앞머리에서 시점을 읽기 위해서다.
     """
     seen = {}
+    indices = {}
     with source_path.open(encoding="utf-8") as file:
         for line in file:
             if not line.strip():
                 continue
             row = json.loads(line)
-            if row.get("id") in EXCLUDED_CORE_IDS:
+            if excluded_reason(row):
                 continue
             if row.get("source_type") == HSK_TYPE:
                 continue
@@ -145,9 +150,11 @@ def _parents(source_path: Path) -> list[dict]:
                                                  "published_at": row.get("published_at"),
                                                  "source_path": row.get("source_path") or "",
                                                  "head": ""})
+            indices.setdefault(parent_id, []).append(row.get("chunk_index"))
             # 앞머리는 첫 청크의 것이어야 한다. 행이 순서대로 온다는 보장이 없다.
-            if not row.get("chunk_index"):
+            if chunk_index(row) == FIRST_CHUNK_INDEX:
                 parent["head"] = row.get("body") or ""
+    check_chunk_indices(indices)
     return list(seen.values())
 
 
@@ -188,8 +195,9 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 try:
                     row = json.loads(line)
                     source_type = row.get("source_type") or "FAQ"
-                    if row.get("id") in EXCLUDED_CORE_IDS:
-                        excluded[EXCLUDED_CORE_IDS[row["id"]]] += 1
+                    reason = excluded_reason(row)
+                    if reason:
+                        excluded[reason] += 1
                         continue
                     dataset = "hsk" if source_type == HSK_TYPE else "core"
                     prepared = _prepare_row(row, source_type)

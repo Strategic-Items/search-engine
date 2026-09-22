@@ -8,6 +8,33 @@
 import re
 from datetime import date
 
+# 청크 번호는 부모마다 0부터 빠짐없이 이어진다. 이 규약은 "첫 청크"를 찾는
+# 곳마다 암묵으로 깔려 있었고(prepare·indexer), core가 1부터 매기는 바람에
+# 612개 문서 전부 앞머리를 읽지 못한 채로 지나갔다. 규약은 코드가 지킨다.
+FIRST_CHUNK_INDEX = 0
+
+
+def chunk_index(row: dict) -> int:
+    """청크 번호. 쪼개지 않은 문서는 번호를 적지 않으므로 첫 청크로 본다."""
+    value = row.get("chunk_index")
+    return FIRST_CHUNK_INDEX if value is None else value
+
+
+def check_chunk_indices(indices: dict[str, list]) -> None:
+    """부모마다 청크 번호가 0부터 빠짐없이 이어지는지 확인한다.
+
+    어긋나도 조용히 넘어가면 앞머리가 빈 문자열이 될 뿐 아무 신호가 없다.
+    그 조용함이 실제로 core 코퍼스를 통째로 빠뜨렸으므로 여기서 멈춘다.
+    """
+    for parent_id, seen in sorted(indices.items()):
+        seen = sorted(FIRST_CHUNK_INDEX if v is None else v for v in seen)
+        if seen != list(range(FIRST_CHUNK_INDEX, FIRST_CHUNK_INDEX + len(seen))):
+            raise ValueError(
+                f"chunk_index must run {FIRST_CHUNK_INDEX}..n-1 without gaps "
+                f"for parent {parent_id}: {seen[:8]}"
+            )
+
+
 # 브라우저가 같은 파일을 두 번 내려받으면 `... (1).hwp`가 옆에 남고, 파서는 그것을
 # 별개 문서로 색인한다. 본문이 글자까지 같으므로 검색은 같은 답을 두 번 싣고 창을
 # 그만큼 좁힌다. 파일명이 스스로 사본이라고 말하고 있으니 추측할 것이 없다 --

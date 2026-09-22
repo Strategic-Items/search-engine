@@ -15,9 +15,14 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder, embedding_text
 from search_engine.indexing.callcenter import CallCenterChunk
 from search_engine.indexing.documents import SearchDocument
-from search_engine.indexing.identity import download_copies, period_hint
+from search_engine.indexing.identity import FIRST_CHUNK_INDEX, chunk_index, download_copies, period_hint
 from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body
 from search_engine.indexing.synonyms import load_synonyms
+
+# 임베딩은 문서마다 한 번씩 부르면 호출 비용이 대부분을 차지한다. ollama는
+# 병렬 요청을 직렬로 처리하므로(2026-09-22 측정, 4병렬이 1.6배에 그친다)
+# 묶어 보내는 것만이 효과가 있다 -- 32묶음이 한 건씩 보낼 때의 2.8배다.
+EMBED_BATCH = 32
 
 log = logging.getLogger(__name__)
 
@@ -59,18 +64,16 @@ def parent_identity(path: Path) -> tuple[set[str], dict[str, str]]:
                 "head": "",
             })
             # 앞머리는 첫 청크의 것이어야 한다. 줄이 순서대로 온다는 보장이 없다.
-            if not row.get("chunk_index"):
+            # 첫 청크는 0번이다 -- 규약은 prepare가 검사한다.
+            if chunk_index(row) == FIRST_CHUNK_INDEX:
                 parent["head"] = row.get("body") or ""
     hints = {parent_id: period_hint(parent["head"])
              for parent_id, parent in parents.items() if not parent["published_at"]}
     return download_copies(list(parents.values())), {k: v for k, v in hints.items() if v}
 
 
-def document_actions(
-    path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
-    dropped: list | None = None,
-):
-    """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
+def _sources(path: Path, callcenter: bool, dropped: list | None):
+    """줄마다 검증해 색인할 _source를 내놓는다. 임베딩은 아직 붙이지 않는다."""
     seen = set()
     copies, hints = (set(), {}) if callcenter else parent_identity(path)
     with path.open(encoding="utf-8") as file:
@@ -94,11 +97,30 @@ def document_actions(
             hint = hints.get(source["parent_id"])
             if hint:
                 source["period_hint"] = hint
-            if embedder is not None:
-                source["embedding"] = embedder.embed([
-                    embedding_text(source["title"], source["body"])
-                ])[0]
+            yield doc_id, source
+
+
+def document_actions(
+    path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
+    dropped: list | None = None, batch: int = EMBED_BATCH,
+):
+    """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
+    pending: list[tuple[str, dict]] = []
+
+    def flush():
+        if embedder is not None:
+            vectors = embedder.embed([embedding_text(s["title"], s["body"]) for _, s in pending])
+            for (_, source), vector in zip(pending, vectors):
+                source["embedding"] = vector
+        for doc_id, source in pending:
             yield {"_op_type": "index", "_index": index_name, "_id": doc_id, "_source": source}
+        pending.clear()
+
+    for doc_id, source in _sources(path, callcenter, dropped):
+        pending.append((doc_id, source))
+        if len(pending) >= batch:
+            yield from flush()
+    yield from flush()
 
 
 def current_alias_indexes(client, alias: str) -> list[str]:
