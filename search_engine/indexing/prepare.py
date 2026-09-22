@@ -6,11 +6,12 @@ import json
 import os
 import re
 from collections import Counter
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
 from search_engine.indexing.documents import SearchDocument
+from search_engine.indexing.identity import download_copies, period_hint
 from search_engine.indexing.indexer import file_sha256
 
 FORM_TYPE = "민원서식"
@@ -27,12 +28,6 @@ GOSI_REVISION = re.compile(r"제\s*\d+\s*차\s*[^\n]*?고시\s*개정")
 # 날짜 순서로는 현행을 가릴 수 있다. 초안은 언제 올라오든 현행이 아니다.
 GOSI_DRAFT = re.compile(r"고시[^\n]*?(?:행정예고|입법예고)|(?:행정예고|입법예고)[^\n]*?고시")
 HSK_TYPE = "HSK 연계표"
-# 브라우저가 같은 파일을 두 번 내려받으면 `... (1).hwp`가 옆에 남고, 파서는 그것을
-# 별개 문서로 색인한다. 본문이 글자까지 같으므로 검색은 같은 답을 두 번 싣고 창을
-# 그만큼 좁힌다. 파일명이 스스로 사본이라고 말하고 있으니 추측할 것이 없다 --
-# 제목+발행일 같은 추정 열쇠와 달리 서로 다른 문서를 잘못 묶을 여지가 없다.
-DOWNLOAD_COPY = re.compile(r"^(?P<stem>.*?)\s*\((?P<copy>\d+)\)(?P<ext>\.[A-Za-z0-9]+)$")
-
 # 실험실 검토 결과, 이 날짜가 표시되지 않은 FAQ는 현재 자기 평가 가이드와 충돌한다.
 EXCLUDED_CORE_IDS = {"faq-042": "conflicts_with_current_self_judgement_guide"}
 
@@ -95,74 +90,6 @@ def supersessions(rows: list[dict]) -> dict[str, str]:
             if is_gosi_draft(row.get("source_type", ""), row["title"]):
                 superseded.setdefault(row["parent_id"], in_force)
     return superseded
-
-
-# 본문 앞머리의 날짜. `2016. 3. 8.`과 `2016년 3월 8일` 둘 다 받는다.
-HEAD_DATE = re.compile(r"(20\d{2})\s*[.년]\s*(\d{1,2})\s*[.월]\s*(\d{1,2})")
-# 앞머리로 볼 범위. 공고문의 발신일은 서두에 있고, 뒤로 갈수록 개정 이력과
-# 시행일이 섞여 어느 것이 발행일인지 본문만으로는 가릴 수 없다.
-HEAD_CHARS = 600
-
-
-def period_hint(head: str) -> str | None:
-    """문서 앞머리가 말하는 시점. 발행일이 아니라 시점 힌트다.
-
-    파서는 파일명에서만 날짜를 읽으므로 docs-v2 52문서 중 43문서에
-    `published_at`이 없다. 그 43문서 중 33문서는 본문에 날짜를 들고 있다.
-
-    이것을 `published_at`에 넣으면 안 된다. 발행일을 아는 9문서로 맞춰
-    보면 날짜까지 정확한 것은 6문서뿐이고 -- 한 문서는 앞머리에 제정일
-    2013-04-12이 있어 실제 발행일 2025-09-23 대신 그것이 잡힌다 -- 대체
-    판정과 사본 병합이 그 필드를 먹으므로 지금보다 나빠진다.
-
-    연·월 눈금에서는 9문서 중 8문서가 맞는다. `_requested_period`가 그
-    눈금으로만 묻기 때문에 그 부스트 전용으로 둔다. 틀린 한 문서는 부스트
-    하나를 잘못 받을 뿐 필터처럼 문서를 지우지 않는다.
-    """
-    match = HEAD_DATE.search(head[:HEAD_CHARS])
-    if not match:
-        return None
-    year, month, day = (int(group) for group in match.groups())
-    try:
-        return date(year, month, day).isoformat()
-    except ValueError:
-        return None
-
-
-def download_copy_key(source_path: str) -> tuple[str, int] | None:
-    """내려받기 사본을 원본과 한데 묶는 열쇠와, 몇 번째 사본인지.
-
-    `(1)`이 붙지 않은 원본은 0번으로 돌아오므로 정렬하면 언제나 원본이 먼저다.
-    경로가 없으면 묶을 수 없고 None을 돌려준다 -- 그 문서는 그대로 남는다.
-    """
-    name = (source_path or "").rsplit("/", 1)[-1]
-    if not name:
-        return None
-    match = DOWNLOAD_COPY.match(name)
-    if not match:
-        return name, 0
-    return match.group("stem") + match.group("ext"), int(match.group("copy"))
-
-
-def download_copies(rows: list[dict]) -> set[str]:
-    """지워야 할 사본의 parent_id. 각 묶음에서 원본 하나만 남긴다.
-
-    같은 열쇠에 사본만 있고 원본이 없을 수도 있으므로 번호가 가장 낮은 것을
-    남긴다. 번호까지 같으면 parent_id로 갈라 실행마다 같은 것이 남게 한다.
-    """
-    groups: dict[str, list[tuple[int, str]]] = {}
-    for row in rows:
-        key = download_copy_key(row.get("source_path") or "")
-        if key is None:
-            continue
-        groups.setdefault(key[0], []).append((key[1], row["parent_id"]))
-    dropped = set()
-    for members in groups.values():
-        if len(members) < 2:
-            continue
-        members.sort()
-        dropped.update(parent_id for _, parent_id in members[1:])
-    return dropped
 
 
 def _date_basis(row: dict) -> str:
