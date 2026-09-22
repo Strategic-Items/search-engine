@@ -76,6 +76,8 @@ def index_body(embedding_dimensions: int) -> dict:
             "superseded_by": {"type": "keyword"},
             "source_url": {"type": "keyword", "index": False},
             "published_at": {"type": "date"},
+            # 발행일이 아니라 본문 앞머리가 말하는 시점. 부스트 전용이다.
+            "period_hint": {"type": "date"},
             "effective_from": {"type": "date"},
             "effective_to": {"type": "date"},
             "content_hash": {"type": "keyword", "index": False},

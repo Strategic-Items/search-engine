@@ -278,3 +278,25 @@ def test_docs_are_embedded_like_core(tmp_path, monkeypatch):
     rebuild(path, dataset="docs")
 
     assert len(embedders) == 1
+
+
+def test_indexing_drops_download_copies_and_carries_the_period_hint(tmp_path: Path):
+    """파서 산출물은 prepare를 거치지 않으므로 색인기가 같은 규칙을 걸어야 한다."""
+    path = tmp_path / "docs.jsonl"
+    path.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in [
+        {"id": "a#0", "parent_id": "a", "title": "안내", "body": "2016. 3. 8. 발신",
+         "chunk_index": 0, "source_path": "안내문.hwp"},
+        {"id": "b#0", "parent_id": "b", "title": "안내", "body": "2016. 3. 8. 발신",
+         "chunk_index": 0, "source_path": "안내문 (1).hwp"},
+        {"id": "c#0", "parent_id": "c", "title": "고시", "body": "2016. 3. 8. 발신",
+         "chunk_index": 0, "source_path": "고시.hwp", "published_at": "2020-01-01"},
+    ]), encoding="utf-8")
+
+    dropped: list[str] = []
+    actions = list(document_actions(path, "idx", dropped=dropped))
+
+    assert [action["_id"] for action in actions] == ["a#0", "c#0"]
+    assert dropped == ["b#0"]
+    assert actions[0]["_source"]["period_hint"] == "2016-03-08"
+    # 발행일을 아는 문서는 추정으로 덮지 않는다.
+    assert "period_hint" not in actions[1]["_source"]

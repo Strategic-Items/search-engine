@@ -11,9 +11,9 @@ from pathlib import Path
 from uuid import uuid4
 
 from search_engine.indexing.documents import SearchDocument
+from search_engine.indexing.identity import download_copies, period_hint
 from search_engine.indexing.indexer import file_sha256
 
-CORE_TYPES = {"FAQ", "민원서식", "공지사항", "판정 안내", "허가 안내", "이용 안내"}
 FORM_TYPE = "민원서식"
 # 「전략물자수출입고시」의 서식은 별지·별표 번호로 자리를 잡는다. 같은 자리의
 # 새 판이 올라오면 옛 판은 대체된다. 제목 형식은 두 가지가 섞여 있다:
@@ -108,7 +108,7 @@ def _prepare_row(row: dict, source_type: str) -> dict:
         match = re.fullmatch(r"form-(\d+)", source_id)
         if match:
             source["source_url"] = f"https://www.yestrade.go.kr/user/boards/70/posts/{match.group(1)}"
-    if source_type in CORE_TYPES:
+    if source_type != HSK_TYPE:
         source["date_basis"] = _date_basis(row)
     if not source.get("content_hash"):
         content = "\n".join(str(source.get(k) or "") for k in ("title", "body", "code"))
@@ -122,24 +122,32 @@ def _prepare_row(row: dict, source_type: str) -> dict:
     return SearchDocument.model_validate(source).model_dump(mode="json", exclude_none=True)
 
 
-def _serial_parents(source_path: Path) -> list[dict]:
-    """숫자 순서에 따라 위치하는 부모 각각에 대해 한 행씩, 쓰기 전에 미리 읽는다."""
+def _parents(source_path: Path) -> list[dict]:
+    """부모마다 한 행씩, 쓰기 전에 미리 읽는다.
+
+    대체 관계도 사본도 부모 단위의 사실이라 한 행씩은 전부 봐야 정해진다.
+    첫 청크를 들고 다니는 것은 본문 앞머리에서 시점을 읽기 위해서다.
+    """
     seen = {}
     with source_path.open(encoding="utf-8") as file:
         for line in file:
             if not line.strip():
                 continue
             row = json.loads(line)
-            source_type = row.get("source_type")
-            if source_type not in (FORM_TYPE, NOTICE_TYPE):
-                continue
             if row.get("id") in EXCLUDED_CORE_IDS:
                 continue
+            if row.get("source_type") == HSK_TYPE:
+                continue
             parent_id = row.get("parent_id") or row.get("id")
-            seen.setdefault(parent_id, {"parent_id": parent_id,
-                                        "source_type": source_type,
-                                        "title": row.get("title") or "",
-                                        "published_at": row.get("published_at")})
+            parent = seen.setdefault(parent_id, {"parent_id": parent_id,
+                                                 "source_type": row.get("source_type") or "",
+                                                 "title": row.get("title") or "",
+                                                 "published_at": row.get("published_at"),
+                                                 "source_path": row.get("source_path") or "",
+                                                 "head": ""})
+            # 앞머리는 첫 청크의 것이어야 한다. 행이 순서대로 온다는 보장이 없다.
+            if not row.get("chunk_index"):
+                parent["head"] = row.get("body") or ""
     return list(seen.values())
 
 
@@ -155,7 +163,12 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
             raise ValueError("lab corpus does not match its source manifest")
         source_manifest_sha = file_sha256(source_manifest_path)
 
-    superseded = supersessions(_serial_parents(source_path))
+    parents_ahead = _parents(source_path)
+    superseded = supersessions(parents_ahead)
+    dropped_copies = download_copies(parents_ahead)
+    # 발행일을 아는 문서는 그것이 낫다. 힌트는 빈자리만 채운다.
+    period_hints = {parent["parent_id"]: period_hint(parent["head"])
+                    for parent in parents_ahead if not parent["published_at"]}
 
     out_dir.mkdir(parents=True, exist_ok=True)
     tmp_core = out_dir / f".core-{uuid4().hex}.tmp"
@@ -175,8 +188,6 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 try:
                     row = json.loads(line)
                     source_type = row.get("source_type") or "FAQ"
-                    if source_type not in CORE_TYPES and source_type != HSK_TYPE:
-                        continue
                     if row.get("id") in EXCLUDED_CORE_IDS:
                         excluded[EXCLUDED_CORE_IDS[row["id"]]] += 1
                         continue
@@ -185,17 +196,25 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 except Exception as exc:
                     raise ValueError(f"invalid source line {line_no}: {exc}") from exc
                 doc_id = prepared["id"]
+                parent_id = prepared.get("parent_id") or doc_id
+                if parent_id in dropped_copies:
+                    excluded["download_copy"] += 1
+                    continue
+                hint = period_hints.get(parent_id)
+                if hint:
+                    prepared["period_hint"] = hint
                 if doc_id in ids[dataset]:
                     raise ValueError(f"duplicate {dataset} document ID: {doc_id}")
                 ids[dataset].add(doc_id)
-                parents[dataset].add(prepared.get("parent_id") or doc_id)
+                parents[dataset].add(parent_id)
                 counts[dataset][source_type] += 1
                 counts[dataset]["missing_source_url"] += not bool(prepared.get("source_url"))
                 counts[dataset]["missing_published_at"] += not bool(prepared.get("published_at"))
+                counts[dataset]["period_hint"] += bool(prepared.get("period_hint"))
                 counts[dataset]["missing_effective_from"] += not bool(prepared.get("effective_from"))
                 if prepared.get("published_at"):
                     ranges[dataset].append(prepared["published_at"])
-                replacement = superseded.get(prepared.get("parent_id") or doc_id)
+                replacement = superseded.get(parent_id)
                 if replacement:
                     prepared["superseded_by"] = replacement
                     counts[dataset]["superseded"] += 1
@@ -218,6 +237,7 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                                  if not k.startswith("missing_")},
                 "missing_source_url": counts[dataset]["missing_source_url"],
                 "missing_published_at": counts[dataset]["missing_published_at"],
+                "period_hint": counts[dataset]["period_hint"],
                 "missing_effective_from": counts[dataset]["missing_effective_from"],
                 "superseded": counts[dataset]["superseded"],
                 "published_min": min(ranges[dataset]) if ranges[dataset] else None,

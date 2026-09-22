@@ -31,6 +31,9 @@
 - [20. 진단이 맞으면 해법은 공짜였다](stages/stage-20-dense-order-inside-documents.md) — 같은 진단이 cross-encoder 대신 밀집 순서를 가리키고 있었다. 지연 0으로 근거 `@1` +23.3p
 - [21. 컷오프가 융합을 투표로 바꿔 놓고 있었다](stages/stage-21-fusion-cutoff-and-judge-polarity.md) — RRF 점수에 비율 컷오프는 "두 검색기 모두에 있어야 한다"는 뜻이었다. P@1 +3.0p, Hit@5 +3.7p, 지연 0. 판정자 폴라리티 규칙 한 줄로 거짓 거절 5.9% → 3.7%
 - [22. 어휘 검색이 본문 근거를 버리고 있었다](stages/stage-22-most-fields-instead-of-best-fields.md) — `best_fields`가 문서를 단일 최고 필드로만 점수 내고 있었다. `most_fields` 한 단어로 Hit@5 +1.5p, 반환분 정밀도 +4.1p, 반환 수는 감소. bm25 단독은 17단계 sparse와 동률이 된다
+- [23. 채점 단위를 청크로 옮겼다](stages/stage-23-chunk-is-the-scoring-unit.md) — 검색이 아니라 재는 자를 바꿨다. 답변 모델이 받는 것은 문서가 아니라 청크이므로 근거 청크 지표가 주 지표이고 문서 지표는 진단용이다. 근거 Precision·MRR을 새로 더했다. 22단계 순위를 다시 재도 하이브리드 우위는 유지되고 더 선명해진다(문서 P@1은 벡터와 동률이지만 근거 R@5는 +5.9p)
+- [24. SPLADE를 현재 검색기와 같은 135문항에 세웠다](stages/stage-24-splade-against-current-retrievers.md) — SPLADE+dense는 현재 BM25+dense보다 문서 P@1 94.8% → 97.8%, 청크 근거 Recall 91.1% → 94.1%로 오른다. 기존 판정표에 있는 청크만 비교하면 풀링 Precision 53.0% → 61.1%, 직접 답 Precision 31.4% → 38.1%다. 첫 근거 순위와 미판정 19%의 선택 편향, 온라인 비용은 남는다
+- [25. core를 docs 질의셋에 섞으면 무엇이 깎이는가](stages/stage-25-core-corpus-against-docs-queries.md) — 검색기는 그대로 두고 읽는 별칭만 바꿨다. core 3,956청크를 섞으면 근거 Recall@5가 0.9630에서 0.9111로 5.2p 떨어지고, 정답은 전부 색인 안에 있으므로 순위 문제다. 청크가 폭주한 공지 4건이 core 청크의 77%를 차지하지만 그 탓은 1.1p뿐이고 나머지 4.1p는 core 전반이 낸다. core에는 사본 제거가 걸리지 않아 재색인해도 수치가 같다. 남은 8건이 오답인지 라벨 누락인지 가르기 전까지 기본값은 그대로 둔다
 
 ## 단계에 걸친 문서
 

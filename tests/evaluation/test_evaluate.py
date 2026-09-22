@@ -232,3 +232,60 @@ def test_a_single_chunk_per_document_still_measures_the_same_way():
         "evidence_groups": [["c4"]],
     }]
     assert quality_metrics(rows, 2)["evidence_recall_at_2"] == 0.0
+
+
+def test_evidence_precision_counts_every_chunk_the_answer_model_receives():
+    """분모는 창 안의 모든 청크다. 문서를 맞게 찾아도 잡청크가 많으면 떨어져야 한다."""
+    rows = [{
+        "qid": "q1", "gold": ["doc-1"], "returned": ["doc-1"],
+        "returned_chunks": [["c1", "c2", "c3", "c4"]],
+        "evidence_groups": [["c4"]],
+    }]
+    metrics = quality_metrics(rows, 1)
+    assert metrics["evidence_recall_at_1"] == 1.0
+    assert metrics["evidence_precision_at_1"] == .25
+    assert metrics["mean_chunks_at_1"] == 4
+
+
+def test_evidence_mrr_reads_the_order_the_context_is_assembled_in():
+    """창은 문서 우선으로 펴지므로, 뒤 문서의 첫 청크는 앞 문서의 끝 청크보다 뒤다."""
+    rows = [{
+        "qid": "q1", "gold": ["doc-1", "doc-2"], "returned": ["doc-1", "doc-2"],
+        "returned_chunks": [["c1", "c2"], ["c3"]],
+        "evidence_groups": [["c3"]],
+    }]
+    metrics = quality_metrics(rows, 2)
+    assert metrics["evidence_mrr_at_2"] == pytest.approx(1 / 3)
+    assert metrics["evidence_first_rank_at_2"] == 3
+
+
+def test_a_repeated_chunk_cannot_inflate_the_precision_denominator():
+    rows = [{
+        "qid": "q1", "gold": ["doc-1"], "returned": ["doc-1", "doc-2"],
+        "returned_chunks": [["c1", "c2"], ["c1", "c2"]],
+        "evidence_groups": [["c2"]],
+    }]
+    metrics = quality_metrics(rows, 2)
+    assert metrics["mean_chunks_at_2"] == 2
+    assert metrics["evidence_precision_at_2"] == .5
+
+
+def test_a_miss_scores_zero_on_every_chunk_metric():
+    rows = [{
+        "qid": "q1", "gold": ["doc-1"], "returned": ["doc-9"],
+        "returned_chunks": [["c9"]],
+        "evidence_groups": [["c4"]],
+    }]
+    metrics = quality_metrics(rows, 1)
+    assert metrics["evidence_precision_at_1"] == 0.0
+    assert metrics["evidence_mrr_at_1"] == 0.0
+    assert metrics["evidence_first_rank_at_1"] == 0.0
+
+
+def test_chunk_metrics_are_absent_when_the_query_set_carries_no_labels():
+    """라벨이 없으면 0을 지어내지 말고 지표 자체가 없어야 한다."""
+    rows = [{"qid": "q1", "gold": ["doc-1"], "returned": ["doc-1"],
+             "returned_chunks": [["c1"]]}]
+    metrics = quality_metrics(rows, 1)
+    assert "evidence_precision_at_1" not in metrics
+    assert "mean_chunks_at_1" not in metrics

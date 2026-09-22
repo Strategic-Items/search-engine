@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     search_number_of_replicas: int = Field(default=0, ge=0)
     ollama_base_url: str = "http://localhost:11434"
     ollama_chat_model: str = "qwen2.5:3b"
+    # 추론 모델(qwen3 등)은 기본적으로 사고 과정을 먼저 내놓는다. 그 토큰이
+    # num_predict를 다 써 버리면 content가 빈 문자열로 돌아오고, 판정자는 그것을
+    # 예외로 처리해 결과를 그대로 통과시킨다 -- 꺼진 판정자와 구분되지 않는다.
+    # 사고를 끄면 같은 토큰 예산 안에서 답이 나온다. 사고가 없는 모델은 이 플래그를
+    # 무시하므로 기본값으로 두어도 안전하다.
+    ollama_think: bool = False
 # 임베딩 모델과 챗 모델을 분리한다: 챗 모델은 일반적으로 훨씬 크며
 # Ollama의 임베딩 엔드포인트를 노출하지 않을 수 있다.
 # 한국어 전용: 코퍼스와 질문은 모두 한국어이다. 한

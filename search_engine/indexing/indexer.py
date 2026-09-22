@@ -15,6 +15,7 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder, embedding_text
 from search_engine.indexing.callcenter import CallCenterChunk
 from search_engine.indexing.documents import SearchDocument
+from search_engine.indexing.identity import download_copies, period_hint
 from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body
 from search_engine.indexing.synonyms import load_synonyms
 
@@ -35,11 +36,43 @@ DATASETS = {
 }
 
 
+def parent_identity(path: Path) -> tuple[set[str], dict[str, str]]:
+    """쓰기 전에 한 번 읽어 부모 단위의 사실을 정한다.
+
+    사본이냐 아니냐도, 앞머리가 말하는 시점도 부모의 성질이라 줄 단위로
+    흘려보내면서는 정할 수 없다. 파일을 두 번 읽는 대신 색인 한 번을
+    통째로 메모리에 들고 있는 쪽이 더 나쁘다.
+    """
+    parents: dict[str, dict] = {}
+    with path.open(encoding="utf-8") as file:
+        for line in file:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            parent_id = row.get("parent_id") or row.get("id")
+            if not parent_id:
+                continue
+            parent = parents.setdefault(parent_id, {
+                "parent_id": parent_id,
+                "source_path": row.get("source_path") or "",
+                "published_at": row.get("published_at"),
+                "head": "",
+            })
+            # 앞머리는 첫 청크의 것이어야 한다. 줄이 순서대로 온다는 보장이 없다.
+            if not row.get("chunk_index"):
+                parent["head"] = row.get("body") or ""
+    hints = {parent_id: period_hint(parent["head"])
+             for parent_id, parent in parents.items() if not parent["published_at"]}
+    return download_copies(list(parents.values())), {k: v for k, v in hints.items() if v}
+
+
 def document_actions(
     path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
+    dropped: list | None = None,
 ):
     """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
     seen = set()
+    copies, hints = (set(), {}) if callcenter else parent_identity(path)
     with path.open(encoding="utf-8") as file:
         for line_no, line in enumerate(file, 1):
             if not line.strip():
@@ -54,6 +87,13 @@ def document_actions(
                 raise ValueError(f"duplicate document ID at line {line_no}: {doc_id}")
             seen.add(doc_id)
             source = doc.index_source()
+            if source["parent_id"] in copies:
+                if dropped is not None:
+                    dropped.append(doc_id)
+                continue
+            hint = hints.get(source["parent_id"])
+            if hint:
+                source["period_hint"] = hint
             if embedder is not None:
                 source["embedding"] = embedder.embed([
                     embedding_text(source["title"], source["body"])
@@ -110,9 +150,11 @@ def rebuild(
     switched = False
     try:
         indexed = 0
+        dropped: list[str] = []
         embedder = OllamaEmbedder(settings) if spec["embed"] else None
         for ok, item in streaming_bulk(
-            client, document_actions(path, index_name, embedder, callcenter=spec["mapping"] == "callcenter"),
+            client, document_actions(path, index_name, embedder,
+                                     callcenter=spec["mapping"] == "callcenter", dropped=dropped),
             chunk_size=500, max_retries=3, raise_on_error=True,
         ):
             if not ok:
@@ -120,8 +162,14 @@ def rebuild(
             indexed += 1
         if indexed == 0:
             raise ValueError("refusing to publish an empty index")
-        if expected_count is not None and indexed != expected_count:
-            raise RuntimeError(f"input count mismatch: expected {expected_count}, got {indexed}")
+        if dropped:
+            log.info("dropped %d chunk(s) from download copies", len(dropped))
+        # 매니페스트는 입력 줄 수를 센 것이므로 지운 사본을 되돌려 놓고 맞춰야
+        # 한다. 그러지 않으면 사본이 있는 코퍼스가 전부 검증에서 걸린다.
+        if expected_count is not None and indexed + len(dropped) != expected_count:
+            raise RuntimeError(
+                f"input count mismatch: expected {expected_count}, "
+                f"got {indexed} indexed + {len(dropped)} dropped")
         client.indices.refresh(index=index_name)
         actual = client.count(index=index_name)["count"]
         if actual != indexed:

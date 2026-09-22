@@ -117,8 +117,21 @@ def offered_within(ranked: list, k: int) -> set[str]:
 
     `returned`은 각 문서당 하나의 부모 ID를 나열하지만, `returned_chunks`는 그 문서의 청크를 중첩한다. 중첩된 목록을 자르면 @k가 문서에 대한 컷오프가 되므로, 문서당 더 많은 청크를 포함해도 창을 줄이지 않는다.
     """
-    return {item for entry in ranked[:k]
-            for item in ([entry] if isinstance(entry, str) else entry)}
+    return set(flat_within(ranked, k))
+
+
+def flat_within(ranked: list, k: int) -> list[str]:
+    """같은 창의 ID들을, 답변 모델이 받는 순서(문서 우선) 그대로 편 목록.
+
+    `offered_within`이 창의 내용이라면 이것은 창의 순서다. 컨텍스트에 실제로 실리는 배열이므로 청크 순위 지표는 이 목록 위에서 계산한다. 같은 청크가 두 번 실리지 않도록 첫 등장만 남긴다.
+    """
+    seen, flat = set(), []
+    for entry in ranked[:k]:
+        for item in ([entry] if isinstance(entry, str) else entry):
+            if item not in seen:
+                seen.add(item)
+                flat.append(item)
+    return flat
 
 
 def quality_metrics(rows: list[dict], k: int) -> dict:
@@ -155,7 +168,43 @@ def quality_metrics(rows: list[dict], k: int) -> dict:
             f"{prefix}_micro_recall_at_{k}": sum(recovered) / sum(len(r[field]) for r in eligible),
             f"{prefix}_all_at_{k}": sum(n == len(r[field]) for n, r in zip(recovered, eligible)) / len(eligible),
         })
+    metrics.update(evidence_ranking_metrics(rows, k))
     return metrics
+
+
+def evidence_ranking_metrics(rows: list[dict], k: int) -> dict:
+    """답변 모델이 실제로 받는 청크 배열 위에서 잰 정밀도와 순위.
+
+    `evidence_*_recall`이 "필요한 근거를 실었는가"를 묻는다면 이쪽은 "실은 것 중 몇 개가
+    근거였는가"와 "근거가 배열의 앞쪽에 있었는가"를 묻는다. 창은 문서 k개이고, 그 문서들이
+    딸고 온 청크가 모두 분모에 들어간다. 이는 컨텍스트에 담기는 것과 같은 집합이다.
+
+    정밀도는 하한이다. `evidence_groups`는 정답 청크만 표시한 라벨이라, 라벨에 없는 청크가
+    실제로 무관한지 판정이 안 된 것인지 구분할 수 없고 둘 다 오답으로 깔린다. 절대값을
+    "컨텍스트의 몇 %가 쓸모 있었다"로 읽으면 안 되고, 같은 질의 세트 위에서 방식 간 비교나
+    변경 전후 비교로만 읽어야 한다.
+    """
+    eligible = [r for r in rows if r.get("evidence_groups") and "returned_chunks" in r]
+    if not eligible:
+        return {}
+    shown = [flat_within(r["returned_chunks"], k) for r in eligible]
+    gold = [{chunk for group in r["evidence_groups"] for chunk in group} for r in eligible]
+    ranks = [next((rank for rank, chunk in enumerate(flat, 1) if chunk in want), 0)
+             for flat, want in zip(shown, gold)]
+    n = len(eligible)
+    return {
+        f"evidence_precision_at_{k}": sum(
+            len(set(flat) & want) / len(flat) if flat else 0.0
+            for flat, want in zip(shown, gold)) / n,
+        f"evidence_micro_precision_at_{k}": (
+            sum(len(set(flat) & want) for flat, want in zip(shown, gold)) /
+            sum(len(flat) for flat in shown) if any(shown) else 0.0),
+        f"evidence_mrr_at_{k}": sum(1 / rank if rank else 0.0 for rank in ranks) / n,
+        f"evidence_first_rank_at_{k}": (
+            sum(rank for rank in ranks if rank) / sum(1 for rank in ranks if rank)
+            if any(ranks) else 0.0),
+        f"mean_chunks_at_{k}": sum(len(flat) for flat in shown) / n,
+    }
 
 
 def search(base_url: str, query: str, timeout: float = 30.0) -> dict:
@@ -257,7 +306,20 @@ def format_report(report: dict) -> str:
     lines.append("정답 검토 상태: " + ", ".join(
         f"{status}={count}" for status, count in sorted(report["reviewed"].items(), key=lambda pair: str(pair[0]))))
     metrics = report["metrics"]
-    lines.append(f"Precision@1 (macro): {metrics['precision_at_1']:.4f}; "
+    if f"evidence_recall_at_{k}" in metrics:
+        lines.append("")
+        lines.append(f"[근거 청크 — 주 지표, {metrics['evidence_queries']}건 라벨됨] "
+                     f"Recall@{k}: {metrics[f'evidence_recall_at_{k}']:.4f}; "
+                     f"모든 근거@{k}: {metrics[f'evidence_all_at_{k}']:.4f}; "
+                     f"Precision@{k} (하한): {metrics[f'evidence_precision_at_{k}']:.4f} "
+                     f"(평균 {metrics[f'mean_chunks_at_{k}']:.2f}청크); "
+                     f"MRR@{k}: {metrics[f'evidence_mrr_at_{k}']:.4f}")
+    else:
+        lines.append("")
+        lines.append("[근거 청크 — 주 지표] 라벨 없음: 이 질의 세트에는 evidence_groups가 "
+                     "없어 청크 기준 채점을 하지 못했습니다. 아래 문서 지표만으로는 "
+                     "문서 안에서 올바른 근거를 골랐는지 알 수 없습니다.")
+    lines.append(f"[문서 — 진단용] Precision@1 (macro): {metrics['precision_at_1']:.4f}; "
                  f"Precision@{k} (반환분 기준, macro): {metrics[f'precision_returned_at_{k}']:.4f} "
                  f"(평균 {metrics[f'mean_returned_at_{k}']:.2f}건); "
                  f"Recall@{k} (macro): {metrics[f'recall_at_{k}']:.4f}; "

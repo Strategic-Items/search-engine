@@ -66,6 +66,31 @@ def _intent_boosts(query: str) -> list[dict]:
     ]
 
 
+# 공고·고시 번호. `제2026-598호`처럼 연도와 일련번호가 붙은 형태만 센다.
+# nori는 이를 `2026`,`598`,`호` 세 토큰으로 쪼개고 `most_fields`는 필드마다 점수를
+# 더하므로, 번호를 못 맞춘 공고문이 `산업/통상/부/공고/2026/호`만으로 따라붙는다.
+# 어휘 검색은 그래도 옳은 문서를 1위에 올리지만 -- 135질의에서 12건 모두 -- 그
+# 우위가 2위와 11%밖에 안 벌어져 RRF에 넘어가면 순위 하나로 뭉개진다.
+DOCKET = re.compile(r"제?\s*(\d{4})\s*-\s*(\d{2,4})\s*호")
+
+
+def _docket_filter(query: str) -> list[dict]:
+    """질의가 공고 번호를 대면, 그 번호를 담지 않은 문서는 답이 아니다.
+
+    부스트가 아니라 필터인 이유는 번호가 관련도를 말하는 것이 아니라 문서를
+    지목하기 때문이다. 제2026-598호를 물었다면 590호 문서는 아무리 비슷해도
+    답이 아니다. 제목과 본문 둘 다 보는 것은 번호가 본문에 없고 제목에만
+    남은 문서가 있기 때문이다(docs-v2-126).
+    """
+    match = DOCKET.search(query)
+    if not match:
+        return []
+    phrase = f"{match.group(1)} {int(match.group(2))}"
+    return [{"bool": {"should": [{"match_phrase": {field: phrase}}
+                                 for field in ("body", "title")],
+                      "minimum_should_match": 1}}]
+
+
 def build_query(query: str, as_of: date) -> dict:
     should = []
     if query.strip():
@@ -100,6 +125,7 @@ def build_query(query: str, as_of: date) -> dict:
             {"bool": {"must_not": {"exists": {"field": "effective_to"}}}},
         ], "minimum_should_match": 1}},
     ]
+    filters += _docket_filter(query)
     base = {"bool": {"should": should, "minimum_should_match": 1, "filter": filters}}
     functions = _intent_boosts(query)
     functions.append({
@@ -113,6 +139,14 @@ def build_query(query: str, as_of: date) -> dict:
             {"filter": {"range": {field: {"gte": start, "lt": end}}}, "weight": 6}
             for field in ("published_at", "effective_from")
         ]
+        # `period_hint`는 발행일이 비어 있는 문서에만 붙는다. 파서가 파일명에서만
+        # 날짜를 읽어 docs-v2 52문서 중 43문서가 그 자리에 있고, 그 문서들은 연도를
+        # 대는 질의에 대해 이 부스트를 아예 받지 못했다. 힌트는 연·월 눈금에서만
+        # 믿을 만하므로(9문서 중 8문서) 같은 눈금을 묻는 이 부스트에만 쓰고,
+        # 대체 판정이나 사본 병합에는 쓰지 않는다. 가중치를 발행일보다 낮게 두는
+        # 것은 힌트가 추정이기 때문이다.
+        functions.append({"filter": {"range": {"period_hint": {"gte": start, "lt": end}}},
+                          "weight": 4})
     if not functions:
         return base
     return {"function_score": {"query": base, "functions": functions,
@@ -133,12 +167,19 @@ def _validity_filters(as_of: date) -> list[dict]:
     ]
 
 
-def build_vector_query(vector: list[float], as_of: date, candidates: int) -> dict:
-    """근사적 HNSW 코사인 검색, 현재 유효한 레코드에 제한됨."""
+def build_vector_query(vector: list[float], as_of: date, candidates: int,
+                      query: str = "") -> dict:
+    """근사적 HNSW 코사인 검색, 현재 유효한 레코드에 제한됨.
+
+    공고 번호는 여기에도 걸린다. 번호는 관련도가 아니라 어느 문서인지를 말하므로
+    두 검색기에 똑같이 해당한다. 어휘 쪽에만 걸면 아무 일도 일어나지 않는다 --
+    번호를 못 맞춘 공고문은 애초에 밀집 목록이 데려온 것들이고, 임베딩에 네 자리
+    일련번호는 사실상 실리지 않아 코사인으로는 590호와 598호가 구별되지 않는다.
+    """
     return {"knn": {"embedding": {
         "vector": vector,
         "k": candidates,
-        "filter": {"bool": {"filter": _validity_filters(as_of)}},
+        "filter": {"bool": {"filter": _validity_filters(as_of) + _docket_filter(query)}},
     }}}
 
 
@@ -226,6 +267,22 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> l
         {**hit, "_score": score, LEADS_A_LIST: parent_id in leaders}
         for parent_id, (score, hit) in sorted(fused.items(), key=order)
     ]
+
+
+def _edition_key(source: dict) -> tuple[str, str] | None:
+    """같은 문서의 사본을 한데 묶는 열쇠. 묶을 수 없으면 None.
+
+    코퍼스에는 내려받기가 남긴 사본이 있다 -- `... (1).hwp`와 `....hwp`는 본문이
+    글자까지 같다 -- 그리고 같은 법령이 hwp/pdf/hwpx로 세 번 들어온 경우가 있다.
+    후자는 파서가 저마다 다르게 끊어 본문이 일치하지 않으므로 `content_hash`로는
+    묶이지 않는다. 제목은 셋 다 같으므로 제목과 발행일로 묶는다.
+
+    청크 제목은 섹션 이름을 뒤에 달고 다니므로(`... — 제2조(정의)`) 앞부분만 쓴다.
+    """
+    title = (source.get("title") or "").split(" — ")[0].strip()
+    if not title:
+        return None
+    return title, source.get("published_at") or ""
 
 
 def _candidates_by_parent(
@@ -373,7 +430,8 @@ def retrieve(
             vector = (embedder or OllamaEmbedder(settings)).embed_query(query.strip())
             semantic = client.search(
                 index=alias,
-                body={"query": build_vector_query(vector, as_of, vector_candidates)},
+                body={"query": build_vector_query(vector, as_of, vector_candidates,
+                                                 query.strip())},
                 size=vector_candidates,
                 ignore_unavailable=not strict,
             )
@@ -425,10 +483,15 @@ def retrieve(
     # 지운다. 두 값 중 더 큰 값을 취하면 더 깊게 잘라내는 것을 적용한다.
     floor = max(_cutoff(ranked, cutoff_ratio), score_floor)
     out = []
+    # 이미 실은 문서의 사본을 두 번 싣지 않는다. 사본은 같은 청크를 다시 데려오므로
+    # 창만 좁히고 새 근거는 주지 않는다. 가장 높이 올라온 사본을 남긴다:
+    # 그것이 이 검색이 고른 사본이다.
+    editions: set[tuple[str, str]] = set()
     for hit in ranked:
         source = hit["_source"]
         parent_id = source.get("parent_id") or hit["_id"]
         score = hit.get("_score")
+
         # 어떤 검색기에서 첫 번째로 순위付け된 문서는 비율에 관계없이 유지된다.
         # 리더에 대해 두 목록 모두에서 발견된 경우, 한 번 발견된 것에 대해 점수를 반으로 줄인다.
         # 순위가 더 낮기 때문이 아니라 발견된 횟수 때문이며, 융합 후에는 어떤 비율도 이를 구분할 수 없다.
@@ -440,6 +503,13 @@ def retrieve(
             # 선택과 정렬은 하나의 결정이므로, 이는 _with_passages를 대체한다.
             if score < score_floor:
                 continue
+        # 잘라낸 뒤에 센다. 바닥값이 떨어뜨릴 히트가 사본 자리를 먼저 차지하면
+        # 살아남았을 사본까지 같이 사라진다.
+        edition = _edition_key(source)
+        if edition is not None:
+            if edition in editions:
+                continue
+            editions.add(edition)
         out.append(SearchHit.model_validate({
             **{key: value for key, value in source.items() if value is not None},
             "id": hit["_id"], "parent_id": parent_id, "score": score,

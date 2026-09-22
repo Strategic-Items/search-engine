@@ -143,9 +143,41 @@ def compare(queries: list[dict], client, index: str, *, ks: tuple[int, ...] = (1
             "query_rewrite": query_rewrite, "modes": summary}
 
 
+def percent(metrics: dict, key: str) -> str:
+    return f"{metrics[key]:.1%}" if key in metrics else "N/A"
+
+
 def format_comparison(report: dict) -> str:
-    lines = ["| 방식 | Precision@1 | Hit@5 | Precision@5 (반환분) | 평균 반환 | Recall@5 | Recall@10 | MRR@5 | p50 ms | p95 ms |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    """청크 지표를 먼저, 문서 지표를 진단용으로 뒤에 싣는다.
+
+    답변에 쓰이는 단위가 청크이므로 방식을 고르는 근거는 위쪽 표다. 아래 표는 위쪽이
+    나빠졌을 때 문서를 못 찾은 것인지 문서 안에서 잘못 고른 것인지 가르는 데 쓴다.
+    """
+    labelled = any("evidence_queries" in result["metrics"]["5"] for result in report["modes"].values())
+    lines = []
+    if labelled:
+        lines.extend(["| 방식 | 근거 Recall@5 | 모든 근거@5 | 근거 Precision@5 (하한) | 평균 청크 | 근거 MRR@5 | 근거 Recall@10 |",
+                      "|---|---:|---:|---:|---:|---:|---:|"])
+        for mode, result in report["modes"].items():
+            m5, m10 = result["metrics"]["5"], result["metrics"]["10"]
+            chunks = f"{m5['mean_chunks_at_5']:.2f}" if "mean_chunks_at_5" in m5 else "N/A"
+            mrr = f"{m5['evidence_mrr_at_5']:.4f}" if "evidence_mrr_at_5" in m5 else "N/A"
+            lines.append(f"| {mode} | {percent(m5, 'evidence_recall_at_5')} | "
+                         f"{percent(m5, 'evidence_all_at_5')} | "
+                         f"{percent(m5, 'evidence_precision_at_5')} | {chunks} | {mrr} | "
+                         f"{percent(m10, 'evidence_recall_at_10')} |")
+        lines.append("")
+        lines.append("근거 Precision은 하한이다: 라벨이 정답 청크만 표시하므로 판정되지 않은 "
+                     "청크가 모두 오답으로 깔린다. 방식 간 비교로만 읽어라.")
+        lines.append("")
+        lines.append("아래는 진단용 문서 지표다.")
+        lines.append("")
+    else:
+        lines.append("근거 청크 라벨(evidence_groups)이 없어 청크 기준 채점을 하지 못했다. "
+                     "아래 문서 지표만으로는 문서 안에서 올바른 근거를 골랐는지 알 수 없다.")
+        lines.append("")
+    lines.extend(["| 방식 | Precision@1 | Hit@5 | Precision@5 (반환분) | 평균 반환 | Recall@5 | Recall@10 | MRR@5 | p50 ms | p95 ms |",
+                  "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"])
     for mode, result in report["modes"].items():
         m5 = result["metrics"]["5"]
         m10 = result["metrics"]["10"]
@@ -155,15 +187,12 @@ def format_comparison(report: dict) -> str:
                      f"{m5['recall_at_5']:.1%} | {m10['recall_at_10']:.1%} | "
                      f"{m5['mrr_at_5']:.4f} | {lat['p50_ms']:.1f} | {lat['p95_ms']:.1f} |")
     if any("group_queries" in result["metrics"]["5"] for result in report["modes"].values()):
-        lines.extend(["", "| 방식 | 논리 문서 Recall@5 | 논리 문서 Recall@10 | 근거 Recall@5 | 모든 근거@5 |",
-                      "|---|---:|---:|---:|---:|"])
+        lines.extend(["", "| 방식 | 논리 문서 Recall@5 | 논리 문서 Recall@10 |",
+                      "|---|---:|---:|"])
         for mode, result in report["modes"].items():
             m5, m10 = result["metrics"]["5"], result["metrics"]["10"]
-            def percent(key, metrics):
-                return f"{metrics[key]:.1%}" if key in metrics else "N/A"
-            lines.append(f"| {mode} | {percent('group_recall_at_5', m5)} | "
-                         f"{percent('group_recall_at_10', m10)} | {percent('evidence_recall_at_5', m5)} | "
-                         f"{percent('evidence_all_at_5', m5)} |")
+            lines.append(f"| {mode} | {percent(m5, 'group_recall_at_5')} | "
+                         f"{percent(m10, 'group_recall_at_10')} |")
     return "\n".join(lines)
 
 
@@ -217,11 +246,14 @@ def main() -> None:
         "code_sha256": {"retrieval": file_sha256(Path(retrieve.__code__.co_filename)),
                         "comparison": file_sha256(Path(__file__)),
                         "metrics": file_sha256(Path(quality_metrics.__code__.co_filename))},
-        "methodology": "parent-level macro recall over source-reviewed gold; single-process "
+        "methodology": "chunk-level evidence recall/precision over source-reviewed gold as the "
+            "primary score, with parent-level macro recall kept as a diagnostic; single-process "
             "retrieval latency including uncached Ollama query embedding, excluding HTTP/LLM; "
             "same candidate depth for all cutoffs; strict failures (no lexical fallback); "
-            "optional equivalent-parent group and final-returned-chunk evidence requirement recall, "
-            "where @k cuts on documents and each document carries its returned chunks; "
+            "equivalent-parent group recall and final-returned-chunk evidence metrics, "
+            "where @k cuts on documents and each document carries its returned chunks, matching "
+            "the context the answer model receives; evidence precision is a lower bound because "
+            "the labels mark acceptable chunks only and unjudged chunks count against it; "
             "unanswerable empty-gold queries excluded",
     })
     args.out.parent.mkdir(parents=True, exist_ok=True)
