@@ -139,6 +139,14 @@ def build_query(query: str, as_of: date) -> dict:
             {"filter": {"range": {field: {"gte": start, "lt": end}}}, "weight": 6}
             for field in ("published_at", "effective_from")
         ]
+        # `period_hint`는 발행일이 비어 있는 문서에만 붙는다. 파서가 파일명에서만
+        # 날짜를 읽어 docs-v2 52문서 중 43문서가 그 자리에 있고, 그 문서들은 연도를
+        # 대는 질의에 대해 이 부스트를 아예 받지 못했다. 힌트는 연·월 눈금에서만
+        # 믿을 만하므로(9문서 중 8문서) 같은 눈금을 묻는 이 부스트에만 쓰고,
+        # 대체 판정이나 사본 병합에는 쓰지 않는다. 가중치를 발행일보다 낮게 두는
+        # 것은 힌트가 추정이기 때문이다.
+        functions.append({"filter": {"range": {"period_hint": {"gte": start, "lt": end}}},
+                          "weight": 4})
     if not functions:
         return base
     return {"function_score": {"query": base, "functions": functions,

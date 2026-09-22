@@ -113,7 +113,15 @@ def test_document_kind_and_period_boosts_apply_together():
     assert [f["filter"]["range"] for f in boosts(query, "range")] == [
         {"published_at": {"gte": "2026-09-01", "lt": "2026-10-01"}},
         {"effective_from": {"gte": "2026-09-01", "lt": "2026-10-01"}},
+        {"period_hint": {"gte": "2026-09-01", "lt": "2026-10-01"}},
     ]
+
+
+def test_period_hint_is_boosted_below_a_known_publication_date():
+    """힌트는 추정이므로 아는 날짜를 덮어써서는 안 된다."""
+    query = build_query("2026년 9월 고시", date(2026, 9, 15))
+    weights = {next(iter(f["filter"]["range"])): f["weight"] for f in boosts(query, "range")}
+    assert weights["period_hint"] < weights["published_at"]
 
 
 def test_boosting_never_removes_a_document_from_the_result_set():

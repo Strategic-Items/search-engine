@@ -6,7 +6,7 @@ import json
 import os
 import re
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -27,6 +27,12 @@ GOSI_REVISION = re.compile(r"제\s*\d+\s*차\s*[^\n]*?고시\s*개정")
 # 날짜 순서로는 현행을 가릴 수 있다. 초안은 언제 올라오든 현행이 아니다.
 GOSI_DRAFT = re.compile(r"고시[^\n]*?(?:행정예고|입법예고)|(?:행정예고|입법예고)[^\n]*?고시")
 HSK_TYPE = "HSK 연계표"
+# 브라우저가 같은 파일을 두 번 내려받으면 `... (1).hwp`가 옆에 남고, 파서는 그것을
+# 별개 문서로 색인한다. 본문이 글자까지 같으므로 검색은 같은 답을 두 번 싣고 창을
+# 그만큼 좁힌다. 파일명이 스스로 사본이라고 말하고 있으니 추측할 것이 없다 --
+# 제목+발행일 같은 추정 열쇠와 달리 서로 다른 문서를 잘못 묶을 여지가 없다.
+DOWNLOAD_COPY = re.compile(r"^(?P<stem>.*?)\s*\((?P<copy>\d+)\)(?P<ext>\.[A-Za-z0-9]+)$")
+
 # 실험실 검토 결과, 이 날짜가 표시되지 않은 FAQ는 현재 자기 평가 가이드와 충돌한다.
 EXCLUDED_CORE_IDS = {"faq-042": "conflicts_with_current_self_judgement_guide"}
 
@@ -91,6 +97,74 @@ def supersessions(rows: list[dict]) -> dict[str, str]:
     return superseded
 
 
+# 본문 앞머리의 날짜. `2016. 3. 8.`과 `2016년 3월 8일` 둘 다 받는다.
+HEAD_DATE = re.compile(r"(20\d{2})\s*[.년]\s*(\d{1,2})\s*[.월]\s*(\d{1,2})")
+# 앞머리로 볼 범위. 공고문의 발신일은 서두에 있고, 뒤로 갈수록 개정 이력과
+# 시행일이 섞여 어느 것이 발행일인지 본문만으로는 가릴 수 없다.
+HEAD_CHARS = 600
+
+
+def period_hint(head: str) -> str | None:
+    """문서 앞머리가 말하는 시점. 발행일이 아니라 시점 힌트다.
+
+    파서는 파일명에서만 날짜를 읽으므로 docs-v2 52문서 중 43문서에
+    `published_at`이 없다. 그 43문서 중 33문서는 본문에 날짜를 들고 있다.
+
+    이것을 `published_at`에 넣으면 안 된다. 발행일을 아는 9문서로 맞춰
+    보면 날짜까지 정확한 것은 6문서뿐이고 -- 한 문서는 앞머리에 제정일
+    2013-04-12이 있어 실제 발행일 2025-09-23 대신 그것이 잡힌다 -- 대체
+    판정과 사본 병합이 그 필드를 먹으므로 지금보다 나빠진다.
+
+    연·월 눈금에서는 9문서 중 8문서가 맞는다. `_requested_period`가 그
+    눈금으로만 묻기 때문에 그 부스트 전용으로 둔다. 틀린 한 문서는 부스트
+    하나를 잘못 받을 뿐 필터처럼 문서를 지우지 않는다.
+    """
+    match = HEAD_DATE.search(head[:HEAD_CHARS])
+    if not match:
+        return None
+    year, month, day = (int(group) for group in match.groups())
+    try:
+        return date(year, month, day).isoformat()
+    except ValueError:
+        return None
+
+
+def download_copy_key(source_path: str) -> tuple[str, int] | None:
+    """내려받기 사본을 원본과 한데 묶는 열쇠와, 몇 번째 사본인지.
+
+    `(1)`이 붙지 않은 원본은 0번으로 돌아오므로 정렬하면 언제나 원본이 먼저다.
+    경로가 없으면 묶을 수 없고 None을 돌려준다 -- 그 문서는 그대로 남는다.
+    """
+    name = (source_path or "").rsplit("/", 1)[-1]
+    if not name:
+        return None
+    match = DOWNLOAD_COPY.match(name)
+    if not match:
+        return name, 0
+    return match.group("stem") + match.group("ext"), int(match.group("copy"))
+
+
+def download_copies(rows: list[dict]) -> set[str]:
+    """지워야 할 사본의 parent_id. 각 묶음에서 원본 하나만 남긴다.
+
+    같은 열쇠에 사본만 있고 원본이 없을 수도 있으므로 번호가 가장 낮은 것을
+    남긴다. 번호까지 같으면 parent_id로 갈라 실행마다 같은 것이 남게 한다.
+    """
+    groups: dict[str, list[tuple[int, str]]] = {}
+    for row in rows:
+        key = download_copy_key(row.get("source_path") or "")
+        if key is None:
+            continue
+        groups.setdefault(key[0], []).append((key[1], row["parent_id"]))
+    dropped = set()
+    for members in groups.values():
+        if len(members) < 2:
+            continue
+        members.sort()
+        dropped.update(parent_id for _, parent_id in members[1:])
+    return dropped
+
+
 def _date_basis(row: dict) -> str:
     if row.get("effective_from") or row.get("effective_to"):
         return "effective"
@@ -121,24 +195,32 @@ def _prepare_row(row: dict, source_type: str) -> dict:
     return SearchDocument.model_validate(source).model_dump(mode="json", exclude_none=True)
 
 
-def _serial_parents(source_path: Path) -> list[dict]:
-    """숫자 순서에 따라 위치하는 부모 각각에 대해 한 행씩, 쓰기 전에 미리 읽는다."""
+def _parents(source_path: Path) -> list[dict]:
+    """부모마다 한 행씩, 쓰기 전에 미리 읽는다.
+
+    대체 관계도 사본도 부모 단위의 사실이라 한 행씩은 전부 봐야 정해진다.
+    첫 청크를 들고 다니는 것은 본문 앞머리에서 시점을 읽기 위해서다.
+    """
     seen = {}
     with source_path.open(encoding="utf-8") as file:
         for line in file:
             if not line.strip():
                 continue
             row = json.loads(line)
-            source_type = row.get("source_type")
-            if source_type not in (FORM_TYPE, NOTICE_TYPE):
-                continue
             if row.get("id") in EXCLUDED_CORE_IDS:
                 continue
+            if row.get("source_type") == HSK_TYPE:
+                continue
             parent_id = row.get("parent_id") or row.get("id")
-            seen.setdefault(parent_id, {"parent_id": parent_id,
-                                        "source_type": source_type,
-                                        "title": row.get("title") or "",
-                                        "published_at": row.get("published_at")})
+            parent = seen.setdefault(parent_id, {"parent_id": parent_id,
+                                                 "source_type": row.get("source_type") or "",
+                                                 "title": row.get("title") or "",
+                                                 "published_at": row.get("published_at"),
+                                                 "source_path": row.get("source_path") or "",
+                                                 "head": ""})
+            # 앞머리는 첫 청크의 것이어야 한다. 행이 순서대로 온다는 보장이 없다.
+            if not row.get("chunk_index"):
+                parent["head"] = row.get("body") or ""
     return list(seen.values())
 
 
@@ -154,7 +236,12 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
             raise ValueError("lab corpus does not match its source manifest")
         source_manifest_sha = file_sha256(source_manifest_path)
 
-    superseded = supersessions(_serial_parents(source_path))
+    parents_ahead = _parents(source_path)
+    superseded = supersessions(parents_ahead)
+    dropped_copies = download_copies(parents_ahead)
+    # 발행일을 아는 문서는 그것이 낫다. 힌트는 빈자리만 채운다.
+    period_hints = {parent["parent_id"]: period_hint(parent["head"])
+                    for parent in parents_ahead if not parent["published_at"]}
 
     out_dir.mkdir(parents=True, exist_ok=True)
     tmp_core = out_dir / f".core-{uuid4().hex}.tmp"
@@ -182,17 +269,25 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 except Exception as exc:
                     raise ValueError(f"invalid source line {line_no}: {exc}") from exc
                 doc_id = prepared["id"]
+                parent_id = prepared.get("parent_id") or doc_id
+                if parent_id in dropped_copies:
+                    excluded["download_copy"] += 1
+                    continue
+                hint = period_hints.get(parent_id)
+                if hint:
+                    prepared["period_hint"] = hint
                 if doc_id in ids[dataset]:
                     raise ValueError(f"duplicate {dataset} document ID: {doc_id}")
                 ids[dataset].add(doc_id)
-                parents[dataset].add(prepared.get("parent_id") or doc_id)
+                parents[dataset].add(parent_id)
                 counts[dataset][source_type] += 1
                 counts[dataset]["missing_source_url"] += not bool(prepared.get("source_url"))
                 counts[dataset]["missing_published_at"] += not bool(prepared.get("published_at"))
+                counts[dataset]["period_hint"] += bool(prepared.get("period_hint"))
                 counts[dataset]["missing_effective_from"] += not bool(prepared.get("effective_from"))
                 if prepared.get("published_at"):
                     ranges[dataset].append(prepared["published_at"])
-                replacement = superseded.get(prepared.get("parent_id") or doc_id)
+                replacement = superseded.get(parent_id)
                 if replacement:
                     prepared["superseded_by"] = replacement
                     counts[dataset]["superseded"] += 1
@@ -215,6 +310,7 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                                  if not k.startswith("missing_")},
                 "missing_source_url": counts[dataset]["missing_source_url"],
                 "missing_published_at": counts[dataset]["missing_published_at"],
+                "period_hint": counts[dataset]["period_hint"],
                 "missing_effective_from": counts[dataset]["missing_effective_from"],
                 "superseded": counts[dataset]["superseded"],
                 "published_min": min(ranges[dataset]) if ranges[dataset] else None,
