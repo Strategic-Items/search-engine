@@ -23,8 +23,16 @@ def test_evaluation_questions_include_answerable_and_abstention_cases():
         "answerable", "unanswerable", "out_of_domain",
     }
     answerable = [row for row in body["questions"] if row["answerable"]]
-    assert Counter(row["evaluation_status"] for row in answerable)["search_miss"] == 8
+    # 채점 단위는 청크다: 근거 청크를 하나도 싣지 못한 질문과 일부만 실은 질문을 가른다.
+    statuses = Counter(row["evaluation_status"] for row in answerable)
+    assert statuses["search_miss"] == 3
+    assert statuses["evidence_miss"] == 4
     assert all("evaluation_rank" in row for row in answerable)
+    assert all(row["evidence_gold"] for row in answerable)
+    assert all(
+        row["evidence_found"] == row["evidence_required"]
+        for row in answerable if row["evaluation_status"] == "pass"
+    )
     unanswerable = [row for row in body["questions"] if row["group"] == "unanswerable"]
     assert Counter(row["evaluation_status"] for row in unanswerable) == {
         "rejection_pass": 22,

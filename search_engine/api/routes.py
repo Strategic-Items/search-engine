@@ -24,28 +24,46 @@ from search_engine.search import (
 app = FastAPI(title="Strategic Items Search", version="0.1.0")
 
 EVALUATION_DATA = Path(__file__).resolve().parents[2] / "data"
-EVALUATION_REPORT = EVALUATION_DATA / "generated/docs-v2/comparison-135q-koemb-gguf.json"
+EVALUATION_REPORT = EVALUATION_DATA / "generated/docs-v2/evaluation-135q-docs-only.json"
 ANSWERABILITY_REPORT = EVALUATION_DATA / "generated/docs-v2/judge-most-fields.json"
 
 
 def _retrieval_outcomes() -> dict[str, dict]:
-    """평가 브라우저에서 사용하는 공개된 하이브리드 @5 결과."""
+    """평가 브라우저가 쓰는 공개된 @5 결과. 채점 단위는 문서가 아니라 청크다.
+
+    답변 모델이 받는 것은 문서가 아니라 창(문서 5개 × 문서당 청크)에 실린 청크이므로,
+    질문의 성패도 라벨된 근거 청크가 그 창에 실렸는지로 가른다. 문서 순위는 실패의
+    원인을 "문서를 못 찾았다"와 "문서 안에서 잘못 골랐다"로 가르는 진단용으로만 남긴다.
+    """
     if not EVALUATION_REPORT.is_file():
         return {}
     report = json.loads(EVALUATION_REPORT.read_text(encoding="utf-8"))
-    rows = report.get("modes", {}).get("hybrid", {}).get("queries", [])
     outcomes = {}
-    for row in rows:
-        returned = row.get("returned", [])[:5]
+    for row in report.get("queries", []):
+        groups = [set(group) for group in row.get("evidence_groups", []) if group]
+        if not groups:
+            continue
+        # 창은 문서 우선으로 편다. 컨텍스트에 실리는 순서 그대로다.
+        window = [chunk for document in row.get("returned_chunks", [])[:5] for chunk in document]
+        offered = set(window)
+        found = [group for group in groups if group & offered]
+        rank = next(
+            (index for index, chunk in enumerate(window, 1)
+             if any(chunk in group for group in groups)),
+            None,
+        )
         gold = set(row.get("gold", []))
-        rank = next((index for index, parent in enumerate(returned, 1) if parent in gold), None)
-        offered = {chunk for document in row.get("returned_chunks", [])[:5] for chunk in document}
-        evidence_groups = row.get("evidence_groups", [])
-        evidence_found = bool(evidence_groups) and all(set(group) & offered for group in evidence_groups)
+        document_rank = next(
+            (index for index, parent in enumerate(row.get("returned", [])[:5], 1) if parent in gold),
+            None,
+        )
         outcomes[row["qid"]] = {
-            "evaluation_status": "search_miss" if rank is None else
-                "evidence_miss" if not evidence_found else "pass",
+            "evaluation_status": "search_miss" if not found else
+                "evidence_miss" if len(found) < len(groups) else "pass",
             "evaluation_rank": rank,
+            "evidence_found": len(found),
+            "evidence_required": len(groups),
+            "document_rank": document_rank,
         }
     return outcomes
 
@@ -105,6 +123,11 @@ def evaluation_questions() -> dict:
                     "answerable": row.get("answerable", bool(row.get("gold"))),
                     "reference_answer": row.get("reference_answer", ""),
                     "gold": row.get("gold", []),
+                    # 채점 단위인 근거 청크. `gold`(부모 문서)는 진단용으로 남긴다.
+                    "evidence_groups": row.get("evidence_groups", []),
+                    "evidence_gold": [
+                        chunk for group in row.get("evidence_groups", []) for chunk in group
+                    ],
                     "reason": row.get("reason", ""),
                     "expected_behavior": row.get("expected_behavior", ""),
                     **outcomes.get(row["qid"], {}),
