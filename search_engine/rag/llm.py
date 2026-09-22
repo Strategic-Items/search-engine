@@ -40,6 +40,8 @@ def _ollama_payload(settings: Settings, prompt: str, temperature: float,
         "messages": _messages(prompt, system),
         "stream": stream,
         "options": options,
+        # 사고 토큰은 num_predict를 함께 쓴다. 자세한 내용은 Settings.ollama_think.
+        "think": settings.ollama_think,
     }
     if json_object:
         payload["format"] = "json"
