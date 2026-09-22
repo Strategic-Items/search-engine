@@ -25,6 +25,11 @@ def test_evaluation_questions_include_answerable_and_abstention_cases():
     answerable = [row for row in body["questions"] if row["answerable"]]
     assert Counter(row["evaluation_status"] for row in answerable)["search_miss"] == 8
     assert all("evaluation_rank" in row for row in answerable)
+    unanswerable = [row for row in body["questions"] if row["group"] == "unanswerable"]
+    assert Counter(row["evaluation_status"] for row in unanswerable) == {
+        "rejection_pass": 22,
+        "answer_exposed": 4,
+    }
 
 
 def test_search_returns_hits_from_alias(monkeypatch):

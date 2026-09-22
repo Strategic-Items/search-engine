@@ -25,6 +25,7 @@ app = FastAPI(title="Strategic Items Search", version="0.1.0")
 
 EVALUATION_DATA = Path(__file__).resolve().parents[2] / "data"
 EVALUATION_REPORT = EVALUATION_DATA / "generated/docs-v2/comparison-135q-koemb-gguf.json"
+ANSWERABILITY_REPORT = EVALUATION_DATA / "generated/docs-v2/judge-most-fields.json"
 
 
 def _retrieval_outcomes() -> dict[str, dict]:
@@ -47,6 +48,22 @@ def _retrieval_outcomes() -> dict[str, dict]:
             "evaluation_rank": rank,
         }
     return outcomes
+
+
+def _answerability_outcomes() -> dict[str, dict]:
+    """최신 무응답 판정 실행의 공개 결과를 평가 브라우저에 붙인다."""
+    if not ANSWERABILITY_REPORT.is_file():
+        return {}
+    report = json.loads(ANSWERABILITY_REPORT.read_text(encoding="utf-8"))
+    return {
+        row["qid"]: {
+            "evaluation_status": (
+                "rejection_pass" if row.get("judge_rejected") else "answer_exposed"
+            ),
+        }
+        for row in report.get("rows", [])
+        if row.get("set") == "unanswerable"
+    }
 
 
 @app.get("/health/live")
@@ -73,7 +90,7 @@ def evaluation_questions() -> dict:
         ("out_of_domain", EVALUATION_DATA / "queries_docs_v2_out_of_domain.jsonl"),
     )
     questions = []
-    outcomes = _retrieval_outcomes()
+    outcomes = {**_retrieval_outcomes(), **_answerability_outcomes()}
     for group, path in groups:
         with path.open(encoding="utf-8") as rows:
             for line in rows:
