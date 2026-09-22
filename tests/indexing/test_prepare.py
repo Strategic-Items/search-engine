@@ -24,7 +24,7 @@ def test_prepare_separates_core_and_hsk_and_checks_manifest(tmp_path: Path):
         json.dumps({"corpus_sha256": file_sha256(source)}))
 
     manifest = prepare(source, tmp_path / "out")
-    assert manifest["datasets"]["core"]["count"] == 3
+    assert manifest["datasets"]["core"]["count"] == 4
     assert manifest["datasets"]["hsk"]["count"] == 1
     assert manifest["excluded"] == {"conflicts_with_current_self_judgement_guide": 1}
     core = [json.loads(line) for line in (tmp_path / "out/core.jsonl").read_text().splitlines()]
@@ -32,6 +32,9 @@ def test_prepare_separates_core_and_hsk_and_checks_manifest(tmp_path: Path):
     assert core[0]["date_basis"] == "undated"
     assert core[1]["date_basis"] == "effective"
     assert core[2]["source_url"].endswith("/70/posts/23311")
+    assert core[3]["id"] == "law-1"
+    assert core[3]["source_type"] == "intl_law"
+    assert core[3]["date_basis"] == "undated"
     hsk = json.loads((tmp_path / "out/hsk.jsonl").read_text())
     assert hsk["hsk_code"] == "0123456789"
     assert manifest["datasets"]["core"]["sha256"] == file_sha256(tmp_path / "out/core.jsonl")

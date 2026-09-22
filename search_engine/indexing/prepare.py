@@ -13,7 +13,6 @@ from uuid import uuid4
 from search_engine.indexing.documents import SearchDocument
 from search_engine.indexing.indexer import file_sha256
 
-CORE_TYPES = {"FAQ", "민원서식", "공지사항", "판정 안내", "허가 안내", "이용 안내"}
 FORM_TYPE = "민원서식"
 # 「전략물자수출입고시」의 서식은 별지·별표 번호로 자리를 잡는다. 같은 자리의
 # 새 판이 올라오면 옛 판은 대체된다. 제목 형식은 두 가지가 섞여 있다:
@@ -108,7 +107,7 @@ def _prepare_row(row: dict, source_type: str) -> dict:
         match = re.fullmatch(r"form-(\d+)", source_id)
         if match:
             source["source_url"] = f"https://www.yestrade.go.kr/user/boards/70/posts/{match.group(1)}"
-    if source_type in CORE_TYPES:
+    if source_type != HSK_TYPE:
         source["date_basis"] = _date_basis(row)
     if not source.get("content_hash"):
         content = "\n".join(str(source.get(k) or "") for k in ("title", "body", "code"))
@@ -175,8 +174,6 @@ def prepare(source_path: Path, out_dir: Path) -> dict:
                 try:
                     row = json.loads(line)
                     source_type = row.get("source_type") or "FAQ"
-                    if source_type not in CORE_TYPES and source_type != HSK_TYPE:
-                        continue
                     if row.get("id") in EXCLUDED_CORE_IDS:
                         excluded[EXCLUDED_CORE_IDS[row["id"]]] += 1
                         continue
