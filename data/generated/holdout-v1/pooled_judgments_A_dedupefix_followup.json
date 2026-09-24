@@ -1,0 +1,41 @@
+{
+  "method": "고친 인덱스의 docs+holdout 시험 A에서 새 코퍼스가 1위인 미적중 29문항과 근거 Recall이 낮아진 질의의 상위 5문서를 재검토. 질의에 실제로 답하는 부모만 gold에 추가하고, 근거 청크는 답이 있는 경우에만 추가한다.",
+  "judged_run": "results/tuned-with-holdout-noise-dedupefix.json",
+  "judgments": [
+    {
+      "qid": "docs-v2-020",
+      "verdict": "relevant",
+      "parent": "yestrade-69-5090-2394825",
+      "evidence": [["yestrade-69-5090-2394825#0077"]],
+      "note": "개정안 영문 사용자 확인서에 item-based comprehensive license는 quantity와 value를 비우라는 문구가 있다. 반환된 이 부모의 #0087, #0022에는 답 문구가 없어 문서 1위만 회복된다."
+    },
+    {
+      "qid": "docs-v2-085",
+      "verdict": "relevant",
+      "parent": "yestrade-67-5929-2393193",
+      "evidence": [["yestrade-67-5929-2393193#0002", "yestrade-67-5929-2393193#0005", "yestrade-67-5929-2393193#0006"]],
+      "note": "중싱통신 제재 안내문은 외국산 품목의 미국산 통제 콘텐츠 편입비율을 이란행 10%, 그 밖의 경우 25%로 설명한다. 질의의 역사적 비율과 같다."
+    },
+    {
+      "qid": "docs-v2-094",
+      "verdict": "relevant",
+      "parent": "yestrade-69-23257-3167283-z003",
+      "evidence": [["yestrade-69-23257-3167283-z003#1632"]],
+      "note": "고시 개정안의 기술통제 일반지침이 기술지원은 지도·훈련·자문, 기술자료는 청사진·계획·설계도·매뉴얼 등이라고 정의한다. 원 질의의 2006년 자료와 같은 정의다."
+    },
+    {
+      "qid": "docs-v2-120",
+      "verdict": "relevant",
+      "parent": "yestrade-62-2855",
+      "evidence": [["yestrade-62-2855#0001"]],
+      "note": "바세나르 체제 설명에서 특정 품목의 수출 여부는 참여국의 재량이며 참여국의 판단에 따라 결정한다고 명시한다."
+    },
+    {
+      "qid": "docs-v2-101",
+      "verdict": "partial",
+      "parent": null,
+      "evidence": [[], ["yestrade-67-19134-3059128#1367", "yestrade-69-8924-2393535-z019#1252"]],
+      "note": "새 별표 2 문서들은 NSG 이중용도 품목의 승인된 장비와 동일한 최종사용자에게 최소 설치·운용·유지·수리 기술도 승인된다고 설명한다. MTCR에 대한 답은 없으므로 부모를 정답에 넣지 않고 두 번째 근거만 보완한다."
+    }
+  ]
+}
