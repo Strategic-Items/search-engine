@@ -1,0 +1,8 @@
+{
+  "status": "frozen_before_search",
+  "query_count": 14,
+  "query_sha256": "0e31089ed15bbc3b1d88ff1059dcd1cea9ea024f5b03dd14f047ca651dbc18c4",
+  "source_corpus_sha256": "afb464ccfd3125e4dbcf7a044ae07fb2db48ddc43d4bf497be713988571507db",
+  "method": "14 selected source documents: 8 CP report notices across distinct years and 6 other dated notices, all read from corpus before search; one evidence chunk per question; answer equivalents are not yet exhaustively labelled",
+  "human_review": "pending"
+}
