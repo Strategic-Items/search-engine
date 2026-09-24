@@ -1,0 +1,7 @@
+{
+  "status": "frozen_before_candidate_implementation_and_search",
+  "question_count": 8,
+  "sha256": "848e3e800a5c8752ac0cc14e97003d9981d8929738815422651aa9d6b36ef611",
+  "method": "eight CP report periods absent as target questions from date-validation-v1; selected and authored from source corpus before candidate algorithm; some source docs had appeared as prior retrieved candidates, so this is a forward comparison set, not a random unseen-document estimate",
+  "human_review": "pending"
+}
