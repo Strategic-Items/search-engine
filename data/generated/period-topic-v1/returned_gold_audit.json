@@ -1,0 +1,17 @@
+{
+  "method": "same-event attachment directly states all requested facts",
+  "additions": [
+    {
+      "qid": "period-topic-v1-001",
+      "parent_id": "yestrade-69-212-2391822",
+      "chunk_id": "yestrade-69-212-2391822#0000",
+      "reason": "같은 2010년 워크숍 신청서에 일시·장소 명시"
+    },
+    {
+      "qid": "period-topic-v1-004",
+      "parent_id": "yestrade-69-5751-2394822",
+      "chunk_id": "yestrade-69-5751-2394822#0000",
+      "reason": "같은 2017년 워크숍 발표자료에 9월 19일 명시"
+    }
+  ]
+}

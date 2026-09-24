@@ -28,6 +28,7 @@ LEADS_A_LIST = "_leads_a_list"
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 HALF_YEAR = re.compile(r"(?<!\d)(20\d{2}|\d{2})\s*(?:년(?:도)?)?\s*(상|하)\s*반기")
+TOPIC_WORD = re.compile(r"[가-힣]{3,}|[A-Za-z]{2,}")
 
 # 요청에는 쿼리만 포함되므로, 사용자가 요청하는 문서의 종류
 # 텍스트에서 읽어야 한다. 이들은 필터가 아니라 종류를 들어 올리는 것이다: a
@@ -69,6 +70,12 @@ def _reporting_half(query: str) -> tuple[int, str] | None:
 def _same_reporting_half(title: str, period: tuple[int, str]) -> bool:
     return any((int(year) if len(year) == 4 else 2000 + int(year), half) == period
                for year, half in HALF_YEAR.findall(title))
+
+
+def _same_topic_in_title(query: str, title: str) -> bool:
+    """연도·반기 외에 제목의 실제 주제어가 질문에도 등장하는지 확인한다."""
+    return any(word not in ("상반기", "하반기") and word.casefold() in query.casefold()
+               for word in TOPIC_WORD.findall(title))
 
 
 def _intent_boosts(query: str) -> list[dict]:
@@ -462,6 +469,7 @@ def retrieve(
     if off_topic:
         return []
     ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
+    period_supported: set[str] = set()
     if len(ranked_lists) > 1:
         # 각 목록을 각각의 검색기의 교정된 비율로 먼저 자른다. 명시적인 `cutoff_ratio`는 전체 절단 정책을 덮어쓴다 -- 0을 전달하여 절단되지 않은 순위를 보려면 그것을 가져와야 하므로, 이 또한 건너뛴다.
         # `ranked_lists` 자체는 그대로 남는다: 그것이 문서별 패스워드가 선택되는 풀이기도 하며, 그것을 줄이면 반환되는 문서에서 조각을 제거하게 된다.
@@ -479,9 +487,17 @@ def retrieve(
         reporting_half = _reporting_half(query) if mode == "hybrid" else None
         if reporting_half:
             period_hits = [hit for hits, _, _ in ranked_lists for hit in hits
-                           if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)]
+                           if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)
+                           and _same_topic_in_title(query, hit["_source"].get("title", ""))]
             if period_hits:
                 fusable = [*fusable, (period_hits, 1.0, "period")]
+                by_retriever = {
+                    name: {hit["_source"].get("parent_id") or hit["_id"] for hit in hits
+                           if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)
+                           and _same_topic_in_title(query, hit["_source"].get("title", ""))}
+                    for hits, _, name in ranked_lists if name in ("bm25", "vector")
+                }
+                period_supported = by_retriever.get("bm25", set()) & by_retriever.get("vector", set())
         ranked = _rrf(fusable, settings.search_hybrid_rrf_k)
     else:
         # 리트리버의 원래 점수를 유지하고, 각 부모에 대해 최고의 청크만 유지한다.
@@ -522,10 +538,9 @@ def retrieve(
         # `break`보다는 `continue`를 사용한다. 왜냐하면 그러한 문서는 비율이 잘라내는 것보다 아래로 정렬되기 때문이다.
         # 절대적인 하한은 비율이 아니며 여전히 적용된다.
         if score is not None and score < floor:
-            if not hit.get(LEADS_A_LIST):
-                continue
-            # 선택과 정렬은 하나의 결정이므로, 이는 _with_passages를 대체한다.
             if score < score_floor:
+                continue
+            if not hit.get(LEADS_A_LIST) and parent_id not in period_supported:
                 continue
         # 잘라낸 뒤에 센다. 바닥값이 떨어뜨릴 히트가 사본 자리를 먼저 차지하면
         # 살아남았을 사본까지 같이 사라진다.

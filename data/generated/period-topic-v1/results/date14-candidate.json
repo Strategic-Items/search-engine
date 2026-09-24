@@ -1,0 +1,619 @@
+{
+  "answerable": {
+    "queries": 14,
+    "first": 10,
+    "top_k": 14
+  },
+  "k": 5,
+  "base_url": "http://127.0.0.1:8114",
+  "totals": {
+    "queries": 14,
+    "first": 10,
+    "top_k": 14,
+    "gold_missing_from_index": 0
+  },
+  "categories": {
+    "cp_report": {
+      "queries": 8,
+      "first": 5,
+      "top_k": 8,
+      "gold_missing_from_index": 0
+    },
+    "other_date": {
+      "queries": 6,
+      "first": 5,
+      "top_k": 6,
+      "gold_missing_from_index": 0
+    }
+  },
+  "reviewed": {
+    "assistant_source_reviewed": 14
+  },
+  "queries": [
+    {
+      "qid": "date-v1-001",
+      "category": "cp_report",
+      "query": "2015년 상반기 CP 실적보고 안내에서 작성·제출 대상은 등급 취득 기업만이야, 평가 중인 기업도 포함돼?",
+      "gold": [
+        "yestrade-69-8841"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-8841",
+        "yestrade-69-7109-2394371",
+        "yestrade-69-6494-2394794-z003"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-8841#0000"
+        ],
+        [
+          "yestrade-69-7109-2394371#0000",
+          "yestrade-69-7109-2394371#0003",
+          "yestrade-69-7109-2394371#0002",
+          "yestrade-69-7109-2394371#0001",
+          "yestrade-69-7109-2394371#0005"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-8841"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-8841#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-002",
+      "category": "cp_report",
+      "query": "2017년 하반기 CP 실적·운영보고 안내에서는 실적보고서 엑셀 각 탭에 어떤 항목을 새로 넣으라고 했어?",
+      "gold": [
+        "yestrade-69-8669"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-8669",
+        "yestrade-69-5751-2394822",
+        "yestrade-69-6494-2394794-z003",
+        "yestrade-69-5746"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-8669#0000"
+        ],
+        [
+          "yestrade-69-5751-2394822#0014",
+          "yestrade-69-5751-2394822#0015",
+          "yestrade-69-5751-2394822#0000",
+          "yestrade-69-5751-2394822#0012",
+          "yestrade-69-5751-2394822#0013"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006"
+        ],
+        [
+          "yestrade-69-5746#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-8669"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-8669#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-003",
+      "category": "cp_report",
+      "query": "2019년 상반기 CP 실적보고는 AAA등급도 7월에 내야 했어?",
+      "gold": [
+        "yestrade-69-4306"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-4306",
+        "yestrade-69-12583-2392920",
+        "yestrade-69-5752"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-4306#0000"
+        ],
+        [
+          "yestrade-69-12583-2392920#0006",
+          "yestrade-69-12583-2392920#0011",
+          "yestrade-69-12583-2392920#0010",
+          "yestrade-69-12583-2392920#0005",
+          "yestrade-69-12583-2392920#0000",
+          "yestrade-69-12583-2392920#0004"
+        ],
+        [
+          "yestrade-69-5752#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-4306"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-4306#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-004",
+      "category": "cp_report",
+      "query": "2022년 상반기 CP 실적보고의 제출 마감일은 언제였고 AAA등급은 당시 대상이었어?",
+      "gold": [
+        "yestrade-65-14272"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-65-14272",
+        "yestrade-69-6494-2394794-z003",
+        "yestrade-69-5752"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-65-14272#0000"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006",
+          "yestrade-69-6494-2394794-z003#0002"
+        ],
+        [
+          "yestrade-69-5752#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-65-14272"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-65-14272#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-005",
+      "category": "cp_report",
+      "query": "2022년 하반기 CP 실적보고와 연간 운영보고의 제출 기간은 언제였어?",
+      "gold": [
+        "yestrade-65-14106"
+      ],
+      "first": false,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-8396-2393418",
+        "yestrade-65-14106",
+        "yestrade-69-6965-2394611-z000",
+        "yestrade-69-6494-2394794-z003",
+        "yestrade-69-8471-2393627-z001"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-8396-2393418#0002",
+          "yestrade-69-8396-2393418#0011",
+          "yestrade-69-8396-2393418#0012",
+          "yestrade-69-8396-2393418#0003",
+          "yestrade-69-8396-2393418#0000",
+          "yestrade-69-8396-2393418#0013"
+        ],
+        [
+          "yestrade-65-14106#0000"
+        ],
+        [
+          "yestrade-69-6965-2394611-z000#0000"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006"
+        ],
+        [
+          "yestrade-69-8471-2393627-z001#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-65-14106"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-65-14106#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-006",
+      "category": "cp_report",
+      "query": "2024년 상반기 CP 실적보고의 제출기한과 AAA등급의 처리 방식은 뭐였어?",
+      "gold": [
+        "yestrade-69-17058"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-17058",
+        "yestrade-69-6494-2394794-z003",
+        "yestrade-69-5752"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-17058#0000"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006"
+        ],
+        [
+          "yestrade-69-5752#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-17058"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-17058#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-007",
+      "category": "cp_report",
+      "query": "2025년 상반기 CP 실적보고 안내에서 제출 마감일과 AAA등급 보고 방식은 어떻게 돼?",
+      "gold": [
+        "yestrade-69-18420"
+      ],
+      "first": false,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-18420-3059108",
+        "yestrade-69-6494-2394794-z003",
+        "yestrade-69-18420"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-18420-3059108#0000"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006"
+        ],
+        [
+          "yestrade-69-18420#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-18420"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-18420#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-008",
+      "category": "cp_report",
+      "query": "2025년 하반기 CP 실적보고와 2025년 운영보고는 언제까지 제출하라고 했어?",
+      "gold": [
+        "yestrade-69-20577"
+      ],
+      "first": false,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-20704",
+        "yestrade-69-20577",
+        "yestrade-69-6965-2394611-z000",
+        "yestrade-69-18420-3059108",
+        "yestrade-69-20381"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-20704#0000"
+        ],
+        [
+          "yestrade-69-20577#0000"
+        ],
+        [
+          "yestrade-69-6965-2394611-z000#0000"
+        ],
+        [
+          "yestrade-69-18420-3059108#0000"
+        ],
+        [
+          "yestrade-69-20381#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-20577"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-20577#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-009",
+      "category": "other_date",
+      "query": "2010년 CP기업 워크숍은 어느 장소에서 며칠간 열렸어?",
+      "gold": [
+        "yestrade-69-198"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-198",
+        "yestrade-69-212"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-198#0000"
+        ],
+        [
+          "yestrade-69-212#0001",
+          "yestrade-69-212#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-198"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-198#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-010",
+      "category": "other_date",
+      "query": "2017년 상반기 CP 워크숍은 언제 어디에서 열릴 예정이었어?",
+      "gold": [
+        "yestrade-69-5115"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-5115"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-5115#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-5115"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-5115#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-011",
+      "category": "other_date",
+      "query": "2019년 기계분야 워크숍 및 간담회의 일시와 장소는?",
+      "gold": [
+        "yestrade-69-4203",
+        "yestrade-69-4203-2391947"
+      ],
+      "first": false,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-56-9698-2393428",
+        "yestrade-69-4203-2391947",
+        "yestrade-69-12023"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-56-9698-2393428#0016",
+          "yestrade-56-9698-2393428#0017",
+          "yestrade-56-9698-2393428#0019",
+          "yestrade-56-9698-2393428#0074",
+          "yestrade-56-9698-2393428#0072",
+          "yestrade-56-9698-2393428#0018"
+        ],
+        [
+          "yestrade-69-4203-2391947#0000"
+        ],
+        [
+          "yestrade-69-12023#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-4203",
+          "yestrade-69-4203-2391947"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-4203#0000",
+          "yestrade-69-4203-2391947#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-012",
+      "category": "other_date",
+      "query": "2022년 HS 일부 개정은 언제 시행되고, HSK 변경 신청에 대한 한시적 신속 판정은 어느 기간에 제공됐어?",
+      "gold": [
+        "yestrade-69-11352"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-11352"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-11352#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-11352"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-11352#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-013",
+      "category": "other_date",
+      "query": "2013년 하반기 전략물자관리 정규교육 안내에서 기본교육은 어느 두 달에 추가 실시한다고 했어?",
+      "gold": [
+        "yestrade-63-3167"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-63-3167"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-63-3167#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-63-3167"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-63-3167#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "date-v1-014",
+      "category": "other_date",
+      "query": "2016년 CP 멘토링 멘티 모집 연장 공지의 신청 마감일은 언제야?",
+      "gold": [
+        "yestrade-69-7555"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-7555"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-7555#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-7555"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-7555#0000"
+        ]
+      ]
+    }
+  ],
+  "metrics": {
+    "queries": 14,
+    "hit_at_1": 0.7142857142857143,
+    "precision_at_1": 0.7142857142857143,
+    "hit_at_5": 1.0,
+    "recall_at_5": 0.9642857142857143,
+    "precision_returned_at_5": 0.5107142857142858,
+    "mean_returned_at_5": 2.7142857142857144,
+    "micro_recall_at_5": 0.9333333333333333,
+    "mrr_at_5": 0.8452380952380952,
+    "group_queries": 14,
+    "group_hit_at_5": 1.0,
+    "group_recall_at_5": 1.0,
+    "group_micro_recall_at_5": 1.0,
+    "group_all_at_5": 1.0,
+    "evidence_queries": 14,
+    "evidence_hit_at_5": 1.0,
+    "evidence_recall_at_5": 1.0,
+    "evidence_micro_recall_at_5": 1.0,
+    "evidence_all_at_5": 1.0,
+    "evidence_precision_at_5": 0.4334183673469388,
+    "evidence_micro_precision_at_5": 0.2222222222222222,
+    "evidence_mrr_at_5": 0.7942176870748299,
+    "evidence_first_rank_at_5": 2.0714285714285716,
+    "mean_chunks_at_5": 4.5
+  },
+  "coverage_known": true
+}

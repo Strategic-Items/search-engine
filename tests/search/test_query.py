@@ -15,7 +15,7 @@ from search_engine.search import (
     search_all,
     search_modes,
 )
-from search_engine.search.query import _reporting_half, _same_reporting_half
+from search_engine.search.query import _reporting_half, _same_reporting_half, _same_topic_in_title
 
 
 def test_reporting_half_reads_four_and_two_digit_years_without_confusing_publication_year():
@@ -58,6 +58,25 @@ def test_matching_reporting_half_survives_pre_fusion_score_trim():
     hits = retrieve(client, "search-documents", "2022년 하반기 CP 보고",
                     date(2026, 9, 25), 2, embedder)
     assert "right" in [hit.parent_id for hit in hits]
+
+
+def test_period_support_keeps_same_topic_even_below_final_ratio_cutoff():
+    assert _same_topic_in_title("2022년 하반기 CP 실적보고", "22년도 하반기 CP 실적보고")
+    assert not _same_topic_in_title("2022년 하반기 CP 실적보고", "2022년 하반기 방산 상담회")
+    client = Mock()
+    other_topic = {"_id": "other", "_score": 10.0, "_source": {
+        "parent_id": "other", "title": "2022년 하반기 방산 상담회"}}
+    answer = {"_id": "answer", "_score": 8.0, "_source": {
+        "parent_id": "answer", "title": "22년도 하반기 CP 실적보고"}}
+    client.search.side_effect = [
+        {"hits": {"hits": [other_topic, answer]}},
+        {"hits": {"hits": [other_topic, answer]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 1024
+    hits = retrieve(client, "search-documents", "2022년 하반기 CP 실적보고",
+                    date(2026, 9, 25), 2, embedder)
+    assert [hit.parent_id for hit in hits] == ["other", "answer"]
 
 
 def matching_query(query: dict) -> dict:
