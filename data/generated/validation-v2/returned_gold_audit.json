@@ -1,0 +1,71 @@
+{
+  "method": "Only returned chunks manually inspected; these equivalent parent/evidence labels are added to the frozen pre-retrieval gold. Other returned documents remain unjudged, so precision remains a lower bound.",
+  "additions": [
+    {
+      "qid": "validation-v2-002",
+      "parent_id": "hwp-전략기술의-무형이전-통제-9167a1c2",
+      "chunk_id": "hwp-전략기술의-무형이전-통제-9167a1c2#0033",
+      "reason": "전자·구두 이전을 함께 명시"
+    },
+    {
+      "qid": "validation-v2-002",
+      "parent_id": "yestrade-69-6345-2394002",
+      "chunk_id": "yestrade-69-6345-2394002#0018",
+      "reason": "이메일·교육·실연 모두 명시"
+    },
+    {
+      "qid": "validation-v2-003",
+      "parent_id": "yestrade-63-2184",
+      "chunk_id": "yestrade-63-2184#0000",
+      "reason": "Entity List 허가 필요 및 일반적 거부 명시"
+    },
+    {
+      "qid": "validation-v2-018",
+      "parent_id": "yestrade-62-2962",
+      "chunk_id": "yestrade-62-2962#0011",
+      "reason": "HSK 및 YesTrade 자가판정 명시"
+    },
+    {
+      "qid": "validation-v2-019",
+      "parent_id": "yestrade-63-1023",
+      "chunk_id": "yestrade-63-1023#0001",
+      "reason": "EAR99 식료품·의약품 제외 명시"
+    },
+    {
+      "qid": "validation-v2-019",
+      "parent_id": "yestrade-62-2319",
+      "chunk_id": "yestrade-62-2319#0009",
+      "reason": "EAR99 식품·의약품 제외 및 일반금지 예외 명시"
+    },
+    {
+      "qid": "validation-v2-024",
+      "parent_id": "yestrade-69-742-2392474-z001",
+      "chunk_id": "yestrade-69-742-2392474-z001#0026",
+      "reason": "9B105 마하 0.9 명시"
+    },
+    {
+      "qid": "validation-v2-024",
+      "parent_id": "yestrade-67-1288-2392133",
+      "chunk_id": "yestrade-67-1288-2392133#0337",
+      "reason": "9B105 마하 0.9 명시"
+    },
+    {
+      "qid": "validation-v2-024",
+      "parent_id": "yestrade-69-17437-2395777-z000",
+      "chunk_id": "yestrade-69-17437-2395777-z000#0326",
+      "reason": "9B105 마하 0.9 명시"
+    },
+    {
+      "qid": "validation-v2-028",
+      "parent_id": "yestrade-faq-11-2288721",
+      "chunk_id": "yestrade-faq-11-2288721#0009",
+      "reason": "별지 2-3 바세나르 서식의 CONTACT PERSON 전화·이메일"
+    },
+    {
+      "qid": "validation-v2-030",
+      "parent_id": "yestrade-69-7272-2394189-z033",
+      "chunk_id": "yestrade-69-7272-2394189-z033#0000",
+      "reason": "별지 제7호 Korean Import Certificate 명시"
+    }
+  ]
+}
