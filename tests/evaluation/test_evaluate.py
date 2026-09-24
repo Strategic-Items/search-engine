@@ -5,6 +5,7 @@ import pytest
 
 from search_engine.evaluation.evaluate import (
     evaluate,
+    format_report,
     hit_at,
     indexed_ids,
     load_queries,
@@ -101,6 +102,30 @@ def test_indexed_ids_covers_documents_and_their_parents(tmp_path: Path):
     (tmp_path / "hsk.jsonl").write_text(
         json.dumps({"id": "hsk-1"}) + "\n", encoding="utf-8")
     assert indexed_ids(tmp_path) == {"chunk-1", "doc-1", "hsk-1"}
+
+
+def test_coverage_can_union_separately_prepared_corpora(tmp_path: Path, monkeypatch):
+    core = tmp_path / "core"
+    docs = tmp_path / "docs"
+    core.mkdir()
+    docs.mkdir()
+    (core / "core.jsonl").write_text(json.dumps({"id": "c#0", "parent_id": "c"}) + "\n")
+    (docs / "docs.jsonl").write_text(json.dumps({"id": "d#0", "parent_id": "d"}) + "\n")
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search", lambda *a, **kw: {
+        "hits": [{"parent_id": "d"}]})
+    report = evaluate([{"qid": "q", "query": "q", "gold": ["d"]}],
+                      "http://example", [core, docs])
+    assert report["answerable"]["queries"] == 1
+    assert report["queries"][0]["gold_missing_ids"] == []
+
+
+def test_report_formats_when_all_gold_is_missing(tmp_path: Path, monkeypatch):
+    (tmp_path / "core.jsonl").write_text(json.dumps({"id": "c", "parent_id": "c"}) + "\n")
+    monkeypatch.setattr("search_engine.evaluation.evaluate.search", lambda *a, **kw: {
+        "hits": []})
+    report = evaluate([{"qid": "q", "query": "q", "gold": ["d"]}],
+                      "http://example", tmp_path)
+    assert "정답이 색인된 질의만: 0건 중" in format_report(report)
 
 
 def test_a_gold_document_that_was_never_indexed_is_reported_separately(tmp_path, monkeypatch):

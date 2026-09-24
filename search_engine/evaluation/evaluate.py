@@ -49,20 +49,22 @@ def load_queries(path: Path) -> list[dict]:
     return rows
 
 
-def indexed_ids(prepared_dir: Path) -> set[str]:
+def indexed_ids(prepared_dir: Path | list[Path]) -> set[str]:
     """준비된 데이터셋이 인덱스에 넣을 모든 id와 parent_id."""
     ids = set()
-    for name in ("core.jsonl", "docs.jsonl", "hsk.jsonl"):
-        path = prepared_dir / name
-        if not path.is_file():
-            continue
-        with path.open(encoding="utf-8") as file:
-            for line in file:
-                if not line.strip():
-                    continue
-                row = json.loads(line)
-                ids.add(row["id"])
-                ids.add(row.get("parent_id") or row["id"])
+    directories = [prepared_dir] if isinstance(prepared_dir, Path) else prepared_dir
+    for directory in directories:
+        for name in ("core.jsonl", "docs.jsonl", "hsk.jsonl"):
+            path = directory / name
+            if not path.is_file():
+                continue
+            with path.open(encoding="utf-8") as file:
+                for line in file:
+                    if not line.strip():
+                        continue
+                    row = json.loads(line)
+                    ids.add(row["id"])
+                    ids.add(row.get("parent_id") or row["id"])
     return ids
 
 
@@ -218,11 +220,13 @@ def search(base_url: str, query: str, timeout: float = 30.0) -> dict:
         return json.loads(response.read())
 
 
-def evaluate(queries: list[dict], base_url: str, prepared_dir: Path, k: int = 5) -> dict:
+def evaluate(queries: list[dict], base_url: str, prepared_dir: Path | list[Path], k: int = 5) -> dict:
     if not queries or not 1 <= k <= 5:
         raise ValueError("nonempty queries and 1 <= k <= 5 required (public API returns at most 5)")
     known = indexed_ids(prepared_dir)
-    coverage_known = any((prepared_dir / name).is_file()
+    directories = [prepared_dir] if isinstance(prepared_dir, Path) else prepared_dir
+    coverage_known = any((directory / name).is_file()
+                         for directory in directories
                          for name in ("core.jsonl", "docs.jsonl", "hsk.jsonl"))
     per_query = []
     for row in queries:
@@ -299,9 +303,9 @@ def format_report(report: dict) -> str:
     answerable = report["answerable"]
     lines.append("")
     lines.append(
-        f"정답이 색인된 질의만: {answerable['queries']}건 중 "
-        f"첫 결과 {answerable['first']}, 상위 {k}건 {answerable['top_k']} "
-        f"(나머지 {totals['queries'] - answerable['queries']}건은 순위가 아니라 색인 범위 문제)"
+        f"정답이 색인된 질의만: {answerable.get('queries', 0)}건 중 "
+        f"첫 결과 {answerable.get('first', 0)}, 상위 {k}건 {answerable.get('top_k', 0)} "
+        f"(나머지 {totals['queries'] - answerable.get('queries', 0)}건은 순위가 아니라 색인 범위 문제)"
     )
     lines.append("정답 검토 상태: " + ", ".join(
         f"{status}={count}" for status, count in sorted(report["reviewed"].items(), key=lambda pair: str(pair[0]))))
@@ -335,13 +339,14 @@ def main() -> None:
     parser.add_argument("queries_jsonl", type=Path, nargs="?",
                         default=Path("data/queries_v1.jsonl"))
     parser.add_argument("--base-url", default="http://127.0.0.1:8092")
-    parser.add_argument("--prepared", type=Path, default=Path("data/generated"),
-                        help="Prepared datasets, used to tell coverage gaps from ranking misses")
+    parser.add_argument("--prepared", type=Path, action="append",
+                        help="Prepared dataset directory; repeat for separately indexed corpora")
     parser.add_argument("--k", type=int, default=5)
     parser.add_argument("--out", type=Path, help="Write the full per-query report as JSON")
     args = parser.parse_args()
 
-    report = evaluate(load_queries(args.queries_jsonl), args.base_url, args.prepared, args.k)
+    report = evaluate(load_queries(args.queries_jsonl), args.base_url,
+                      args.prepared or Path("data/generated"), args.k)
     if args.out:
         args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
                             encoding="utf-8")
