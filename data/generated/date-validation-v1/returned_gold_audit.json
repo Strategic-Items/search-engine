@@ -1,0 +1,11 @@
+{
+  "method": "Direct inspection of returned top-5 candidates that can satisfy all requested facts. Source-specific year and reporting period must match. All other returned candidates require further audit before treating precision as exact.",
+  "additions": [
+    {
+      "qid": "date-v1-011",
+      "parent_id": "yestrade-69-4203-2391947",
+      "chunk_id": "yestrade-69-4203-2391947#0000",
+      "reason": "2019년 2월 20일 14시, 관리원 23층 교육장 명시"
+    }
+  ]
+}
