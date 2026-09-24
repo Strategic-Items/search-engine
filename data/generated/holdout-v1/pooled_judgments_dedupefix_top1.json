@@ -1,0 +1,11 @@
+{
+ "method": "사본 판정 수정(디렉터리 포함) 뒤 재색인한 인덱스에서, 기존 판정(small·full·A)에 없던 1위 문서 5건을 판정. 같은 규칙: 질의에 실제로 답해야 인정, 정답은 추가만 한다.",
+ "judged_runs": ["results/holdout-full-dedupefix.json", "results/tuned-with-holdout-noise-dedupefix.json"],
+ "judgments": [
+  {"qid": "holdout-v1-028", "verdict": "not_relevant", "parent": "yestrade-faq-126", "note": "신청 방법·심사 절차만. 40일·80점 기준 없음"},
+  {"qid": "holdout-v1-042", "verdict": "not_relevant", "parent": "yestrade-69-5163-2393646", "note": "무기 분야 금수품목(로켓 추진). 무관"},
+  {"qid": "holdout-v1-048", "verdict": "not_relevant", "parent": "yestrade-faq-113", "note": "해외출장자 기술자료. 특허 출원 예외 없음"},
+  {"qid": "docs-v2-018", "verdict": "not_relevant", "parent": "yestrade-faq-186", "note": "면제 시 사전신고서/수출 후 7일 내 보고서 제출. 서식의 거래 내역 작성 시점 없음"},
+  {"qid": "docs-v2-040", "verdict": "not_relevant", "parent": "yestrade-67-1348-2392049", "note": "기업 내부 판정 절차. 보세판매장·제37조 위탁 없음"}
+ ]
+}
