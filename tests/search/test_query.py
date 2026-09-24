@@ -15,6 +15,49 @@ from search_engine.search import (
     search_all,
     search_modes,
 )
+from search_engine.search.query import _reporting_half, _same_reporting_half
+
+
+def test_reporting_half_reads_four_and_two_digit_years_without_confusing_publication_year():
+    assert _reporting_half("2022년 하반기 CP 실적보고") == (2022, "하")
+    assert _same_reporting_half("실적보고(22년도 하반기), 2023년 1월 발행", (2022, "하"))
+    assert not _same_reporting_half("실적보고(2022년 상반기)", (2022, "하"))
+    assert not _same_reporting_half("2023년 1월 발행", (2022, "하"))
+    assert _reporting_half("2022년 하반기와 2023년 상반기") is None
+
+
+def test_hybrid_promotes_existing_candidate_with_matching_reporting_half():
+    client = Mock()
+    wrong = {"_id": "old", "_score": 10.0, "_source": {
+        "parent_id": "old", "title": "2014년도 하반기 CP 보고"}}
+    right = {"_id": "right", "_score": 9.5, "_source": {
+        "parent_id": "right", "title": "22년도 하반기 CP 보고"}}
+    client.search.side_effect = [
+        {"hits": {"hits": [wrong, right]}},
+        {"hits": {"hits": [wrong, right]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 1024
+    hits = retrieve(client, "search-documents", "2022년 하반기 CP 보고",
+                    date(2026, 9, 25), 2, embedder, cutoff_ratio=0)
+    assert [hit.parent_id for hit in hits] == ["right", "old"]
+
+
+def test_matching_reporting_half_survives_pre_fusion_score_trim():
+    client = Mock()
+    wrong = {"_id": "old", "_score": 10.0, "_source": {
+        "parent_id": "old", "title": "2014년도 하반기 CP 보고"}}
+    right = {"_id": "right", "_score": 8.0, "_source": {
+        "parent_id": "right", "title": "22년도 하반기 CP 보고"}}
+    client.search.side_effect = [
+        {"hits": {"hits": [wrong, right]}},
+        {"hits": {"hits": [wrong, right]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 1024
+    hits = retrieve(client, "search-documents", "2022년 하반기 CP 보고",
+                    date(2026, 9, 25), 2, embedder)
+    assert "right" in [hit.parent_id for hit in hits]
 
 
 def matching_query(query: dict) -> dict:

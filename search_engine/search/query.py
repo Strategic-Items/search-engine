@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 LEADS_A_LIST = "_leads_a_list"
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
+HALF_YEAR = re.compile(r"(?<!\d)(20\d{2}|\d{2})\s*(?:년(?:도)?)?\s*(상|하)\s*반기")
 
 # 요청에는 쿼리만 포함되므로, 사용자가 요청하는 문서의 종류
 # 텍스트에서 읽어야 한다. 이들은 필터가 아니라 종류를 들어 올리는 것이다: a
@@ -56,6 +57,18 @@ def _requested_period(query: str) -> tuple[str, str] | None:
         return f"{year}-01-01", f"{year + 1}-01-01"
     next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
     return f"{year}-{month:02d}-01", f"{next_year}-{next_month:02d}-01"
+
+
+def _reporting_half(query: str) -> tuple[int, str] | None:
+    """질문에 하나의 연도·반기만 명시됐을 때 그 기간을 읽는다."""
+    matches = {(int(year) if len(year) == 4 else 2000 + int(year), half)
+               for year, half in HALF_YEAR.findall(query)}
+    return next(iter(matches)) if len(matches) == 1 else None
+
+
+def _same_reporting_half(title: str, period: tuple[int, str]) -> bool:
+    return any((int(year) if len(year) == 4 else 2000 + int(year), half) == period
+               for year, half in HALF_YEAR.findall(title))
 
 
 def _intent_boosts(query: str) -> list[dict]:
@@ -460,6 +473,15 @@ def retrieve(
             (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
             for hits, weight, retriever in ranked_lists
         ]
+        # 날짜를 적시한 질문에서는 대상 반기가 발행 연도와 다를 수 있다.
+        # 제목에 같은 보고 기간이 적힌 기존 후보에만 세 번째 순위 신호를 준다.
+        # 주제 검색의 후보 밖 문서를 새로 끌어오거나 다른 연도를 지우지 않는다.
+        reporting_half = _reporting_half(query) if mode == "hybrid" else None
+        if reporting_half:
+            period_hits = [hit for hits, _, _ in ranked_lists for hit in hits
+                           if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)]
+            if period_hits:
+                fusable = [*fusable, (period_hits, 1.0, "period")]
         ranked = _rrf(fusable, settings.search_hybrid_rrf_k)
     else:
         # 리트리버의 원래 점수를 유지하고, 각 부모에 대해 최고의 청크만 유지한다.
