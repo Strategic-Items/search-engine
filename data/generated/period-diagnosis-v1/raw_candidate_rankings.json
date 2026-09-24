@@ -1,0 +1,97 @@
+{
+  "method": "live OpenSearch index, 25 lexical chunks and 50 vector chunks, same pre-fusion and final cutoff as retrieval",
+  "entries": [
+    {
+      "qid": "date-v1-007",
+      "query": "2025년 상반기 CP 실적보고 안내에서 제출 마감일과 AAA등급 보고 방식은 어떻게 돼?",
+      "target_parent": "yestrade-69-18420",
+      "lexical_chunk_positions": [
+        5
+      ],
+      "vector_chunk_positions": [
+        10
+      ],
+      "lexical_after_trim": [],
+      "vector_after_trim": [],
+      "period_list_positions": [
+        2,
+        3
+      ],
+      "period_list_first_parents": [
+        "yestrade-69-18420-3059108",
+        "yestrade-69-18420",
+        "yestrade-69-20001"
+      ],
+      "fused_position": [
+        4
+      ],
+      "fused_score": 0.016129032258064516,
+      "fused_leads_list": false,
+      "final_score_cutoff": 0.029508196721311476,
+      "survives_cutoff": false
+    },
+    {
+      "qid": "date-v1-008",
+      "query": "2025년 하반기 CP 실적보고와 2025년 운영보고는 언제까지 제출하라고 했어?",
+      "target_parent": "yestrade-69-20577",
+      "lexical_chunk_positions": [
+        3
+      ],
+      "vector_chunk_positions": [
+        7
+      ],
+      "lexical_after_trim": [],
+      "vector_after_trim": [
+        7
+      ],
+      "period_list_positions": [
+        2,
+        5
+      ],
+      "period_list_first_parents": [
+        "yestrade-69-20704",
+        "yestrade-69-20577",
+        "yestrade-69-20381"
+      ],
+      "fused_position": [
+        2
+      ],
+      "fused_score": 0.031054405392392875,
+      "fused_leads_list": false,
+      "final_score_cutoff": 0.04290659102927744,
+      "survives_cutoff": false
+    },
+    {
+      "qid": "date-confirm-v1-008",
+      "query": "2023년 하반기 CP 실적보고와 2023년 운영보고의 마감일은 언제야?",
+      "target_parent": "yestrade-69-15564",
+      "lexical_chunk_positions": [
+        10
+      ],
+      "vector_chunk_positions": [
+        46
+      ],
+      "lexical_after_trim": [],
+      "vector_after_trim": [],
+      "period_list_positions": [
+        5,
+        8
+      ],
+      "period_list_first_parents": [
+        "yestrade-69-15580",
+        "yestrade-69-15954",
+        "yestrade-69-15954-2391342",
+        "yestrade-69-15954-2391343",
+        "yestrade-69-15564",
+        "yestrade-69-15834"
+      ],
+      "fused_position": [
+        9
+      ],
+      "fused_score": 0.015384615384615385,
+      "fused_leads_list": false,
+      "final_score_cutoff": 0.04379391100702577,
+      "survives_cutoff": false
+    }
+  ]
+}
