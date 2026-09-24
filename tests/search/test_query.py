@@ -30,6 +30,7 @@ def boosts(query: dict, key: str) -> list[dict]:
 
 def test_query_keeps_unknown_dates_and_filters_expired_documents():
     query = build_query("수출허가", date(2026, 9, 15))
+    assert matching_query(query)["bool"]["should"][0]["multi_match"]["fields"][0] == "title^1"
     filters = matching_query(query)["bool"]["filter"]
     assert filters[0]["bool"]["should"][0]["range"]["effective_from"]["lte"] == "2026-09-15"
     assert filters[1]["bool"]["should"][0]["range"]["effective_to"]["gt"] == "2026-09-15"
@@ -46,6 +47,19 @@ def test_retrieve_returns_unique_parent_documents():
     hits = retrieve(client, "search-documents", "수출허가", date.today(), 2, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
     assert client.search.call_args.kwargs["size"] == 10
+
+
+def test_lexical_search_uses_global_term_statistics_across_indices():
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": []}}
+    retrieve(client, "search-holdout,search-docs", "수출허가", date.today(), 5,
+             mode="bm25", query_rewrite=False)
+    assert client.search.call_args.kwargs["search_type"] == "dfs_query_then_fetch"
+
+    client.reset_mock()
+    retrieve(client, "search-docs", "수출허가", date.today(), 5,
+             mode="bm25", query_rewrite=False)
+    assert "search_type" not in client.search.call_args.kwargs
 
 
 def test_explicit_year_month_boosts_matching_publication_and_effective_dates():

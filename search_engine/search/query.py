@@ -106,10 +106,9 @@ def build_query(query: str, as_of: date) -> dict:
             # 받(7.03) + 허가(4.43) = 11.46 outscored 의견 + 러시아 + 보내 +
             # 허가 + 있 = 7.80, 그리고 러시아는 이 코퍼스에서 가장 차별적인 용어이다. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
             # 이 코퍼스에서. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
-            # 부스트는 3으로 유지된다 -- 이를 낮추면 식별자 쿼리가 제대로 작동하지 않으며, 3은 `most_fields` 아래에서 탐색된 값들 중 최고였다.
-            # 식별자 쿼리가 제대로 작동하도록 제목을 쿼리에 포함시키며, 3은 또한 `most_fields` 아래에서 탐색된 값들 중 최고였다.
-            # 식별자 쿼리가 제대로 작동하도록 제목을 쿼리에 포함시키며, 3은 또한 `most_fields` 아래에서 탐색된 값들 중 최고였다.
-            "fields": ["title^3", "body", "title.standard^1.5", "body.standard^0.5"],
+            # 제목은 모든 청크에 반복된다. 여러 코퍼스를 함께 검색할 때 ^3은
+            # 제목이 비슷한 새 문서를 과하게 올리므로 본문과 같은 가중치를 준다.
+            "fields": ["title^1", "body", "title.standard^1.5", "body.standard^0.5"],
             "type": "most_fields",
         }})
     if not should:
@@ -412,9 +411,11 @@ def retrieve(
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
     if mode in ("bm25", "hybrid"):
+        lexical_options = {"search_type": "dfs_query_then_fetch"} if "," in alias else {}
         lexical = client.search(
             index=alias, body={"query": build_query(query, as_of)},
             size=lexical_candidates, ignore_unavailable=not strict,
+            **lexical_options,
         )
         add_response(lexical, "lexical", "bm25")
         if query_rewrite is None:
@@ -424,6 +425,7 @@ def retrieve(
                 add_response(client.search(
                     index=alias, body={"query": build_query(rewritten, as_of)},
                     size=lexical_candidates, ignore_unavailable=not strict,
+                    **lexical_options,
                 ), "rewrite", "bm25", settings.search_query_rewrite_weight)
     try:
         if mode in ("vector", "hybrid"):
