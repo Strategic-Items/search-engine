@@ -1,0 +1,95 @@
+{
+  "method": "docs-v2 135문항의 docs+holdout 상위 5개 결과에서 새 코퍼스 문서 205쌍을 전수 선별. 제목과 반환 청크를 확인하고, 답이 있을 가능성이 있는 부모는 본문 전체의 답 문구를 확인. 문서가 질문의 모든 요구사항에 답할 때만 gold에 추가한다.",
+  "judged_run": "results/tuned-with-holdout-noise-dedupefix-gold-audit.json",
+  "judgments": [
+    {
+      "qid": "docs-v2-020",
+      "verdict": "relevant",
+      "parent": "yestrade-69-16577-2391354-z019",
+      "evidence": [["yestrade-69-16577-2391354-z019#0002"]],
+      "note": "영문 END-USER STATEMENT의 품목 포괄수출허가에는 quantity 칸을 비우라는 안내가 반환 청크에 있다."
+    },
+    {
+      "qid": "docs-v2-020",
+      "verdict": "relevant",
+      "parent": "yestrade-69-16842-2394523-z019",
+      "evidence": [["yestrade-69-16842-2394523-z019#0002"]],
+      "note": "다른 개정판의 같은 영문 서식에 quantity 칸을 비우라는 안내가 반환 청크에 있다."
+    },
+    {
+      "qid": "docs-v2-087",
+      "verdict": "relevant",
+      "parent": "yestrade-56-8674-2393300",
+      "evidence": [[]],
+      "note": "2016년 포커스는 3월 24일 시작, 6월 30일 종료, 관련 4개사 중 2개사 적용을 #0019~#0022에 나눠 설명한다. 반환 청크에는 종료일이 빠져 있어 근거 적중은 추가하지 않는다."
+    },
+    {
+      "qid": "docs-v2-094",
+      "verdict": "relevant",
+      "parent": "yestrade-69-21177-2395322-z100",
+      "evidence": [["yestrade-69-21177-2395322-z100#1611", "yestrade-69-21177-2395322-z100#1804"]],
+      "note": "기술지원은 지도·기능·훈련·자문, 기술자료는 청사진·설계도·매뉴얼로 구분한다."
+    },
+    {
+      "qid": "docs-v2-094",
+      "verdict": "relevant",
+      "parent": "yestrade-69-216-2391873",
+      "evidence": [["yestrade-69-216-2391873#1364"]],
+      "note": "기술지원과 기술자료 정의가 같은 반환 청크에 있다."
+    },
+    {
+      "qid": "docs-v2-110",
+      "verdict": "relevant",
+      "parent": "yestrade-69-12583-2392915",
+      "evidence": [["yestrade-69-12583-2392915#0000"]],
+      "note": "발표자료가 1987년 한미양해각서 제4조를 인용해 미국 서면동의 증명 없이는 재수출을 허용하지 않는다고 명시한다."
+    },
+    {
+      "qid": "docs-v2-120",
+      "verdict": "relevant",
+      "parent": "yestrade-69-3543-2392631-z003",
+      "evidence": [["yestrade-69-3543-2392631-z003#0001"]],
+      "note": "바세나르 기본 지침은 통제품목의 이전 또는 거부 결정이 각 회원국의 고유권한이라고 명시한다."
+    },
+    {
+      "qid": "docs-v2-128",
+      "verdict": "relevant",
+      "parent": "yestrade-69-7272-2394189-z063",
+      "evidence": [["yestrade-69-7272-2394189-z063#0034"]],
+      "note": "고시 제26조 제목이 개별수출허가의 면제다."
+    },
+    {
+      "qid": "docs-v2-128",
+      "verdict": "relevant",
+      "parent": "yestrade-69-3543-2392630",
+      "evidence": [["yestrade-69-3543-2392630#0026"]],
+      "note": "다른 고시 판본의 제26조 제목도 개별수출허가의 면제다."
+    },
+    {
+      "qid": "docs-v2-128",
+      "verdict": "relevant",
+      "parent": "yestrade-69-6736-2394197-z000",
+      "evidence": [["yestrade-69-6736-2394197-z000#0033"]],
+      "note": "23차 고시의 제26조 제목도 개별수출허가의 면제다."
+    },
+    {
+      "qid": "docs-v2-128",
+      "verdict": "relevant",
+      "parent": "yestrade-69-7986-2394054",
+      "evidence": [["yestrade-69-7986-2394054#0005", "yestrade-69-7986-2394054#0014"]],
+      "note": "고시 개정 설명자료는 개별수출허가 면제 조항을 제26조로 지목한다."
+    }
+  ],
+  "special_cases": [
+    {
+      "qid": "docs-v2-099",
+      "verdict": "not_relevant",
+      "note": "한국 FAQ는 공개기술과 최소 사용기술 예외를 설명하지만 질의가 묻는 2006년 일본 제도의 예외가 아니다."
+    },
+    {
+      "qid": "docs-v2-127",
+      "verdict": "version_conflict",
+      "note": "새 고시 판본의 제54조는 상황허가 대상이고 제54조의2가 면제다. 기존 docs 정답과 조문 번호가 달라 추가 gold로 취급할 수 없다."
+    }
+  ]
+}
