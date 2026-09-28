@@ -14,6 +14,7 @@ import random
 import re
 
 from scripts.evaluate_mode_oracle import per_query
+from search_engine.evaluation.evaluate import quality_metrics
 
 MODES = ("hybrid", "bm25", "vector")
 
@@ -115,6 +116,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--evaluation-report", type=Path,
+                        help="Separate questions, never used to fit or tune the models")
     args = parser.parse_args()
     report = json.loads(args.report.read_text())
     by_mode = {m: {r["qid"]: r for r in report["modes"][m]["queries"]
@@ -175,9 +178,62 @@ def main() -> None:
               "per_query": [{"qid": q, "query": rows[q]["hybrid"]["query"],
                              "scores": scores[q], "choices": {n: p[q] for n, p in choices.items()}}
                             for q in qids]}
+    output["metrics_by_subset"] = {
+        subset: {name: quality_metrics([rows[q][pick[q]] for q in selected], 5)
+                 for name, pick in choices.items()}
+        for subset, selected in (("all", qids),
+                                 ("docs", [q for q in qids if q.startswith("docs-v2-")]),
+                                 ("holdout", [q for q in qids if q.startswith("holdout-v1-")]))
+        if selected}
+    if args.evaluation_report:
+        external = json.loads(args.evaluation_report.read_text())
+        external_modes = {m: {r["qid"]: r for r in external["modes"][m]["queries"]}
+                          for m in MODES}
+        external_qids = sorted(external_modes["hybrid"])
+        assert all(set(external_modes[m]) == set(external_qids) for m in MODES)
+        train_docs = {p for q in qids for p in rows[q]["hybrid"]["gold"]}
+        overlapping = [q for q in external_qids if train_docs & set(external_modes["hybrid"][q]["gold"])]
+        external_scores = {q: {m: per_query(external_modes[m][q], 5) for m in MODES}
+                           for q in external_qids}
+        picks = {m: {q: m for q in external_qids} for m in MODES}
+        picks["oracle"] = {q: max(MODES, key=lambda m: external_scores[q][m]) for q in external_qids}
+        final_models = {}
+        for results in (False, True):
+            name = "query_and_results" if results else "query_only"
+            trees = {m: fit([features(rows[q], results) for q in qids],
+                            [scores[q][m][0] - scores[q]["hybrid"][0] for q in qids])
+                     for m in MODES[1:]}
+            final_models[name] = trees
+            picks[name] = {}
+            for q in external_qids:
+                xq = features({m: external_modes[m][q] for m in MODES}, results)
+                gains = {m: predict(trees[m], xq) for m in MODES[1:]}
+                mode = max(gains, key=gains.get)
+                picks[name][q] = mode if gains[mode] > 0.02 else "hybrid"
+        external_summary = {}
+        for subset, selected in (("all", external_qids), ("disjoint_gold_documents", [q for q in external_qids if q not in overlapping])):
+            external_summary[subset] = {}
+            for name, pick in picks.items():
+                n = len(selected)
+                ds = [external_scores[q][pick[q]][0] - external_scores[q]["hybrid"][0] for q in selected]
+                external_summary[subset][name] = {
+                    "queries": n,
+                    "evidence_recall_at_5": sum(external_scores[q][pick[q]][0] for q in selected) / n if n else None,
+                    "evidence_mrr_at_5": sum(external_scores[q][pick[q]][1] for q in selected) / n if n else None,
+                    "choices": dict(Counter(pick[q] for q in selected)),
+                    "recall_improved_queries": sum(d > 1e-12 for d in ds),
+                    "recall_harmed_queries": sum(d < -1e-12 for d in ds),
+                }
+        output["separate_evaluation"] = {
+            "source": str(args.evaluation_report), "source_sha256": hashlib.sha256(args.evaluation_report.read_bytes()).hexdigest(),
+            "overlapping_gold_qids": overlapping, "summary": external_summary,
+            "trained_on_all_main_questions": final_models,
+            "per_query": [{"qid": q, "scores": external_scores[q], "choices": {n: p[q] for n, p in picks.items()}}
+                          for q in external_qids]}
     args.out.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({"queries": len(qids), "groups": len(groups),
-                      "fold_sizes": list(map(len, folds)), "summary": summary},
+                      "fold_sizes": list(map(len, folds)), "summary": summary,
+                      "separate_evaluation": output.get("separate_evaluation", {}).get("summary")},
                      ensure_ascii=False, indent=2))
 
 

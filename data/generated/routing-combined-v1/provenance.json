@@ -1,0 +1,59 @@
+{
+  "corpus": {
+    "search-docs-only-v20260918101819-0ae9e1": {
+      "count": 1198,
+      "embedding_count": 1198
+    },
+    "search-holdout-v20260923102126-0143e7": {
+      "count": 84413,
+      "embedding_count": 84413
+    }
+  },
+  "index": "search-docs-only-v20260918101819-0ae9e1,search-holdout-v20260923102126-0143e7",
+  "settings": {
+    "search_index_alias": "search-documents",
+    "search_index_prefix": "search-documents-v",
+    "search_docs_alias": "search-docs-only",
+    "search_docs_prefix": "search-docs-only-v",
+    "search_callcenter_alias": "search-callcenter",
+    "search_callcenter_prefix": "search-callcenter-v",
+    "search_hsk_alias": "search-hsk",
+    "search_hsk_prefix": "search-hsk-v",
+    "search_document_datasets": "docs",
+    "search_mode": "hybrid",
+    "search_hsk_enabled": false,
+    "search_number_of_replicas": 0,
+    "ollama_embedding_model": "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16",
+    "search_embedding_dimensions": 1024,
+    "search_vector_candidates": 50,
+    "search_hybrid_rrf_k": 60,
+    "search_chunks_per_document": 6,
+    "search_query_rewrite": false,
+    "search_query_rewrite_weight": 0.5,
+    "search_cutoff_ratio_bm25": 0.9,
+    "search_cutoff_ratio_vector": 0.99,
+    "search_cutoff_ratio_hybrid": 0.9,
+    "search_score_floor_bm25": 14.75,
+    "search_score_floor_vector": 0.7063,
+    "search_score_floor_hybrid": 0.0,
+    "search_answerability_judge": false,
+    "search_rerank_chunks": false,
+    "search_rerank_base_url": "http://localhost:8080",
+    "search_rerank_model": "BAAI/bge-reranker-v2-m3",
+    "search_rerank_depth": 20,
+    "search_rerank_timeout_seconds": 30.0,
+    "search_fusion_trim_bm25": 0.9,
+    "search_fusion_trim_vector": 0.97
+  },
+  "sources": {
+    "data/generated/period-topic-v1/results/docs135-candidate.json": "c02601198977db6ecb4ed63451969698e21f58a42f3fb1654dd5b9e6068c6290",
+    "data/generated/period-topic-v1/results/holdout69-candidate.json": "8b5f2a05260a4a0d77482e5fb0c6c748c97c649ea5dea14ba9036f943197cec2",
+    "data/generated/validation-v2/queries_combined_returned_audited.jsonl": "6f1bee034d79b95f2a2072586ef29983b38704a5b580072b10b7a015a3519051"
+  },
+  "excluded_unindexed_legacy_alternatives": [
+    "yestrade-form-22209#0002",
+    "yestrade-form-23307#0000"
+  ],
+  "code_sha256": "14b80f235a0ce85ef3bff7d54bdc6fc565721c265b529bd5d7299952e972ad32",
+  "label_validation": "All evidence chunks present, parent membership and recorded quotes checked; no full corpus content scan."
+}
