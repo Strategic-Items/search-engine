@@ -1,0 +1,302 @@
+{
+  "answerable": {
+    "queries": 7,
+    "first": 6,
+    "top_k": 7
+  },
+  "k": 5,
+  "base_url": "http://127.0.0.1:8114",
+  "totals": {
+    "queries": 7,
+    "first": 6,
+    "top_k": 7,
+    "gold_missing_from_index": 0
+  },
+  "categories": {
+    "topic_period": {
+      "queries": 7,
+      "first": 6,
+      "top_k": 7,
+      "gold_missing_from_index": 0
+    }
+  },
+  "reviewed": {
+    "assistant_source_reviewed": 7
+  },
+  "queries": [
+    {
+      "qid": "period-topic-v1-001",
+      "category": "topic_period",
+      "query": "2010년 하반기 전략물자 수출기업 워크숍은 언제 어디에서 열렸어?",
+      "gold": [
+        "yestrade-69-212"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-212",
+        "yestrade-69-212-2391822"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-212#0000",
+          "yestrade-69-212#0001"
+        ],
+        [
+          "yestrade-69-212-2391822#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-212"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-212#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-topic-v1-002",
+      "category": "topic_period",
+      "query": "2007년 하반기 전략물자관리원 교육안내에서 전문과정은 어느 두 날짜에 열렸어?",
+      "gold": [
+        "yestrade-69-333"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-333"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-333#0000",
+          "yestrade-69-333#0001",
+          "yestrade-69-333#0002",
+          "yestrade-69-333#0003"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-333"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-333#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-topic-v1-003",
+      "category": "topic_period",
+      "query": "2014년 하반기 무역안보워크숍 발표자료 공지에서 행사는 언제 어디서 열렸다고 했어?",
+      "gold": [
+        "yestrade-69-5205"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-5205",
+        "yestrade-69-5205-2392641"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-5205#0000"
+        ],
+        [
+          "yestrade-69-5205-2392641#0000",
+          "yestrade-69-5205-2392641#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-5205"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-5205#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-topic-v1-004",
+      "category": "topic_period",
+      "query": "2017년 하반기 무역안보 워크숍 주제발표 자료에는 워크숍 개최일을 언제로 적었어?",
+      "gold": [
+        "yestrade-69-5751"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-5751",
+        "yestrade-69-5751-2394822"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-5751#0000"
+        ],
+        [
+          "yestrade-69-5751-2394822#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-5751"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-5751#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-topic-v1-005",
+      "category": "topic_period",
+      "query": "2014년 하반기 방산 수출입 심사 방문교육은 어느 기간에 진행할 계획이었어?",
+      "gold": [
+        "yestrade-69-6497-2393141"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-6497-2393141"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-6497-2393141#0000",
+          "yestrade-69-6497-2393141#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-6497-2393141"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-6497-2393141#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-topic-v1-006",
+      "category": "topic_period",
+      "query": "2013년 상반기 자율준수무역거래자 지정기업 워크숍은 언제 어디에서 열렸어?",
+      "gold": [
+        "yestrade-69-857"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-857",
+        "yestrade-69-857-2391812"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-857#0000"
+        ],
+        [
+          "yestrade-69-857-2391812#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-857"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-857#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-topic-v1-007",
+      "category": "topic_period",
+      "query": "2020년 하반기 수출입 맞춤형 컨설팅의 연장된 신청 마감일은 언제야?",
+      "gold": [
+        "yestrade-69-9112"
+      ],
+      "first": false,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-9112-2394309",
+        "yestrade-69-9112"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-9112-2394309#0002",
+          "yestrade-69-9112-2394309#0000",
+          "yestrade-69-9112-2394309#0004",
+          "yestrade-69-9112-2394309#0003",
+          "yestrade-69-9112-2394309#0001"
+        ],
+        [
+          "yestrade-69-9112#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-9112"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-9112#0000"
+        ]
+      ]
+    }
+  ],
+  "metrics": {
+    "queries": 7,
+    "hit_at_1": 0.8571428571428571,
+    "precision_at_1": 0.8571428571428571,
+    "hit_at_5": 1.0,
+    "recall_at_5": 1.0,
+    "precision_returned_at_5": 0.6428571428571429,
+    "mean_returned_at_5": 1.7142857142857142,
+    "micro_recall_at_5": 1.0,
+    "mrr_at_5": 0.9285714285714286,
+    "group_queries": 7,
+    "group_hit_at_5": 1.0,
+    "group_recall_at_5": 1.0,
+    "group_micro_recall_at_5": 1.0,
+    "group_all_at_5": 1.0,
+    "evidence_queries": 7,
+    "evidence_hit_at_5": 1.0,
+    "evidence_recall_at_5": 1.0,
+    "evidence_micro_recall_at_5": 1.0,
+    "evidence_all_at_5": 1.0,
+    "evidence_precision_at_5": 0.36904761904761907,
+    "evidence_micro_precision_at_5": 0.3181818181818182,
+    "evidence_mrr_at_5": 0.880952380952381,
+    "evidence_first_rank_at_5": 1.7142857142857142,
+    "mean_chunks_at_5": 3.142857142857143
+  },
+  "coverage_known": true
+}

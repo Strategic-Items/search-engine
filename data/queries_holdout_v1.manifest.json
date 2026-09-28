@@ -1,0 +1,44 @@
+{
+ "schema_version": 2,
+ "created_at": "2026-09-23",
+ "status": "frozen_before_first_search",
+ "purpose": "과적합 측정용 홀드아웃. 튜닝에 한 번도 쓰지 않은 문서와 질의.",
+ "queries_file": "queries_holdout_v1.jsonl",
+ "queries_sha256": "38abbb92aaf51db4ce45ee11f0f8b8fb391dc4e5f3929b47edc64624688b44a0",
+ "queries": 69,
+ "categories": {
+  "multi_evidence": 11,
+  "scenario": 29,
+  "paraphrase": 22,
+  "identifier_number": 2,
+  "identifier_mixed": 2,
+  "identifier_article": 3
+ },
+ "negative_queries_file": "queries_holdout_v1_unanswerable.jsonl",
+ "negative_queries_sha256": "d597853f1bf0cb739e55119a127a2fe53457bac865e34d2c71622792fcedb1be",
+ "negative_queries": 11,
+ "source_corpus": "data/generated/holdout-v1/core.jsonl",
+ "source_corpus_sha256": "afb464ccfd3125e4dbcf7a044ae07fb2db48ddc43d4bf497be713988571507db",
+ "source_chunks": 84413,
+ "source_parents": 3293,
+ "corpus_builder": "unstructured-doc-parser_ver2-holdout (로컬 전용 복사본, 브랜치 local/holdout-corpus 490d28b) scripts/build_holdout_corpus.py -- docs와 같은 파서·청커, 47/47 docs 문서 동일 재현 확인",
+ "sampling": {
+  "script": "scripts/sample_holdout_parents.py",
+  "seed": 20260923,
+  "parents": 70,
+  "target_chunks": "3청크 이하는 전부, 그보다 길면 시드로 고른 청크와 다음 청크",
+  "skipped_parents": 1
+ },
+ "labeling": "요구사항별 핵심 문구를 코퍼스 전체에서 문자열 일치(한글·영숫자 정규화)로 찾아 사본을 모두 정답·근거에 넣음 (scripts/build_holdout_queries.py). source_specific 질의는 지정 문서만 정답.",
+ "v2_search_executed_on_this_corpus": false,
+ "gold_unit": "parent_id",
+ "primary_document_metric": "group_recall_at_k",
+ "primary_answer_support_metric": "evidence_recall_at_k",
+ "human_review": "pending",
+ "limitations": [
+  "AI 작성 초안이며 사람 검수 전이다. v2와 같은 작성자 유형(assistant)이라 작성 습관은 통제되지만, 사람이 쓴 질의와는 다를 수 있다.",
+  "사본 탐지는 문자열 일치라, 표현이 다른 동등 문서(요약본, 번역본)는 정답에서 빠질 수 있다. 그런 문서가 1위를 하면 오답으로 채점된다.",
+  "docs 코퍼스에 같은 내용이 있는 경우 docs_equivalent_*에 따로 적었다. docs를 함께 읽는 조건에서는 그 문서도 정답으로 봐야 한다.",
+  "질의 작성 대상 청크는 무작위였지만 질의 표현은 작성자가 골랐다."
+ ]
+}

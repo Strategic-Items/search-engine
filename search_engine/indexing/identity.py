@@ -53,14 +53,18 @@ def download_copy_key(source_path: str) -> tuple[str, int] | None:
 
     `(1)`이 붙지 않은 원본은 0번으로 돌아오므로 정렬하면 언제나 원본이 먼저다.
     경로가 없으면 묶을 수 없고 None을 돌려준다 -- 그 문서는 그대로 남는다.
+
+    열쇠에는 디렉터리가 들어간다. 사본은 원본 옆에 생기기 때문이다. 파일명만
+    쓰면 `faq/113.html`과 `posts/69/113.html`처럼 번호만 같은 남남이 묶여, 수집
+    코퍼스에서 FAQ 94건이 사본으로 지워졌다(2026-09-23).
     """
-    name = (source_path or "").rsplit("/", 1)[-1]
+    directory, _, name = (source_path or "").rpartition("/")
     if not name:
         return None
     match = DOWNLOAD_COPY.match(name)
     if not match:
-        return name, 0
-    return match.group("stem") + match.group("ext"), int(match.group("copy"))
+        return f"{directory}/{name}", 0
+    return f"{directory}/{match.group('stem')}{match.group('ext')}", int(match.group("copy"))
 
 
 def download_copies(rows: list[dict]) -> set[str]:

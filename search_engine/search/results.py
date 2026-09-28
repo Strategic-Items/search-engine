@@ -9,6 +9,7 @@ class Passage(BaseModel):
     id: str
     body: str = ""
     score: float | None = None
+    relevance: int | None = None
 
 
 class SearchHit(BaseModel):
@@ -34,6 +35,7 @@ class SearchHit(BaseModel):
     # 질문에 대한 답변은 종종 다른 조각에 있으며, 그 조각은 이전에 버려졌었다.
     # `id`/`body`는 문서의 기본 조각으로 유지된다.
     passages: list[Passage] = []
+    chunk_relevance: int | None = None
     # 고립된 콜센터 코퍼스에서만 존재한다. 이들을 선택적으로 유지함으로써
     # 공유 리트리버가 간결하고 유용한 케이스 카드를 반환할 수 있게 한다.
     # 공식 문서 응답 계약을 변경하는 중.

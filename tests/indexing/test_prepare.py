@@ -70,6 +70,16 @@ def test_a_group_without_the_original_keeps_its_lowest_copy():
     assert download_copies(rows) == {"b"}
 
 
+def test_same_file_name_in_different_directories_is_not_a_copy():
+    """사본은 원본 옆에 생긴다. 번호만 같은 다른 폴더의 문서는 남남이다."""
+    rows = [
+        {"parent_id": "faq-113", "source_path": "yestrade/faq/113.html"},
+        {"parent_id": "post-113", "source_path": "yestrade/posts/69/113.html"},
+        {"parent_id": "copy", "source_path": "yestrade/posts/69/113 (1).html"},
+    ]
+    assert download_copies(rows) == {"copy"}
+
+
 def test_documents_without_a_source_path_are_never_grouped():
     """경로가 없으면 사본인지 알 수 없다. 지우지 않는다."""
     rows = [{"parent_id": "a", "source_path": ""}, {"parent_id": "b", "source_path": ""}]

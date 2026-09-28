@@ -15,6 +15,68 @@ from search_engine.search import (
     search_all,
     search_modes,
 )
+from search_engine.search.query import _reporting_half, _same_reporting_half, _same_topic_in_title
+
+
+def test_reporting_half_reads_four_and_two_digit_years_without_confusing_publication_year():
+    assert _reporting_half("2022년 하반기 CP 실적보고") == (2022, "하")
+    assert _same_reporting_half("실적보고(22년도 하반기), 2023년 1월 발행", (2022, "하"))
+    assert not _same_reporting_half("실적보고(2022년 상반기)", (2022, "하"))
+    assert not _same_reporting_half("2023년 1월 발행", (2022, "하"))
+    assert _reporting_half("2022년 하반기와 2023년 상반기") is None
+
+
+def test_hybrid_promotes_existing_candidate_with_matching_reporting_half():
+    client = Mock()
+    wrong = {"_id": "old", "_score": 10.0, "_source": {
+        "parent_id": "old", "title": "2014년도 하반기 CP 보고"}}
+    right = {"_id": "right", "_score": 9.5, "_source": {
+        "parent_id": "right", "title": "22년도 하반기 CP 보고"}}
+    client.search.side_effect = [
+        {"hits": {"hits": [wrong, right]}},
+        {"hits": {"hits": [wrong, right]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 1024
+    hits = retrieve(client, "search-documents", "2022년 하반기 CP 보고",
+                    date(2026, 9, 25), 2, embedder, cutoff_ratio=0)
+    assert [hit.parent_id for hit in hits] == ["right", "old"]
+
+
+def test_matching_reporting_half_survives_pre_fusion_score_trim():
+    client = Mock()
+    wrong = {"_id": "old", "_score": 10.0, "_source": {
+        "parent_id": "old", "title": "2014년도 하반기 CP 보고"}}
+    right = {"_id": "right", "_score": 8.0, "_source": {
+        "parent_id": "right", "title": "22년도 하반기 CP 보고"}}
+    client.search.side_effect = [
+        {"hits": {"hits": [wrong, right]}},
+        {"hits": {"hits": [wrong, right]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 1024
+    hits = retrieve(client, "search-documents", "2022년 하반기 CP 보고",
+                    date(2026, 9, 25), 2, embedder)
+    assert "right" in [hit.parent_id for hit in hits]
+
+
+def test_period_support_keeps_same_topic_even_below_final_ratio_cutoff():
+    assert _same_topic_in_title("2022년 하반기 CP 실적보고", "22년도 하반기 CP 실적보고")
+    assert not _same_topic_in_title("2022년 하반기 CP 실적보고", "2022년 하반기 방산 상담회")
+    client = Mock()
+    other_topic = {"_id": "other", "_score": 10.0, "_source": {
+        "parent_id": "other", "title": "2022년 하반기 방산 상담회"}}
+    answer = {"_id": "answer", "_score": 8.0, "_source": {
+        "parent_id": "answer", "title": "22년도 하반기 CP 실적보고"}}
+    client.search.side_effect = [
+        {"hits": {"hits": [other_topic, answer]}},
+        {"hits": {"hits": [other_topic, answer]}},
+    ]
+    embedder = Mock()
+    embedder.embed_query.return_value = [0.1] * 1024
+    hits = retrieve(client, "search-documents", "2022년 하반기 CP 실적보고",
+                    date(2026, 9, 25), 2, embedder)
+    assert [hit.parent_id for hit in hits] == ["other", "answer"]
 
 
 def matching_query(query: dict) -> dict:
@@ -30,6 +92,7 @@ def boosts(query: dict, key: str) -> list[dict]:
 
 def test_query_keeps_unknown_dates_and_filters_expired_documents():
     query = build_query("수출허가", date(2026, 9, 15))
+    assert matching_query(query)["bool"]["should"][0]["multi_match"]["fields"][0] == "title^1"
     filters = matching_query(query)["bool"]["filter"]
     assert filters[0]["bool"]["should"][0]["range"]["effective_from"]["lte"] == "2026-09-15"
     assert filters[1]["bool"]["should"][0]["range"]["effective_to"]["gt"] == "2026-09-15"
@@ -46,6 +109,19 @@ def test_retrieve_returns_unique_parent_documents():
     hits = retrieve(client, "search-documents", "수출허가", date.today(), 2, cutoff_ratio=0)
     assert [hit.parent_id for hit in hits] == ["doc-1", "doc-2"]
     assert client.search.call_args.kwargs["size"] == 10
+
+
+def test_lexical_search_uses_global_term_statistics_across_indices():
+    client = Mock()
+    client.search.return_value = {"hits": {"hits": []}}
+    retrieve(client, "search-holdout,search-docs", "수출허가", date.today(), 5,
+             mode="bm25", query_rewrite=False)
+    assert client.search.call_args.kwargs["search_type"] == "dfs_query_then_fetch"
+
+    client.reset_mock()
+    retrieve(client, "search-docs", "수출허가", date.today(), 5,
+             mode="bm25", query_rewrite=False)
+    assert "search_type" not in client.search.call_args.kwargs
 
 
 def test_explicit_year_month_boosts_matching_publication_and_effective_dates():

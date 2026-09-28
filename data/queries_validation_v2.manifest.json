@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-25",
+  "status": "frozen_before_first_validation_query_search",
+  "purpose": "Independent question-level check of title^1 and multi-index DFS without further tuning",
+  "sample_commit": "67948ba",
+  "sample_manifest": "data/generated/validation-v2/frozen_sample.json",
+  "sample_manifest_sha256": "74b590d5492f5ec14761e45436eb2b4563dc0782eee7f222ae397bc57d9aa06b",
+  "source_corpus": "data/generated/holdout-v1/core.jsonl",
+  "source_corpus_sha256": "afb464ccfd3125e4dbcf7a044ae07fb2db48ddc43d4bf497be713988571507db",
+  "query_spec": "data/generated/validation-v2/queries_spec.json",
+  "query_spec_sha256": "dc9e78249221b60f7fe6cae7ce09d84554a5b56a894c780b1f16088be9919c13",
+  "core_queries": "data/queries_validation_v2.jsonl",
+  "core_queries_sha256": "d44e49607289beaeaf28cda567df61b040c885cbdc4807787c6045f0877084ee",
+  "combined_queries": "data/queries_validation_v2_combined.jsonl",
+  "combined_queries_sha256": "d5f293dc1ff8ad96470ba2a0c44e99a69f583947cefe86c623fc92ad954c80fb",
+  "questions": 36,
+  "categories": {
+    "scenario": 8,
+    "paraphrase": 5,
+    "identifier": 11,
+    "multi_evidence": 7,
+    "form": 5
+  },
+  "all_sampled_parents_used": true,
+  "source_review": "assistant; human review pending",
+  "labeling": "Phrase match over corpus before search; new top-five equivalents to be adjudicated after search",
+  "retrieval_configuration": "af064c9 title^1 + multi-index dfs_query_then_fetch; no tuning on validation-v2"
+}

@@ -1,0 +1,5874 @@
+{
+  "source": "data/generated/docs-v2/comparison-135q-stage27-modes.json",
+  "source_sha256": "64e15d3db1b13ebd2e32424b83137da921889d1283f9325b86328b501f47ae99",
+  "protocol": "data/generated/routing-v1/protocol.md",
+  "queries": 135,
+  "document_groups": [
+    [
+      "docs-v2-001",
+      "docs-v2-002",
+      "docs-v2-028",
+      "docs-v2-029",
+      "docs-v2-038",
+      "docs-v2-051",
+      "docs-v2-052",
+      "docs-v2-057",
+      "docs-v2-058",
+      "docs-v2-059",
+      "docs-v2-060",
+      "docs-v2-061",
+      "docs-v2-062",
+      "docs-v2-075",
+      "docs-v2-076"
+    ],
+    [
+      "docs-v2-012",
+      "docs-v2-030",
+      "docs-v2-031",
+      "docs-v2-032",
+      "docs-v2-034",
+      "docs-v2-039",
+      "docs-v2-063",
+      "docs-v2-064",
+      "docs-v2-065",
+      "docs-v2-066",
+      "docs-v2-077",
+      "docs-v2-123",
+      "docs-v2-124",
+      "docs-v2-135"
+    ],
+    [
+      "docs-v2-081",
+      "docs-v2-082",
+      "docs-v2-083",
+      "docs-v2-084",
+      "docs-v2-085",
+      "docs-v2-086",
+      "docs-v2-087",
+      "docs-v2-088",
+      "docs-v2-089",
+      "docs-v2-090"
+    ],
+    [
+      "docs-v2-013",
+      "docs-v2-014",
+      "docs-v2-015",
+      "docs-v2-016",
+      "docs-v2-053",
+      "docs-v2-054",
+      "docs-v2-055",
+      "docs-v2-056",
+      "docs-v2-079",
+      "docs-v2-125"
+    ],
+    [
+      "docs-v2-094",
+      "docs-v2-095",
+      "docs-v2-096",
+      "docs-v2-097",
+      "docs-v2-098",
+      "docs-v2-099",
+      "docs-v2-100",
+      "docs-v2-101",
+      "docs-v2-102"
+    ],
+    [
+      "docs-v2-021",
+      "docs-v2-022",
+      "docs-v2-023",
+      "docs-v2-024",
+      "docs-v2-035",
+      "docs-v2-073",
+      "docs-v2-074",
+      "docs-v2-126"
+    ],
+    [
+      "docs-v2-067",
+      "docs-v2-068",
+      "docs-v2-069",
+      "docs-v2-070",
+      "docs-v2-071",
+      "docs-v2-072",
+      "docs-v2-078"
+    ],
+    [
+      "docs-v2-103",
+      "docs-v2-104",
+      "docs-v2-105",
+      "docs-v2-106",
+      "docs-v2-107",
+      "docs-v2-108"
+    ],
+    [
+      "docs-v2-025",
+      "docs-v2-026",
+      "docs-v2-027",
+      "docs-v2-036",
+      "docs-v2-132"
+    ],
+    [
+      "docs-v2-003",
+      "docs-v2-033",
+      "docs-v2-037",
+      "docs-v2-133"
+    ],
+    [
+      "docs-v2-017",
+      "docs-v2-018",
+      "docs-v2-127",
+      "docs-v2-128"
+    ],
+    [
+      "docs-v2-109",
+      "docs-v2-110",
+      "docs-v2-111",
+      "docs-v2-112"
+    ],
+    [
+      "docs-v2-047",
+      "docs-v2-048",
+      "docs-v2-134"
+    ],
+    [
+      "docs-v2-091",
+      "docs-v2-092",
+      "docs-v2-093"
+    ],
+    [
+      "docs-v2-049",
+      "docs-v2-050",
+      "docs-v2-122"
+    ],
+    [
+      "docs-v2-043",
+      "docs-v2-044",
+      "docs-v2-131"
+    ],
+    [
+      "docs-v2-113",
+      "docs-v2-114",
+      "docs-v2-115"
+    ],
+    [
+      "docs-v2-008",
+      "docs-v2-129"
+    ],
+    [
+      "docs-v2-019",
+      "docs-v2-020"
+    ],
+    [
+      "docs-v2-004",
+      "docs-v2-080"
+    ],
+    [
+      "docs-v2-041",
+      "docs-v2-042"
+    ],
+    [
+      "docs-v2-045",
+      "docs-v2-046"
+    ],
+    [
+      "docs-v2-005",
+      "docs-v2-040"
+    ],
+    [
+      "docs-v2-116",
+      "docs-v2-117"
+    ],
+    [
+      "docs-v2-009",
+      "docs-v2-121"
+    ],
+    [
+      "docs-v2-010"
+    ],
+    [
+      "docs-v2-006"
+    ],
+    [
+      "docs-v2-118"
+    ],
+    [
+      "docs-v2-119"
+    ],
+    [
+      "docs-v2-130"
+    ],
+    [
+      "docs-v2-011"
+    ],
+    [
+      "docs-v2-120"
+    ],
+    [
+      "docs-v2-007"
+    ]
+  ],
+  "folds": [
+    [
+      "docs-v2-001",
+      "docs-v2-002",
+      "docs-v2-028",
+      "docs-v2-029",
+      "docs-v2-038",
+      "docs-v2-051",
+      "docs-v2-052",
+      "docs-v2-057",
+      "docs-v2-058",
+      "docs-v2-059",
+      "docs-v2-060",
+      "docs-v2-061",
+      "docs-v2-062",
+      "docs-v2-075",
+      "docs-v2-076",
+      "docs-v2-003",
+      "docs-v2-033",
+      "docs-v2-037",
+      "docs-v2-133",
+      "docs-v2-091",
+      "docs-v2-092",
+      "docs-v2-093",
+      "docs-v2-019",
+      "docs-v2-020",
+      "docs-v2-116",
+      "docs-v2-117",
+      "docs-v2-119"
+    ],
+    [
+      "docs-v2-012",
+      "docs-v2-030",
+      "docs-v2-031",
+      "docs-v2-032",
+      "docs-v2-034",
+      "docs-v2-039",
+      "docs-v2-063",
+      "docs-v2-064",
+      "docs-v2-065",
+      "docs-v2-066",
+      "docs-v2-077",
+      "docs-v2-123",
+      "docs-v2-124",
+      "docs-v2-135",
+      "docs-v2-025",
+      "docs-v2-026",
+      "docs-v2-027",
+      "docs-v2-036",
+      "docs-v2-132",
+      "docs-v2-049",
+      "docs-v2-050",
+      "docs-v2-122",
+      "docs-v2-004",
+      "docs-v2-080",
+      "docs-v2-009",
+      "docs-v2-121",
+      "docs-v2-130"
+    ],
+    [
+      "docs-v2-081",
+      "docs-v2-082",
+      "docs-v2-083",
+      "docs-v2-084",
+      "docs-v2-085",
+      "docs-v2-086",
+      "docs-v2-087",
+      "docs-v2-088",
+      "docs-v2-089",
+      "docs-v2-090",
+      "docs-v2-067",
+      "docs-v2-068",
+      "docs-v2-069",
+      "docs-v2-070",
+      "docs-v2-071",
+      "docs-v2-072",
+      "docs-v2-078",
+      "docs-v2-109",
+      "docs-v2-110",
+      "docs-v2-111",
+      "docs-v2-112",
+      "docs-v2-008",
+      "docs-v2-129",
+      "docs-v2-041",
+      "docs-v2-042",
+      "docs-v2-010",
+      "docs-v2-011"
+    ],
+    [
+      "docs-v2-013",
+      "docs-v2-014",
+      "docs-v2-015",
+      "docs-v2-016",
+      "docs-v2-053",
+      "docs-v2-054",
+      "docs-v2-055",
+      "docs-v2-056",
+      "docs-v2-079",
+      "docs-v2-125",
+      "docs-v2-103",
+      "docs-v2-104",
+      "docs-v2-105",
+      "docs-v2-106",
+      "docs-v2-107",
+      "docs-v2-108",
+      "docs-v2-017",
+      "docs-v2-018",
+      "docs-v2-127",
+      "docs-v2-128",
+      "docs-v2-043",
+      "docs-v2-044",
+      "docs-v2-131",
+      "docs-v2-045",
+      "docs-v2-046",
+      "docs-v2-006",
+      "docs-v2-120"
+    ],
+    [
+      "docs-v2-094",
+      "docs-v2-095",
+      "docs-v2-096",
+      "docs-v2-097",
+      "docs-v2-098",
+      "docs-v2-099",
+      "docs-v2-100",
+      "docs-v2-101",
+      "docs-v2-102",
+      "docs-v2-021",
+      "docs-v2-022",
+      "docs-v2-023",
+      "docs-v2-024",
+      "docs-v2-035",
+      "docs-v2-073",
+      "docs-v2-074",
+      "docs-v2-126",
+      "docs-v2-047",
+      "docs-v2-048",
+      "docs-v2-134",
+      "docs-v2-113",
+      "docs-v2-114",
+      "docs-v2-115",
+      "docs-v2-005",
+      "docs-v2-040",
+      "docs-v2-118",
+      "docs-v2-007"
+    ]
+  ],
+  "summary": {
+    "hybrid": {
+      "evidence_recall_at_5": 0.9629629629629629,
+      "evidence_mrr_at_5": 0.8178835978835979,
+      "choices": {
+        "hybrid": 135
+      },
+      "recall_improved_queries": 0,
+      "recall_harmed_queries": 0,
+      "recall_delta_ci95_group_bootstrap": [
+        0.0,
+        0.0
+      ]
+    },
+    "bm25": {
+      "evidence_recall_at_5": 0.8777777777777778,
+      "evidence_mrr_at_5": 0.7006878306878307,
+      "choices": {
+        "bm25": 135
+      },
+      "recall_improved_queries": 4,
+      "recall_harmed_queries": 16,
+      "recall_delta_ci95_group_bootstrap": [
+        -0.15053763440860216,
+        -0.02358490566037736
+      ]
+    },
+    "vector": {
+      "evidence_recall_at_5": 0.9222222222222223,
+      "evidence_mrr_at_5": 0.8162962962962963,
+      "choices": {
+        "vector": 135
+      },
+      "recall_improved_queries": 0,
+      "recall_harmed_queries": 7,
+      "recall_delta_ci95_group_bootstrap": [
+        -0.08187134502923976,
+        -0.01056338028169014
+      ]
+    },
+    "oracle": {
+      "evidence_recall_at_5": 0.9851851851851852,
+      "evidence_mrr_at_5": 0.924074074074074,
+      "choices": {
+        "hybrid": 108,
+        "bm25": 25,
+        "vector": 2
+      },
+      "recall_improved_queries": 4,
+      "recall_harmed_queries": 0,
+      "recall_delta_ci95_group_bootstrap": [
+        0.0,
+        0.045454545454545456
+      ]
+    },
+    "query_only": {
+      "evidence_recall_at_5": 0.9222222222222223,
+      "evidence_mrr_at_5": 0.7732451499118166,
+      "choices": {
+        "bm25": 38,
+        "hybrid": 97
+      },
+      "recall_improved_queries": 1,
+      "recall_harmed_queries": 7,
+      "recall_delta_ci95_group_bootstrap": [
+        -0.072992700729927,
+        -0.01056338028169014
+      ]
+    },
+    "query_and_results": {
+      "evidence_recall_at_5": 0.9555555555555556,
+      "evidence_mrr_at_5": 0.8065961199294532,
+      "choices": {
+        "hybrid": 119,
+        "bm25": 16
+      },
+      "recall_improved_queries": 1,
+      "recall_harmed_queries": 2,
+      "recall_delta_ci95_group_bootstrap": [
+        -0.018617021276595744,
+        0.0
+      ]
+    }
+  },
+  "models": {
+    "query_only": [
+      {
+        "test_qids": [
+          "docs-v2-001",
+          "docs-v2-002",
+          "docs-v2-028",
+          "docs-v2-029",
+          "docs-v2-038",
+          "docs-v2-051",
+          "docs-v2-052",
+          "docs-v2-057",
+          "docs-v2-058",
+          "docs-v2-059",
+          "docs-v2-060",
+          "docs-v2-061",
+          "docs-v2-062",
+          "docs-v2-075",
+          "docs-v2-076",
+          "docs-v2-003",
+          "docs-v2-033",
+          "docs-v2-037",
+          "docs-v2-133",
+          "docs-v2-091",
+          "docs-v2-092",
+          "docs-v2-093",
+          "docs-v2-019",
+          "docs-v2-020",
+          "docs-v2-116",
+          "docs-v2-117",
+          "docs-v2-119"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.08333333333333333,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 55.5,
+            "left": {
+              "prediction": -0.15384615384615385,
+              "samples": 39,
+              "feature": "chars",
+              "threshold": 52.5,
+              "left": {
+                "prediction": -0.07142857142857142,
+                "samples": 28
+              },
+              "right": {
+                "prediction": -0.36363636363636365,
+                "samples": 11
+              }
+            },
+            "right": {
+              "prediction": -0.043478260869565216,
+              "samples": 69,
+              "feature": "digit_count",
+              "threshold": 3.5,
+              "left": {
+                "prediction": 0.047619047619047616,
+                "samples": 21
+              },
+              "right": {
+                "prediction": -0.08333333333333333,
+                "samples": 48
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.046296296296296294,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 36.5,
+            "left": {
+              "prediction": -0.25,
+              "samples": 8
+            },
+            "right": {
+              "prediction": -0.03,
+              "samples": 100,
+              "feature": "chars",
+              "threshold": 62.5,
+              "left": {
+                "prediction": 0.0,
+                "samples": 52
+              },
+              "right": {
+                "prediction": -0.0625,
+                "samples": 48
+              }
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-012",
+          "docs-v2-030",
+          "docs-v2-031",
+          "docs-v2-032",
+          "docs-v2-034",
+          "docs-v2-039",
+          "docs-v2-063",
+          "docs-v2-064",
+          "docs-v2-065",
+          "docs-v2-066",
+          "docs-v2-077",
+          "docs-v2-123",
+          "docs-v2-124",
+          "docs-v2-135",
+          "docs-v2-025",
+          "docs-v2-026",
+          "docs-v2-027",
+          "docs-v2-036",
+          "docs-v2-132",
+          "docs-v2-049",
+          "docs-v2-050",
+          "docs-v2-122",
+          "docs-v2-004",
+          "docs-v2-080",
+          "docs-v2-009",
+          "docs-v2-121",
+          "docs-v2-130"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.1111111111111111,
+            "samples": 108,
+            "feature": "words",
+            "threshold": 15.5,
+            "left": {
+              "prediction": -0.06382978723404255,
+              "samples": 47,
+              "feature": "chars",
+              "threshold": 55.5,
+              "left": {
+                "prediction": -0.12903225806451613,
+                "samples": 31
+              },
+              "right": {
+                "prediction": 0.0625,
+                "samples": 16
+              }
+            },
+            "right": {
+              "prediction": -0.14754098360655737,
+              "samples": 61,
+              "feature": "words",
+              "threshold": 16.5,
+              "left": {
+                "prediction": -0.4444444444444444,
+                "samples": 9
+              },
+              "right": {
+                "prediction": -0.09615384615384616,
+                "samples": 52
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.037037037037037035,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 43.0,
+            "left": {
+              "prediction": -0.25,
+              "samples": 8
+            },
+            "right": {
+              "prediction": -0.02,
+              "samples": 100,
+              "feature": "chars",
+              "threshold": 83.5,
+              "left": {
+                "prediction": -0.010869565217391304,
+                "samples": 92
+              },
+              "right": {
+                "prediction": -0.125,
+                "samples": 8
+              }
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-081",
+          "docs-v2-082",
+          "docs-v2-083",
+          "docs-v2-084",
+          "docs-v2-085",
+          "docs-v2-086",
+          "docs-v2-087",
+          "docs-v2-088",
+          "docs-v2-089",
+          "docs-v2-090",
+          "docs-v2-067",
+          "docs-v2-068",
+          "docs-v2-069",
+          "docs-v2-070",
+          "docs-v2-071",
+          "docs-v2-072",
+          "docs-v2-078",
+          "docs-v2-109",
+          "docs-v2-110",
+          "docs-v2-111",
+          "docs-v2-112",
+          "docs-v2-008",
+          "docs-v2-129",
+          "docs-v2-041",
+          "docs-v2-042",
+          "docs-v2-010",
+          "docs-v2-011"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.06481481481481481,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 69.5,
+            "left": {
+              "prediction": -0.04,
+              "samples": 75,
+              "feature": "chars",
+              "threshold": 57.5,
+              "left": {
+                "prediction": -0.09090909090909091,
+                "samples": 44
+              },
+              "right": {
+                "prediction": 0.03225806451612903,
+                "samples": 31
+              }
+            },
+            "right": {
+              "prediction": -0.12121212121212122,
+              "samples": 33,
+              "feature": "chars",
+              "threshold": 73.5,
+              "left": {
+                "prediction": -0.3,
+                "samples": 10
+              },
+              "right": {
+                "prediction": -0.043478260869565216,
+                "samples": 23
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.041666666666666664,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 36.5,
+            "left": {
+              "prediction": -0.25,
+              "samples": 8
+            },
+            "right": {
+              "prediction": -0.025,
+              "samples": 100,
+              "feature": "chars",
+              "threshold": 81.5,
+              "left": {
+                "prediction": -0.010869565217391304,
+                "samples": 92
+              },
+              "right": {
+                "prediction": -0.1875,
+                "samples": 8
+              }
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-013",
+          "docs-v2-014",
+          "docs-v2-015",
+          "docs-v2-016",
+          "docs-v2-053",
+          "docs-v2-054",
+          "docs-v2-055",
+          "docs-v2-056",
+          "docs-v2-079",
+          "docs-v2-125",
+          "docs-v2-103",
+          "docs-v2-104",
+          "docs-v2-105",
+          "docs-v2-106",
+          "docs-v2-107",
+          "docs-v2-108",
+          "docs-v2-017",
+          "docs-v2-018",
+          "docs-v2-127",
+          "docs-v2-128",
+          "docs-v2-043",
+          "docs-v2-044",
+          "docs-v2-131",
+          "docs-v2-045",
+          "docs-v2-046",
+          "docs-v2-006",
+          "docs-v2-120"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.0787037037037037,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 57.5,
+            "left": {
+              "prediction": -0.15384615384615385,
+              "samples": 39,
+              "feature": "words",
+              "threshold": 13.5,
+              "left": {
+                "prediction": -0.07692307692307693,
+                "samples": 26
+              },
+              "right": {
+                "prediction": -0.3076923076923077,
+                "samples": 13
+              }
+            },
+            "right": {
+              "prediction": -0.036231884057971016,
+              "samples": 69,
+              "feature": "words",
+              "threshold": 19.5,
+              "left": {
+                "prediction": 0.01020408163265306,
+                "samples": 49
+              },
+              "right": {
+                "prediction": -0.15,
+                "samples": 20
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.032407407407407406,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 83.5,
+            "left": {
+              "prediction": -0.02,
+              "samples": 100,
+              "feature": "chars",
+              "threshold": 62.5,
+              "left": {
+                "prediction": 0.0,
+                "samples": 57
+              },
+              "right": {
+                "prediction": -0.046511627906976744,
+                "samples": 43
+              }
+            },
+            "right": {
+              "prediction": -0.1875,
+              "samples": 8
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-094",
+          "docs-v2-095",
+          "docs-v2-096",
+          "docs-v2-097",
+          "docs-v2-098",
+          "docs-v2-099",
+          "docs-v2-100",
+          "docs-v2-101",
+          "docs-v2-102",
+          "docs-v2-021",
+          "docs-v2-022",
+          "docs-v2-023",
+          "docs-v2-024",
+          "docs-v2-035",
+          "docs-v2-073",
+          "docs-v2-074",
+          "docs-v2-126",
+          "docs-v2-047",
+          "docs-v2-048",
+          "docs-v2-134",
+          "docs-v2-113",
+          "docs-v2-114",
+          "docs-v2-115",
+          "docs-v2-005",
+          "docs-v2-040",
+          "docs-v2-118",
+          "docs-v2-007"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.08796296296296297,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 77.5,
+            "left": {
+              "prediction": -0.11170212765957446,
+              "samples": 94,
+              "feature": "chars",
+              "threshold": 69.5,
+              "left": {
+                "prediction": -0.08974358974358974,
+                "samples": 78
+              },
+              "right": {
+                "prediction": -0.21875,
+                "samples": 16
+              }
+            },
+            "right": {
+              "prediction": 0.07142857142857142,
+              "samples": 14
+            }
+          },
+          "vector": {
+            "prediction": -0.046296296296296294,
+            "samples": 108,
+            "feature": "chars",
+            "threshold": 36.5,
+            "left": {
+              "prediction": -0.25,
+              "samples": 8
+            },
+            "right": {
+              "prediction": -0.03,
+              "samples": 100,
+              "feature": "chars",
+              "threshold": 62.5,
+              "left": {
+                "prediction": 0.0,
+                "samples": 52
+              },
+              "right": {
+                "prediction": -0.0625,
+                "samples": 48
+              }
+            }
+          }
+        }
+      }
+    ],
+    "query_and_results": [
+      {
+        "test_qids": [
+          "docs-v2-001",
+          "docs-v2-002",
+          "docs-v2-028",
+          "docs-v2-029",
+          "docs-v2-038",
+          "docs-v2-051",
+          "docs-v2-052",
+          "docs-v2-057",
+          "docs-v2-058",
+          "docs-v2-059",
+          "docs-v2-060",
+          "docs-v2-061",
+          "docs-v2-062",
+          "docs-v2-075",
+          "docs-v2-076",
+          "docs-v2-003",
+          "docs-v2-033",
+          "docs-v2-037",
+          "docs-v2-133",
+          "docs-v2-091",
+          "docs-v2-092",
+          "docs-v2-093",
+          "docs-v2-019",
+          "docs-v2-020",
+          "docs-v2-116",
+          "docs-v2-117",
+          "docs-v2-119"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.08333333333333333,
+            "samples": 108,
+            "feature": "bm25_vector_chunks_jaccard",
+            "threshold": 0.045454545454545456,
+            "left": {
+              "prediction": -0.7727272727272727,
+              "samples": 11
+            },
+            "right": {
+              "prediction": -0.005154639175257732,
+              "samples": 97,
+              "feature": "bm25_vector_chunks_jaccard",
+              "threshold": 0.26785714285714285,
+              "left": {
+                "prediction": 0.10714285714285714,
+                "samples": 14
+              },
+              "right": {
+                "prediction": -0.024096385542168676,
+                "samples": 83
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.046296296296296294,
+            "samples": 108,
+            "feature": "hybrid_chunks",
+            "threshold": 6.5,
+            "left": {
+              "prediction": 0.0,
+              "samples": 93
+            },
+            "right": {
+              "prediction": -0.3333333333333333,
+              "samples": 15
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-012",
+          "docs-v2-030",
+          "docs-v2-031",
+          "docs-v2-032",
+          "docs-v2-034",
+          "docs-v2-039",
+          "docs-v2-063",
+          "docs-v2-064",
+          "docs-v2-065",
+          "docs-v2-066",
+          "docs-v2-077",
+          "docs-v2-123",
+          "docs-v2-124",
+          "docs-v2-135",
+          "docs-v2-025",
+          "docs-v2-026",
+          "docs-v2-027",
+          "docs-v2-036",
+          "docs-v2-132",
+          "docs-v2-049",
+          "docs-v2-050",
+          "docs-v2-122",
+          "docs-v2-004",
+          "docs-v2-080",
+          "docs-v2-009",
+          "docs-v2-121",
+          "docs-v2-130"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.1111111111111111,
+            "samples": 108,
+            "feature": "bm25_vector_chunks_jaccard",
+            "threshold": 0.045454545454545456,
+            "left": {
+              "prediction": -0.7692307692307693,
+              "samples": 13
+            },
+            "right": {
+              "prediction": -0.021052631578947368,
+              "samples": 95,
+              "feature": "bm25_hybrid_chunks_jaccard",
+              "threshold": 0.26785714285714285,
+              "left": {
+                "prediction": 0.09090909090909091,
+                "samples": 11
+              },
+              "right": {
+                "prediction": -0.03571428571428571,
+                "samples": 84
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.037037037037037035,
+            "samples": 108,
+            "feature": "hybrid_chunks",
+            "threshold": 6.5,
+            "left": {
+              "prediction": 0.0,
+              "samples": 92
+            },
+            "right": {
+              "prediction": -0.25,
+              "samples": 16,
+              "feature": "bm25_hybrid_chunks_jaccard",
+              "threshold": 0.39230769230769236,
+              "left": {
+                "prediction": -0.1875,
+                "samples": 8
+              },
+              "right": {
+                "prediction": -0.3125,
+                "samples": 8
+              }
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-081",
+          "docs-v2-082",
+          "docs-v2-083",
+          "docs-v2-084",
+          "docs-v2-085",
+          "docs-v2-086",
+          "docs-v2-087",
+          "docs-v2-088",
+          "docs-v2-089",
+          "docs-v2-090",
+          "docs-v2-067",
+          "docs-v2-068",
+          "docs-v2-069",
+          "docs-v2-070",
+          "docs-v2-071",
+          "docs-v2-072",
+          "docs-v2-078",
+          "docs-v2-109",
+          "docs-v2-110",
+          "docs-v2-111",
+          "docs-v2-112",
+          "docs-v2-008",
+          "docs-v2-129",
+          "docs-v2-041",
+          "docs-v2-042",
+          "docs-v2-010",
+          "docs-v2-011"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.06481481481481481,
+            "samples": 108,
+            "feature": "bm25_vector_chunks_jaccard",
+            "threshold": 0.045454545454545456,
+            "left": {
+              "prediction": -0.6666666666666666,
+              "samples": 12
+            },
+            "right": {
+              "prediction": 0.010416666666666666,
+              "samples": 96,
+              "feature": "bm25_vector_chunks_jaccard",
+              "threshold": 0.26785714285714285,
+              "left": {
+                "prediction": 0.15384615384615385,
+                "samples": 13
+              },
+              "right": {
+                "prediction": -0.012048192771084338,
+                "samples": 83
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.041666666666666664,
+            "samples": 108,
+            "feature": "bm25_vector_top1_equal",
+            "threshold": 0.5,
+            "left": {
+              "prediction": -0.3,
+              "samples": 15
+            },
+            "right": {
+              "prediction": 0.0,
+              "samples": 93
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-013",
+          "docs-v2-014",
+          "docs-v2-015",
+          "docs-v2-016",
+          "docs-v2-053",
+          "docs-v2-054",
+          "docs-v2-055",
+          "docs-v2-056",
+          "docs-v2-079",
+          "docs-v2-125",
+          "docs-v2-103",
+          "docs-v2-104",
+          "docs-v2-105",
+          "docs-v2-106",
+          "docs-v2-107",
+          "docs-v2-108",
+          "docs-v2-017",
+          "docs-v2-018",
+          "docs-v2-127",
+          "docs-v2-128",
+          "docs-v2-043",
+          "docs-v2-044",
+          "docs-v2-131",
+          "docs-v2-045",
+          "docs-v2-046",
+          "docs-v2-006",
+          "docs-v2-120"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.0787037037037037,
+            "samples": 108,
+            "feature": "bm25_vector_chunks_jaccard",
+            "threshold": 0.045454545454545456,
+            "left": {
+              "prediction": -0.75,
+              "samples": 12
+            },
+            "right": {
+              "prediction": 0.005208333333333333,
+              "samples": 96,
+              "feature": "bm25_vector_chunks_jaccard",
+              "threshold": 0.29166666666666663,
+              "left": {
+                "prediction": 0.10714285714285714,
+                "samples": 14
+              },
+              "right": {
+                "prediction": -0.012195121951219513,
+                "samples": 82
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.032407407407407406,
+            "samples": 108,
+            "feature": "hybrid_chunks",
+            "threshold": 6.5,
+            "left": {
+              "prediction": 0.0,
+              "samples": 94
+            },
+            "right": {
+              "prediction": -0.25,
+              "samples": 14
+            }
+          }
+        }
+      },
+      {
+        "test_qids": [
+          "docs-v2-094",
+          "docs-v2-095",
+          "docs-v2-096",
+          "docs-v2-097",
+          "docs-v2-098",
+          "docs-v2-099",
+          "docs-v2-100",
+          "docs-v2-101",
+          "docs-v2-102",
+          "docs-v2-021",
+          "docs-v2-022",
+          "docs-v2-023",
+          "docs-v2-024",
+          "docs-v2-035",
+          "docs-v2-073",
+          "docs-v2-074",
+          "docs-v2-126",
+          "docs-v2-047",
+          "docs-v2-048",
+          "docs-v2-134",
+          "docs-v2-113",
+          "docs-v2-114",
+          "docs-v2-115",
+          "docs-v2-005",
+          "docs-v2-040",
+          "docs-v2-118",
+          "docs-v2-007"
+        ],
+        "train_count": 108,
+        "trees": {
+          "bm25": {
+            "prediction": -0.08796296296296297,
+            "samples": 108,
+            "feature": "bm25_vector_chunks_jaccard",
+            "threshold": 0.0625,
+            "left": {
+              "prediction": -0.7083333333333334,
+              "samples": 12
+            },
+            "right": {
+              "prediction": -0.010416666666666666,
+              "samples": 96,
+              "feature": "chars",
+              "threshold": 77.5,
+              "left": {
+                "prediction": -0.030120481927710843,
+                "samples": 83
+              },
+              "right": {
+                "prediction": 0.11538461538461539,
+                "samples": 13
+              }
+            }
+          },
+          "vector": {
+            "prediction": -0.046296296296296294,
+            "samples": 108,
+            "feature": "hybrid_chunks",
+            "threshold": 6.5,
+            "left": {
+              "prediction": 0.0,
+              "samples": 92
+            },
+            "right": {
+              "prediction": -0.3125,
+              "samples": 16,
+              "feature": "chars",
+              "threshold": 61.5,
+              "left": {
+                "prediction": -0.25,
+                "samples": 8
+              },
+              "right": {
+                "prediction": -0.375,
+                "samples": 8
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "oof_predictions": {
+    "query_only": {
+      "docs-v2-001": {
+        "bm25": 0.047619047619047616,
+        "vector": 0.0
+      },
+      "docs-v2-002": {
+        "bm25": 0.047619047619047616,
+        "vector": 0.0
+      },
+      "docs-v2-028": {
+        "bm25": 0.047619047619047616,
+        "vector": 0.0
+      },
+      "docs-v2-029": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-038": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-051": {
+        "bm25": -0.07142857142857142,
+        "vector": 0.0
+      },
+      "docs-v2-052": {
+        "bm25": -0.07142857142857142,
+        "vector": 0.0
+      },
+      "docs-v2-057": {
+        "bm25": -0.08333333333333333,
+        "vector": 0.0
+      },
+      "docs-v2-058": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-059": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-060": {
+        "bm25": -0.36363636363636365,
+        "vector": 0.0
+      },
+      "docs-v2-061": {
+        "bm25": -0.08333333333333333,
+        "vector": 0.0
+      },
+      "docs-v2-062": {
+        "bm25": -0.08333333333333333,
+        "vector": 0.0
+      },
+      "docs-v2-075": {
+        "bm25": -0.08333333333333333,
+        "vector": 0.0
+      },
+      "docs-v2-076": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-003": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-033": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-037": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-133": {
+        "bm25": -0.07142857142857142,
+        "vector": -0.25
+      },
+      "docs-v2-091": {
+        "bm25": -0.36363636363636365,
+        "vector": 0.0
+      },
+      "docs-v2-092": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-093": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-019": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-020": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-116": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-117": {
+        "bm25": -0.08333333333333333,
+        "vector": -0.0625
+      },
+      "docs-v2-119": {
+        "bm25": 0.047619047619047616,
+        "vector": -0.0625
+      },
+      "docs-v2-012": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-030": {
+        "bm25": -0.4444444444444444,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-031": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-032": {
+        "bm25": -0.09615384615384616,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-034": {
+        "bm25": -0.09615384615384616,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-039": {
+        "bm25": -0.09615384615384616,
+        "vector": -0.125
+      },
+      "docs-v2-063": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-064": {
+        "bm25": -0.4444444444444444,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-065": {
+        "bm25": -0.4444444444444444,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-066": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-077": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-123": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-124": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-135": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-025": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-026": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-027": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-036": {
+        "bm25": -0.09615384615384616,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-132": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-049": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-050": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-122": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-004": {
+        "bm25": -0.09615384615384616,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-080": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-009": {
+        "bm25": 0.0625,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-121": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-130": {
+        "bm25": -0.12903225806451613,
+        "vector": -0.25
+      },
+      "docs-v2-081": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-082": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.1875
+      },
+      "docs-v2-083": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-084": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-085": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.1875
+      },
+      "docs-v2-086": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-087": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-088": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.1875
+      },
+      "docs-v2-089": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-090": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-067": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-068": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-069": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-070": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-071": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-072": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-078": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-109": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-110": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.1875
+      },
+      "docs-v2-111": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-112": {
+        "bm25": -0.043478260869565216,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-008": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-129": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.25
+      },
+      "docs-v2-041": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-042": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-010": {
+        "bm25": 0.03225806451612903,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-011": {
+        "bm25": -0.09090909090909091,
+        "vector": -0.010869565217391304
+      },
+      "docs-v2-013": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-014": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-015": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-016": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-053": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-054": {
+        "bm25": -0.15,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-055": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-056": {
+        "bm25": 0.01020408163265306,
+        "vector": 0.0
+      },
+      "docs-v2-079": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-125": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-103": {
+        "bm25": -0.15,
+        "vector": -0.1875
+      },
+      "docs-v2-104": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-105": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-106": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-107": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-108": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-017": {
+        "bm25": -0.15,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-018": {
+        "bm25": -0.15,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-127": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-128": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-043": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-044": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-131": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-045": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-046": {
+        "bm25": -0.07692307692307693,
+        "vector": 0.0
+      },
+      "docs-v2-006": {
+        "bm25": 0.01020408163265306,
+        "vector": 0.0
+      },
+      "docs-v2-120": {
+        "bm25": 0.01020408163265306,
+        "vector": -0.046511627906976744
+      },
+      "docs-v2-094": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-095": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-096": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-097": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-098": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-099": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-100": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-101": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-102": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-021": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-022": {
+        "bm25": -0.08974358974358974,
+        "vector": -0.0625
+      },
+      "docs-v2-023": {
+        "bm25": -0.21875,
+        "vector": -0.0625
+      },
+      "docs-v2-024": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-035": {
+        "bm25": -0.21875,
+        "vector": -0.0625
+      },
+      "docs-v2-073": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-074": {
+        "bm25": -0.08974358974358974,
+        "vector": -0.0625
+      },
+      "docs-v2-126": {
+        "bm25": -0.08974358974358974,
+        "vector": -0.25
+      },
+      "docs-v2-047": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-048": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-134": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-113": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-114": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-115": {
+        "bm25": -0.21875,
+        "vector": -0.0625
+      },
+      "docs-v2-005": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      },
+      "docs-v2-040": {
+        "bm25": 0.07142857142857142,
+        "vector": -0.0625
+      },
+      "docs-v2-118": {
+        "bm25": -0.08974358974358974,
+        "vector": -0.0625
+      },
+      "docs-v2-007": {
+        "bm25": -0.08974358974358974,
+        "vector": 0.0
+      }
+    },
+    "query_and_results": {
+      "docs-v2-001": {
+        "bm25": -0.7727272727272727,
+        "vector": -0.3333333333333333
+      },
+      "docs-v2-002": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-028": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-029": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-038": {
+        "bm25": -0.7727272727272727,
+        "vector": -0.3333333333333333
+      },
+      "docs-v2-051": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-052": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-057": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-058": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-059": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-060": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-061": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-062": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-075": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-076": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-003": {
+        "bm25": 0.10714285714285714,
+        "vector": 0.0
+      },
+      "docs-v2-033": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-037": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-133": {
+        "bm25": 0.10714285714285714,
+        "vector": 0.0
+      },
+      "docs-v2-091": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-092": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-093": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-019": {
+        "bm25": -0.7727272727272727,
+        "vector": -0.3333333333333333
+      },
+      "docs-v2-020": {
+        "bm25": -0.7727272727272727,
+        "vector": -0.3333333333333333
+      },
+      "docs-v2-116": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-117": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-119": {
+        "bm25": -0.024096385542168676,
+        "vector": 0.0
+      },
+      "docs-v2-012": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-030": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-031": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-032": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-034": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-039": {
+        "bm25": -0.03571428571428571,
+        "vector": -0.3125
+      },
+      "docs-v2-063": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-064": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-065": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-066": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-077": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-123": {
+        "bm25": 0.09090909090909091,
+        "vector": 0.0
+      },
+      "docs-v2-124": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-135": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-025": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-026": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-027": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-036": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-132": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-049": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-050": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-122": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-004": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-080": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-009": {
+        "bm25": -0.7692307692307693,
+        "vector": -0.1875
+      },
+      "docs-v2-121": {
+        "bm25": -0.03571428571428571,
+        "vector": 0.0
+      },
+      "docs-v2-130": {
+        "bm25": -0.7692307692307693,
+        "vector": -0.3125
+      },
+      "docs-v2-081": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-082": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-083": {
+        "bm25": -0.6666666666666666,
+        "vector": -0.3
+      },
+      "docs-v2-084": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-085": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-086": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-087": {
+        "bm25": -0.6666666666666666,
+        "vector": -0.3
+      },
+      "docs-v2-088": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-089": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-090": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-067": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-068": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-069": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-070": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-071": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-072": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-078": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-109": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-110": {
+        "bm25": 0.15384615384615385,
+        "vector": 0.0
+      },
+      "docs-v2-111": {
+        "bm25": 0.15384615384615385,
+        "vector": 0.0
+      },
+      "docs-v2-112": {
+        "bm25": 0.15384615384615385,
+        "vector": 0.0
+      },
+      "docs-v2-008": {
+        "bm25": -0.6666666666666666,
+        "vector": -0.3
+      },
+      "docs-v2-129": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-041": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-042": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-010": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-011": {
+        "bm25": -0.012048192771084338,
+        "vector": 0.0
+      },
+      "docs-v2-013": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-014": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-015": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-016": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-053": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-054": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-055": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-056": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-079": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-125": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-103": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-104": {
+        "bm25": -0.75,
+        "vector": -0.25
+      },
+      "docs-v2-105": {
+        "bm25": 0.10714285714285714,
+        "vector": -0.25
+      },
+      "docs-v2-106": {
+        "bm25": -0.75,
+        "vector": -0.25
+      },
+      "docs-v2-107": {
+        "bm25": 0.10714285714285714,
+        "vector": 0.0
+      },
+      "docs-v2-108": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-017": {
+        "bm25": 0.10714285714285714,
+        "vector": 0.0
+      },
+      "docs-v2-018": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-127": {
+        "bm25": -0.012195121951219513,
+        "vector": -0.25
+      },
+      "docs-v2-128": {
+        "bm25": -0.75,
+        "vector": -0.25
+      },
+      "docs-v2-043": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-044": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-131": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-045": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-046": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-006": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-120": {
+        "bm25": -0.012195121951219513,
+        "vector": 0.0
+      },
+      "docs-v2-094": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-095": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-096": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-097": {
+        "bm25": -0.7083333333333334,
+        "vector": -0.375
+      },
+      "docs-v2-098": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-099": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-100": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-101": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-102": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-021": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-022": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-023": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-024": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-035": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-073": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-074": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-126": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-047": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-048": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-134": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-113": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-114": {
+        "bm25": 0.11538461538461539,
+        "vector": 0.0
+      },
+      "docs-v2-115": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-005": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-040": {
+        "bm25": -0.7083333333333334,
+        "vector": -0.375
+      },
+      "docs-v2-118": {
+        "bm25": -0.030120481927710843,
+        "vector": 0.0
+      },
+      "docs-v2-007": {
+        "bm25": -0.7083333333333334,
+        "vector": -0.25
+      }
+    }
+  },
+  "per_query": [
+    {
+      "qid": "docs-v2-001",
+      "query": "작은 회사가 공공 에너지 회사에서 쓰지 않는 특허를 공짜로 받아 사업에 활용할 수 있는 제도가 있을까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-002",
+      "query": "다른 회사의 기술을 사고파는 일을 전문으로 하는 기관으로 인정받으려면 어떤 사람들을 몇 명 두어야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-003",
+      "query": "연구장비를 잘 운영해서 기업을 도운 사람에게 주는 장관 표창은 그 분야에서 공적을 쌓은 기간이 최소 얼마나 돼야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-004",
+      "query": "행정절차에서 당사자의 지위를 이어받으려고 해. 관청에 알리는 서류와 승인을 요청하는 서류를 같이 볼 수 있는 양식이 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-005",
+      "query": "국내에서 만든 물건을 공항 면세점에서 외국인에게 파는 것도 법에서 말하는 수출에 들어가?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.3333333333333333
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          0.3333333333333333
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-006",
+      "query": "뇌의 신경망을 회로로 흉내 낸 칩과 단순히 행렬 계산을 하는 AI 칩을 다르게 설명한 개정 전후 자료가 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-007",
+      "query": "러시아로 보내는 물건 중 별도 허가가 필요한 목록을 늘리겠다고 의견을 받은 자료는 어디에 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-008",
+      "query": "수출허가를 신청할 때 내던 업체의 약속 문서를 없애려는 변경안이 있었다는데 그 자료를 보고 싶어.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-009",
+      "query": "데이터를 저장하는 게 아니라 계산하거나 신호를 감지하는 반도체를 어떤 종류로 나눈다는 건지 설명한 자료가 있을까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-010",
+      "query": "폐배터리에서 다시 뽑아 쓰는 원료를 들여올 때 2027년 세금을 낮춰 달라고 한 품목 목록을 볼 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-011",
+      "query": "수출 관련 규정을 고치는데 영향 분석 자료를 붙이지 않은 이유를 확인할 수 있는 문서가 있을까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-012",
+      "query": "지역에서 연구개발하는 기업의 부담을 줄이려고 정부에 내는 기술 사용료를 깎아 주자는 변경 자료가 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-013",
+      "query": "2025년 무역안보 관련 아이디어 행사에 친구 네 명과 나까지 다섯 명이 한 팀으로 참가하려고 해. 팀 인원 조건에 맞을까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.25
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          0.25
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-014",
+      "query": "2025년 무역안보 아이디어 행사에 세로 영상으로 참가하려는데 길이가 2분이야. 길이 제한에 걸릴까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.16666666666666666
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-015",
+      "query": "2025년 무역안보 아이디어 행사에 홍보 그림도 만들고 짧은 문구도 냈는데, 한 사람이 둘 다 참가하면 안 되는 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-016",
+      "query": "2025년 무역안보 아이디어 행사에 보낼 작품은 만들었어. 담당자에게 이메일로 보내는 건지 별도 접수 화면이 있는 건지 알고 싶어.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-017",
+      "query": "허가 면제 거래를 미리 보고하는 서류를 쓰는데, 물건을 실제로 쓰는 업체가 두 곳이야. 칸에는 대표 업체 한 곳만 적어도 될까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-018",
+      "query": "허가 면제 거래를 미리 보고할 때는 아직 배에 싣기 전이라 운송장 번호가 없는데, 거래 내역 칸을 언제 채우라고 돼 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-019",
+      "query": "해외 구매자가 받은 물건을 다른 나라 업체에 다시 팔 수도 있대. 수출 때 받는 영문 사용자 약속 양식에는 이 부분을 어떻게 써 놓았어?",
+      "scores": {
+        "hybrid": [
+          0.0,
+          0.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-020",
+      "query": "품목 기준으로 한꺼번에 받는 수출허가용 영문 사용자 확인서를 쓰고 있어. 수량은 아직 정해지지 않았는데 그 칸을 비워 둘 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-021",
+      "query": "2026년 두 번째 산업부 청년인턴에 붙었어. 가족관계 서류를 다섯 달 전에 발급받았는데 그대로 제출해도 될까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-022",
+      "query": "2026년 두 번째 산업부 청년인턴 합격 서류를 올리려고 해. 파일 이름은 아무렇게나 붙이고 서명은 타자로 입력해도 돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-023",
+      "query": "2026년 두 번째 산업부 청년인턴에 최종 합격했는데 다른 일을 하게 돼서 못 나갈 것 같아. 포기 의사를 어떻게 전달해야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          0.2
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-024",
+      "query": "2026년 두 번째 산업부 청년인턴에 최종 합격했는데 처음 출근하는 날짜가 정해져 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.25
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-025",
+      "query": "2026년 미주통상과 영어 문서 담당자 면접을 보러 가는데 주민등록증 하나만 가져가면 되지?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-026",
+      "query": "2026년 미주통상과 영어 문서 담당자 면접이 잡혔어. 내 순서 10분 전에 대기실에 도착하면 괜찮을까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-027",
+      "query": "2026년 미주통상과 영어 문서 담당자 면접을 본 뒤 최종 결과를 언제 어디서 확인하라고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-028",
+      "query": "에너지 공기업의 특허를 무료로 넘겨받으면 등록 절차 비용이나 매년 유지하는 돈까지 전부 안 내도 되는 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.2
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-029",
+      "query": "우리 회사는 중소기업이나 중견기업이 아닌 대기업인데, 에너지 공기업 특허를 무료로 받는 이번 사업의 지원대상에 들어가?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.2
+        ],
+        "bm25": [
+          1.0,
+          0.25
+        ],
+        "vector": [
+          1.0,
+          0.2
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-030",
+      "query": "산업이 어려워진 지역의 기업 대출 이자를 지원하는 사업에서 추천서를 받았어. 그러면 은행이 반드시 돈을 빌려주는 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-031",
+      "query": "당진에서 산업위기 지역 대출 이자 지원을 신청하려는데, 예전처럼 중앙 진흥원에 보내면 돼? 바뀐 접수처가 있나?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-032",
+      "query": "산업위기 지역 대출 이자 지원을 마감 직전에 신청하려고 해. 달력에 적힌 마지막 날까지는 무조건 접수를 받는 거지?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-033",
+      "query": "산업부 지원을 받아 바이오헬스 연구를 한 지 2년 됐어. 이번 연구자 포상 공고에 적힌 최소 공적 기간은 채운 걸까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-034",
+      "query": "정부 연구개발 과제의 기술 사용료를 내는데, 예전에는 납부 방식을 선택하겠다는 확인서를 냈어. 그 서류 관련 조항을 없애려는 변경안이 있어?",
+      "scores": {
+        "hybrid": [
+          0.0,
+          0.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-035",
+      "query": "2026년 두 번째 산업부 청년인턴에 붙었어. 서류를 언제까지 내야 하고, 실제 출근은 언제 시작하는지 한 번에 확인하고 싶어.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-036",
+      "query": "2026년 미주통상과 영어 문서 담당자 면접에 가려고 해. 얼마나 일찍 도착해야 하고 신분증은 몇 개 챙겨야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-037",
+      "query": "연구장비 운영으로 기업을 도운 개인 표창과 바이오헬스 연구자 포상을 비교하고 있어. 각각 해당 분야에서 공적을 쌓은 기간이 최소 몇 년이어야 해?",
+      "scores": {
+        "hybrid": [
+          0.5,
+          1.0
+        ],
+        "bm25": [
+          0.5,
+          1.0
+        ],
+        "vector": [
+          0.5,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-038",
+      "query": "기술을 사업에 쓰고 싶은 회사야. 공공 에너지 회사 특허를 무료로 받는 지원과, 다른 회사 기술 거래를 전문으로 하는 기관 지정을 비교하면 대상과 목적이 어떻게 달라?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          0.5,
+          1.0
+        ],
+        "vector": [
+          0.5,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-039",
+      "query": "지역에서 연구개발하는 중소기업인데, 대출 이자를 줄여 주는 지원과 정부에 내는 기술 사용료를 깎아 주자는 변경안을 혼동하고 있어. 각각 어떤 부담을 줄이는 자료인지 따로 확인해 줘.",
+      "scores": {
+        "hybrid": [
+          0.5,
+          0.14285714285714285
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-040",
+      "query": "법에서 말하는 수출에는 국내 면세점에서 외국인에게 파는 것도 들어가는지, 그리고 전략물자 판정 업무를 다른 기관에 맡기는 규정은 어디 있는지 확인하고 싶어.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.5,
+          1.0
+        ],
+        "vector": [
+          0.5,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-041",
+      "query": "공공기관이 엔지니어링 용역비를 계산한 내용을 입찰 참가자에게 보여 주도록 하려는 변경안은 왜 나온 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-042",
+      "query": "엔지니어링 용역비 계산 내역을 공개하는 변경안에서는 언제 어떤 문서에 넣어 보여 주라고 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-043",
+      "query": "해외 사이트에서 직접 산 어린이용 물건도 안전정보를 모으고 관리하는 대상에 넣으려는 자료가 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-044",
+      "query": "칠판이나 게시판 같은 학습용 도구의 종류를 안전 관련 규정에서 정하려는 이유가 뭐야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-045",
+      "query": "내일디자인센터의 고객 서비스 관리자 민간자격은 왜 등록을 없앴다고 돼 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-046",
+      "query": "지식재산스토리텔링협회가 운영하던 ESG 관련 두 민간자격은 어떤 이유로 등록을 폐지했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-047",
+      "query": "2026년 2분기에 등록된 첨단산업 교육 전문가 중 인공지능 분야 사람은 누구야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-048",
+      "query": "2026년 2분기 첨단산업 교육 전문가 등록 명단에는 이차전지와 로봇 분야에 각각 누가 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-049",
+      "query": "2026년 9월 가스 안전 기준 개정 안내에서 안전밸브에 적는 유량 명칭과 단위는 어떻게 바꿨어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-050",
+      "query": "가스 설비 기준에서 해수로 채운 해저터널의 배관도 지상 배관처럼 지진 설계를 적용하는 이유가 뭐야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-051",
+      "query": "기술 거래를 전문으로 하는 기관으로 지정받으려면 업무 안내서에는 어떤 내용이 들어 있어야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-052",
+      "query": "사업화 지원을 전문으로 하는 회사로 지정받으려면 최근 실적은 얼마나 있어야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-053",
+      "query": "2025년 무역안보 아이디어 행사에 친구와 팀으로 참여해. 개인정보 동의서는 대표인 나만 내면 돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-054",
+      "query": "2025년 무역안보 아이디어 행사에 정책 제안을 두 건 내려고 해. 서로 다른 아이디어면 같은 부문에 둘 다 낼 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          0.16666666666666666
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-055",
+      "query": "2025년 무역안보 아이디어 행사에 예전에 다른 공모전에서 상 받은 포스터를 다시 내도 돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.2
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-056",
+      "query": "2025년 무역안보 아이디어 행사 시상식에 참석하려고 해. 현장에서 본인 확인을 위해 무엇을 챙겨야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.2
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-057",
+      "query": "기술거래기관 지정이 취소된 지 4개월 됐어. 2026년 지정 신청 공고 기준으로 바로 다시 신청할 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-058",
+      "query": "사업화 자문을 하는 회사가 2026년 전문회사 지정을 신청하려고 해. 자격 인력 다섯 명이 있어도 기술거래사가 한 명뿐이면 인력 기준에 맞아?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-059",
+      "query": "우리 회사는 사업화에 필요한 자금 유치와 투자만 해. 2026년 전문회사 지정 공고의 자격 인력 다섯 명 고용 요건에도 예외가 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-060",
+      "query": "2026년 에너지 공기업 무료 특허 이전 사업에 관심 있어. 공고에 나온 기술 수는 총 몇 건이야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-061",
+      "query": "2026년 에너지 공기업 무료 특허 사업에 신청하려고 해. 서류는 방문해서 내는 거야, 온라인으로 내는 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-062",
+      "query": "2026년 에너지 공기업의 무료 특허 사업에서 신청 방법과 유망 기술을 설명하는 행사는 언제로 안내돼 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.3333333333333333
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.3333333333333333
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-063",
+      "query": "산업위기 지역의 기업 이자 지원으로 기존 대출을 갚기 위한 대환대출을 받으려 해. 이 용도도 지원해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-064",
+      "query": "산업위기 지역 기업 이자 지원을 받아 새 공장 건물과 땅을 사려고 해. 시설투자 자금이면 이것도 포함돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-065",
+      "query": "산업위기 지역 기업 이자 지원으로 이미 10억원을 빌렸어. 다른 은행에서 5억원을 더 빌려 지원받을 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-066",
+      "query": "산업위기 지역의 중견기업이 시설자금 대출 이자 지원을 받으려 해. 공고상 지원금리는 몇 퍼센트포인트야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-067",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 채용에 지원해. 디자인 전공은 아니지만 관련 실무 경력이 1년이면 공고의 전공·경력 조건은 맞아?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-068",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 근로자로 일하면 정규직이나 무기계약직으로 전환되는 자리야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-069",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 채용 서류를 퀵서비스로 보내도 접수돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-070",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 채용에서 자격증 우대는 면접 때도 적용돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.2
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-071",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 채용에 지원하는데 예전 회사가 폐업해서 경력증명서를 못 받아. 공고는 보완 서류를 허용해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.25
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-072",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 채용에서 같은 기간 두 기관에서 일한 경력을 모두 합쳐 우대받을 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.2
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-073",
+      "query": "2026년 두 번째 산업부 청년인턴에 최종 합격했어. 증명사진을 PDF로 제출해도 돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-074",
+      "query": "2026년 두 번째 산업부 청년인턴에 최종 합격했어. 가족관계증명서와 기본증명서는 일반본으로 내고 주민번호를 가려도 돼?",
+      "scores": {
+        "hybrid": [
+          0.0,
+          0.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-075",
+      "query": "2026년 에너지 공기업 무료 특허 사업에 지원하려고 해. 제공 기술은 총 몇 건이고 신청 접수 일정은 언제야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.3333333333333333
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.3333333333333333
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-076",
+      "query": "2026년 기술거래기관 지정을 준비해. 자격 인력을 세 명 갖췄다면 업무지침서와 홈페이지는 각각 무엇을 갖춰야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-077",
+      "query": "산업위기 지역 기업 이자 지원을 비교하고 있어. 중소기업과 중견기업의 운전자금 지원금리는 같고 시설자금 지원금리도 같아?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-078",
+      "query": "2026년 산업부 홍보 이미지 디자이너 휴직대체 채용을 보고 있어. 공고상 세전 월 보수와 하루 근무시간은 어떻게 돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-079",
+      "query": "2025년 무역안보 아이디어 행사에 포스터를 내려고 해. 권장 크기와 최소 해상도는 각각 얼마야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.25
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-080",
+      "query": "행정절차에서 당사자의 지위를 승계하는 승인신청서를 준비해. 첨부해야 하는 자료는 무엇이고 수수료는 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-081",
+      "query": "2016년 3월 초 중싱통신에 내려진 미국의 거래 제한은 미국 회사에만 적용됐어, 아니면 다른 나라 회사도 대상이었어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-082",
+      "query": "2016년 3월 초 제재 직후 중국 중싱통신이 최종 구매자가 아니라 중간 수하인으로만 참여했다면 미국 수출관리 대상 품목을 보내는 데 허가가 필요했을까?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-083",
+      "query": "2016년 3월 초 중싱통신 관련 제재 보고서에서는 미국 정부가 어떤 불법 거래와 은폐 계획을 문제 삼았어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.14285714285714285
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          0.25
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "vector",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-084",
+      "query": "2016년 3월 중싱통신 제재가 발표됐을 때 이미 운송 중이던 허가 불요 거래나 허가예외 거래는 마무리할 수 있었어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.25
+        ],
+        "bm25": [
+          1.0,
+          0.25
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-085",
+      "query": "2016년 3월 중싱통신 제재 당시, 미국 부품을 넣어 다른 나라에서 만든 물품도 미국 수출관리 대상이 될 수 있었어? 이란행과 그 밖의 경우에 보고서가 제시한 비율은 뭐야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-086",
+      "query": "2016년 3월 중싱통신에 처음 내려진 거래 제한과 그달 말의 한시적 완화는 어떻게 달랐어?",
+      "scores": {
+        "hybrid": [
+          0.5,
+          1.0
+        ],
+        "bm25": [
+          0.5,
+          1.0
+        ],
+        "vector": [
+          0.5,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-087",
+      "query": "2016년 3월 말 중싱통신에 대한 거래 제한을 잠시 풀어 준 기간과 대상 회사 수는 어떻게 돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-088",
+      "query": "2016년 봄 중싱통신 관련사에 대한 제한 완화가 나왔을 때, 이란의 ZTE Parsian과 중국의 Beijing 8 Star도 똑같이 혜택을 받았어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-089",
+      "query": "2016년 중싱통신 본사에 한시적 일반허가가 적용됐으면, 다른 미국 수출관리 조항 때문에 원래 허가가 필요했던 거래도 허가 없이 할 수 있었어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-090",
+      "query": "2016년 중싱통신의 한시적 제재 완화 보고서는 거래자 명단에 올리거나 빼는 결정을 누가 한다고 설명해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-091",
+      "query": "2016년 6월 화웨이에 대한 미국의 자료 제출 요구는 어느 나라와의 거래 정보를 대상으로 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-092",
+      "query": "2016년 화웨이에 송달된 자료 제출 명령은 직접 운송한 건만 대상으로 했어? 다른 회사를 거친 운송이나 몇 년 전 거래도 포함됐어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-093",
+      "query": "2016년 6월 화웨이 조사 동향만으로 불법수출이 확정됐다고 볼 수 있어? 보고서의 자료 제출 요구와 제재 영향 설명을 구분해 줘.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-094",
+      "query": "2006년 기술이전 통제 자료에서는 도면 같은 기술자료와 교육·컨설팅 같은 기술지원이 어떻게 구분돼?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-095",
+      "query": "2006년 기술이전 통제 자료의 미국 설명에 따르면, 물건을 보내지 않고 설계정보를 이메일이나 전화로만 전달해도 통제 문제가 생길 수 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.16666666666666666
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          0.16666666666666666
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-096",
+      "query": "2006년 기술이전 통제 자료에서 미국은 특정 고객만 읽을 수 있는 이메일 설계자료와 누구나 볼 수 있는 인터넷 공개자료를 어떻게 다르게 취급해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-097",
+      "query": "2006년 자료의 미국 제도 설명에서, 미국 밖으로 파일을 보내지 않고 미국 안에서 외국인 직원에게 통제 기술을 보여 주는 것도 허가 대상이라고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-098",
+      "query": "2006년 기술이전 자료의 일본 설명에 따르면, 일본에 거주하는 사람이 비거주자에게 통제 기술을 공짜로 제공하면 가격이 없어서 통제 대상에서 빠졌어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-099",
+      "query": "2006년 기술이전 자료에서 일본은 공개 기술과 제품 사용에 필요한 최소 기술을 어떻게 예외로 설명했어? 수리로 성능이 좋아지는 경우도 같은 예외야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-100",
+      "query": "2006년 기술이전 자료의 일본 설명에서, 해외 고객에게 무료 샘플을 보내면서 실제 사용에 필요한 기술자료를 같이 주는 것도 통제 대상이라고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-101",
+      "query": "2006년 기술이전 자료에서 미사일 분야와 원자력 이중용도 분야는 장비 수출승인을 받으면 설치·유지에 필요한 기술도 함께 승인된 것으로 봤어?",
+      "scores": {
+        "hybrid": [
+          0.5,
+          0.3333333333333333
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          0.5,
+          0.3333333333333333
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-102",
+      "query": "2006년 자료에서 EU의 전화상 기술 전달은 어떤 경우 통제 대상이라고 설명했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-103",
+      "query": "2005년 미국 수출통제 세미나 문답에서는 수입한 부품을 가공해 고객이 지정한 곳으로 보내는 회사가 소유권이 없다는 이유로 허가신청을 피할 수 있다고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.16666666666666666
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          0.16666666666666666
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-104",
+      "query": "2005년 미국 수출통제 세미나에서 일본 제조사가 영업비밀을 이유로 미국산 부품 비율을 안 알려 준다면 어떻게 하라고 답했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-105",
+      "query": "2005년 미국 수출통제 세미나 문답에 따르면, 입찰이 확정되기 전에 수출허가를 신청할 방법이 있었어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.14285714285714285
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-106",
+      "query": "2005년 미국 수출통제 세미나에서는 한국산 제품의 성능 규격이 미국산과 똑같다는 이유만으로 미국 수출허가를 신청해야 한다고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-107",
+      "query": "2005년 미국 수출통제 세미나 문답에서 허가를 받고 물량이 늘어난 경우와, 같은 품목을 북한의 다른 경제특구에 보내는 경우는 어떻게 설명했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-108",
+      "query": "2005년 미국 수출통제 세미나에서 개성공단용 장비 제조사가 문제가 없다고 판단했다면 서비스 공급 회사는 거래 책임에서 빠진다고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-109",
+      "query": "한국과 미국이 전략물자와 기술자료 보호에 관해 맺은 1980년대 합의는 언제 어디서 서명했고 언제 발효했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-110",
+      "query": "한미 간 1987년 전략물자 보호 합의에서, 한국이 수입한 미국 원산지 통제품목을 다시 수출할 때 미국의 서면동의가 필요한 경우 무엇을 확인하기로 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-111",
+      "query": "1987년 한미 전략물자 보호 합의에서는 보세시설을 이용한 수출통제 회피나 불법 수출이 의심되는 물품의 재선적에 어떻게 대응하기로 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-112",
+      "query": "1987년 한미 전략물자 보호 합의는 위반이 의심될 때 어떤 협력을 하도록 했고, 해석 문제가 생기면 협의를 얼마나 빨리 해결하려고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          0.5,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-113",
+      "query": "2005년 초 전략물자 전자문서 시스템 안내에서 개발 지침을 배포받으려는 회사는 어떤 정보를 회신해야 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-114",
+      "query": "2005년 초 전략물자 인허가 전산시스템 안내에서는 이미 전자문서 시스템이 있는 회사와 없는 회사가 각각 어떤 방식으로 신청할 수 있다고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-115",
+      "query": "2005년 초 전략물자 전산시스템 안내에 나온 전자문서 송수신 시험 일정과 인허가 서비스 시작 일정은 각각 언제였고, 확정 운영 실적이야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-116",
+      "query": "2015년 이란 핵합의 채택 이후의 제재를 설명한 동향자료는 원자력, 재래식 무기, 탄도미사일 통제기간을 각각 얼마로 소개했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-117",
+      "query": "2015년 이란 핵합의 채택을 기준으로 작성된 동향자료에서 원자력 분야 제한은 장비 판매만 다뤘어, 관련 기술이나 금융 제공도 포함됐어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-118",
+      "query": "새로 들어온 확인의무 면제 대상 표에서 커피·차와 악기는 각각 어떤 HS 류로 기재돼 있어? 이 표의 분류를 찾아줘.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-119",
+      "query": "새로 들어온 대량파괴무기 전용 우려 품목 자료는 살포장치를 달 수 있는 무인항공기를 어떻게 적었고, 취미용 모형 비행기도 포함했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "bm25",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-120",
+      "query": "새로 들어온 국제 수출통제체제 비교 자료에서는 바세나르 회원국의 품목 이전이나 거부를 공동기구가 결정한다고 했어, 개별 회원국이 결정한다고 했어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.3333333333333333
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-121",
+      "query": "산업통상부공고 제2026-598호는 무엇에 관한 공고야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.5
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          0.5
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-122",
+      "query": "제2026-590호 공고에서 승인·공고한 내용이 뭐야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-123",
+      "query": "산업통상부공고 제2026-584호 문서를 찾아줘.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-124",
+      "query": "산업부공고 제2026-562호 행정예고는 무슨 규정을 고치는 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-125",
+      "query": "제2025-17호 공고가 어떤 행사에 관한 거야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-126",
+      "query": "공고 제2026-599호 최종합격자 공고 문서를 보고 싶어.",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-127",
+      "query": "전략물자 수출입고시 제54조는 어떤 허가의 면제를 정한 조항이야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.14285714285714285
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-128",
+      "query": "개별수출허가의 면제는 전략물자 수출입고시 몇 조에 있어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.14285714285714285
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          0.0,
+          0.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-129",
+      "query": "전략물자수출입고시 제54조의2 제2항을 어떻게 고치는 개정안이야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-130",
+      "query": "상황허가 대상은 대외무역법 제19조의3하고 고시 몇 조에 따른 물품이야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.14285714285714285
+        ],
+        "bm25": [
+          0.0,
+          0.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "vector",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-131",
+      "query": "산업통상부공고 제2026-579호 어린이제품 시행규칙 개정안은 의견을 어디로 언제까지 내야 해?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-132",
+      "query": "공고 제2026-586호 영문에디터 채용 면접이 언제 어디서 열려?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          0.3333333333333333
+        ],
+        "bm25": [
+          1.0,
+          0.5
+        ],
+        "vector": [
+          1.0,
+          0.3333333333333333
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "bm25",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-133",
+      "query": "산업부공고 2026-577호 포상에서 개인에게 주는 훈격이 뭐야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "bm25"
+      }
+    },
+    {
+      "qid": "docs-v2-134",
+      "query": "제2026-575호 공고에 등록된 인공지능 분야 전문양성인이 누구야?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    },
+    {
+      "qid": "docs-v2-135",
+      "query": "제2026-584호 변경공고에서 충남 당진시 접수기관이 어디로 바뀌었어?",
+      "scores": {
+        "hybrid": [
+          1.0,
+          1.0
+        ],
+        "bm25": [
+          1.0,
+          1.0
+        ],
+        "vector": [
+          1.0,
+          1.0
+        ]
+      },
+      "choices": {
+        "hybrid": "hybrid",
+        "bm25": "bm25",
+        "vector": "vector",
+        "oracle": "hybrid",
+        "query_only": "hybrid",
+        "query_and_results": "hybrid"
+      }
+    }
+  ]
+}

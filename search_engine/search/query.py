@@ -12,6 +12,7 @@ from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.answerability import is_unanswerable
 from search_engine.search.rerank import select_passages
+from search_engine.search.chunk_filter import filter_chunks
 from search_engine.search.rewrite import rewrite_query
 from search_engine.search.results import (
     ModeComparison,
@@ -27,6 +28,8 @@ log = logging.getLogger(__name__)
 LEADS_A_LIST = "_leads_a_list"
 
 PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
+HALF_YEAR = re.compile(r"(?<!\d)(20\d{2}|\d{2})\s*(?:년(?:도)?)?\s*(상|하)\s*반기")
+TOPIC_WORD = re.compile(r"[가-힣]{3,}|[A-Za-z]{2,}")
 
 # 요청에는 쿼리만 포함되므로, 사용자가 요청하는 문서의 종류
 # 텍스트에서 읽어야 한다. 이들은 필터가 아니라 종류를 들어 올리는 것이다: a
@@ -56,6 +59,24 @@ def _requested_period(query: str) -> tuple[str, str] | None:
         return f"{year}-01-01", f"{year + 1}-01-01"
     next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
     return f"{year}-{month:02d}-01", f"{next_year}-{next_month:02d}-01"
+
+
+def _reporting_half(query: str) -> tuple[int, str] | None:
+    """질문에 하나의 연도·반기만 명시됐을 때 그 기간을 읽는다."""
+    matches = {(int(year) if len(year) == 4 else 2000 + int(year), half)
+               for year, half in HALF_YEAR.findall(query)}
+    return next(iter(matches)) if len(matches) == 1 else None
+
+
+def _same_reporting_half(title: str, period: tuple[int, str]) -> bool:
+    return any((int(year) if len(year) == 4 else 2000 + int(year), half) == period
+               for year, half in HALF_YEAR.findall(title))
+
+
+def _same_topic_in_title(query: str, title: str) -> bool:
+    """연도·반기 외에 제목의 실제 주제어가 질문에도 등장하는지 확인한다."""
+    return any(word not in ("상반기", "하반기") and word.casefold() in query.casefold()
+               for word in TOPIC_WORD.findall(title))
 
 
 def _intent_boosts(query: str) -> list[dict]:
@@ -106,10 +127,9 @@ def build_query(query: str, as_of: date) -> dict:
             # 받(7.03) + 허가(4.43) = 11.46 outscored 의견 + 러시아 + 보내 +
             # 허가 + 있 = 7.80, 그리고 러시아는 이 코퍼스에서 가장 차별적인 용어이다. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
             # 이 코퍼스에서. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
-            # 부스트는 3으로 유지된다 -- 이를 낮추면 식별자 쿼리가 제대로 작동하지 않으며, 3은 `most_fields` 아래에서 탐색된 값들 중 최고였다.
-            # 식별자 쿼리가 제대로 작동하도록 제목을 쿼리에 포함시키며, 3은 또한 `most_fields` 아래에서 탐색된 값들 중 최고였다.
-            # 식별자 쿼리가 제대로 작동하도록 제목을 쿼리에 포함시키며, 3은 또한 `most_fields` 아래에서 탐색된 값들 중 최고였다.
-            "fields": ["title^3", "body", "title.standard^1.5", "body.standard^0.5"],
+            # 제목은 모든 청크에 반복된다. 여러 코퍼스를 함께 검색할 때 ^3은
+            # 제목이 비슷한 새 문서를 과하게 올리므로 본문과 같은 가중치를 준다.
+            "fields": ["title^1", "body", "title.standard^1.5", "body.standard^0.5"],
             "type": "most_fields",
         }})
     if not should:
@@ -412,9 +432,11 @@ def retrieve(
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
     if mode in ("bm25", "hybrid"):
+        lexical_options = {"search_type": "dfs_query_then_fetch"} if "," in alias else {}
         lexical = client.search(
             index=alias, body={"query": build_query(query, as_of)},
             size=lexical_candidates, ignore_unavailable=not strict,
+            **lexical_options,
         )
         add_response(lexical, "lexical", "bm25")
         if query_rewrite is None:
@@ -424,6 +446,7 @@ def retrieve(
                 add_response(client.search(
                     index=alias, body={"query": build_query(rewritten, as_of)},
                     size=lexical_candidates, ignore_unavailable=not strict,
+                    **lexical_options,
                 ), "rewrite", "bm25", settings.search_query_rewrite_weight)
     try:
         if mode in ("vector", "hybrid"):
@@ -447,6 +470,7 @@ def retrieve(
     if off_topic:
         return []
     ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
+    period_supported: set[str] = set()
     if len(ranked_lists) > 1:
         # 각 목록을 각각의 검색기의 교정된 비율로 먼저 자른다. 명시적인 `cutoff_ratio`는 전체 절단 정책을 덮어쓴다 -- 0을 전달하여 절단되지 않은 순위를 보려면 그것을 가져와야 하므로, 이 또한 건너뛴다.
         # `ranked_lists` 자체는 그대로 남는다: 그것이 문서별 패스워드가 선택되는 풀이기도 하며, 그것을 줄이면 반환되는 문서에서 조각을 제거하게 된다.
@@ -458,6 +482,23 @@ def retrieve(
             (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
             for hits, weight, retriever in ranked_lists
         ]
+        # 날짜를 적시한 질문에서는 대상 반기가 발행 연도와 다를 수 있다.
+        # 제목에 같은 보고 기간이 적힌 기존 후보에만 세 번째 순위 신호를 준다.
+        # 주제 검색의 후보 밖 문서를 새로 끌어오거나 다른 연도를 지우지 않는다.
+        reporting_half = _reporting_half(query) if mode == "hybrid" else None
+        if reporting_half:
+            period_hits = [hit for hits, _, _ in ranked_lists for hit in hits
+                           if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)
+                           and _same_topic_in_title(query, hit["_source"].get("title", ""))]
+            if period_hits:
+                fusable = [*fusable, (period_hits, 1.0, "period")]
+                by_retriever = {
+                    name: {hit["_source"].get("parent_id") or hit["_id"] for hit in hits
+                           if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)
+                           and _same_topic_in_title(query, hit["_source"].get("title", ""))}
+                    for hits, _, name in ranked_lists if name in ("bm25", "vector")
+                }
+                period_supported = by_retriever.get("bm25", set()) & by_retriever.get("vector", set())
         ranked = _rrf(fusable, settings.search_hybrid_rrf_k)
     else:
         # 리트리버의 원래 점수를 유지하고, 각 부모에 대해 최고의 청크만 유지한다.
@@ -498,10 +539,9 @@ def retrieve(
         # `break`보다는 `continue`를 사용한다. 왜냐하면 그러한 문서는 비율이 잘라내는 것보다 아래로 정렬되기 때문이다.
         # 절대적인 하한은 비율이 아니며 여전히 적용된다.
         if score is not None and score < floor:
-            if not hit.get(LEADS_A_LIST):
-                continue
-            # 선택과 정렬은 하나의 결정이므로, 이는 _with_passages를 대체한다.
             if score < score_floor:
+                continue
+            if not hit.get(LEADS_A_LIST) and parent_id not in period_supported:
                 continue
         # 잘라낸 뒤에 센다. 바닥값이 떨어뜨릴 히트가 사본 자리를 먼저 차지하면
         # 살아남았을 사본까지 같이 사라진다.
@@ -532,6 +572,8 @@ def retrieve(
             and chunks_per_document >= 2
             and select_passages(query, hits, by_parent, chunks_per_document, settings)):
         hits = _with_passages(hits, by_parent, chunks_per_document)
+    if settings.search_chunk_filter:
+        hits = filter_chunks(query, hits, settings)
     if answerability is None:
         answerability = settings.search_answerability_judge
     # 실제로 독자에게 전달될 문장들에 대해 마지막으로 판단한다:

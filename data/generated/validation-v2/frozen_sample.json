@@ -1,0 +1,347 @@
+{
+  "status": "parents_frozen_before_query_authoring_or_search",
+  "seed": 20260925,
+  "corpus": "data/generated/holdout-v1/core.jsonl",
+  "corpus_sha256": "afb464ccfd3125e4dbcf7a044ae07fb2db48ddc43d4bf497be713988571507db",
+  "exclusion_rules": [
+    "previous_holdout_sampled_parents",
+    "previous_query_gold",
+    "stage28_inspected_top5_parents"
+  ],
+  "excluded_parent_count": 283,
+  "min_parent_chars": 300,
+  "target_chunk_chars": [
+    180,
+    5000
+  ],
+  "strata": {
+    "FAQ": 5,
+    "공지사항": 5,
+    "공지사항 첨부": 5,
+    "알기쉬운 전략물자": 4,
+    "알기쉬운 전략물자 첨부": 2,
+    "동향자료": 2,
+    "동향자료 첨부": 2,
+    "법령 별표": 5,
+    "안내": 2,
+    "국내외 소식": 2,
+    "기타 게시판": 2
+  },
+  "eligible_pool_sizes": {
+    "FAQ": 239,
+    "공지사항": 453,
+    "공지사항 첨부": 748,
+    "국내외 소식": 654,
+    "국내외 소식 첨부": 47,
+    "기타 게시판": 52,
+    "동향자료": 19,
+    "동향자료 첨부": 119,
+    "법령 별표": 51,
+    "안내": 18,
+    "알기쉬운 전략물자": 203,
+    "알기쉬운 전략물자 첨부": 12
+  },
+  "sampled_counts": {
+    "FAQ": 5,
+    "공지사항": 5,
+    "공지사항 첨부": 5,
+    "알기쉬운 전략물자": 4,
+    "알기쉬운 전략물자 첨부": 2,
+    "동향자료": 2,
+    "동향자료 첨부": 2,
+    "법령 별표": 5,
+    "안내": 2,
+    "국내외 소식": 2,
+    "기타 게시판": 2
+  },
+  "sampled": [
+    {
+      "stratum": "FAQ",
+      "parent_id": "yestrade-faq-161",
+      "source_type": "FAQ",
+      "source_path": "yestrade/faq/161.html",
+      "title": "궤도상 인공위성의 소유권 이전",
+      "target_chunk_id": "yestrade-faq-161#0000"
+    },
+    {
+      "stratum": "FAQ",
+      "parent_id": "yestrade-faq-131",
+      "source_type": "FAQ",
+      "source_path": "yestrade/faq/131.html",
+      "title": "전략물자(기술) 무형이전(ITT)에 대한 수출허가 도입",
+      "target_chunk_id": "yestrade-faq-131#0000"
+    },
+    {
+      "stratum": "FAQ",
+      "parent_id": "yestrade-faq-74-2288596",
+      "source_type": "FAQ 첨부",
+      "source_path": "yestrade/files/faq/74-2288596-★0226_(9차)_전략물자관리제도_Q168.pdf",
+      "title": "★0226 (9차) 전략물자관리제도 Q168",
+      "target_chunk_id": "yestrade-faq-74-2288596#0000"
+    },
+    {
+      "stratum": "FAQ",
+      "parent_id": "yestrade-faq-26",
+      "source_type": "FAQ",
+      "source_path": "yestrade/faq/26.html",
+      "title": "자가판정과 전문판정 결과가 다를 때",
+      "target_chunk_id": "yestrade-faq-26#0000"
+    },
+    {
+      "stratum": "FAQ",
+      "parent_id": "yestrade-faq-129-2288652",
+      "source_type": "FAQ 첨부",
+      "source_path": "yestrade/files/faq/129-2288652-★0226_(9차)_전략물자관리제도_Q111.pdf",
+      "title": "★0226 (9차) 전략물자관리제도 Q111",
+      "target_chunk_id": "yestrade-faq-129-2288652#0001"
+    },
+    {
+      "stratum": "공지사항",
+      "parent_id": "yestrade-69-5716",
+      "source_type": "공지사항",
+      "source_path": "yestrade/posts/69/5716.html",
+      "title": "공작기계 고시 개정 관련 기업 간담회 개최",
+      "target_chunk_id": "yestrade-69-5716#0000"
+    },
+    {
+      "stratum": "공지사항",
+      "parent_id": "yestrade-69-22627",
+      "source_type": "공지사항",
+      "source_path": "yestrade/posts/69/22627.html",
+      "title": "자율준수무역거래자 실적보고(26년도 상반기) 작성 안내('26.7.31(금)까지)",
+      "target_chunk_id": "yestrade-69-22627#0000"
+    },
+    {
+      "stratum": "공지사항",
+      "parent_id": "yestrade-69-10724",
+      "source_type": "공지사항",
+      "source_path": "yestrade/posts/69/10724.html",
+      "title": "2021년 제1차 정기워크숍 및 CEO과정 개최 안내",
+      "target_chunk_id": "yestrade-69-10724#0001"
+    },
+    {
+      "stratum": "공지사항",
+      "parent_id": "yestrade-69-250",
+      "source_type": "공지사항",
+      "source_path": "yestrade/posts/69/250.html",
+      "title": "자율준수무역거래자 지정(인증) 교육 및 신청 안내",
+      "target_chunk_id": "yestrade-69-250#0000"
+    },
+    {
+      "stratum": "공지사항",
+      "parent_id": "yestrade-69-910",
+      "source_type": "공지사항",
+      "source_path": "yestrade/posts/69/910.html",
+      "title": "美 국제무기거래규정(ITAR) 설명회 개최 안내",
+      "target_chunk_id": "yestrade-69-910#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-752-2391838",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/files/69/752-2391838-admin42012091321000722붙임지원서및자소서.hwp",
+      "title": "admin42012091321000722붙임지원서및자소서",
+      "target_chunk_id": "yestrade-69-752-2391838#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-104-2392266",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/files/69/104-2392266-세미나_프로그램(국문).hwp",
+      "title": "세미나 프로그램(국문)",
+      "target_chunk_id": "yestrade-69-104-2392266#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-139-2392284",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/files/69/139-2392284-집중과정교육참가신청서.hwp",
+      "title": "집중과정교육참가신청서",
+      "target_chunk_id": "yestrade-69-139-2392284#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-16842-2394523-z034",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/16842-2394523-제35차_전략물자수출입고시_개정_전문.zip![별표 13의2] 원자력전용품목 관련 기술 이전의 수출허가에 관한 지침(전략물자 수출입고시) - v1.hwp",
+      "title": "[별표 13의2] 원자력전용품목 관련 기술 이전의 수출허가에 관한 지침(전략물자 수출입고시) - v1",
+      "target_chunk_id": "yestrade-69-16842-2394523-z034#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-652-2391888",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/files/69/652-2391888-admin42011092019002151전략물자_유공자_지식경제부_장관포상시행_안내문.hwp",
+      "title": "admin42011092019002151전략물자 유공자 지식경제부 장관포상시행 안내문",
+      "target_chunk_id": "yestrade-69-652-2391888#0001"
+    },
+    {
+      "stratum": "알기쉬운 전략물자",
+      "parent_id": "yestrade-62-2411",
+      "source_type": "알기쉬운 전략물자",
+      "source_path": "yestrade/posts/62/2411.html",
+      "title": "품목별 판정 및 수출허가 기관",
+      "target_chunk_id": "yestrade-62-2411#0001"
+    },
+    {
+      "stratum": "알기쉬운 전략물자",
+      "parent_id": "yestrade-62-2872",
+      "source_type": "알기쉬운 전략물자",
+      "source_path": "yestrade/posts/62/2872.html",
+      "title": "미국 수출관리규정(EAR) 허가예외 (1)",
+      "target_chunk_id": "yestrade-62-2872#0007"
+    },
+    {
+      "stratum": "알기쉬운 전략물자",
+      "parent_id": "yestrade-62-2766",
+      "source_type": "알기쉬운 전략물자",
+      "source_path": "yestrade/posts/62/2766.html",
+      "title": "전략물자 확인, 신고, 통보 제도 안내",
+      "target_chunk_id": "yestrade-62-2766#0000"
+    },
+    {
+      "stratum": "알기쉬운 전략물자",
+      "parent_id": "yestrade-62-2973",
+      "source_type": "알기쉬운 전략물자",
+      "source_path": "yestrade/posts/62/2973.html",
+      "title": "미국의 금수국 통제 : (3) 북한",
+      "target_chunk_id": "yestrade-62-2973#0000"
+    },
+    {
+      "stratum": "알기쉬운 전략물자 첨부",
+      "parent_id": "yestrade-62-2348-2392017",
+      "source_type": "알기쉬운 전략물자 첨부",
+      "source_path": "yestrade/files/62/2348-2392017-(제83호_뉴스레터)베트남의_수출통제제도21.hwp",
+      "title": "(제83호 뉴스레터)베트남의 수출통제제도21",
+      "target_chunk_id": "yestrade-62-2348-2392017#0003"
+    },
+    {
+      "stratum": "알기쉬운 전략물자 첨부",
+      "parent_id": "yestrade-62-2708-2392030",
+      "source_type": "알기쉬운 전략물자 첨부",
+      "source_path": "yestrade/files/62/2708-2392030-(제84호_뉴스레터)인도의수출통제제도(1).hwp",
+      "title": "(제84호 뉴스레터)인도의수출통제제도",
+      "target_chunk_id": "yestrade-62-2708-2392030#0002"
+    },
+    {
+      "stratum": "동향자료",
+      "parent_id": "yestrade-67-1324",
+      "source_type": "동향자료",
+      "source_path": "yestrade/posts/67/1324.html",
+      "title": "제 1 종 전략물자 HSK 연계표",
+      "target_chunk_id": "yestrade-67-1324#0000"
+    },
+    {
+      "stratum": "동향자료",
+      "parent_id": "yestrade-67-1281",
+      "source_type": "동향자료",
+      "source_path": "yestrade/posts/67/1281.html",
+      "title": "1장에 정리한 전략물자 수출관리제도 변경내용",
+      "target_chunk_id": "yestrade-67-1281#0000"
+    },
+    {
+      "stratum": "동향자료 첨부",
+      "parent_id": "yestrade-67-1313-2392117-z036",
+      "source_type": "동향자료 첨부",
+      "source_path": "yestrade/1313-2392117-EAR.zip!53. Category 9 - Propulsion Systems, Space Vehicles and Related Equipment.pdf",
+      "title": "Category 9 - Propulsion Systems, Space Vehicles and Related Equipment",
+      "target_chunk_id": "yestrade-67-1313-2392117-z036#0057"
+    },
+    {
+      "stratum": "동향자료 첨부",
+      "parent_id": "yestrade-67-1313-2392117-z005",
+      "source_type": "동향자료 첨부",
+      "source_path": "yestrade/1313-2392117-EAR.zip!06. Directory of Offices of Export Enforcement.pdf",
+      "title": "Directory of Offices of Export Enforcement",
+      "target_chunk_id": "yestrade-67-1313-2392117-z005#0003"
+    },
+    {
+      "stratum": "법령 별표",
+      "parent_id": "law-admrul-2100000284150-annex-x0007-02",
+      "source_type": "법령 별표",
+      "source_path": "law/annex/admrul-2100000284150-x0007-02.hwp",
+      "title": "전략물자수출입고시 [별지 7의2] 정부보증 대상 물품등에 대한 사용서약서",
+      "target_chunk_id": "law-admrul-2100000284150-annex-x0007-02#0001"
+    },
+    {
+      "stratum": "법령 별표",
+      "parent_id": "law-admrul-2100000284150-annex-b0024-00",
+      "source_type": "법령 별표",
+      "source_path": "law/annex/admrul-2100000284150-b0024-00.hwp",
+      "title": "전략물자수출입고시 [별표 24] 국제사회 수출통제 공조를 위한 러시아, 벨라루스 허가 지침",
+      "target_chunk_id": "law-admrul-2100000284150-annex-b0024-00#0000"
+    },
+    {
+      "stratum": "법령 별표",
+      "parent_id": "law-admrul-2100000284150-annex-x0002-03",
+      "source_type": "법령 별표",
+      "source_path": "law/annex/admrul-2100000284150-x0002-03.hwp",
+      "title": "전략물자수출입고시 [별지 2의3] END-USER  STATEMENT (For Wassenaar Arrangement Items Only)",
+      "target_chunk_id": "law-admrul-2100000284150-annex-x0002-03#0001"
+    },
+    {
+      "stratum": "법령 별표",
+      "parent_id": "law-admrul-2100000284150-annex-x0026-00",
+      "source_type": "법령 별표",
+      "source_path": "law/annex/admrul-2100000284150-x0026-00.hwp",
+      "title": "전략물자수출입고시 [별지 26] 전략물자등 설치에 관한 확인서",
+      "target_chunk_id": "law-admrul-2100000284150-annex-x0026-00#0001"
+    },
+    {
+      "stratum": "법령 별표",
+      "parent_id": "law-admrul-2100000284150-annex-x0007-00",
+      "source_type": "법령 별표",
+      "source_path": "law/annex/admrul-2100000284150-x0007-00.hwp",
+      "title": "전략물자수출입고시 [별지 7] 수입목적확인(신청)서",
+      "target_chunk_id": "law-admrul-2100000284150-annex-x0007-00#0000"
+    },
+    {
+      "stratum": "안내",
+      "parent_id": "yestrade-guide-system-guidance__compliance-program__domestic",
+      "source_type": "안내",
+      "source_path": "yestrade/guides/system-guidance__compliance-program__domestic.html",
+      "title": "국내",
+      "target_chunk_id": "yestrade-guide-system-guidance__compliance-program__domestic#0001"
+    },
+    {
+      "stratum": "안내",
+      "parent_id": "yestrade-guide-system-guidance__treaty__cwc",
+      "source_type": "안내",
+      "source_path": "yestrade/guides/system-guidance__treaty__cwc.html",
+      "title": "CWC",
+      "target_chunk_id": "yestrade-guide-system-guidance__treaty__cwc#0000"
+    },
+    {
+      "stratum": "국내외 소식",
+      "parent_id": "yestrade-63-3206",
+      "source_type": "국내외 소식",
+      "source_path": "yestrade/posts/63/3206.html",
+      "title": "[국내외동향] 영국, 2010년 수출허가 통계 발표",
+      "target_chunk_id": "yestrade-63-3206#0000"
+    },
+    {
+      "stratum": "국내외 소식",
+      "parent_id": "yestrade-63-2926",
+      "source_type": "국내외 소식",
+      "source_path": "yestrade/posts/63/2926.html",
+      "title": "[국내외동향] 美 BIS, 수출허가 사용률에 관한 의견수렴",
+      "target_chunk_id": "yestrade-63-2926#0001"
+    },
+    {
+      "stratum": "기타 게시판",
+      "parent_id": "yestrade-56-7314-2394023",
+      "source_type": "홍보자료 첨부",
+      "source_path": "yestrade/files/56/7314-2394023-전략물자관리제도및지원사업안내(통합리플릿)_201609.pdf",
+      "title": "전략물자관리제도및지원사업안내(통합리플릿) 201609",
+      "target_chunk_id": "yestrade-56-7314-2394023#0003"
+    },
+    {
+      "stratum": "기타 게시판",
+      "parent_id": "yestrade-65-10638",
+      "source_type": "CP공지사항",
+      "source_path": "yestrade/posts/65/10638.html",
+      "title": "자율준수무역거래자 실적보고(20년도 하반기) 및 운영보고(20년도) 작성 안내",
+      "target_chunk_id": "yestrade-65-10638#0000"
+    }
+  ]
+}

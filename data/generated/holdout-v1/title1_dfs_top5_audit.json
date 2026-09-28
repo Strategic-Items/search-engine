@@ -1,0 +1,776 @@
+{
+  "method": "고정된 title^1 + 다중 인덱스 DFS 결과의 새 top-5 쌍만 판정. 질문/모범답안과 반환 청크를 먼저 대조하고, 완전한 답 가능성이 있는 부모의 다른 청크를 확인했다. 모든 부모의 전체 청크를 한 줄씩 수동 검수한 것은 아니다. 문서 완전 정답과 실제 반환 청크 근거를 분리했다.",
+  "runs": {
+    "docs": {
+      "base": "data/generated/holdout-v1/results/tuned-with-holdout-noise-dedupefix-full-gold-audit.json",
+      "audited": "data/generated/holdout-v1/results/mixed-title1-dfs-top5-audited.json",
+      "pairs": 25,
+      "counts": {
+        "screened_no_complete_answer": 21,
+        "partial_answer": 1,
+        "relevant_already_in_gold": 3
+      }
+    },
+    "holdout": {
+      "base": "data/generated/holdout-v1/results/holdout-full-dedupefix-adjudicated.json",
+      "audited": "data/generated/holdout-v1/results/holdout-title1-dfs-top5-audited.json",
+      "pairs": 35,
+      "counts": {
+        "partial_answer": 3,
+        "relevant_added": 5,
+        "screened_no_complete_answer": 22,
+        "relevant_already_in_gold": 5
+      }
+    }
+  },
+  "judgments": [
+    {
+      "qid": "docs-v2-001",
+      "rank": 3,
+      "parent_id": "yestrade-64-2956",
+      "returned_chunk_ids": [
+        "yestrade-64-2956#0008",
+        "yestrade-64-2956#0009",
+        "yestrade-64-2956#0002",
+        "yestrade-64-2956#0006"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-007",
+      "rank": 5,
+      "parent_id": "yestrade-69-16247",
+      "returned_chunk_ids": [
+        "yestrade-69-16247#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-008",
+      "rank": 3,
+      "parent_id": "yestrade-69-7025",
+      "returned_chunk_ids": [
+        "yestrade-69-7025#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-008",
+      "rank": 4,
+      "parent_id": "yestrade-62-2811",
+      "returned_chunk_ids": [
+        "yestrade-62-2811#0002"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-008",
+      "rank": 5,
+      "parent_id": "yestrade-69-6494-2394794-z006",
+      "returned_chunk_ids": [
+        "yestrade-69-6494-2394794-z006#0003"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-012",
+      "rank": 3,
+      "parent_id": "yestrade-faq-121",
+      "returned_chunk_ids": [
+        "yestrade-faq-121#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-012",
+      "rank": 4,
+      "parent_id": "yestrade-faq-90",
+      "returned_chunk_ids": [
+        "yestrade-faq-90#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-014",
+      "rank": 2,
+      "parent_id": "yestrade-69-19921",
+      "returned_chunk_ids": [
+        "yestrade-69-19921#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-017",
+      "rank": 4,
+      "parent_id": "law-admrul-2100000284150",
+      "returned_chunk_ids": [
+        "law-admrul-2100000284150#0033"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-019",
+      "rank": 2,
+      "parent_id": "yestrade-faq-25",
+      "returned_chunk_ids": [
+        "yestrade-faq-25#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-020",
+      "rank": 4,
+      "parent_id": "yestrade-guide-usage-guidance",
+      "returned_chunk_ids": [
+        "yestrade-guide-usage-guidance#0001"
+      ],
+      "verdict": "partial_answer",
+      "evidence_chunk_ids": [],
+      "note": "품목포괄수출허가 수량을 자율 결정한다고 설명하지만 영문 양식의 quantity 공란 지시는 없음"
+    },
+    {
+      "qid": "docs-v2-039",
+      "rank": 3,
+      "parent_id": "yestrade-63-698",
+      "returned_chunk_ids": [
+        "yestrade-63-698#0001",
+        "yestrade-63-698#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-056",
+      "rank": 4,
+      "parent_id": "yestrade-69-19921",
+      "returned_chunk_ids": [
+        "yestrade-69-19921#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-056",
+      "rank": 5,
+      "parent_id": "yestrade-69-20715-3059076",
+      "returned_chunk_ids": [
+        "yestrade-69-20715-3059076#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-084",
+      "rank": 2,
+      "parent_id": "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-1-a1ed6830",
+      "returned_chunk_ids": [
+        "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-1-a1ed6830#0003",
+        "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-1-a1ed6830#0000",
+        "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-1-a1ed6830#0002"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "docs-v2-094",
+      "rank": 2,
+      "parent_id": "yestrade-faq-116",
+      "returned_chunk_ids": [
+        "yestrade-faq-116#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-094",
+      "rank": 4,
+      "parent_id": "hwp-전략기술의-무형이전-통제-9167a1c2",
+      "returned_chunk_ids": [
+        "hwp-전략기술의-무형이전-통제-9167a1c2#0018",
+        "hwp-전략기술의-무형이전-통제-9167a1c2#0023",
+        "hwp-전략기술의-무형이전-통제-9167a1c2#0034",
+        "hwp-전략기술의-무형이전-통제-9167a1c2#0019",
+        "hwp-전략기술의-무형이전-통제-9167a1c2#0036",
+        "hwp-전략기술의-무형이전-통제-9167a1c2#0033"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "docs-v2-099",
+      "rank": 2,
+      "parent_id": "yestrade-62-2816",
+      "returned_chunk_ids": [
+        "yestrade-62-2816#0001"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-101",
+      "rank": 4,
+      "parent_id": "yestrade-63-587",
+      "returned_chunk_ids": [
+        "yestrade-63-587#0000",
+        "yestrade-63-587#0001",
+        "yestrade-63-587#0002"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-104",
+      "rank": 3,
+      "parent_id": "yestrade-69-104",
+      "returned_chunk_ids": [
+        "yestrade-69-104#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-108",
+      "rank": 4,
+      "parent_id": "yestrade-67-1415-2392054",
+      "returned_chunk_ids": [
+        "yestrade-67-1415-2392054#0000",
+        "yestrade-67-1415-2392054#0006",
+        "yestrade-67-1415-2392054#0005",
+        "yestrade-67-1415-2392054#0001",
+        "yestrade-67-1415-2392054#0002",
+        "yestrade-67-1415-2392054#0004"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-111",
+      "rank": 2,
+      "parent_id": "hwp-한미양해각서11-deca5575",
+      "returned_chunk_ids": [
+        "hwp-한미양해각서11-deca5575#0010",
+        "hwp-한미양해각서11-deca5575#0009",
+        "hwp-한미양해각서11-deca5575#0001",
+        "hwp-한미양해각서11-deca5575#0011"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "docs-v2-127",
+      "rank": 4,
+      "parent_id": "law-admrul-2100000268604",
+      "returned_chunk_ids": [
+        "law-admrul-2100000268604#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-130",
+      "rank": 1,
+      "parent_id": "yestrade-65-9736-2393983",
+      "returned_chunk_ids": [
+        "yestrade-65-9736-2393983#0008",
+        "yestrade-65-9736-2393983#0002"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "docs-v2-130",
+      "rank": 4,
+      "parent_id": "yestrade-69-11960-2393726",
+      "returned_chunk_ids": [
+        "yestrade-69-11960-2393726#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-001",
+      "rank": 1,
+      "parent_id": "yestrade-faq-68",
+      "returned_chunk_ids": [
+        "yestrade-faq-68#0000",
+        "yestrade-faq-68#0001"
+      ],
+      "verdict": "partial_answer",
+      "evidence_chunk_ids": [],
+      "note": "전문판정 15일과 자가판정 유효기간 없음은 있으나 허가 신청 시 최근 2년 요건 없음"
+    },
+    {
+      "qid": "holdout-v1-002",
+      "rank": 2,
+      "parent_id": "yestrade-69-6504-2393992",
+      "returned_chunk_ids": [
+        "yestrade-69-6504-2393992#0029"
+      ],
+      "verdict": "relevant_added",
+      "evidence_chunk_ids": [
+        "yestrade-69-6504-2393992#0029"
+      ],
+      "note": "제23조: 접수일부터 15일; 별도 기술심사 기간은 산입하지 않음"
+    },
+    {
+      "qid": "holdout-v1-004",
+      "rank": 2,
+      "parent_id": "yestrade-faq-105",
+      "returned_chunk_ids": [
+        "yestrade-faq-105#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-004",
+      "rank": 3,
+      "parent_id": "yestrade-69-6345-2394002",
+      "returned_chunk_ids": [
+        "yestrade-69-6345-2394002#0023",
+        "yestrade-69-6345-2394002#0005",
+        "yestrade-69-6345-2394002#0029",
+        "yestrade-69-6345-2394002#0033",
+        "yestrade-69-6345-2394002#0027"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-006",
+      "rank": 3,
+      "parent_id": "yestrade-69-16247-2394463",
+      "returned_chunk_ids": [
+        "yestrade-69-16247-2394463#0029",
+        "yestrade-69-16247-2394463#0004",
+        "yestrade-69-16247-2394463#0037",
+        "yestrade-69-16247-2394463#0021",
+        "yestrade-69-16247-2394463#0035",
+        "yestrade-69-16247-2394463#0011"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-007",
+      "rank": 4,
+      "parent_id": "yestrade-62-2409",
+      "returned_chunk_ids": [
+        "yestrade-62-2409#0000",
+        "yestrade-62-2409#0001"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-011",
+      "rank": 3,
+      "parent_id": "yestrade-69-646",
+      "returned_chunk_ids": [
+        "yestrade-69-646#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-014",
+      "rank": 3,
+      "parent_id": "yestrade-69-19993",
+      "returned_chunk_ids": [
+        "yestrade-69-19993#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-017",
+      "rank": 2,
+      "parent_id": "yestrade-56-9700-2392954",
+      "returned_chunk_ids": [
+        "yestrade-56-9700-2392954#0032",
+        "yestrade-56-9700-2392954#0031",
+        "yestrade-56-9700-2392954#0033"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-021",
+      "rank": 1,
+      "parent_id": "yestrade-69-11656-2393338",
+      "returned_chunk_ids": [
+        "yestrade-69-11656-2393338#0004",
+        "yestrade-69-11656-2393338#0006",
+        "yestrade-69-11656-2393338#0002",
+        "yestrade-69-11656-2393338#0005",
+        "yestrade-69-11656-2393338#0003",
+        "yestrade-69-11656-2393338#0001"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "holdout-v1-021",
+      "rank": 2,
+      "parent_id": "yestrade-69-12583-2392920",
+      "returned_chunk_ids": [
+        "yestrade-69-12583-2392920#0004",
+        "yestrade-69-12583-2392920#0006",
+        "yestrade-69-12583-2392920#0002",
+        "yestrade-69-12583-2392920#0001"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "holdout-v1-022",
+      "rank": 2,
+      "parent_id": "yestrade-faq-128",
+      "returned_chunk_ids": [
+        "yestrade-faq-128#0001"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "holdout-v1-022",
+      "rank": 4,
+      "parent_id": "yestrade-69-6023-2393150",
+      "returned_chunk_ids": [
+        "yestrade-69-6023-2393150#0028"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "holdout-v1-023",
+      "rank": 2,
+      "parent_id": "yestrade-67-1288-2392133",
+      "returned_chunk_ids": [
+        "yestrade-67-1288-2392133#0192",
+        "yestrade-67-1288-2392133#0199",
+        "yestrade-67-1288-2392133#0255",
+        "yestrade-67-1288-2392133#0218",
+        "yestrade-67-1288-2392133#0206",
+        "yestrade-67-1288-2392133#0189"
+      ],
+      "verdict": "relevant_added",
+      "evidence_chunk_ids": [
+        "yestrade-67-1288-2392133#0199"
+      ],
+      "note": "6A002.a.2.a. 영상 강화 튜브(영상증배관)"
+    },
+    {
+      "qid": "holdout-v1-024",
+      "rank": 3,
+      "parent_id": "yestrade-faq-67",
+      "returned_chunk_ids": [
+        "yestrade-faq-67#0000"
+      ],
+      "verdict": "partial_answer",
+      "evidence_chunk_ids": [],
+      "note": "기존 계약 및 자회사 예외만 설명하며 질문의 예외 유형 전체는 없음"
+    },
+    {
+      "qid": "holdout-v1-026",
+      "rank": 2,
+      "parent_id": "yestrade-62-2999",
+      "returned_chunk_ids": [
+        "yestrade-62-2999#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-027",
+      "rank": 2,
+      "parent_id": "yestrade-69-10957-2393740",
+      "returned_chunk_ids": [
+        "yestrade-69-10957-2393740#0004",
+        "yestrade-69-10957-2393740#0003",
+        "yestrade-69-10957-2393740#0008",
+        "yestrade-69-10957-2393740#0007",
+        "yestrade-69-10957-2393740#0001"
+      ],
+      "verdict": "relevant_added",
+      "evidence_chunk_ids": [
+        "yestrade-69-10957-2393740#0004"
+      ],
+      "note": "제7조: 수출계약서와 원산지증명서; 제8조: 7일 이내 발급"
+    },
+    {
+      "qid": "holdout-v1-029",
+      "rank": 2,
+      "parent_id": "yestrade-67-1228-2392110",
+      "returned_chunk_ids": [
+        "yestrade-67-1228-2392110#0338",
+        "yestrade-67-1228-2392110#0306",
+        "yestrade-67-1228-2392110#0329",
+        "yestrade-67-1228-2392110#0408",
+        "yestrade-67-1228-2392110#0079",
+        "yestrade-67-1228-2392110#0304"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-038",
+      "rank": 3,
+      "parent_id": "yestrade-63-2359",
+      "returned_chunk_ids": [
+        "yestrade-63-2359#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-047",
+      "rank": 3,
+      "parent_id": "pdf-대외무역법-시행령-대통령령-제36526호-20260731-cbab17b6",
+      "returned_chunk_ids": [
+        "pdf-대외무역법-시행령-대통령령-제36526호-20260731-cbab17b6#0048"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-048",
+      "rank": 1,
+      "parent_id": "yestrade-62-2355-2392022",
+      "returned_chunk_ids": [
+        "yestrade-62-2355-2392022#0040",
+        "yestrade-62-2355-2392022#0043",
+        "yestrade-62-2355-2392022#0042",
+        "yestrade-62-2355-2392022#0041",
+        "yestrade-62-2355-2392022#0037",
+        "yestrade-62-2355-2392022#0036"
+      ],
+      "verdict": "relevant_already_in_gold",
+      "evidence_chunk_ids": [],
+      "note": "기존 gold에 포함됨"
+    },
+    {
+      "qid": "holdout-v1-053",
+      "rank": 1,
+      "parent_id": "hwp-상무부-세미나-QnA-91625c48",
+      "returned_chunk_ids": [
+        "hwp-상무부-세미나-QnA-91625c48#0011",
+        "hwp-상무부-세미나-QnA-91625c48#0003",
+        "hwp-상무부-세미나-QnA-91625c48#0001",
+        "hwp-상무부-세미나-QnA-91625c48#0009",
+        "hwp-상무부-세미나-QnA-91625c48#0004",
+        "hwp-상무부-세미나-QnA-91625c48#0010"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-053",
+      "rank": 3,
+      "parent_id": "yestrade-67-1415-2392054",
+      "returned_chunk_ids": [
+        "yestrade-67-1415-2392054#0004",
+        "yestrade-67-1415-2392054#0000",
+        "yestrade-67-1415-2392054#0002",
+        "yestrade-67-1415-2392054#0001",
+        "yestrade-67-1415-2392054#0006",
+        "yestrade-67-1415-2392054#0003"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-055",
+      "rank": 3,
+      "parent_id": "yestrade-faq-102",
+      "returned_chunk_ids": [
+        "yestrade-faq-102#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-056",
+      "rank": 3,
+      "parent_id": "yestrade-69-11197",
+      "returned_chunk_ids": [
+        "yestrade-69-11197#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-057",
+      "rank": 3,
+      "parent_id": "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6",
+      "returned_chunk_ids": [
+        "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6#0001",
+        "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6#0000",
+        "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6#0004",
+        "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6#0003",
+        "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6#0002"
+      ],
+      "verdict": "relevant_added",
+      "evidence_chunk_ids": [
+        "hwp-전략물자-등-수출통관에-관한-고시-신구조문대비표-226f4ea6#0001"
+      ],
+      "note": "제3조: 전략물자 등 허가번호, 전문판정 발급번호, 자가판정 등록번호 또는 사전신고서 판정번호"
+    },
+    {
+      "qid": "holdout-v1-063",
+      "rank": 2,
+      "parent_id": "yestrade-69-11656-2393338",
+      "returned_chunk_ids": [
+        "yestrade-69-11656-2393338#0002",
+        "yestrade-69-11656-2393338#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-063",
+      "rank": 3,
+      "parent_id": "yestrade-56-8674-2393300",
+      "returned_chunk_ids": [
+        "yestrade-56-8674-2393300#0051",
+        "yestrade-56-8674-2393300#0096"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-063",
+      "rank": 4,
+      "parent_id": "yestrade-69-6494-2394794-z005",
+      "returned_chunk_ids": [
+        "yestrade-69-6494-2394794-z005#0003"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-063",
+      "rank": 5,
+      "parent_id": "yestrade-69-18569-3059099",
+      "returned_chunk_ids": [
+        "yestrade-69-18569-3059099#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-064",
+      "rank": 2,
+      "parent_id": "yestrade-67-1350-2394230",
+      "returned_chunk_ids": [
+        "yestrade-67-1350-2394230#1161"
+      ],
+      "verdict": "relevant_added",
+      "evidence_chunk_ids": [
+        "yestrade-67-1350-2394230#1161"
+      ],
+      "note": "동일한 화학구조는 다른 이름/CAS 번호에도 통제; CAS는 유일한 식별자 아님"
+    },
+    {
+      "qid": "holdout-v1-065",
+      "rank": 2,
+      "parent_id": "yestrade-faq-12",
+      "returned_chunk_ids": [
+        "yestrade-faq-12#0000"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-065",
+      "rank": 4,
+      "parent_id": "yestrade-56-5610-2393247",
+      "returned_chunk_ids": [
+        "yestrade-56-5610-2393247#0083"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    },
+    {
+      "qid": "holdout-v1-068",
+      "rank": 2,
+      "parent_id": "yestrade-62-2806",
+      "returned_chunk_ids": [
+        "yestrade-62-2806#0002"
+      ],
+      "verdict": "partial_answer",
+      "evidence_chunk_ids": [],
+      "note": "7년 징역과 거래가액 5배 벌금은 있으나 3년 수출입 제한은 없음"
+    },
+    {
+      "qid": "holdout-v1-068",
+      "rank": 4,
+      "parent_id": "yestrade-63-95",
+      "returned_chunk_ids": [
+        "yestrade-63-95#0002"
+      ],
+      "verdict": "screened_no_complete_answer",
+      "evidence_chunk_ids": [],
+      "note": "반환 청크와 질문의 완전 답을 대조했으나 확인되지 않음"
+    }
+  ]
+}

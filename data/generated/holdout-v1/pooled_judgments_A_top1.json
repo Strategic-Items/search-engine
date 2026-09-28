@@ -1,0 +1,64 @@
+{
+ "method": "docs 질의를 docs+홀드아웃에 던진 실행에서 1위가 정답이 아닌 34건 판정. 같은 규칙.",
+ "judged_run": "results/tuned-with-holdout-noise.json",
+ "judgments": [
+  {
+   "qid": "docs-v2-109",
+   "verdict": "relevant",
+   "parent": "yestrade-67-1216-2392060",
+   "evidence": [
+    [
+     "yestrade-67-1216-2392060#0174",
+     "yestrade-67-1216-2392060#0164"
+    ]
+   ],
+   "note": "실무가이드 부록 한미양해각서: 1987.9.11 워싱턴 서명, 1989.5.11 발효"
+  },
+  {
+   "qid": "docs-v2-110",
+   "verdict": "relevant",
+   "parent": "yestrade-67-1216-2392060",
+   "evidence": [
+    [
+     "yestrade-67-1216-2392060#0174"
+    ]
+   ],
+   "note": "서면동의 증명 없이 재수출 불허"
+  },
+  {
+   "qid": "docs-v2-111",
+   "verdict": "relevant",
+   "parent": "yestrade-67-1216-2392060",
+   "evidence": [
+    [
+     "yestrade-67-1216-2392060#0175"
+    ]
+   ],
+   "note": "경유·보세시설 회피 방지, 재선적 방지 협력"
+  },
+  {
+   "qid": "docs-v2-128",
+   "verdict": "relevant",
+   "parent": "law-admrul-2100000284150",
+   "evidence": [
+    [
+     "law-admrul-2100000284150#0033"
+    ]
+   ],
+   "note": "현행 고시 제26조 개별수출허가의 면제"
+  },
+  {
+   "qid": "docs-v2-112",
+   "verdict": "partial",
+   "parent": null,
+   "evidence": [
+    [
+     "yestrade-67-1216-2392060#0176",
+     "yestrade-67-1216-2392060#0171"
+    ],
+    []
+   ],
+   "note": "위반 의심 시 정보교환·유치검사만, 30일 협의 없음"
+  }
+ ]
+}

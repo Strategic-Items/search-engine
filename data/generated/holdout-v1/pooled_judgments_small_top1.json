@@ -1,0 +1,18 @@
+{
+  "method": "holdout-small 실행에서 1위가 정답 문서가 아닌 16건의 1위 문서 청크를 사람이 읽고 판정했다(작성자=assistant). 정답은 추가만 하고 제거하지 않는다. top-2~5는 판정하지 않았으므로 홀드아웃 점수는 하한이다.",
+  "judged_run": "results/holdout-small.json",
+  "judgments": [
+    {"qid": "holdout-v1-002", "verdict": "relevant", "parent": "law-admrul-2100000284150", "evidence": [["law-admrul-2100000284150#0031"]], "note": "고시 제23조: 15일 이내, 별도 기술심사 일수 불산입"},
+    {"qid": "holdout-v1-005", "verdict": "relevant", "parent": "law-admrul-2100000284150", "evidence": [["law-admrul-2100000284150#0031"], ["law-admrul-2100000284150#0032"]], "note": "제24조 대상품목·최종사용자 변경 제외, 제25조③ 유효기간 당초와 같음"},
+    {"qid": "holdout-v1-055", "verdict": "relevant", "parent": "yestrade-62-2355-2392022", "evidence": [["yestrade-62-2355-2392022#0034"]], "note": "일반에 공개된 정보, 기초과학연구, 특허 출원 최소 정보는 통제에서 제외"},
+    {"qid": "holdout-v1-061", "verdict": "relevant", "parent": "law-admrul-2100000284150", "evidence": [["law-admrul-2100000284150#0011"]], "note": "제16조③: 별지 제4호의2로 당초 판정받은 자의 활용 동의를 받은 제3자에게 효력"},
+    {"qid": "holdout-v1-062", "verdict": "relevant", "parent": "law-admrul-2100000284150", "evidence": [["law-admrul-2100000284150#0043", "law-admrul-2100000284150#0048"], ["law-admrul-2100000284150#0044", "law-admrul-2100000284150#0048"]], "note": "제29·35조 신청, 제30·36조 허가 조문 자체"},
+    {"qid": "holdout-v1-001", "verdict": "partial", "parent": null, "evidence": [["yestrade-guide-usage-guidance#0000"], []], "note": "전문판정 15일 이내만 답하고 자가판정서 2년은 없음. 근거 1번만 인정, 정답 문서로는 보지 않음"},
+    {"qid": "holdout-v1-007", "verdict": "partial", "parent": null, "evidence": null, "note": "대형 장비는 전체 장비 기준 판정이라는 다른 답. 참조 답(대표 품목 전문판정)과 다르다. 인정하지 않음"},
+    {"qid": "holdout-v1-026", "verdict": "partial", "parent": null, "evidence": null, "note": "제83조 별지 제17호 지정서 교부만 언급, 지정서 항목 없음. 인정하지 않음"},
+    {"qid": "holdout-v1-004", "verdict": "not_relevant"}, {"qid": "holdout-v1-010", "verdict": "not_relevant"},
+    {"qid": "holdout-v1-025", "verdict": "not_relevant"}, {"qid": "holdout-v1-040", "verdict": "not_relevant"},
+    {"qid": "holdout-v1-045", "verdict": "not_relevant"}, {"qid": "holdout-v1-050", "verdict": "not_relevant"},
+    {"qid": "holdout-v1-052", "verdict": "not_relevant"}, {"qid": "holdout-v1-063", "verdict": "not_relevant"}
+  ]
+}

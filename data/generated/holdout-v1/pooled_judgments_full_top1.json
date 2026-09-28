@@ -1,0 +1,204 @@
+{
+ "method": "전체 코퍼스 실행에서 1위가 정답이 아닌 27건의 1위 청크를 판정. 질의가 자료를 지목하면(연도·회차) 다른 자료는 내용이 같아도 인정하지 않음. 정답은 추가만 한다.",
+ "judged_run": "results/holdout-full.json",
+ "judgments": [
+  {
+   "qid": "holdout-v1-002",
+   "verdict": "relevant",
+   "parent": "yestrade-guide-export-permissions__guide__overview",
+   "evidence": [
+    [
+     "yestrade-guide-export-permissions__guide__overview#0004"
+    ]
+   ],
+   "note": "수출허가 안내: 접수일부터 15일, 기술적 심사 기간 불산입"
+  },
+  {
+   "qid": "holdout-v1-022",
+   "verdict": "relevant",
+   "parent": "yestrade-62-2970",
+   "evidence": [
+    [
+     "yestrade-62-2970#0001"
+    ]
+   ],
+   "note": "구 통합공고 해설: 비회원국 기술료 총액 미화 1만불 이하 면제"
+  },
+  {
+   "qid": "holdout-v1-024",
+   "verdict": "relevant",
+   "parent": "yestrade-guide-export-permissions__guide__overview",
+   "evidence": [
+    [
+     "yestrade-guide-export-permissions__guide__overview#0011"
+    ]
+   ],
+   "note": "수출허가 안내: 대러·벨 사안별 심사 대상 목록"
+  },
+  {
+   "qid": "holdout-v1-039",
+   "verdict": "relevant",
+   "parent": "yestrade-67-1286-2392131",
+   "evidence": [
+    [
+     "yestrade-67-1286-2392131#0706"
+    ]
+   ],
+   "note": "EAR 관리규정 번역 762.6: 5년 보관"
+  },
+  {
+   "qid": "holdout-v1-040",
+   "verdict": "relevant",
+   "parent": "yestrade-67-1329-2394254",
+   "evidence": [
+    [
+     "yestrade-67-1329-2394254#0130"
+    ]
+   ],
+   "note": "품목해설서 8A001.h: 3.25m 파고 40노트 자동제어 호일 수중익선"
+  },
+  {
+   "qid": "holdout-v1-045",
+   "verdict": "relevant",
+   "parent": "yestrade-63-970",
+   "evidence": [
+    [
+     "yestrade-63-970#0000"
+    ]
+   ],
+   "note": "스위스 금융자산 동결·사치품 수출금지 기사 원문"
+  },
+  {
+   "qid": "holdout-v1-052",
+   "verdict": "relevant",
+   "parent": "yestrade-faq-42",
+   "evidence": [
+    [
+     "yestrade-faq-42#0000",
+     "yestrade-faq-42#0002"
+    ]
+   ],
+   "note": "교육 미이수 시 500만원 이하 과태료"
+  },
+  {
+   "qid": "holdout-v1-061",
+   "verdict": "relevant",
+   "parent": "yestrade-guide-judgements__expert__apply__guide",
+   "evidence": [
+    [
+     "yestrade-guide-judgements__expert__apply__guide#0001"
+    ]
+   ],
+   "note": "전문판정 안내: 별지 제4호의2 서면 동의"
+  },
+  {
+   "qid": "holdout-v1-062",
+   "verdict": "relevant",
+   "parent": "yestrade-69-6504-2393992",
+   "evidence": [
+    [
+     "yestrade-69-6504-2393992#0036"
+    ],
+    []
+   ],
+   "note": "구판 고시 제29조(신청), 제30조 이하 동일 조문"
+  },
+  {
+   "qid": "holdout-v1-001",
+   "verdict": "partial",
+   "parent": null,
+   "evidence": [
+    [
+     "yestrade-69-10895-2393859#0327"
+    ],
+    []
+   ],
+   "note": "판정 15일 이내·연장만, 자가판정서 2년 없음"
+  },
+  {
+   "qid": "holdout-v1-005",
+   "verdict": "partial",
+   "parent": null,
+   "evidence": [
+    [],
+    [
+     "yestrade-69-6314-2394365#0236"
+    ]
+   ],
+   "note": "구판 고시 제25조③ 유효기간만"
+  },
+  {
+   "qid": "holdout-v1-050",
+   "verdict": "partial",
+   "parent": null,
+   "evidence": [
+    [
+     "yestrade-56-5642-2393248#0038",
+     "yestrade-56-5642-2393248#0074"
+    ],
+    []
+   ],
+   "note": "EG 의장국 시기만, 레이저 안건 없음"
+  },
+  {
+   "qid": "holdout-v1-004",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-006",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-009",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-011",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-013",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-025",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-026",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-028",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-033",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-037",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-048",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-054",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-063",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-067",
+   "verdict": "not_relevant"
+  },
+  {
+   "qid": "holdout-v1-068",
+   "verdict": "not_relevant"
+  }
+ ]
+}

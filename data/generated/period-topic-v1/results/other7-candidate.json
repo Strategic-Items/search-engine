@@ -1,0 +1,321 @@
+{
+  "answerable": {
+    "queries": 7,
+    "first": 7,
+    "top_k": 7
+  },
+  "k": 5,
+  "base_url": "http://127.0.0.1:8114",
+  "totals": {
+    "queries": 7,
+    "first": 7,
+    "top_k": 7,
+    "gold_missing_from_index": 0
+  },
+  "categories": {
+    "other_period": {
+      "queries": 7,
+      "first": 7,
+      "top_k": 7,
+      "gold_missing_from_index": 0
+    }
+  },
+  "reviewed": {
+    "assistant_source_reviewed": 7
+  },
+  "queries": [
+    {
+      "qid": "period-other-v1-001",
+      "category": "other_period",
+      "query": "2022년 상반기 맞춤형 방산 수출입제도 상담회 신청은 언제부터 언제까지 받았어?",
+      "gold": [
+        "yestrade-69-13401",
+        "yestrade-69-13401-2395017"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-13401-2395017",
+        "yestrade-69-13401",
+        "yestrade-69-13213"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-13401-2395017#0000",
+          "yestrade-69-13401-2395017#0002",
+          "yestrade-69-13401-2395017#0004"
+        ],
+        [
+          "yestrade-69-13401#0000"
+        ],
+        [
+          "yestrade-69-13213#0090",
+          "yestrade-69-13213#0095",
+          "yestrade-69-13213#0092",
+          "yestrade-69-13213#0096",
+          "yestrade-69-13213#0094",
+          "yestrade-69-13213#0081"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-13401",
+          "yestrade-69-13401-2395017"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-13401#0000",
+          "yestrade-69-13401-2395017#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-other-v1-002",
+      "category": "other_period",
+      "query": "2023년 상반기 맞춤형 방산 수출입제도 상담회는 언제 어디서 열렸어?",
+      "gold": [
+        "yestrade-69-14405",
+        "yestrade-69-14405-2395210"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-14405-2395210",
+        "yestrade-69-14405",
+        "yestrade-69-14405-2395211"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-14405-2395210#0000",
+          "yestrade-69-14405-2395210#0001"
+        ],
+        [
+          "yestrade-69-14405#0000"
+        ],
+        [
+          "yestrade-69-14405-2395211#0000",
+          "yestrade-69-14405-2395211#0002",
+          "yestrade-69-14405-2395211#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-14405",
+          "yestrade-69-14405-2395210"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-14405#0000",
+          "yestrade-69-14405-2395210#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-other-v1-003",
+      "category": "other_period",
+      "query": "2023년 하반기 맞춤형 방산 수출입제도 상담회의 운영 기간은 언제였어?",
+      "gold": [
+        "yestrade-69-15954"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-15954",
+        "yestrade-69-15954-2391342"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-15954#0000"
+        ],
+        [
+          "yestrade-69-15954-2391342#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-15954"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-15954#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-other-v1-004",
+      "category": "other_period",
+      "query": "2025년 상반기 정규교육 개최 일정 공지는 몇 월부터 몇 월까지의 교육을 안내했어?",
+      "gold": [
+        "yestrade-69-20001"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-20001"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-20001#0003",
+          "yestrade-69-20001#0001",
+          "yestrade-69-20001#0000",
+          "yestrade-69-20001#0002"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-20001"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-20001#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-other-v1-005",
+      "category": "other_period",
+      "query": "2025년 하반기 정규교육에서 8월 강좌를 들으려면 신청은 어느 달에 하라고 안내했어?",
+      "gold": [
+        "yestrade-69-18551"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-18551"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-18551#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-18551"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-18551#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-other-v1-006",
+      "category": "other_period",
+      "query": "2026년 상반기 정규교육 개최 일정 안내의 교육홍보팀 문의 전화번호는?",
+      "gold": [
+        "yestrade-69-21184"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-21184",
+        "yestrade-63-502-2391917"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-21184#0000"
+        ],
+        [
+          "yestrade-63-502-2391917#0003",
+          "yestrade-63-502-2391917#0004",
+          "yestrade-63-502-2391917#0002"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-21184"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-21184#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "period-other-v1-007",
+      "category": "other_period",
+      "query": "2026년 하반기 정규교육 일정 안내에서 일부 과정을 비대면으로 운영하는 달은?",
+      "gold": [
+        "yestrade-69-22713"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-22713",
+        "yestrade-63-3167"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-22713#0000"
+        ],
+        [
+          "yestrade-63-3167#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-22713"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-22713#0000"
+        ]
+      ]
+    }
+  ],
+  "metrics": {
+    "queries": 7,
+    "hit_at_1": 1.0,
+    "precision_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_5": 1.0,
+    "precision_returned_at_5": 0.6904761904761905,
+    "mean_returned_at_5": 2.0,
+    "micro_recall_at_5": 1.0,
+    "mrr_at_5": 1.0,
+    "group_queries": 7,
+    "group_hit_at_5": 1.0,
+    "group_recall_at_5": 1.0,
+    "group_micro_recall_at_5": 1.0,
+    "group_all_at_5": 1.0,
+    "evidence_queries": 7,
+    "evidence_hit_at_5": 1.0,
+    "evidence_recall_at_5": 1.0,
+    "evidence_micro_recall_at_5": 1.0,
+    "evidence_all_at_5": 1.0,
+    "evidence_precision_at_5": 0.4333333333333333,
+    "evidence_micro_precision_at_5": 0.3103448275862069,
+    "evidence_mrr_at_5": 0.9047619047619048,
+    "evidence_first_rank_at_5": 1.2857142857142858,
+    "mean_chunks_at_5": 4.142857142857143
+  },
+  "coverage_known": true
+}

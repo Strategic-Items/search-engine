@@ -1,0 +1,542 @@
+{
+  "seed": 20260923,
+  "min_chars": 300,
+  "corpus": "data/generated/holdout-v1/core.jsonl",
+  "pool_sizes": {
+    "FAQ": 269,
+    "공지사항": 467,
+    "공지사항 첨부": 845,
+    "국내외 소식": 663,
+    "국내외 소식 첨부": 50,
+    "기타 게시판": 62,
+    "동향자료": 22,
+    "동향자료 첨부": 140,
+    "민원서식 첨부": 3,
+    "법령": 5,
+    "법령 별표": 61,
+    "안내": 23,
+    "알기쉬운 전략물자": 217,
+    "알기쉬운 전략물자 첨부": 17
+  },
+  "unassigned_strata": [],
+  "picked": {
+    "FAQ": [
+      {
+        "parent_id": "yestrade-faq-43-2288564",
+        "title": "★0226 (9차) 전략물자관리제도 Q8",
+        "source_type": "FAQ 첨부",
+        "chars": 1441,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-faq-185-2288713",
+        "title": "★0226 (9차) 전략물자관리제도 Q48",
+        "source_type": "FAQ 첨부",
+        "chars": 366,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-28-2288737",
+        "title": "★0226 (9차) 전략물자관리제도 Q23",
+        "source_type": "FAQ 첨부",
+        "chars": 759,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-5",
+        "title": "주한 외국공관으로 그 공관이 사용할 전략물자를납품하는 것은 전략물자 수출허가 대상인지 여부",
+        "source_type": "FAQ",
+        "chars": 321,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-184-2288712",
+        "title": "★0226 (9차) 전략물자관리제도 Q49",
+        "source_type": "FAQ 첨부",
+        "chars": 350,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-70",
+        "title": "對러시아·벨라루스 상황허가 대상 품목",
+        "source_type": "FAQ",
+        "chars": 405,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-9-2288559",
+        "title": "★0226 (9차) 전략물자관리제도 Q14",
+        "source_type": "FAQ 첨부",
+        "chars": 468,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-17",
+        "title": "전략물자 국내관리 의무의 범위",
+        "source_type": "FAQ",
+        "chars": 319,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-110-2288638",
+        "title": "★0226 (9차) 전략물자관리제도 Q125",
+        "source_type": "FAQ 첨부",
+        "chars": 345,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-faq-115-2288643",
+        "title": "★0226 (9차) 전략물자관리제도 Q120",
+        "source_type": "FAQ 첨부",
+        "chars": 313,
+        "chunks": 1
+      }
+    ],
+    "공지사항": [
+      {
+        "parent_id": "yestrade-69-524",
+        "title": "제18차 전략물자관리제도 전문과정 개최",
+        "source_type": "공지사항",
+        "chars": 1043,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-69-906",
+        "title": "2012년 전략물자 무역주간 개최",
+        "source_type": "공지사항",
+        "chars": 1337,
+        "chunks": 3
+      },
+      {
+        "parent_id": "yestrade-69-867",
+        "title": "제28차 『전략물자관리제도 기본과정』개최",
+        "source_type": "공지사항",
+        "chars": 680,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-69-18590",
+        "title": "2025 무역안보의 날 행사 개최 안내",
+        "source_type": "공지사항",
+        "chars": 498,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-69-523",
+        "title": "美 상무부, 『2011년 수출통제 및 정책 컨퍼런스』 참가자 모집",
+        "source_type": "공지사항",
+        "chars": 1053,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-69-654",
+        "title": "전략물자 판정사례 CD 제작",
+        "source_type": "공지사항",
+        "chars": 957,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-69-12164",
+        "title": "[CP서식] 자율준수무역거래자(CP)지정신청을 위한 양식 및 작성 안내",
+        "source_type": "공지사항",
+        "chars": 935,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-69-4187",
+        "title": "자가판정 시스템 고도화 기업 간담회 개최 계획",
+        "source_type": "공지사항",
+        "chars": 353,
+        "chunks": 1
+      }
+    ],
+    "공지사항 첨부": [
+      {
+        "parent_id": "yestrade-69-7495-2394123-z003",
+        "title": "최종용도 확인서 (이란 외교부, 원자력청) 발급 절차 등 수정v1",
+        "source_type": "공지사항 첨부",
+        "chars": 2092,
+        "chunks": 3
+      },
+      {
+        "parent_id": "yestrade-69-767-2392452-z007",
+        "title": "제4부 컴퓨터",
+        "source_type": "공지사항 첨부",
+        "chars": 5734,
+        "chunks": 9
+      },
+      {
+        "parent_id": "yestrade-69-12583-2392920",
+        "title": "[발표7]CP 정기보고 요령 및 멘토링 안내 최수아 연구원(전략물자관리원)",
+        "source_type": "공지사항 첨부",
+        "chars": 7266,
+        "chunks": 13
+      },
+      {
+        "parent_id": "yestrade-69-11937-2392827",
+        "title": "★제2019-154호(26차 전략물자 수출입고시 본문, 190918)",
+        "source_type": "공지사항 첨부",
+        "chars": 50847,
+        "chunks": 90
+      },
+      {
+        "parent_id": "yestrade-69-21177-2395322-z088",
+        "title": "[별표 1] 전략물자·기술 색인(전략물자수출입고시)",
+        "source_type": "공지사항 첨부",
+        "chars": 58649,
+        "chunks": 83
+      },
+      {
+        "parent_id": "yestrade-69-17354-2395837",
+        "title": "제35차 전략물자수출입고시 개정안 사전 설명회 발표자료",
+        "source_type": "공지사항 첨부",
+        "chars": 7724,
+        "chunks": 12
+      }
+    ],
+    "민원서식 첨부": [
+      {
+        "parent_id": "yestrade-70-4755-3046261",
+        "title": "annexed24",
+        "source_type": "민원서식 첨부",
+        "chars": 1847,
+        "chunks": 4
+      },
+      {
+        "parent_id": "yestrade-70-4880-3046254",
+        "title": "annexed17",
+        "source_type": "민원서식 첨부",
+        "chars": 1002,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-70-7721-3046248",
+        "title": "annexed kimberley",
+        "source_type": "민원서식 첨부",
+        "chars": 1269,
+        "chunks": 2
+      }
+    ],
+    "알기쉬운 전략물자": [
+      {
+        "parent_id": "yestrade-62-2304",
+        "title": "전략물자 자율준수 가이던스 (4)",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 4839,
+        "chunks": 8
+      },
+      {
+        "parent_id": "yestrade-62-2865",
+        "title": "안전한 무역으로 안내하는 『전략물자관리제도』",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 1218,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-62-2382",
+        "title": "북한의 테러지원국 해제 후 예상되는 미국의 수출통제 정책 변화",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 1784,
+        "chunks": 3
+      },
+      {
+        "parent_id": "yestrade-62-2803",
+        "title": "업계의견 적극 수렴, 심사 및 허가 업무 간편하고 빠르게",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 1873,
+        "chunks": 3
+      },
+      {
+        "parent_id": "yestrade-62-2823",
+        "title": "전략물자 수출통제 가이드 : 파키스탄 (2)",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 5401,
+        "chunks": 11
+      },
+      {
+        "parent_id": "yestrade-62-2828",
+        "title": "생화학무기시리즈(5)_리신",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 1403,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-62-2742",
+        "title": "대북 반출물자 관리 시리즈 : (5) 전략물자 및 미국 EAR 대상품목의 반출통관",
+        "source_type": "알기쉬운 전략물자",
+        "chars": 961,
+        "chunks": 2
+      }
+    ],
+    "동향자료": [
+      {
+        "parent_id": "yestrade-67-4703",
+        "title": "[참고]<b>WMD개발 관련 외국 우려업체 및 품목</b>",
+        "source_type": "동향자료",
+        "chars": 555,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-67-1329",
+        "title": "<font color=blue><b>전략물자 품목해설서</b></font>",
+        "source_type": "동향자료",
+        "chars": 460,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-67-475",
+        "title": "전자신문 기획연재 2호 \"수출관리 왜 해야할까\"",
+        "source_type": "동향자료",
+        "chars": 1458,
+        "chunks": 3
+      }
+    ],
+    "동향자료 첨부": [
+      {
+        "parent_id": "yestrade-67-1418-2392057",
+        "title": "EAR해설서1",
+        "source_type": "동향자료 첨부",
+        "chars": 106888,
+        "chunks": 166
+      },
+      {
+        "parent_id": "yestrade-67-1313-2392117-z024",
+        "title": "Part 762 - Recordkeeping",
+        "source_type": "동향자료 첨부",
+        "chars": 17405,
+        "chunks": 26
+      },
+      {
+        "parent_id": "yestrade-67-1313-2392117-z054",
+        "title": "Category 8 - Marine",
+        "source_type": "동향자료 첨부",
+        "chars": 29464,
+        "chunks": 43
+      },
+      {
+        "parent_id": "yestrade-67-1313-2392117-z013",
+        "title": "Part 740 - License Exceptions",
+        "source_type": "동향자료 첨부",
+        "chars": 189858,
+        "chunks": 271
+      }
+    ],
+    "국내외 소식": [
+      {
+        "parent_id": "yestrade-63-2991",
+        "title": "[국내외동향] 北 미사일 적재 수송기 태국에 억류",
+        "source_type": "국내외 소식",
+        "chars": 1479,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-63-491",
+        "title": "RFID 장착 컨테이너, 항구안전 및 이익 증진에 기여",
+        "source_type": "국내외 소식",
+        "chars": 551,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-63-492",
+        "title": "원자력통제기술원 출범",
+        "source_type": "국내외 소식",
+        "chars": 358,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-63-3054",
+        "title": "[국내외동향] 2008년 유관기관 전략물자 사전판정 신청 및 처리 현황",
+        "source_type": "국내외 소식",
+        "chars": 713,
+        "chunks": 1
+      },
+      {
+        "parent_id": "yestrade-63-1124",
+        "title": "[국내외소식]유엔안보리 결의(UNSCR) 1718호 이행을 위한 국제동향",
+        "source_type": "국내외 소식",
+        "chars": 2237,
+        "chunks": 3
+      }
+    ],
+    "국내외 소식 첨부": [
+      {
+        "parent_id": "yestrade-63-3129-2391997",
+        "title": "kosti2010081015004010이란국제제재동향",
+        "source_type": "국내외 소식 첨부",
+        "chars": 15323,
+        "chunks": 29
+      },
+      {
+        "parent_id": "yestrade-63-1160-2391303",
+        "title": "보도자료 대외무역법시행령",
+        "source_type": "국내외 소식 첨부",
+        "chars": 3496,
+        "chunks": 6
+      }
+    ],
+    "알기쉬운 전략물자 첨부": [
+      {
+        "parent_id": "yestrade-62-2355-2392022",
+        "title": "수출통제 대상기술 안내2",
+        "source_type": "알기쉬운 전략물자 첨부",
+        "chars": 30469,
+        "chunks": 55
+      },
+      {
+        "parent_id": "yestrade-62-8572-2392899",
+        "title": "2013 연례보고서",
+        "source_type": "알기쉬운 전략물자 첨부",
+        "chars": 216392,
+        "chunks": 409
+      },
+      {
+        "parent_id": "yestrade-62-5605-2392867",
+        "title": "2015 연례보고서",
+        "source_type": "알기쉬운 전략물자 첨부",
+        "chars": 112477,
+        "chunks": 216
+      }
+    ],
+    "기타 게시판": [
+      {
+        "parent_id": "yestrade-64-5652-2393244",
+        "title": "[전문가컬럼]로켓 그리고 미사일",
+        "source_type": "전문가 칼럼 첨부",
+        "chars": 13883,
+        "chunks": 21
+      },
+      {
+        "parent_id": "yestrade-65-9736-2393982",
+        "title": "[발표3] 판정 관련 주요 FAQ 전략물자관리원",
+        "source_type": "CP공지사항 첨부",
+        "chars": 5723,
+        "chunks": 8
+      },
+      {
+        "parent_id": "yestrade-64-2949",
+        "title": "전자신문 기획연재 5호 \"개성공단 사업의 전제조건\"",
+        "source_type": "전문가 칼럼",
+        "chars": 1613,
+        "chunks": 3
+      },
+      {
+        "parent_id": "yestrade-64-8536-2393479",
+        "title": "[전문가컬럼]유엔의 대북제재와 수출통제",
+        "source_type": "전문가 칼럼 첨부",
+        "chars": 9067,
+        "chunks": 12
+      },
+      {
+        "parent_id": "yestrade-56-5644-2391937",
+        "title": "2018년 포커스(여름호)",
+        "source_type": "홍보자료 첨부",
+        "chars": 70630,
+        "chunks": 129
+      }
+    ],
+    "법령": [
+      {
+        "parent_id": "law-admrul-2100000284150",
+        "title": "전략물자수출입고시",
+        "source_type": "법령",
+        "chars": 57822,
+        "chunks": 96
+      },
+      {
+        "parent_id": "law-admrul-2100000268604",
+        "title": "전략물자 등 수출통관에 관한 고시",
+        "source_type": "법령",
+        "chars": 2163,
+        "chunks": 3
+      },
+      {
+        "parent_id": "law-admrul-2100000257522",
+        "title": "군용전략물자 수출허가 처리지침",
+        "source_type": "법령",
+        "chars": 2239,
+        "chunks": 3
+      },
+      {
+        "parent_id": "law-law-276491",
+        "title": "대외무역법",
+        "source_type": "법령",
+        "chars": 46443,
+        "chunks": 91
+      },
+      {
+        "parent_id": "law-admrul-2100000269512",
+        "title": "대북 전략물자의 반출승인절차에 관한 고시",
+        "source_type": "법령",
+        "chars": 3525,
+        "chunks": 6
+      }
+    ],
+    "법령 별표": [
+      {
+        "parent_id": "law-admrul-2100000284150-annex-x0004-02",
+        "title": "전략물자수출입고시 [별지 4의2] 전문판정결과 활용 동의서",
+        "source_type": "법령 별표",
+        "chars": 3174,
+        "chunks": 6
+      },
+      {
+        "parent_id": "law-admrul-2100000284150-annex-x0006-00",
+        "title": "전략물자수출입고시 [별지 6] 포괄수출허가(신청)서 Comprehensive Export License (Application)",
+        "source_type": "법령 별표",
+        "chars": 2363,
+        "chunks": 5
+      },
+      {
+        "parent_id": "law-admrul-2100000284150-annex-b0020-00",
+        "title": "전략물자수출입고시 [별표 20] 자율준수무역거래자 등급심사기준",
+        "source_type": "법령 별표",
+        "chars": 23074,
+        "chunks": 32
+      },
+      {
+        "parent_id": "law-admrul-2100000284150-annex-b0003-00",
+        "title": "전략물자수출입고시 [별표 3] 군용물자목록",
+        "source_type": "법령 별표",
+        "chars": 160233,
+        "chunks": 237
+      },
+      {
+        "parent_id": "law-admrul-2100000269512-annex-x0005-00",
+        "title": "대북 전략물자의 반출승인절차에 관한 고시 [별지 5] 전략물자반출결과보고서",
+        "source_type": "법령 별표",
+        "chars": 3298,
+        "chunks": 6
+      }
+    ],
+    "안내": [
+      {
+        "parent_id": "yestrade-guide-system-guidance__international-regime__ag",
+        "title": "AG",
+        "source_type": "안내",
+        "chars": 951,
+        "chunks": 2
+      },
+      {
+        "parent_id": "yestrade-guide-judgements__self__guide",
+        "title": "온라인 자가판정 안내",
+        "source_type": "안내",
+        "chars": 1497,
+        "chunks": 3
+      },
+      {
+        "parent_id": "yestrade-guide-usage-guidance",
+        "title": "이용방법",
+        "source_type": "안내",
+        "chars": 3330,
+        "chunks": 6
+      },
+      {
+        "parent_id": "yestrade-guide-system-guidance__treaty__bwc",
+        "title": "BWC",
+        "source_type": "안내",
+        "chars": 593,
+        "chunks": 1
+      }
+    ]
+  }
+}

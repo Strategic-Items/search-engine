@@ -1,0 +1,1655 @@
+{
+  "answerable": {
+    "queries": 36,
+    "first": 33,
+    "top_k": 34
+  },
+  "k": 5,
+  "base_url": "http://127.0.0.1:8112",
+  "totals": {
+    "queries": 36,
+    "first": 33,
+    "top_k": 34,
+    "gold_missing_from_index": 0
+  },
+  "categories": {
+    "form": {
+      "queries": 5,
+      "first": 5,
+      "top_k": 5,
+      "gold_missing_from_index": 0
+    },
+    "identifier": {
+      "queries": 11,
+      "first": 11,
+      "top_k": 11,
+      "gold_missing_from_index": 0
+    },
+    "multi_evidence": {
+      "queries": 7,
+      "first": 7,
+      "top_k": 7,
+      "gold_missing_from_index": 0
+    },
+    "paraphrase": {
+      "queries": 5,
+      "first": 5,
+      "top_k": 5,
+      "gold_missing_from_index": 0
+    },
+    "scenario": {
+      "queries": 8,
+      "first": 5,
+      "top_k": 6,
+      "gold_missing_from_index": 0
+    }
+  },
+  "reviewed": {
+    "assistant_source_reviewed": 36
+  },
+  "queries": [
+    {
+      "qid": "validation-v2-001",
+      "category": "scenario",
+      "query": "이미 궤도에 있는 한일 공동소유 인공위성의 국내 지분을 해외 업체에 팔면 국내 통관이 없어도 수출허가가 필요해?",
+      "gold": [
+        "yestrade-faq-161",
+        "yestrade-faq-161-2288684"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-faq-161"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-faq-161#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-faq-161",
+          "yestrade-faq-161-2288684"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-faq-161#0000",
+          "yestrade-faq-161-2288684#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-002",
+      "category": "paraphrase",
+      "query": "전략기술을 이메일로 보내거나 구두로 교육하는 것도 무형이전 통제에서 말하는 이전 방식이야?",
+      "gold": [
+        "yestrade-faq-131",
+        "yestrade-faq-131-2288654",
+        "yestrade-69-6345-2394002"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-6345-2394002",
+        "yestrade-67-1284",
+        "yestrade-69-6023-2393150",
+        "yestrade-62-2801"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-6345-2394002#0018",
+          "yestrade-69-6345-2394002#0004",
+          "yestrade-69-6345-2394002#0019",
+          "yestrade-69-6345-2394002#0014",
+          "yestrade-69-6345-2394002#0026",
+          "yestrade-69-6345-2394002#0017"
+        ],
+        [
+          "yestrade-67-1284#0000"
+        ],
+        [
+          "yestrade-69-6023-2393150#0013",
+          "yestrade-69-6023-2393150#0066",
+          "yestrade-69-6023-2393150#0047",
+          "yestrade-69-6023-2393150#0046",
+          "yestrade-69-6023-2393150#0067",
+          "yestrade-69-6023-2393150#0062"
+        ],
+        [
+          "yestrade-62-2801#0000",
+          "yestrade-62-2801#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-faq-131",
+          "yestrade-faq-131-2288654",
+          "yestrade-69-6345-2394002"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-faq-131#0000",
+          "yestrade-faq-131-2288654#0000",
+          "yestrade-69-6345-2394002#0018"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-003",
+      "category": "identifier",
+      "query": "미국 Entity List에 오른 업체로 EAR 대상 품목을 수출하면 허가 심사는 원칙적으로 어떻게 돼?",
+      "gold": [
+        "yestrade-faq-74-2288596",
+        "yestrade-faq-74",
+        "yestrade-63-2184"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-63-2184",
+        "yestrade-faq-74",
+        "yestrade-62-2303-2392010"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-63-2184#0000"
+        ],
+        [
+          "yestrade-faq-74#0000"
+        ],
+        [
+          "yestrade-62-2303-2392010#0209",
+          "yestrade-62-2303-2392010#0383",
+          "yestrade-62-2303-2392010#0469",
+          "yestrade-62-2303-2392010#0296",
+          "yestrade-62-2303-2392010#0461",
+          "yestrade-62-2303-2392010#0181"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-faq-74-2288596",
+          "yestrade-faq-74",
+          "yestrade-63-2184"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-faq-74#0000",
+          "yestrade-faq-74-2288596#0000",
+          "yestrade-63-2184#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-004",
+      "category": "scenario",
+      "query": "자가판정에서는 비해당인데 같은 제품의 전문판정이 해당으로 나오면 자가판정은 처음부터 효력이 없는 거야?",
+      "gold": [
+        "yestrade-faq-26",
+        "yestrade-faq-26-2288735"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-faq-26"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-faq-26#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-faq-26",
+          "yestrade-faq-26-2288735"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-faq-26#0000",
+          "yestrade-faq-26-2288735#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-005",
+      "category": "identifier",
+      "query": "전략물자관리제도 Q111에서는 법률상 전략물자라는 말에 기술도 포함된다고 설명해?",
+      "gold": [
+        "yestrade-faq-129-2288652",
+        "yestrade-faq-129"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-faq-129-2288652"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-faq-129-2288652#0000",
+          "yestrade-faq-129-2288652#0001",
+          "yestrade-faq-129-2288652#0003",
+          "yestrade-faq-129-2288652#0002"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-faq-129-2288652",
+          "yestrade-faq-129"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-faq-129#0000",
+          "yestrade-faq-129-2288652#0000",
+          "yestrade-faq-129-2288652#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-006",
+      "category": "multi_evidence",
+      "query": "2018년 공작기계 고시 개정안에서 새로 들이려던 통제 파라미터와 완화하려던 기준은 각각 뭐야?",
+      "gold": [
+        "yestrade-69-5716"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-5716"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-5716#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-5716"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-5716#0000"
+        ],
+        [
+          "yestrade-69-5716#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-007",
+      "category": "scenario",
+      "query": "2026년 상반기 CP 실적보고를 해야 하는데 제출 마감일과 AAA등급의 보고 주기는 어떻게 안내돼 있어?",
+      "gold": [
+        "yestrade-69-22627"
+      ],
+      "first": false,
+      "top_k": false,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-6494-2394794-z003",
+        "yestrade-69-5752",
+        "yestrade-69-8396-2393418",
+        "yestrade-69-7194",
+        "yestrade-69-11656-2393338"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-6494-2394794-z003#0006"
+        ],
+        [
+          "yestrade-69-5752#0000"
+        ],
+        [
+          "yestrade-69-8396-2393418#0004",
+          "yestrade-69-8396-2393418#0003",
+          "yestrade-69-8396-2393418#0002",
+          "yestrade-69-8396-2393418#0001",
+          "yestrade-69-8396-2393418#0011",
+          "yestrade-69-8396-2393418#0005"
+        ],
+        [
+          "yestrade-69-7194#0000"
+        ],
+        [
+          "yestrade-69-11656-2393338#0005",
+          "yestrade-69-11656-2393338#0006",
+          "yestrade-69-11656-2393338#0004",
+          "yestrade-69-11656-2393338#0003",
+          "yestrade-69-11656-2393338#0002",
+          "yestrade-69-11656-2393338#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-22627"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-22627#0000"
+        ],
+        [
+          "yestrade-69-22627#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-008",
+      "category": "multi_evidence",
+      "query": "2021년 7월 CP 정기워크숍과 CEO 교육은 참가비가 각각 얼마였어?",
+      "gold": [
+        "yestrade-69-10724"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-10724"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-10724#0001",
+          "yestrade-69-10724#0000",
+          "yestrade-69-10724#0003",
+          "yestrade-69-10724#0002"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-10724"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-10724#0001"
+        ],
+        [
+          "yestrade-69-10724#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-009",
+      "category": "paraphrase",
+      "query": "자율준수무역거래자 지정 교육 신청을 못 한 기업도 당시 교육에 추가로 참여할 수 있었어?",
+      "gold": [
+        "yestrade-69-250"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-250"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-250#0000",
+          "yestrade-69-250#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-250"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-250#0000"
+        ],
+        [
+          "yestrade-69-250#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-010",
+      "category": "identifier",
+      "query": "2009년 싱가포르 ITAR 설명회의 일정과 등록비는 얼마였어?",
+      "gold": [
+        "yestrade-69-910"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-910",
+        "yestrade-63-2359"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-910#0000"
+        ],
+        [
+          "yestrade-63-2359#0000",
+          "yestrade-63-2359#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-910"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-910#0000"
+        ],
+        [
+          "yestrade-69-910#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-011",
+      "category": "form",
+      "query": "제1기 전략물자 청년전문가 지원서의 자기소개서는 분량과 제출 이메일을 어떻게 안내했어?",
+      "gold": [
+        "yestrade-69-752-2391838"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-752-2391838",
+        "yestrade-69-752"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-752-2391838#0000"
+        ],
+        [
+          "yestrade-69-752#0001",
+          "yestrade-69-752#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-752-2391838"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-752-2391838#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-012",
+      "category": "identifier",
+      "query": "6월 24일 미국 수출통제 세미나 국문 프로그램에서 Q&A는 몇 시에 시작해?",
+      "gold": [
+        "yestrade-69-104-2392266"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-104-2392266"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-104-2392266#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-104-2392266"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-104-2392266#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-013",
+      "category": "form",
+      "query": "2006년 전략물자수출통제 집중과정교육 참가신청서에서 무역업고유번호를 모르면 신청 자체가 불가능해?",
+      "gold": [
+        "yestrade-69-139-2392284",
+        "yestrade-69-148-2392289",
+        "yestrade-69-184-2392257",
+        "yestrade-69-242-2392309"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-139-2392284"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-139-2392284#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-139-2392284",
+          "yestrade-69-148-2392289",
+          "yestrade-69-184-2392257",
+          "yestrade-69-242-2392309"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-139-2392284#0000",
+          "yestrade-69-148-2392289#0000",
+          "yestrade-69-184-2392257#0000",
+          "yestrade-69-242-2392309#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-014",
+      "category": "paraphrase",
+      "query": "원자력 전용품목 기술 이전 지침에서 도면·매뉴얼과 작업지식·실연은 각각 어떤 이전으로 구분돼?",
+      "gold": [
+        "yestrade-69-16842-2394523-z034",
+        "yestrade-69-14353-2395122-z036",
+        "yestrade-69-15585-2391416-z013",
+        "yestrade-69-8239-2393253-z000"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-15585-2391416-z013",
+        "yestrade-69-16842-2394523-z034",
+        "yestrade-69-14353-2395122-z036"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-15585-2391416-z013#0000",
+          "yestrade-69-15585-2391416-z013#0001"
+        ],
+        [
+          "yestrade-69-16842-2394523-z034#0000",
+          "yestrade-69-16842-2394523-z034#0001"
+        ],
+        [
+          "yestrade-69-14353-2395122-z036#0001",
+          "yestrade-69-14353-2395122-z036#0000",
+          "yestrade-69-14353-2395122-z036#0002",
+          "yestrade-69-14353-2395122-z036#0003"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-16842-2394523-z034",
+          "yestrade-69-14353-2395122-z036",
+          "yestrade-69-15585-2391416-z013",
+          "yestrade-69-8239-2393253-z000"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-14353-2395122-z036#0001",
+          "yestrade-69-15585-2391416-z013#0000",
+          "yestrade-69-16842-2394523-z034#0000",
+          "yestrade-69-8239-2393253-z000#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-015",
+      "category": "scenario",
+      "query": "2011년 전략물자 유공자 장관표창에 개인을 추천하려면 해당 공적 분야에서 최소 몇 년 근무해야 했어?",
+      "gold": [
+        "yestrade-69-652-2391888",
+        "yestrade-69-652"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-652-2391888",
+        "yestrade-69-652",
+        "yestrade-69-712"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-652-2391888#0001",
+          "yestrade-69-652-2391888#0002",
+          "yestrade-69-652-2391888#0003"
+        ],
+        [
+          "yestrade-69-652#0003",
+          "yestrade-69-652#0002",
+          "yestrade-69-652#0004",
+          "yestrade-69-652#0001"
+        ],
+        [
+          "yestrade-69-712#0001",
+          "yestrade-69-712#0003",
+          "yestrade-69-712#0004",
+          "yestrade-69-712#0002",
+          "yestrade-69-712#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-69-652-2391888",
+          "yestrade-69-652"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-69-652#0002",
+          "yestrade-69-652#0003",
+          "yestrade-69-652-2391888#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-016",
+      "category": "identifier",
+      "query": "옛 기관별 판정·허가 안내표에서 원자력전용 품목과 기술의 승인을 맡는 부처는 어디야?",
+      "gold": [
+        "yestrade-62-2411"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-62-2411"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-62-2411#0001",
+          "yestrade-62-2411#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-62-2411"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-62-2411#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-017",
+      "category": "multi_evidence",
+      "query": "미국 LVS 허가예외에서 한도액 기준은 판매가격 그대로야, 그리고 적용 목적지 그룹은 어디야?",
+      "gold": [
+        "yestrade-62-2872"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-62-2872"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-62-2872#0007",
+          "yestrade-62-2872#0005",
+          "yestrade-62-2872#0008",
+          "yestrade-62-2872#0002",
+          "yestrade-62-2872#0001",
+          "yestrade-62-2872#0004"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-62-2872"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-62-2872#0007"
+        ],
+        [
+          "yestrade-62-2872#0007"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-018",
+      "category": "scenario",
+      "query": "예전 전략물자 확인 안내에서 기업이 자체적으로 먼저 판정하려면 어떤 코드와 시스템을 쓰라고 했어?",
+      "gold": [
+        "yestrade-62-2766",
+        "yestrade-69-318-2392339",
+        "yestrade-62-2962"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-62-2962",
+        "yestrade-62-2766",
+        "yestrade-69-3982-2394156",
+        "yestrade-62-2770",
+        "yestrade-62-2303-2392010"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-62-2962#0011",
+          "yestrade-62-2962#0012",
+          "yestrade-62-2962#0010"
+        ],
+        [
+          "yestrade-62-2766#0000",
+          "yestrade-62-2766#0004"
+        ],
+        [
+          "yestrade-69-3982-2394156#0024",
+          "yestrade-69-3982-2394156#0023"
+        ],
+        [
+          "yestrade-62-2770#0001",
+          "yestrade-62-2770#0000"
+        ],
+        [
+          "yestrade-62-2303-2392010#0047",
+          "yestrade-62-2303-2392010#0138"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-62-2766",
+          "yestrade-69-318-2392339",
+          "yestrade-62-2962"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-62-2766#0000",
+          "yestrade-69-318-2392339#0001",
+          "yestrade-62-2962#0011"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-019",
+      "category": "identifier",
+      "query": "미국 EAR의 북한 통제 설명에서 식료품과 의약품 EAR99는 일반적인 대북 허가 요구에서 어떻게 취급됐어?",
+      "gold": [
+        "yestrade-62-2973",
+        "yestrade-63-1023",
+        "yestrade-62-2319"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-63-1023",
+        "yestrade-62-2319",
+        "yestrade-62-2973"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-63-1023#0001"
+        ],
+        [
+          "yestrade-62-2319#0009",
+          "yestrade-62-2319#0004"
+        ],
+        [
+          "yestrade-62-2973#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-62-2973",
+          "yestrade-63-1023",
+          "yestrade-62-2319"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-62-2973#0000",
+          "yestrade-63-1023#0001",
+          "yestrade-62-2319#0009"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-020",
+      "category": "multi_evidence",
+      "query": "옛 베트남 세관제도 설명에서 관세법을 잘 지키는 화물과 반복 위반 징후가 있는 화물은 검사 방식이 어떻게 달랐어?",
+      "gold": [
+        "yestrade-62-2348-2392017"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-62-2348-2392017",
+        "yestrade-62-2348"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-62-2348-2392017#0003",
+          "yestrade-62-2348-2392017#0002",
+          "yestrade-62-2348-2392017#0004",
+          "yestrade-62-2348-2392017#0005",
+          "yestrade-62-2348-2392017#0000"
+        ],
+        [
+          "yestrade-62-2348#0001",
+          "yestrade-62-2348#0000",
+          "yestrade-62-2348#0002"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-62-2348-2392017"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-62-2348-2392017#0003"
+        ],
+        [
+          "yestrade-62-2348-2392017#0003"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-021",
+      "category": "identifier",
+      "query": "인도 수출통제 설명에서 SCOMET이라는 목록명은 어떤 품목군의 이니셜에서 왔다고 해?",
+      "gold": [
+        "yestrade-62-2708-2392030"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-62-2708-2392030"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-62-2708-2392030#0001",
+          "yestrade-62-2708-2392030#0002",
+          "yestrade-62-2708-2392030#0003",
+          "yestrade-62-2708-2392030#0004",
+          "yestrade-62-2708-2392030#0006"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-62-2708-2392030"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-62-2708-2392030#0001",
+          "yestrade-62-2708-2392030#0002"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-022",
+      "category": "paraphrase",
+      "query": "전략물자 목록을 HS코드와 연결하려던 이유로 기업과 세관이 겪던 문제는 뭐였어?",
+      "gold": [
+        "yestrade-67-1324"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-67-1324",
+        "yestrade-faq-35",
+        "yestrade-56-5644-2391937",
+        "yestrade-62-2770"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-67-1324#0000"
+        ],
+        [
+          "yestrade-faq-35#0000"
+        ],
+        [
+          "yestrade-56-5644-2391937#0067",
+          "yestrade-56-5644-2391937#0066",
+          "yestrade-56-5644-2391937#0065",
+          "yestrade-56-5644-2391937#0064"
+        ],
+        [
+          "yestrade-62-2770#0001",
+          "yestrade-62-2770#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-67-1324"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-67-1324#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-023",
+      "category": "scenario",
+      "query": "예전 대외무역법 개정 안내에서는 가 지역 수출거래보고서만 제출해 수출허가를 갈음하던 방식을 어떻게 바꾼다고 했어?",
+      "gold": [
+        "yestrade-67-1281"
+      ],
+      "first": false,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-84",
+        "yestrade-67-1281",
+        "yestrade-69-897"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-84#0000",
+          "yestrade-69-84#0001"
+        ],
+        [
+          "yestrade-67-1281#0000"
+        ],
+        [
+          "yestrade-69-897#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-67-1281"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-67-1281#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-024",
+      "category": "identifier",
+      "query": "EAR Category 9의 9B105 풍동 항목은 미사일용으로 쓸 수 있는 풍동의 속도를 어느 기준부터 적고 있어?",
+      "gold": [
+        "yestrade-67-1313-2392117-z036",
+        "yestrade-67-1313-2392117-z029",
+        "yestrade-69-742-2392474-z001",
+        "yestrade-67-1288-2392133",
+        "yestrade-69-17437-2395777-z000"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-742-2392474-z001",
+        "yestrade-67-1288-2392133",
+        "yestrade-69-17437-2395777-z000"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-742-2392474-z001#0026"
+        ],
+        [
+          "yestrade-67-1288-2392133#0337",
+          "yestrade-67-1288-2392133#0333",
+          "yestrade-67-1288-2392133#0027"
+        ],
+        [
+          "yestrade-69-17437-2395777-z000#0326"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-67-1313-2392117-z036",
+          "yestrade-67-1313-2392117-z029",
+          "yestrade-69-742-2392474-z001",
+          "yestrade-67-1288-2392133",
+          "yestrade-69-17437-2395777-z000"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-67-1313-2392117-z029#0142",
+          "yestrade-67-1313-2392117-z036#0057",
+          "yestrade-69-742-2392474-z001#0026",
+          "yestrade-67-1288-2392133#0337",
+          "yestrade-69-17437-2395777-z000#0326"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-025",
+      "category": "identifier",
+      "query": "미국 수출집행 사무소 명부에서 San Jose Field Office의 전화번호는 뭐야?",
+      "gold": [
+        "yestrade-67-1313-2392117-z005",
+        "yestrade-67-1286-2392131"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-67-1313-2392117-z005"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-67-1313-2392117-z005#0003",
+          "yestrade-67-1313-2392117-z005#0001",
+          "yestrade-67-1313-2392117-z005#0002",
+          "yestrade-67-1313-2392117-z005#0004",
+          "yestrade-67-1313-2392117-z005#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-67-1313-2392117-z005",
+          "yestrade-67-1286-2392131"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-67-1286-2392131#0725",
+          "yestrade-67-1313-2392117-z005#0003"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-026",
+      "category": "form",
+      "query": "정부보증 대상 물품 사용서약서에서 수입자는 수입목적과 용도에 맞게 쓰겠다고 누구에게 서약서를 내?",
+      "gold": [
+        "law-admrul-2100000284150-annex-x0007-02",
+        "yestrade-69-21177-2395322-z060"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-21177-2395322-z060"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-21177-2395322-z060#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0007-02",
+          "yestrade-69-21177-2395322-z060"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0007-02#0001",
+          "yestrade-69-21177-2395322-z060#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-027",
+      "category": "identifier",
+      "query": "러시아·벨라루스 허가 지침은 어떤 두 종류의 포괄수출허가 신청을 거부 대상으로 열거해?",
+      "gold": [
+        "law-admrul-2100000284150-annex-b0024-00",
+        "law-admrul-2100000284150-annex-b0021-00",
+        "yestrade-69-16295-2395721",
+        "yestrade-69-16577-2391354-z046",
+        "yestrade-69-16842-2394523-z046",
+        "yestrade-69-17437-2395775-z004",
+        "yestrade-69-17700-2395675",
+        "yestrade-69-19230-2395865-z047",
+        "yestrade-69-21177-2395322-z098",
+        "yestrade-faq-196-2288744"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-faq-196-2288744",
+        "yestrade-69-19230-2395865-z047",
+        "law-admrul-2100000284150-annex-b0024-00",
+        "yestrade-69-17700-2395675",
+        "yestrade-69-16577-2391354-z046"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-faq-196-2288744#0000",
+          "yestrade-faq-196-2288744#0002",
+          "yestrade-faq-196-2288744#0001"
+        ],
+        [
+          "yestrade-69-19230-2395865-z047#0000"
+        ],
+        [
+          "law-admrul-2100000284150-annex-b0024-00#0000",
+          "law-admrul-2100000284150-annex-b0024-00#0002",
+          "law-admrul-2100000284150-annex-b0024-00#0001"
+        ],
+        [
+          "yestrade-69-17700-2395675#0000",
+          "yestrade-69-17700-2395675#0001"
+        ],
+        [
+          "yestrade-69-16577-2391354-z046#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "law-admrul-2100000284150-annex-b0024-00",
+          "law-admrul-2100000284150-annex-b0021-00",
+          "yestrade-69-16295-2395721",
+          "yestrade-69-16577-2391354-z046",
+          "yestrade-69-16842-2394523-z046",
+          "yestrade-69-17437-2395775-z004",
+          "yestrade-69-17700-2395675",
+          "yestrade-69-19230-2395865-z047",
+          "yestrade-69-21177-2395322-z098",
+          "yestrade-faq-196-2288744"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "law-admrul-2100000284150-annex-b0021-00#0000",
+          "law-admrul-2100000284150-annex-b0024-00#0000",
+          "yestrade-69-16295-2395721#0000",
+          "yestrade-69-16577-2391354-z046#0000",
+          "yestrade-69-16842-2394523-z046#0000",
+          "yestrade-69-17437-2395775-z004#0000",
+          "yestrade-69-17700-2395675#0000",
+          "yestrade-69-19230-2395865-z047#0000",
+          "yestrade-69-21177-2395322-z098#0000",
+          "yestrade-faq-196-2288744#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-028",
+      "category": "form",
+      "query": "바세나르 품목용 영문 최종사용자 서약서에서 연락 담당자란에는 어떤 연락처 항목이 있어?",
+      "gold": [
+        "law-admrul-2100000284150-annex-x0002-03",
+        "yestrade-69-21177-2395322-z045",
+        "yestrade-faq-11-2288721"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-faq-11-2288721",
+        "yestrade-faq-134",
+        "yestrade-faq-11"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-faq-11-2288721#0001",
+          "yestrade-faq-11-2288721#0009",
+          "yestrade-faq-11-2288721#0004"
+        ],
+        [
+          "yestrade-faq-134#0000"
+        ],
+        [
+          "yestrade-faq-11#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0002-03",
+          "yestrade-69-21177-2395322-z045",
+          "yestrade-faq-11-2288721"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0002-03#0001",
+          "yestrade-69-21177-2395322-z045#0000",
+          "yestrade-faq-11-2288721#0009"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-029",
+      "category": "form",
+      "query": "전략물자등 설치 확인서에서 설치 여부를 증빙할 때 어떤 자료를 첨부하라고 해?",
+      "gold": [
+        "law-admrul-2100000284150-annex-x0026-00",
+        "yestrade-69-19230-2395865-z017",
+        "yestrade-69-21177-2395322-z038"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-21177-2395322-z038",
+        "yestrade-69-19230-2395865-z017",
+        "law-admrul-2100000284150-annex-x0026-00"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-21177-2395322-z038#0000"
+        ],
+        [
+          "yestrade-69-19230-2395865-z017#0000"
+        ],
+        [
+          "law-admrul-2100000284150-annex-x0026-00#0002",
+          "law-admrul-2100000284150-annex-x0026-00#0001",
+          "law-admrul-2100000284150-annex-x0026-00#0000",
+          "law-admrul-2100000284150-annex-x0026-00#0003"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0026-00",
+          "yestrade-69-19230-2395865-z017",
+          "yestrade-69-21177-2395322-z038"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0026-00#0001",
+          "law-admrul-2100000284150-annex-x0026-00#0002",
+          "yestrade-69-19230-2395865-z017#0000",
+          "yestrade-69-21177-2395322-z038#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-030",
+      "category": "identifier",
+      "query": "수입목적확인(신청)서 별지 제7호 서식의 영문 제목은 뭐야?",
+      "gold": [
+        "law-admrul-2100000284150-annex-x0007-00",
+        "yestrade-69-5090-2394825",
+        "yestrade-69-7272-2394189-z033"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-7272-2394189-z033"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-7272-2394189-z033#0000",
+          "yestrade-69-7272-2394189-z033#0002",
+          "yestrade-69-7272-2394189-z033#0001",
+          "yestrade-69-7272-2394189-z033#0004",
+          "yestrade-69-7272-2394189-z033#0003",
+          "yestrade-69-7272-2394189-z033#0005"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0007-00",
+          "yestrade-69-5090-2394825",
+          "yestrade-69-7272-2394189-z033"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "law-admrul-2100000284150-annex-x0007-00#0000",
+          "yestrade-69-5090-2394825#0087",
+          "yestrade-69-7272-2394189-z033#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-031",
+      "category": "scenario",
+      "query": "자율준수무역거래자 지정심사를 신청하면 접수 후 적격·부적격 결과는 언제까지 통보한다고 안내돼 있어?",
+      "gold": [
+        "yestrade-guide-system-guidance__compliance-program__domestic"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-guide-system-guidance__compliance-program__domestic",
+        "yestrade-faq-126"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-guide-system-guidance__compliance-program__domestic#0001",
+          "yestrade-guide-system-guidance__compliance-program__domestic#0000"
+        ],
+        [
+          "yestrade-faq-126#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-guide-system-guidance__compliance-program__domestic"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-guide-system-guidance__compliance-program__domestic#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-032",
+      "category": "multi_evidence",
+      "query": "화학무기금지협약은 2018년 8월 기준 몇 나라가 가입했고 북한은 가입국이야?",
+      "gold": [
+        "yestrade-guide-system-guidance__treaty__cwc"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-guide-system-guidance__treaty__cwc",
+        "yestrade-62-2834",
+        "yestrade-63-722"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-guide-system-guidance__treaty__cwc#0000"
+        ],
+        [
+          "yestrade-62-2834#0000",
+          "yestrade-62-2834#0002",
+          "yestrade-62-2834#0001"
+        ],
+        [
+          "yestrade-63-722#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-guide-system-guidance__treaty__cwc"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-guide-system-guidance__treaty__cwc#0000"
+        ],
+        [
+          "yestrade-guide-system-guidance__treaty__cwc#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-033",
+      "category": "multi_evidence",
+      "query": "영국 2010년 수출허가 통계에서 개별허가와 포괄허가 발급 건수는 각각 얼마였어?",
+      "gold": [
+        "yestrade-63-3206"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-63-3206"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-63-3206#0001",
+          "yestrade-63-3206#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-63-3206"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-63-3206#0000"
+        ],
+        [
+          "yestrade-63-3206#0000"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-034",
+      "category": "paraphrase",
+      "query": "BIS가 수출허가 사용률에 관해 의견을 받을 때 허가 유효기간을 늘리는 방안도 물었어?",
+      "gold": [
+        "yestrade-63-2926"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-63-2926"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-63-2926#0001",
+          "yestrade-63-2926#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-63-2926"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-63-2926#0001"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-035",
+      "category": "multi_evidence",
+      "query": "2016년 지원사업 안내에서 CP 실무자과정은 며칠이고 교육비와 정원은 얼마였어?",
+      "gold": [
+        "yestrade-56-7314-2394023"
+      ],
+      "first": true,
+      "top_k": true,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-56-7314-2394023",
+        "yestrade-69-7376-2394759",
+        "yestrade-69-6494-2394794-z003"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-56-7314-2394023#0002",
+          "yestrade-56-7314-2394023#0003",
+          "yestrade-56-7314-2394023#0005",
+          "yestrade-56-7314-2394023#0001"
+        ],
+        [
+          "yestrade-69-7376-2394759#0004",
+          "yestrade-69-7376-2394759#0005",
+          "yestrade-69-7376-2394759#0000",
+          "yestrade-69-7376-2394759#0002"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0017",
+          "yestrade-69-6494-2394794-z003#0003",
+          "yestrade-69-6494-2394794-z003#0004",
+          "yestrade-69-6494-2394794-z003#0002",
+          "yestrade-69-6494-2394794-z003#0016",
+          "yestrade-69-6494-2394794-z003#0000"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-56-7314-2394023"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-56-7314-2394023#0003"
+        ]
+      ]
+    },
+    {
+      "qid": "validation-v2-036",
+      "category": "scenario",
+      "query": "2020년 하반기 CP 실적보고와 운영보고 안내에서는 A·AA·AAA 지정법인이 언제까지 제출해야 했어?",
+      "gold": [
+        "yestrade-65-10638"
+      ],
+      "first": false,
+      "top_k": false,
+      "gold_indexed": true,
+      "gold_missing_ids": [],
+      "review_status": "assistant_source_reviewed",
+      "returned": [
+        "yestrade-69-12583-2392920",
+        "yestrade-69-18046",
+        "yestrade-69-8396-2393418",
+        "yestrade-69-11656",
+        "yestrade-69-6494-2394794-z003"
+      ],
+      "returned_chunks": [
+        [
+          "yestrade-69-12583-2392920#0011",
+          "yestrade-69-12583-2392920#0010",
+          "yestrade-69-12583-2392920#0006",
+          "yestrade-69-12583-2392920#0007",
+          "yestrade-69-12583-2392920#0009",
+          "yestrade-69-12583-2392920#0008"
+        ],
+        [
+          "yestrade-69-18046#0000"
+        ],
+        [
+          "yestrade-69-8396-2393418#0002",
+          "yestrade-69-8396-2393418#0004",
+          "yestrade-69-8396-2393418#0005",
+          "yestrade-69-8396-2393418#0011",
+          "yestrade-69-8396-2393418#0003",
+          "yestrade-69-8396-2393418#0001"
+        ],
+        [
+          "yestrade-69-11656#0000"
+        ],
+        [
+          "yestrade-69-6494-2394794-z003#0006",
+          "yestrade-69-6494-2394794-z003#0001"
+        ]
+      ],
+      "gold_groups": [
+        [
+          "yestrade-65-10638"
+        ]
+      ],
+      "evidence_groups": [
+        [
+          "yestrade-65-10638#0000"
+        ],
+        [
+          "yestrade-65-10638#0000"
+        ]
+      ]
+    }
+  ],
+  "metrics": {
+    "queries": 36,
+    "hit_at_1": 0.9166666666666666,
+    "precision_at_1": 0.9166666666666666,
+    "hit_at_5": 0.9444444444444444,
+    "recall_at_5": 0.7481481481481481,
+    "precision_returned_at_5": 0.7379629629629629,
+    "mean_returned_at_5": 2.2777777777777777,
+    "micro_recall_at_5": 0.6533333333333333,
+    "mrr_at_5": 0.9305555555555556,
+    "group_queries": 36,
+    "group_hit_at_5": 0.9444444444444444,
+    "group_recall_at_5": 0.9444444444444444,
+    "group_micro_recall_at_5": 0.9444444444444444,
+    "group_all_at_5": 0.9444444444444444,
+    "evidence_queries": 36,
+    "evidence_hit_at_5": 0.9444444444444444,
+    "evidence_recall_at_5": 0.9444444444444444,
+    "evidence_micro_recall_at_5": 0.9130434782608695,
+    "evidence_all_at_5": 0.9444444444444444,
+    "evidence_precision_at_5": 0.42485870610870613,
+    "evidence_micro_precision_at_5": 0.2560386473429952,
+    "evidence_mrr_at_5": 0.8842592592592592,
+    "evidence_first_rank_at_5": 1.1470588235294117,
+    "mean_chunks_at_5": 5.75
+  },
+  "coverage_known": true
+}

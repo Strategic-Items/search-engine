@@ -1,0 +1,17 @@
+{
+  "additions": [
+    {
+      "qid": "period-other-v1-001",
+      "parent_id": "yestrade-69-13401-2395017",
+      "chunk_id": "yestrade-69-13401-2395017#0000",
+      "reason": "같은 상담회의 2022-05-16~27 신청 기간"
+    },
+    {
+      "qid": "period-other-v1-002",
+      "parent_id": "yestrade-69-14405-2395210",
+      "chunk_id": "yestrade-69-14405-2395210#0000",
+      "reason": "같은 상담회의 2023-05-18 일시와 장소"
+    }
+  ],
+  "method": "return chunks directly contain all requested facts; original frozen queries unchanged"
+}
