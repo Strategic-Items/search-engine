@@ -12,6 +12,7 @@ from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.answerability import is_unanswerable
 from search_engine.search.rerank import select_passages
+from search_engine.search.chunk_filter import filter_chunks
 from search_engine.search.rewrite import rewrite_query
 from search_engine.search.results import (
     ModeComparison,
@@ -571,6 +572,8 @@ def retrieve(
             and chunks_per_document >= 2
             and select_passages(query, hits, by_parent, chunks_per_document, settings)):
         hits = _with_passages(hits, by_parent, chunks_per_document)
+    if settings.search_chunk_filter:
+        hits = filter_chunks(query, hits, settings)
     if answerability is None:
         answerability = settings.search_answerability_judge
     # 실제로 독자에게 전달될 문장들에 대해 마지막으로 판단한다:

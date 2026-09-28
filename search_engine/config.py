@@ -195,6 +195,8 @@ class Settings(BaseSettings):
     # p50는 그대로 유지하고 p95는 4분의 1로 줄인다.
     search_rerank_depth: int = Field(default=20, ge=2)
     search_rerank_timeout_seconds: float = Field(default=30.0, gt=0)
+    # 선택된 청크별로 0/1/2 관련도를 판정하고 무관(0) 청크만 제거한다.
+    search_chunk_filter: bool = False
     rag_top_k: int = Field(default=5, ge=1)
 
     # 각 리트리버 목록의 얼마나 들어가서 융합되는가. 위의 컷오프 비율과는 별도로, 다른 질문에 답한다: "아니오"가 아니라
