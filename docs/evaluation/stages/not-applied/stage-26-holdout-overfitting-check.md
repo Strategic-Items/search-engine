@@ -182,7 +182,7 @@
   안에 있는 같은 이름의 별표와 서식이었다.
 - 정답 FAQ 3건(005, 009, 010)이 색인되지 않은 채 측정됐다. 평가의 `gold_missing_ids`는
   prepared jsonl을 기준으로 세기 때문에 이 누락을 잡지 못했다.
-- **수정:** 판정 열쇠에 디렉터리를 넣었다([identity.py](../../../search_engine/indexing/identity.py)).
+- **수정:** 판정 열쇠에 디렉터리를 넣었다([identity.py](../../../../search_engine/indexing/identity.py)).
   브라우저 사본은 원본 옆에 생기기 때문이다. docs에서 지우는 사본은 수정 전과 같은
   6건이고, holdout에서는 0건이다. 회귀 테스트를 추가했다.
 - 재색인 후(84,413청크 전부) 수치는 위 표에 반영했다. 옛 인덱스와의 차이는 전체 조건

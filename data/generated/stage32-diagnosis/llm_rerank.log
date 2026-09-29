@@ -1,0 +1,16 @@
+261 queries in 1276s, failed grade batches: 6
+docs135    base n=135 evRecall@5=0.874 top1=0.844 hit@5=0.904 docPrec=0.773 chunkPrec(lb)=0.249 docs=1.76 chunks=6.33
+docs135    llm  n=135 evRecall@5=0.881 top1=0.844 hit@5=0.919 docPrec=0.319 chunkPrec(lb)=0.175 docs=4.16 chunks=10.15
+docs135    gold in pool of 20: 130/135
+holdout69  base n=69 evRecall@5=0.877 top1=0.812 hit@5=0.899 docPrec=0.613 chunkPrec(lb)=0.350 docs=2.51 chunks=6.71
+holdout69  llm  n=69 evRecall@5=0.833 top1=0.681 hit@5=0.855 docPrec=0.296 chunkPrec(lb)=0.145 docs=4.93 chunks=11.80
+holdout69  gold in pool of 20: 67/69
+val36comb  base n=36 evRecall@5=1.000 top1=1.000 hit@5=1.000 docPrec=0.794 chunkPrec(lb)=0.473 docs=2.03 chunks=4.83
+val36comb  llm  n=36 evRecall@5=0.889 top1=0.806 hit@5=0.889 docPrec=0.291 chunkPrec(lb)=0.154 docs=4.89 chunks=11.58
+val36comb  gold in pool of 20: 36/36
+date14     base n=14 evRecall@5=1.000 top1=0.714 hit@5=1.000 docPrec=0.511 chunkPrec(lb)=0.433 docs=2.71 chunks=4.50
+date14     llm  n=14 evRecall@5=0.929 top1=0.786 hit@5=0.929 docPrec=0.204 chunkPrec(lb)=0.116 docs=4.93 chunks=9.29
+date14     gold in pool of 20: 14/14
+ptopic7    base n=7 evRecall@5=1.000 top1=0.857 hit@5=1.000 docPrec=0.786 chunkPrec(lb)=0.488 docs=1.71 chunks=3.14
+ptopic7    llm  n=7 evRecall@5=0.857 top1=0.714 hit@5=0.857 docPrec=0.250 chunkPrec(lb)=0.135 docs=4.71 chunks=9.00
+ptopic7    gold in pool of 20: 7/7

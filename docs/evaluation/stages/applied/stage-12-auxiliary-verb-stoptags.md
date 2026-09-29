@@ -38,7 +38,7 @@ Lucene 기본 stoptags에 있어 버려지지만 **`VX`(보조용언)는 남는�
 노이즈가 1위에 앉으면서 컷오프 기준선이 `0.90 × 14.37 = 12.94`로 올라갔고, 정답
 4건이 전부 그 아래로 깔렸다. 화면에 1건만 뜬 이유다.
 
-[9단계](stage-09-identifier-queries.md)의 "컷오프가 정답을 잘라낸다"와 증상은 같지만
+[9단계](../not-applied/stage-09-identifier-queries.md)의 "컷오프가 정답을 잘라낸다"와 증상은 같지만
 원인이 다르다. 거기서는 RRF가 어휘 경로의 확신을 눌러서였고, 여기서는 **엉뚱한 1위가
 기준선을 끌어올려서**다. 컷오프 비율을 조정해서 풀 문제가 아니다.
 
@@ -108,7 +108,7 @@ VX가 섞여 있었기 때문이다. 구어체 질의에서 상위 5위가 바�
 ## 남는 것
 
 `identifier_article`은 이 수정으로 움직이지 않았다. 4문항 모두 0.250이고,
-[10단계](stage-10-learned-sparse.md)·[11단계](stage-11-qwen3-embedding.md)에서도
+[10단계](../not-applied/stage-10-learned-sparse.md)·[11단계](../not-applied/stage-11-qwen3-embedding.md)에서도
 어느 모드로도 0.312를 넘지 못했다. 세 단계가 같은 곳을 가리킨다.
 
 원자료는 `data/generated/docs-v2/comparison-135q-pos-{before,after}-{formal,colloquial}.json`에 있다.

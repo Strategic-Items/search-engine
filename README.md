@@ -36,7 +36,7 @@ OpenSearch와 Dashboards를 Compose로 띄운다. 먼저 `ollama serve`를 실�
 **모델이나 차원을 바꾸면 모든 데이터셋을 전부 재색인해야 한다.** 매핑이 인덱스마다
 벡터 폭을 고정하므로, 차원이 다른 기존 인덱스는 k-NN 결과에 전혀 기여하지 못한다.
 `bge-m3`는 다국어 모델이다. 영어 중심 모델은 이 한국어 코퍼스에서 문서 Recall@5가
-100%에서 22%로 떨어진다([6단계: 임베딩 모델 교체](docs/evaluation/stages/stage-06-embedding-model.md)).
+100%에서 22%로 떨어진다([6단계: 임베딩 모델 교체](docs/evaluation/stages/applied/stage-06-embedding-model.md)).
 
 ### 채팅 모델을 다른 서버로 옮기기
 
@@ -291,7 +291,7 @@ Recall도 아니며, 부모마다 청크 하나를 반환하는 현재 로직의
 
 `data/queries_v1.jsonl`에는 `evidence_groups` 라벨이 없고 붙이지 않는다. v1은 문서
 지표만 내는 회귀 세트이며, 정확 일치 조회가 살아 있는지 보는 데 쓴다. **방식 선택은
-근거 라벨이 있는 v2에서 한다**([23단계](docs/evaluation/stages/stage-23-chunk-is-the-scoring-unit.md)).
+근거 라벨이 있는 v2에서 한다**([23단계](docs/evaluation/stages/applied/stage-23-chunk-is-the-scoring-unit.md)).
 
 `queries_docs_v2_unanswerable.jsonl`의 8개 질문은 정답이 없어 Recall 분모에 넣지
 않는다. 현재 비교 도구에는 자동 무응답 판정 기능이 없으므로 별도 사람이 검토한다.

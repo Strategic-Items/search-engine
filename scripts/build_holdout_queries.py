@@ -70,6 +70,11 @@ def main() -> None:
             if not any(c["parent_id"] == parent for c in found):
                 problems.append(f"{q['qid']}: 지정 문서에서 '{req['label']}' 문구가 안 잡힘")
         parents_all = set.intersection(*[{c["parent_id"] for c in f} for f in per_req])
+        # 출처의 연도를 대는 질의는 같은 해에 다시 올라온 사본만 정답이다. 다른 해의
+        # 문서가 같은 문장을 담아도 질문이 가리킨 자료가 아니다.
+        if q.get("source_year"):
+            published = {c["parent_id"]: (c.get("published_at") or "")[:4] for c in corpus}
+            parents_all = {p for p in parents_all if published.get(p) == str(q["source_year"])}
         gold = [parent] if q.get("source_specific") else sorted(parents_all | {parent})
         gold = [parent] + [p for p in gold if p != parent]
         evidence_groups, requirements = [], []
@@ -89,6 +94,7 @@ def main() -> None:
             "evidence_groups": evidence_groups, "evidence_requirements": requirements,
             "sampled_parent": parent, "sampled_chunks": q.get("sampled_chunks", []),
             "source_specific": bool(q.get("source_specific")),
+            **({"source_year": q["source_year"]} if q.get("source_year") else {}),
             "docs_equivalent_parents": docs_parents,
             "docs_equivalent_chunks": docs_chunks if docs_parents else [],
             "review_status": "assistant_source_reviewed", "human_review": "pending",

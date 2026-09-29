@@ -28,7 +28,7 @@ services:
         condition: service_healthy
 
 # 문서의 자체 청크들을 쿼리와 대조하여 재정렬한다. 자세한 내용은
-  # docs/evaluation/stages/stage-19-chunk-rerank-within-document.md를 참조.
+  # docs/evaluation/stages/applied/stage-19-chunk-rerank-within-document.md를 참조.
   # SEARCH_RERANK_CHUNKS=true가 설정될 때까지 아무 것도 사용하지 않는다.
   #
   # text-embeddings-inference는 동일한 /rerank 계약을 제공하며 amd64 또는 GPU 환경에서는 더 나은 선택이다.

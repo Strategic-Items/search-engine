@@ -23,7 +23,8 @@
 | 문서 | 내용 |
 |---|---|
 | [performance_history](evaluation/performance_history.md) | **여기부터 본다.** 단계별 측정 이력의 색인 |
-| [evaluation/stages/](evaluation/stages/) | 단계마다 문서 하나. 그 단계의 코퍼스·평가셋·판정 |
+| [evaluation/stages/applied/](evaluation/stages/applied/) | **적용된 단계.** 검색 코드에 들어간 것. 기본 꺼짐인 선택 기능(5·14·18·19·31단계)도 여기에 둔다 |
+| [evaluation/stages/not-applied/](evaluation/stages/not-applied/) | **적용 안 된 단계.** 기준선·측정·채택하지 않은 실험. 검색 동작을 바꾸지 않았다 |
 | [measurement_conditions](evaluation/measurement_conditions.md) | 공통 측정 조건과 단계별 재현 명령 |
 | [stages_1_7_overview](evaluation/stages_1_7_overview.md) | 단계 1~7을 같은 표에서 비교 |
 | [evidence_chunk_metrics_v2](evaluation/evidence_chunk_metrics_v2.md) | 단계 2~7의 근거 청크 지표 |
