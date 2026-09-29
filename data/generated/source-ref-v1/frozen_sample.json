@@ -1,0 +1,186 @@
+{
+  "status": "parents_frozen_before_query_authoring_or_search",
+  "seed": 20260929,
+  "corpus": "data/generated/holdout-v1/core.jsonl",
+  "corpus_sha256": "afb464ccfd3125e4dbcf7a044ae07fb2db48ddc43d4bf497be713988571507db",
+  "exclusion_rules": [
+    "gold_of_every_earlier_query_set",
+    "previous_holdout_sampled_parents",
+    "stage28_inspected_top5_parents",
+    "validation_v2_sampled_parents",
+    "no_publication_date"
+  ],
+  "excluded_parent_count": 483,
+  "min_parent_chars": 300,
+  "target_chunk_chars": [
+    180,
+    5000
+  ],
+  "strata": {
+    "동향자료 첨부": 4,
+    "공지사항 첨부": 4,
+    "국내외 소식": 3,
+    "알기쉬운 전략물자 첨부": 2,
+    "기타 게시판": 3
+  },
+  "eligible_pool_sizes": {
+    "공지사항 첨부": 716,
+    "국내외 소식": 649,
+    "기타 게시판": 109,
+    "동향자료 첨부": 115,
+    "알기쉬운 전략물자 첨부": 10
+  },
+  "sampled_counts": {
+    "동향자료 첨부": 4,
+    "공지사항 첨부": 4,
+    "국내외 소식": 3,
+    "알기쉬운 전략물자 첨부": 2,
+    "기타 게시판": 3
+  },
+  "sampled": [
+    {
+      "stratum": "동향자료 첨부",
+      "parent_id": "yestrade-67-1313-2392117-z042",
+      "source_type": "동향자료 첨부",
+      "source_path": "yestrade/1313-2392117-EAR.zip!18. Part 742 - Control Policy -- CCL Based Controls.pdf",
+      "published_at": "2005-06-28",
+      "title": "Part 742 - Control Policy -- CCL Based Controls",
+      "target_chunk_id": "yestrade-67-1313-2392117-z042#0350"
+    },
+    {
+      "stratum": "동향자료 첨부",
+      "parent_id": "yestrade-67-1407-2392083-z000",
+      "source_type": "동향자료 첨부",
+      "source_path": "yestrade/1407-2392083-워크숍분임자료_060208.zip!2.공작기계토론.hwp",
+      "published_at": "2006-02-09",
+      "title": "공작기계토론",
+      "target_chunk_id": "yestrade-67-1407-2392083-z000#0014"
+    },
+    {
+      "stratum": "동향자료 첨부",
+      "parent_id": "yestrade-67-3485-2392087-z000",
+      "source_type": "동향자료 첨부",
+      "source_path": "yestrade/3485-2392087-Session_2.zip!세션_2_1_김대원.hwp",
+      "published_at": "2006-05-26",
+      "title": "세션 2 1 김대원",
+      "target_chunk_id": "yestrade-67-3485-2392087-z000#0005"
+    },
+    {
+      "stratum": "동향자료 첨부",
+      "parent_id": "yestrade-67-1313-2392117-z030",
+      "source_type": "동향자료 첨부",
+      "source_path": "yestrade/1313-2392117-EAR.zip!42. Part 774 - The Commerce Control List.pdf",
+      "published_at": "2005-06-28",
+      "title": "Part 774 - The Commerce Control List",
+      "target_chunk_id": "yestrade-67-1313-2392117-z030#0001"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-193-2392317",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/files/69/193-2392317-전략물자_수출통제_교육용_영상물(CD)_사용_신청서.hwp",
+      "published_at": "2006-10-25",
+      "title": "전략물자 수출통제 교육용 영상물(CD) 사용 신청서",
+      "target_chunk_id": "yestrade-69-193-2392317#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-8094-2392858-z000",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/8094-2392858-대외무역법_시행령_개정.zip!대외무역법 시행령 [별표 4] 과태료의 부과기준(제94조 관련).hwp",
+      "published_at": "2020-06-16",
+      "title": "대외무역법 시행령 [별표 4] 과태료의 부과기준(제94조 관련)",
+      "target_chunk_id": "yestrade-69-8094-2392858-z000#0001"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-4022-2394811-z009",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/4022-2394811-산업부_공문_포함_모집_공고.zip!붙임 05 최고경영자 확약서(양식).hwp",
+      "published_at": "2017-04-05",
+      "title": "붙임 05 최고경영자 확약서(양식)",
+      "target_chunk_id": "yestrade-69-4022-2394811-z009#0000"
+    },
+    {
+      "stratum": "공지사항 첨부",
+      "parent_id": "yestrade-69-662-2392645-z000",
+      "source_type": "공지사항 첨부",
+      "source_path": "yestrade/662-2392645-admin22010072114000014첨부서류1.zip!공적조서.hwp",
+      "published_at": "2010-07-21",
+      "title": "공적조서",
+      "target_chunk_id": "yestrade-69-662-2392645-z000#0004"
+    },
+    {
+      "stratum": "국내외 소식",
+      "parent_id": "yestrade-63-684",
+      "source_type": "국내외 소식",
+      "source_path": "yestrade/posts/63/684.html",
+      "published_at": "2005-07-27",
+      "title": "<b>[기고]\"전략물자 수출관리, 결국 기업의 몫이다\"</b>",
+      "target_chunk_id": "yestrade-63-684#0002"
+    },
+    {
+      "stratum": "국내외 소식",
+      "parent_id": "yestrade-63-707",
+      "source_type": "국내외 소식",
+      "source_path": "yestrade/posts/63/707.html",
+      "published_at": "2006-03-28",
+      "title": "국방과학연구소 군사기밀, 佛 군수업체로 유출",
+      "target_chunk_id": "yestrade-63-707#0001"
+    },
+    {
+      "stratum": "국내외 소식",
+      "parent_id": "yestrade-63-3190",
+      "source_type": "국내외 소식",
+      "source_path": "yestrade/posts/63/3190.html",
+      "published_at": "2009-11-10",
+      "title": "[불법수출사례] 美 법무부, 중국인 3명 및 2개社 군용품목 불법수출로 기소",
+      "target_chunk_id": "yestrade-63-3190#0001"
+    },
+    {
+      "stratum": "알기쉬운 전략물자 첨부",
+      "parent_id": "yestrade-62-2412-2392024",
+      "source_type": "알기쉬운 전략물자 첨부",
+      "source_path": "yestrade/files/62/2412-2392024-[제86호_뉴스레터]인도네시아(전문)1.hwp",
+      "published_at": "2009-12-08",
+      "title": "[제86호 뉴스레터]인도네시아(전문)1",
+      "target_chunk_id": "yestrade-62-2412-2392024#0002"
+    },
+    {
+      "stratum": "알기쉬운 전략물자 첨부",
+      "parent_id": "yestrade-62-2347-2392016",
+      "source_type": "알기쉬운 전략물자 첨부",
+      "source_path": "yestrade/files/62/2347-2392016-베트남의_수출통제제도_(1).hwp",
+      "published_at": "2009-10-13",
+      "title": "베트남의 수출통제제도",
+      "target_chunk_id": "yestrade-62-2347-2392016#0016"
+    },
+    {
+      "stratum": "기타 게시판",
+      "parent_id": "yestrade-63-798-2391306",
+      "source_type": "국내외 소식 첨부",
+      "source_path": "yestrade/files/63/798-2391306-Entitly_List_이란기업_추가_관련_미_상무부_보도자료.pdf",
+      "published_at": "2007-07-24",
+      "title": "Entitly List 이란기업 추가 관련 미 상무부 보도자료",
+      "target_chunk_id": "yestrade-63-798-2391306#0001"
+    },
+    {
+      "stratum": "기타 게시판",
+      "parent_id": "yestrade-63-110-2391907",
+      "source_type": "국내외 소식 첨부",
+      "source_path": "yestrade/files/63/110-2391907-미_재무부.hwp",
+      "published_at": "2005-10-26",
+      "title": "미 재무부",
+      "target_chunk_id": "yestrade-63-110-2391907#0005"
+    },
+    {
+      "stratum": "기타 게시판",
+      "parent_id": "yestrade-63-200-2391904",
+      "source_type": "국내외 소식 첨부",
+      "source_path": "yestrade/files/63/200-2391904-Omega_Engineering.hwp",
+      "published_at": "2006-03-10",
+      "title": "Omega Engineering",
+      "target_chunk_id": "yestrade-63-200-2391904#0001"
+    }
+  ]
+}

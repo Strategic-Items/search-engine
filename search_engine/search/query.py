@@ -167,6 +167,15 @@ def build_query(query: str, as_of: date) -> dict:
         # 것은 힌트가 추정이기 때문이다.
         functions.append({"filter": {"range": {"period_hint": {"gte": start, "lt": end}}},
                           "weight": 4})
+        # 날짜를 하나도 모르는 문서는 그 기간이 아니라고 말할 근거가 없다. 가산점을
+        # 주지 않으면 연도를 대는 질의에서 날짜가 붙은 다른 코퍼스의 같은 해 문서에
+        # 밀린다 -- docs 인덱스는 발행일이 비어 2005년 세미나 문답(docs-v2-103~106)이
+        # 그해의 세미나 개최 안내문 뒤로 내려갔다. 아는 날짜보다 앞서지 않도록 추정
+        # 날짜와 같은 무게를 준다.
+        functions.append({"filter": {"bool": {"must_not": [
+            {"exists": {"field": field}}
+            for field in ("published_at", "effective_from", "period_hint")
+        ]}}, "weight": 4})
     if not functions:
         return base
     return {"function_score": {"query": base, "functions": functions,

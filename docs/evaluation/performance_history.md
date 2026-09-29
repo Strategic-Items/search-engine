@@ -44,6 +44,7 @@
 - [29. 새 검증 질문을 검색 전에 동결하고 평가](stages/not-applied/stage-29-independent-validation.md) — 36부모를 무작위로 뽑아 질문과 정답을 먼저 커밋했다. 반환 근거를 정답 대안으로 추가한 뒤 core+docs 1위 34/36이다. 남은 실패는 연도·보고 기간 혼동 두 문항이다
 - [30. 연도·반기가 비슷한 문서를 구별한다](stages/applied/stage-30-period-disambiguation.md) — 질문에 적힌 연도·반기와 주제어가 제목과 맞는 후보로 세 번째 RRF 목록을 만들고, 이런 후보는 컷오프에서 보존했다. 날짜 진단 5위 내 10 → 14/14, CP 확인 4 → 8/8이고 docs 135·holdout 69는 반환 배열까지 그대로다
 - [31. 전달 청크의 Precision을 올릴 수 있는가](stages/applied/stage-31-chunk-precision.md) — LLM 관련도 필터는 Recall 손실 없이 25.1% → 37.8%다. 점수 컷오프는 최고 68.9%로 80%에 못 미친다. 제목을 뺀 청크 점수는 더 나빴고, SPLADE는 95% 조건에서 청크 1위만 +2.2p다
+- [32. core+docs에서 정답이 1위에 오지 않는 이유](stages/applied/stage-32-why-the-answer-is-not-first.md) — 정답은 대부분 후보 안에 있고, 1위를 뺏는 것은 같은 주제인데 답이 없는 문서다. 날짜를 모르는 문서에도 기간 가산점을 주는 것만 반영했다(docs 1위 0.837 → 0.844, 퇴행 없음). 컷오프 완화, FAQ 사본 병합, 부모 순위 RRF, 출처 설명 분리, LLM 재정렬은 기각했다. LLM 목록 선택은 개발 셋 근거 Recall을 0.919로 올리지만 동결 셋 1위는 52 → 53문항이고 질문마다 LLM 호출이 붙는다
 
 
 ## 단계에 걸친 문서

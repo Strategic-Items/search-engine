@@ -1,0 +1,26 @@
+261 queries in 436s, failed 0, empty picks 1, mean passages 19.1
+docs135    base n=135 evRecall@5=0.874 top1=0.844 hit@5=0.904 docPrec=0.773 chunkPrec(lb)=0.249 docs=1.76 chunks=6.33
+docs135    sel  n=135 evRecall@5=0.837 top1=0.904 hit@5=0.941 docPrec=0.861 chunkPrec(lb)=0.684 docs=1.38 chunks=1.81
+docs135    doc  n=135 evRecall@5=0.867 top1=0.904 hit@5=0.941 docPrec=0.861 chunkPrec(lb)=0.346 docs=1.38 chunks=3.61
+docs135    merge n=135 evRecall@5=0.919 top1=0.904 hit@5=0.941 docPrec=0.747 chunkPrec(lb)=0.238 docs=1.96 chunks=7.07
+docs135    gold in pool: 127/135
+holdout69  base n=69 evRecall@5=0.877 top1=0.812 hit@5=0.899 docPrec=0.613 chunkPrec(lb)=0.350 docs=2.51 chunks=6.71
+holdout69  sel  n=69 evRecall@5=0.862 top1=0.826 hit@5=0.913 docPrec=0.678 chunkPrec(lb)=0.592 docs=2.42 chunks=3.07
+holdout69  doc  n=69 evRecall@5=0.870 top1=0.826 hit@5=0.913 docPrec=0.678 chunkPrec(lb)=0.419 docs=2.42 chunks=5.20
+holdout69  merge n=69 evRecall@5=0.913 top1=0.826 hit@5=0.942 docPrec=0.529 chunkPrec(lb)=0.280 docs=3.43 chunks=8.99
+holdout69  gold in pool: 66/69
+val36comb  base n=36 evRecall@5=1.000 top1=1.000 hit@5=1.000 docPrec=0.794 chunkPrec(lb)=0.473 docs=2.03 chunks=4.83
+val36comb  sel  n=36 evRecall@5=0.889 top1=0.917 hit@5=0.944 docPrec=0.615 chunkPrec(lb)=0.540 docs=2.81 chunks=3.28
+val36comb  doc  n=36 evRecall@5=0.944 top1=0.917 hit@5=0.944 docPrec=0.615 chunkPrec(lb)=0.390 docs=2.81 chunks=5.94
+val36comb  merge n=36 evRecall@5=0.972 top1=0.917 hit@5=0.972 docPrec=0.560 chunkPrec(lb)=0.289 docs=3.25 chunks=8.69
+val36comb  gold in pool: 36/36
+date14     base n=14 evRecall@5=1.000 top1=0.714 hit@5=1.000 docPrec=0.511 chunkPrec(lb)=0.433 docs=2.71 chunks=4.50
+date14     sel  n=14 evRecall@5=1.000 top1=1.000 hit@5=1.000 docPrec=1.000 chunkPrec(lb)=1.000 docs=1.07 chunks=1.07
+date14     doc  n=14 evRecall@5=1.000 top1=1.000 hit@5=1.000 docPrec=1.000 chunkPrec(lb)=1.000 docs=1.07 chunks=1.07
+date14     merge n=14 evRecall@5=1.000 top1=1.000 hit@5=1.000 docPrec=0.523 chunkPrec(lb)=0.440 docs=2.79 chunks=4.57
+date14     gold in pool: 14/14
+ptopic7    base n=7 evRecall@5=1.000 top1=0.857 hit@5=1.000 docPrec=0.786 chunkPrec(lb)=0.488 docs=1.71 chunks=3.14
+ptopic7    sel  n=7 evRecall@5=0.857 top1=0.857 hit@5=0.857 docPrec=0.690 chunkPrec(lb)=0.679 docs=1.71 chunks=1.86
+ptopic7    doc  n=7 evRecall@5=0.857 top1=0.857 hit@5=0.857 docPrec=0.690 chunkPrec(lb)=0.429 docs=1.71 chunks=3.00
+ptopic7    merge n=7 evRecall@5=1.000 top1=0.857 hit@5=1.000 docPrec=0.762 chunkPrec(lb)=0.452 docs=1.86 chunks=3.43
+ptopic7    gold in pool: 7/7

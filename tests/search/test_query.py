@@ -200,6 +200,22 @@ def test_period_hint_is_boosted_below_a_known_publication_date():
     assert weights["period_hint"] < weights["published_at"]
 
 
+def test_a_document_with_no_date_is_not_ranked_as_the_wrong_period():
+    """날짜를 모르는 문서는 아는 날짜만큼은 아니어도 기간이 틀린 문서보다 앞선다."""
+    def undated_boosts(query):
+        return [f for f in boosts(query, "must_not") if "period_hint" in str(f["filter"])]
+
+    query = build_query("2005년 세미나 문답", date(2026, 9, 15))
+    undated = undated_boosts(query)
+    assert len(undated) == 1
+    assert {f["exists"]["field"] for f in undated[0]["filter"]["bool"]["must_not"]} == {
+        "published_at", "effective_from", "period_hint",
+    }
+    weights = {next(iter(f["filter"]["range"])): f["weight"] for f in boosts(query, "range")}
+    assert 0 < undated[0]["weight"] <= weights["period_hint"] < weights["published_at"]
+    assert undated_boosts(build_query("세미나 문답", date(2026, 9, 15))) == []
+
+
 def test_boosting_never_removes_a_document_from_the_result_set():
     """매칭된 결과를 재정렬하는 데 부스트를 적용함; 필터가 되어서는 안 됨."""
     query = build_query("전문판정 절차", date(2026, 9, 15))

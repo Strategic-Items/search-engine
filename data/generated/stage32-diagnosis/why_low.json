@@ -1,0 +1,1717 @@
+[
+ {
+  "qid": "docs-v2-008",
+  "query": "수출허가를 신청할 때 내던 업체의 약속 문서를 없애려는 변경안이 있었다는데 그 자료를 보고 싶어.",
+  "gold": [
+   "hwp-전략물자수출입고시-일부개정고시안_최종-6f7abdfb"
+  ],
+  "gold_size": 28,
+  "bm25": {
+   "chunk_rank": null,
+   "parent_rank": null,
+   "top_score": 29.483358,
+   "gold_score": null,
+   "above": [
+    [
+     "yestrade-56-8673-2393195",
+     163
+    ],
+    [
+     "yestrade-faq-180",
+     1
+    ],
+    [
+     "yestrade-63-467",
+     1
+    ],
+    [
+     "yestrade-65-9736-2393983",
+     20
+    ],
+    [
+     "yestrade-faq-169",
+     1
+    ],
+    [
+     "yestrade-67-1406-2392082",
+     65
+    ],
+    [
+     "yestrade-faq-184",
+     1
+    ],
+    [
+     "yestrade-67-1463-2392101",
+     149
+    ]
+   ],
+   "chunks_above": 300,
+   "chunks_above_from_top3_parents": 0
+  },
+  "vector": {
+   "chunk_rank": 7,
+   "parent_rank": 7,
+   "top_score": 0.79191154,
+   "gold_score": 0.77809453,
+   "above": [
+    [
+     "yestrade-65-9736-2393983",
+     20
+    ],
+    [
+     "yestrade-69-7025",
+     1
+    ],
+    [
+     "yestrade-62-2811",
+     5
+    ],
+    [
+     "yestrade-69-6494-2394794-z006",
+     23
+    ],
+    [
+     "yestrade-69-5915-2394137",
+     34
+    ],
+    [
+     "yestrade-69-16313-2395099",
+     1
+    ]
+   ],
+   "chunks_above": 6,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "[발표4] 전략물자 수출허가 — 02. 대외무역법 개정 주요내용",
+    "<font color=\"red\">수출허가신청 첨부서류 서식 안내</fon",
+    "전략물자수출입고시 개정 내용"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-009",
+  "query": "데이터를 저장하는 게 아니라 계산하거나 신호를 감지하는 반도체를 어떤 종류로 나눈다는 건지 설명한 자료가 있을까?",
+  "gold": [
+   "hwp-행정예고문_제2026-598호_비메모리반도체-범위에-관한-고시-f0ba5ce5"
+  ],
+  "gold_size": 2,
+  "bm25": {
+   "chunk_rank": 4,
+   "parent_rank": 4,
+   "top_score": 26.007847,
+   "gold_score": 20.145779,
+   "above": [
+    [
+     "yestrade-56-8538-2393412",
+     13
+    ],
+    [
+     "yestrade-faq-107",
+     1
+    ],
+    [
+     "yestrade-67-1407-2392083-z003",
+     12
+    ]
+   ],
+   "chunks_above": 3,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "홈닥터-소재 — 전략물자에는 어떤 것들이 있나요?",
+    "서버를 통해 전략물자(기술) 정보를 저장하는 것의 수출허가 대상 여부",
+    "반도체토론 — < 반도체분야 품목 토론자료 >"
+   ]
+  },
+  "vector": {
+   "chunk_rank": null,
+   "parent_rank": null,
+   "top_score": 0.77335036,
+   "gold_score": null,
+   "above": [
+    [
+     "yestrade-67-1407-2392083-z003",
+     12
+    ],
+    [
+     "yestrade-69-11352-2393804",
+     2588
+    ],
+    [
+     "yestrade-69-7272-2394189-z050",
+     1645
+    ],
+    [
+     "yestrade-69-21177-2395322-z101",
+     1795
+    ],
+    [
+     "yestrade-69-216-2391873",
+     1605
+    ],
+    [
+     "yestrade-69-13532-2395204-z010",
+     307
+    ],
+    [
+     "yestrade-69-16577-2391354-z047",
+     1748
+    ],
+    [
+     "yestrade-62-2705",
+     7
+    ]
+   ],
+   "chunks_above": 300,
+   "chunks_above_from_top3_parents": 0
+  }
+ },
+ {
+  "qid": "docs-v2-017",
+  "query": "허가 면제 거래를 미리 보고하는 서류를 쓰는데, 물건을 실제로 쓰는 업체가 두 곳이야. 칸에는 대표 업체 한 곳만 적어도 될까?",
+  "gold": [
+   "hwp-별지-16-사전거래보고서-전략물자-수출입고시-77b122dc"
+  ],
+  "gold_size": 3,
+  "bm25": {
+   "chunk_rank": 180,
+   "parent_rank": 138,
+   "top_score": 31.448572,
+   "gold_score": 18.536518,
+   "above": [
+    [
+     "yestrade-faq-186",
+     1
+    ],
+    [
+     "law-admrul-2100000284150",
+     96
+    ],
+    [
+     "yestrade-faq-4",
+     1
+    ],
+    [
+     "yestrade-69-19230-2395865-z057",
+     104
+    ],
+    [
+     "yestrade-faq-187",
+     1
+    ],
+    [
+     "yestrade-69-3543-2392630",
+     67
+    ],
+    [
+     "yestrade-faq-173",
+     1
+    ],
+    [
+     "yestrade-69-7272-2394189-z063",
+     89
+    ]
+   ],
+   "chunks_above": 179,
+   "chunks_above_from_top3_parents": 13,
+   "top_titles": [
+    "수출허가 면제 시허가기관장에게 제출해야 되는 자료",
+    "전략물자수출입고시 — 제26조(개별수출허가의 면제)",
+    "수출허가 면제 요건"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 12,
+   "parent_rank": 12,
+   "top_score": 0.76146376,
+   "gold_score": 0.7461245,
+   "above": [
+    [
+     "yestrade-69-6494-2394794-z006",
+     23
+    ],
+    [
+     "yestrade-67-4736-2392077",
+     232
+    ],
+    [
+     "yestrade-67-1228-2392110",
+     727
+    ],
+    [
+     "yestrade-69-14353-2395122-z015",
+     2
+    ],
+    [
+     "yestrade-69-21177-2395322-z022",
+     2
+    ],
+    [
+     "yestrade-62-5608-2391936",
+     1007
+    ],
+    [
+     "yestrade-69-12583-2392918",
+     13
+    ],
+    [
+     "yestrade-69-16842-2394523-z009",
+     2
+    ]
+   ],
+   "chunks_above": 11,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "02-01 전략물자 수출입고시 개정방향 산업부 정해진",
+    "가이던스1",
+    "주요국 전략물자 수출통제 비교분석"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-018",
+  "query": "허가 면제 거래를 미리 보고할 때는 아직 배에 싣기 전이라 운송장 번호가 없는데, 거래 내역 칸을 언제 채우라고 돼 있어?",
+  "gold": [
+   "hwp-별지-16-사전거래보고서-전략물자-수출입고시-77b122dc",
+   "yestrade-form-22209"
+  ],
+  "gold_size": 3,
+  "bm25": {
+   "chunk_rank": 18,
+   "parent_rank": 18,
+   "top_score": 28.910158,
+   "gold_score": 24.864834,
+   "above": [
+    [
+     "yestrade-faq-169",
+     1
+    ],
+    [
+     "yestrade-62-2405",
+     4
+    ],
+    [
+     "yestrade-faq-186",
+     1
+    ],
+    [
+     "yestrade-69-664-2392646",
+     77
+    ],
+    [
+     "yestrade-faq-4",
+     1
+    ],
+    [
+     "yestrade-62-2374",
+     1
+    ],
+    [
+     "law-admrul-2100000284150",
+     96
+    ],
+    [
+     "yestrade-69-5016-2394650-z003",
+     10
+    ]
+   ],
+   "chunks_above": 17,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "거래대금이 0원일 때 수출가액 및허가면제 대상여부",
+    "[국내제도] 수출허가의 면제",
+    "수출허가 면제 시허가기관장에게 제출해야 되는 자료"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 8,
+   "parent_rank": 8,
+   "top_score": 0.7926425,
+   "gold_score": 0.7737084,
+   "above": [
+    [
+     "yestrade-69-11299-2393886",
+     33
+    ],
+    [
+     "yestrade-69-14353-2395122-z003",
+     9
+    ],
+    [
+     "law-admrul-2100000284150-annex-x0016-00",
+     4
+    ],
+    [
+     "yestrade-69-7272-2394189-z007",
+     9
+    ],
+    [
+     "law-admrul-2100000284150",
+     96
+    ],
+    [
+     "yestrade-69-8893-2394379-z005",
+     25
+    ],
+    [
+     "yestrade-faq-173",
+     1
+    ]
+   ],
+   "chunks_above": 7,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "전략물자수출입고시 일부개정 및 신구대비표",
+    "[별지 16] 수출거래 보고서(전략물자 수출입고시)",
+    "전략물자수출입고시 [별지 16] 사전거래보고서"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-037",
+  "query": "연구장비 운영으로 기업을 도운 개인 표창과 바이오헬스 연구자 포상을 비교하고 있어. 각각 해당 분야에서 공적을 쌓은 기간이 최소 몇 년이어야 해?",
+  "gold": [
+   "hwpx-산업부공고-2026-577호-2026년-연구기반-통합관리-포상-추진계획-안-_공고문-f9ed5698"
+  ],
+  "gold_size": 26,
+  "bm25": {
+   "chunk_rank": 3,
+   "parent_rank": 2,
+   "top_score": 49.338703,
+   "gold_score": 45.71713,
+   "above": [
+    [
+     "hwpx-공고문-2026년도-산업통상부-바이오헬스산업분야-우수-R-D-유공-포상계획-연장-공고-44a8c844",
+     13
+    ]
+   ],
+   "chunks_above": 2,
+   "chunks_above_from_top3_parents": 2,
+   "top_titles": [
+    "[공고문] 2026년도 산업통상부 바이오헬스산업분야 우수 R&D 유공 포",
+    "[공고문] 2026년도 산업통상부 바이오헬스산업분야 우수 R&D 유공 포",
+    "(산업부공고 2026-577호)2026년 연구기반 통합관리 포상 추진계획"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 4,
+   "parent_rank": 2,
+   "top_score": 0.813557,
+   "gold_score": 0.77210546,
+   "above": [
+    [
+     "hwpx-공고문-2026년도-산업통상부-바이오헬스산업분야-우수-R-D-유공-포상계획-연장-공고-44a8c844",
+     13
+    ]
+   ],
+   "chunks_above": 3,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "[공고문] 2026년도 산업통상부 바이오헬스산업분야 우수 R&D 유공 포",
+    "[공고문] 2026년도 산업통상부 바이오헬스산업분야 우수 R&D 유공 포",
+    "[공고문] 2026년도 산업통상부 바이오헬스산업분야 우수 R&D 유공 포"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-039",
+  "query": "지역에서 연구개발하는 중소기업인데, 대출 이자를 줄여 주는 지원과 정부에 내는 기술 사용료를 깎아 주자는 변경안을 혼동하고 있어. 각각 어떤 부담을 줄이는 자료인지 따로 확인해 줘.",
+  "gold": [
+   "hwpx-2026년도-지역산업위기대응-이차보전-지원사업-2차-변경공고-산업통상부공고-제2026-584호-a3df79c0"
+  ],
+  "gold_size": 18,
+  "bm25": {
+   "chunk_rank": 4,
+   "parent_rank": 3,
+   "top_score": 35.178307,
+   "gold_score": 29.27949,
+   "above": [
+    [
+     "yestrade-63-1160",
+     2
+    ],
+    [
+     "yestrade-63-698",
+     2
+    ]
+   ],
+   "chunks_above": 3,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "[보도자료] \"전략물자 관리, 기업 자율성 높이고 부담 줄인다\"",
+    "[보도자료] \"전략물자 관리, 기업 자율성 높이고 부담 줄인다\"",
+    "산자부,『중소기업 수출통제 지원프로그램 개발』시연회 개최"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 15,
+   "parent_rank": 6,
+   "top_score": 0.7725094,
+   "gold_score": 0.73630136,
+   "above": [
+    [
+     "hwpx-5.-산업부공고-제2026-562호-기술료-징수-및-관리에-관한-통합요령-개정-안-행정예고-99d620a2",
+     17
+    ],
+    [
+     "yestrade-69-5113-2394648-z004",
+     20
+    ],
+    [
+     "yestrade-69-23257-3167283-z002",
+     1825
+    ],
+    [
+     "yestrade-69-23257-3167283-z003",
+     1828
+    ],
+    [
+     "yestrade-69-14189-2395159-z046",
+     1730
+    ]
+   ],
+   "chunks_above": 14,
+   "chunks_above_from_top3_parents": 12,
+   "top_titles": [
+    "(산업부공고 제2026-562호) 기술료 징수 및 관리에 관한 통합요령 ",
+    "(산업부공고 제2026-562호) 기술료 징수 및 관리에 관한 통합요령 ",
+    "(산업부공고 제2026-562호) 기술료 징수 및 관리에 관한 통합요령 "
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-039",
+  "query": "지역에서 연구개발하는 중소기업인데, 대출 이자를 줄여 주는 지원과 정부에 내는 기술 사용료를 깎아 주자는 변경안을 혼동하고 있어. 각각 어떤 부담을 줄이는 자료인지 따로 확인해 줘.",
+  "gold": [
+   "hwpx-5.-산업부공고-제2026-562호-기술료-징수-및-관리에-관한-통합요령-개정-안-행정예고-99d620a2"
+  ],
+  "gold_size": 17,
+  "bm25": {
+   "chunk_rank": 14,
+   "parent_rank": 10,
+   "top_score": 35.178307,
+   "gold_score": 24.324903,
+   "above": [
+    [
+     "yestrade-63-1160",
+     2
+    ],
+    [
+     "yestrade-63-698",
+     2
+    ],
+    [
+     "hwpx-2026년도-지역산업위기대응-이차보전-지원사업-2차-변경공고-산업통상부공고-제2026-584호-a3df79c0",
+     18
+    ],
+    [
+     "yestrade-62-5923-2391935",
+     216
+    ],
+    [
+     "yestrade-69-163",
+     6
+    ],
+    [
+     "yestrade-67-1348-2392049",
+     234
+    ],
+    [
+     "yestrade-63-3066",
+     2
+    ],
+    [
+     "yestrade-faq-121",
+     1
+    ]
+   ],
+   "chunks_above": 13,
+   "chunks_above_from_top3_parents": 6,
+   "top_titles": [
+    "[보도자료] \"전략물자 관리, 기업 자율성 높이고 부담 줄인다\"",
+    "[보도자료] \"전략물자 관리, 기업 자율성 높이고 부담 줄인다\"",
+    "산자부,『중소기업 수출통제 지원프로그램 개발』시연회 개최"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 1,
+   "parent_rank": 1,
+   "top_score": 0.7725094,
+   "gold_score": 0.7725094,
+   "above": [],
+   "chunks_above": 0,
+   "chunks_above_from_top3_parents": 0,
+   "top_titles": [
+    "(산업부공고 제2026-562호) 기술료 징수 및 관리에 관한 통합요령 ",
+    "(산업부공고 제2026-562호) 기술료 징수 및 관리에 관한 통합요령 ",
+    "(산업부공고 제2026-562호) 기술료 징수 및 관리에 관한 통합요령 "
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-081",
+  "query": "2016년 3월 초 중싱통신에 내려진 미국의 거래 제한은 미국 회사에만 적용됐어, 아니면 다른 나라 회사도 대상이었어?",
+  "gold": [
+   "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-1-a1ed6830",
+   "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-54068e54"
+  ],
+  "gold_size": 4,
+  "bm25": {
+   "chunk_rank": 3,
+   "parent_rank": 3,
+   "top_score": 45.49463,
+   "gold_score": 38.296677,
+   "above": [
+    [
+     "yestrade-67-5929-2393193",
+     24
+    ],
+    [
+     "yestrade-67-5929",
+     1
+    ]
+   ],
+   "chunks_above": 2,
+   "chunks_above_from_top3_parents": 2,
+   "top_titles": [
+    "(180511) 미국 정부의 중싱통신 제재 관련 미국산 품목 거래 주의사",
+    "(180511) 미국 정부의 중싱통신 제재 관련 미국산 품목 거래 주의사",
+    "(160309) 美 상무부, 中 중싱통신(ZTE)에 대한 미국산 제품 수"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 2,
+   "parent_rank": 2,
+   "top_score": 0.79996544,
+   "gold_score": 0.7962364,
+   "above": [
+    [
+     "yestrade-67-5929-2393193",
+     24
+    ]
+   ],
+   "chunks_above": 1,
+   "chunks_above_from_top3_parents": 1,
+   "top_titles": [
+    "(180511) 미국 정부의 중싱통신 제재 관련 미국산 품목 거래 주의사",
+    "(160309) 美 상무부, 中 중싱통신(ZTE)에 대한 미국산 제품 수",
+    "(160309) 美 상무부, 中 중싱통신(ZTE)에 대한 미국산 제품 수"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-086",
+  "query": "2016년 3월 중싱통신에 처음 내려진 거래 제한과 그달 말의 한시적 완화는 어떻게 달랐어?",
+  "gold": [
+   "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-1-a1ed6830",
+   "hwp-160309-美-상무부-中-중싱통신-ZTE-에-대한-미국산-제품-수출금지-부과-54068e54"
+  ],
+  "gold_size": 4,
+  "bm25": {
+   "chunk_rank": 8,
+   "parent_rank": 4,
+   "top_score": 51.63447,
+   "gold_score": 27.802454,
+   "above": [
+    [
+     "hwp-160325-美-상무부-中-중싱통신-ZTE-제재-한시적-완화-1-baed5cd7",
+     3
+    ],
+    [
+     "hwp-160325-美-상무부-中-중싱통신-ZTE-제재-한시적-완화-474eea09",
+     3
+    ],
+    [
+     "yestrade-56-8674-2393300",
+     146
+    ]
+   ],
+   "chunks_above": 7,
+   "chunks_above_from_top3_parents": 7,
+   "top_titles": [
+    "(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화",
+    "(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화",
+    "(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 11,
+   "parent_rank": 7,
+   "top_score": 0.80280775,
+   "gold_score": 0.7315003,
+   "above": [
+    [
+     "hwp-160325-美-상무부-中-중싱통신-ZTE-제재-한시적-완화-1-baed5cd7",
+     3
+    ],
+    [
+     "hwp-160325-美-상무부-中-중싱통신-ZTE-제재-한시적-완화-474eea09",
+     3
+    ],
+    [
+     "yestrade-67-1228-2392110",
+     727
+    ],
+    [
+     "yestrade-67-5929-2393193",
+     24
+    ],
+    [
+     "yestrade-63-1025",
+     5
+    ],
+    [
+     "yestrade-56-8674-2393300",
+     146
+    ]
+   ],
+   "chunks_above": 10,
+   "chunks_above_from_top3_parents": 7,
+   "top_titles": [
+    "(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화",
+    "(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화",
+    "(160325)美 상무부, 中 중싱통신(ZTE) 제재 한시적 완화"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-097",
+  "query": "2006년 자료의 미국 제도 설명에서, 미국 밖으로 파일을 보내지 않고 미국 안에서 외국인 직원에게 통제 기술을 보여 주는 것도 허가 대상이라고 했어?",
+  "gold": [
+   "hwp-전략기술의-무형이전-통제-9167a1c2"
+  ],
+  "gold_size": 38,
+  "bm25": {
+   "chunk_rank": 119,
+   "parent_rank": 49,
+   "top_score": 54.069393,
+   "gold_score": 35.555145,
+   "above": [
+    [
+     "yestrade-67-1216-2392060",
+     167
+    ],
+    [
+     "yestrade-63-490",
+     1
+    ],
+    [
+     "yestrade-62-2328",
+     10
+    ],
+    [
+     "yestrade-63-470",
+     1
+    ],
+    [
+     "yestrade-67-1415-2392054",
+     38
+    ],
+    [
+     "yestrade-63-1128",
+     1
+    ],
+    [
+     "yestrade-56-9700-2392954",
+     127
+    ],
+    [
+     "yestrade-67-1216",
+     1
+    ]
+   ],
+   "chunks_above": 118,
+   "chunks_above_from_top3_parents": 64,
+   "top_titles": [
+    "미국 재수출통제 실무가이드 — 미국 재수출통제",
+    "美, 외국인 무기중개상의 수출허가서에 미국인의 서명요구",
+    "미국 재수출통제 실무가이드(6)"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 4,
+   "parent_rank": 4,
+   "top_score": 0.78317565,
+   "gold_score": 0.7684798,
+   "above": [
+    [
+     "yestrade-62-2842",
+     24
+    ],
+    [
+     "yestrade-67-793-2392111",
+     187
+    ],
+    [
+     "yestrade-69-6494-2394794-z002",
+     10
+    ]
+   ],
+   "chunks_above": 3,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "아시아 주요국 수출통제제도(1) : 일본",
+    "observer 6호",
+    "01-01 기술이전 통제강화에 따른 전략기술 관리방안 산업부 방규철"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-101",
+  "query": "2006년 기술이전 자료에서 미사일 분야와 원자력 이중용도 분야는 장비 수출승인을 받으면 설치·유지에 필요한 기술도 함께 승인된 것으로 봤어?",
+  "gold": [
+   "hwp-전략기술의-무형이전-통제-9167a1c2"
+  ],
+  "gold_size": 38,
+  "bm25": {
+   "chunk_rank": 8,
+   "parent_rank": 7,
+   "top_score": 38.811386,
+   "gold_score": 33.272873,
+   "above": [
+    [
+     "yestrade-67-1407-2392083-z007",
+     15
+    ],
+    [
+     "yestrade-63-587",
+     3
+    ],
+    [
+     "yestrade-63-456",
+     1
+    ],
+    [
+     "yestrade-faq-127",
+     1
+    ],
+    [
+     "yestrade-63-455",
+     1
+    ],
+    [
+     "yestrade-67-1407-2392083-z009",
+     11
+    ]
+   ],
+   "chunks_above": 7,
+   "chunks_above_from_top3_parents": 4,
+   "top_titles": [
+    "원자력토론 — < 원자력분야 품목 토론자료 >",
+    "[기고문]북한 미사일 기술",
+    "[기고문]북한 미사일 기술"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 154,
+   "parent_rank": 28,
+   "top_score": 0.80935705,
+   "gold_score": 0.76273215,
+   "above": [
+    [
+     "yestrade-67-19134-3059128",
+     1773
+    ],
+    [
+     "yestrade-69-8924-2393535-z019",
+     1669
+    ],
+    [
+     "yestrade-69-21177-2395322-z101",
+     1795
+    ],
+    [
+     "law-admrul-2100000284150-annex-b0002-00",
+     1834
+    ],
+    [
+     "yestrade-69-21177-2395322-z100",
+     1813
+    ],
+    [
+     "yestrade-69-7272-2394189-z050",
+     1645
+    ],
+    [
+     "yestrade-69-16577-2391354-z047",
+     1748
+    ],
+    [
+     "yestrade-69-23257-3167283-z003",
+     1828
+    ]
+   ],
+   "chunks_above": 153,
+   "chunks_above_from_top3_parents": 40,
+   "top_titles": [
+    "[별표 2] 이중용도품목(전략물자 수출입고시)",
+    "[별표 2] 이중용도품목",
+    "[별표 2] 이중용도품목(전략물자수출입고시)"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-103",
+  "query": "2005년 미국 수출통제 세미나 문답에서는 수입한 부품을 가공해 고객이 지정한 곳으로 보내는 회사가 소유권이 없다는 이유로 허가신청을 피할 수 있다고 했어?",
+  "gold": [
+   "hwp-상무부-세미나-QnA-91625c48"
+  ],
+  "gold_size": 13,
+  "bm25": {
+   "chunk_rank": 15,
+   "parent_rank": 10,
+   "top_score": 44.93849,
+   "gold_score": 34.26542,
+   "above": [
+    [
+     "yestrade-69-104",
+     2
+    ],
+    [
+     "yestrade-69-129",
+     1
+    ],
+    [
+     "yestrade-69-207",
+     1
+    ],
+    [
+     "yestrade-67-1205",
+     1
+    ],
+    [
+     "yestrade-69-104-2392655",
+     1
+    ],
+    [
+     "yestrade-69-108-2392657",
+     1
+    ],
+    [
+     "yestrade-69-108",
+     2
+    ],
+    [
+     "yestrade-67-1415-2392054",
+     38
+    ]
+   ],
+   "chunks_above": 14,
+   "chunks_above_from_top3_parents": 8,
+   "top_titles": [
+    "미국 전략물자 수출통제 세미나 개최",
+    "2005년 한·일 수출통제 세미나 자료(2/1)",
+    "2005년 한·일 수출통제 세미나 자료(2/2)"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 21,
+   "parent_rank": 16,
+   "top_score": 0.7767183,
+   "gold_score": 0.7590874,
+   "above": [
+    [
+     "yestrade-67-1228-2392110",
+     727
+    ],
+    [
+     "yestrade-faq-2-2288697",
+     1
+    ],
+    [
+     "yestrade-56-5644-2391937",
+     129
+    ],
+    [
+     "yestrade-67-793-2392111",
+     187
+    ],
+    [
+     "yestrade-69-6023-2393150",
+     128
+    ],
+    [
+     "yestrade-69-5016-2394650-z000",
+     54
+    ],
+    [
+     "yestrade-67-1415-2392054",
+     38
+    ],
+    [
+     "yestrade-62-2304-2392011",
+     217
+    ]
+   ],
+   "chunks_above": 20,
+   "chunks_above_from_top3_parents": 8,
+   "top_titles": [
+    "주요국 전략물자 수출통제 비교분석",
+    "★0226 (9차) 전략물자관리제도 Q65",
+    "2018년 포커스(여름호)"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-104",
+  "query": "2005년 미국 수출통제 세미나에서 일본 제조사가 영업비밀을 이유로 미국산 부품 비율을 안 알려 준다면 어떻게 하라고 답했어?",
+  "gold": [
+   "hwp-상무부-세미나-QnA-91625c48"
+  ],
+  "gold_size": 13,
+  "bm25": {
+   "chunk_rank": 69,
+   "parent_rank": 35,
+   "top_score": 43.29013,
+   "gold_score": 27.868526,
+   "above": [
+    [
+     "yestrade-67-1205",
+     1
+    ],
+    [
+     "yestrade-69-129",
+     1
+    ],
+    [
+     "yestrade-69-207",
+     1
+    ],
+    [
+     "yestrade-67-1415-2392054",
+     38
+    ],
+    [
+     "yestrade-69-104",
+     2
+    ],
+    [
+     "yestrade-67-1415",
+     2
+    ],
+    [
+     "yestrade-67-1358",
+     1
+    ],
+    [
+     "yestrade-67-1285",
+     1
+    ]
+   ],
+   "chunks_above": 68,
+   "chunks_above_from_top3_parents": 36,
+   "top_titles": [
+    "미국 2005년 수출통제 연례보고서",
+    "2005년 한·일 수출통제 세미나 자료(2/1)",
+    "2005년 한·일 수출통제 세미나 자료(2/2)"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 6,
+   "parent_rank": 5,
+   "top_score": 0.7832576,
+   "gold_score": 0.76305187,
+   "above": [
+    [
+     "yestrade-63-111-2391998",
+     129
+    ],
+    [
+     "yestrade-69-207",
+     1
+    ],
+    [
+     "yestrade-69-104",
+     2
+    ],
+    [
+     "yestrade-69-129",
+     1
+    ]
+   ],
+   "chunks_above": 5,
+   "chunks_above_from_top3_parents": 4,
+   "top_titles": [
+    "AECO Korean issue7 — 워크샵과 컨퍼런스",
+    "2005년 한·일 수출통제 세미나 자료(2/2)",
+    "AECO Korean issue7 — 지역 협력"
+   ]
+  }
+ },
+ {
+  "qid": "docs-v2-106",
+  "query": "2005년 미국 수출통제 세미나에서는 한국산 제품의 성능 규격이 미국산과 똑같다는 이유만으로 미국 수출허가를 신청해야 한다고 했어?",
+  "gold": [
+   "hwp-상무부-세미나-QnA-91625c48"
+  ],
+  "gold_size": 13,
+  "bm25": {
+   "chunk_rank": 133,
+   "parent_rank": 54,
+   "top_score": 54.920334,
+   "gold_score": 33.265892,
+   "above": [
+    [
+     "yestrade-69-104",
+     2
+    ],
+    [
+     "yestrade-67-1205",
+     1
+    ],
+    [
+     "yestrade-67-1415",
+     2
+    ],
+    [
+     "yestrade-67-1415-2392054",
+     38
+    ],
+    [
+     "yestrade-67-1285",
+     1
+    ],
+    [
+     "yestrade-69-104-2392655",
+     1
+    ],
+    [
+     "yestrade-69-129",
+     1
+    ],
+    [
+     "yestrade-69-328",
+     1
+    ]
+   ],
+   "chunks_above": 132,
+   "chunks_above_from_top3_parents": 65,
+   "top_titles": [
+    "미국 전략물자 수출통제 세미나 개최",
+    "미국 2005년 수출통제 연례보고서",
+    "미국 수출통제 정책동향"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 3,
+   "parent_rank": 3,
+   "top_score": 0.77477854,
+   "gold_score": 0.7698747,
+   "above": [
+    [
+     "yestrade-69-104",
+     2
+    ],
+    [
+     "yestrade-63-111-2391998",
+     129
+    ]
+   ],
+   "chunks_above": 2,
+   "chunks_above_from_top3_parents": 2,
+   "top_titles": [
+    "미국 전략물자 수출통제 세미나 개최",
+    "AECO Korean issue7 — 워크샵과 컨퍼런스",
+    "상무부 세미나 QnA"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-001",
+  "query": "수출 일정이 촉박해서 판정 방식을 고르려는데, 기관에 맡기는 판정은 보통 얼마나 걸리고 우리가 직접 한 판정 결과는 허가 신청 때 얼마나 지난 것까지 인정돼?",
+  "gold": [
+   "yestrade-faq-43-2288564"
+  ],
+  "gold_size": 2,
+  "bm25": {
+   "chunk_rank": null,
+   "parent_rank": null,
+   "top_score": 44.535404,
+   "gold_score": null,
+   "above": [
+    [
+     "yestrade-faq-25",
+     1
+    ],
+    [
+     "yestrade-69-3497-2391965",
+     46
+    ],
+    [
+     "yestrade-62-8572-2392899",
+     409
+    ],
+    [
+     "yestrade-62-2411",
+     2
+    ],
+    [
+     "yestrade-guide-usage-guidance",
+     6
+    ],
+    [
+     "yestrade-62-8575-2392900",
+     263
+    ],
+    [
+     "yestrade-faq-68",
+     2
+    ],
+    [
+     "yestrade-63-493",
+     1
+    ]
+   ],
+   "chunks_above": 300,
+   "chunks_above_from_top3_parents": 0
+  },
+  "vector": {
+   "chunk_rank": 26,
+   "parent_rank": 21,
+   "top_score": 0.80070513,
+   "gold_score": 0.7649662,
+   "above": [
+    [
+     "yestrade-69-10895-2393859",
+     336
+    ],
+    [
+     "yestrade-faq-68-2288590",
+     3
+    ],
+    [
+     "yestrade-63-699-2391923",
+     7
+    ],
+    [
+     "yestrade-faq-68",
+     2
+    ],
+    [
+     "yestrade-69-21177-2395322-z050",
+     7
+    ],
+    [
+     "yestrade-69-11664-2392689",
+     44
+    ],
+    [
+     "yestrade-69-16577-2391354-z021",
+     7
+    ],
+    [
+     "yestrade-69-4610-2393316",
+     13
+    ]
+   ],
+   "chunks_above": 25,
+   "chunks_above_from_top3_parents": 6,
+   "top_titles": [
+    "57개 품목 수출허가신청 가이드라인",
+    "★0226 (9차) 전략물자관리제도 Q174",
+    "보도자료 2월17일3"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-004",
+  "query": "우리 회사가 서울에 있는 외국 대사관에 그 대사관에서 쓸 통제 대상 장비를 납품하게 됐어. 수출허가를 받아야 해?",
+  "gold": [
+   "yestrade-faq-5",
+   "yestrade-faq-5-2288700"
+  ],
+  "gold_size": 1,
+  "bm25": {
+   "chunk_rank": 3,
+   "parent_rank": 3,
+   "top_score": 28.43762,
+   "gold_score": 27.873993,
+   "above": [
+    [
+     "yestrade-62-2355-2392022",
+     55
+    ],
+    [
+     "yestrade-faq-105",
+     1
+    ]
+   ],
+   "chunks_above": 2,
+   "chunks_above_from_top3_parents": 2,
+   "top_titles": [
+    "수출통제 대상기술 안내2 — 5. 해 외지사(해외 연구소 포함)에 대한 ",
+    "설계도 제공 시 수출허가 대상 여부",
+    "주한 외국공관으로 그 공관이 사용할 전략물자를납품하는 것은 전략물자 수출"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 27,
+   "parent_rank": 15,
+   "top_score": 0.8151797,
+   "gold_score": 0.7823282,
+   "above": [
+    [
+     "yestrade-62-2355-2392022",
+     55
+    ],
+    [
+     "yestrade-faq-105-2288634",
+     1
+    ],
+    [
+     "yestrade-69-6345-2394002",
+     52
+    ],
+    [
+     "yestrade-faq-105",
+     1
+    ],
+    [
+     "yestrade-faq-170-2288692",
+     2
+    ],
+    [
+     "yestrade-69-6023-2393150",
+     128
+    ],
+    [
+     "yestrade-faq-170",
+     1
+    ],
+    [
+     "yestrade-guide-system-guidance",
+     17
+    ]
+   ],
+   "chunks_above": 26,
+   "chunks_above_from_top3_parents": 15,
+   "top_titles": [
+    "수출통제 대상기술 안내2",
+    "수출통제 대상기술 안내2",
+    "★0226 (9차) 전략물자관리제도 Q129 — Q129"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-028",
+  "query": "우리 회사가 자율준수무역거래자 지정을 신청하면 결과는 언제쯤 나오고, 몇 점을 받아야 지정돼?",
+  "gold": [
+   "yestrade-62-2304",
+   "yestrade-62-2304-2392011"
+  ],
+  "gold_size": 217,
+  "bm25": {
+   "chunk_rank": 81,
+   "parent_rank": 55,
+   "top_score": 56.905155,
+   "gold_score": 42.09811,
+   "above": [
+    [
+     "yestrade-faq-126",
+     1
+    ],
+    [
+     "yestrade-65-14995",
+     2
+    ],
+    [
+     "yestrade-69-15020",
+     2
+    ],
+    [
+     "yestrade-69-3543-2392630",
+     67
+    ],
+    [
+     "yestrade-guide-system-guidance__compliance-program__domestic",
+     3
+    ],
+    [
+     "yestrade-69-6314-2394365",
+     277
+    ],
+    [
+     "yestrade-69-18978",
+     1
+    ],
+    [
+     "yestrade-69-393-2391805",
+     5
+    ]
+   ],
+   "chunks_above": 80,
+   "chunks_above_from_top3_parents": 11,
+   "top_titles": [
+    "자율준수무역거래자 지정을 위한 신청 방법은?심사 절차는?",
+    "자율준수무역거래자 신규 지정 신청 안내",
+    "자율준수무역거래자 신규 지정 신청 안내"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 11,
+   "parent_rank": 11,
+   "top_score": 0.86488426,
+   "gold_score": 0.8459199,
+   "above": [
+    [
+     "yestrade-65-22169-3053746-z000",
+     1
+    ],
+    [
+     "yestrade-69-6504-2393994-z017",
+     1
+    ],
+    [
+     "yestrade-65-13413-2394963-z000",
+     1
+    ],
+    [
+     "yestrade-69-3543-2392632-z015",
+     1
+    ],
+    [
+     "yestrade-guide-system-guidance__compliance-program__domestic",
+     3
+    ],
+    [
+     "yestrade-69-726-2392461-z000",
+     1
+    ],
+    [
+     "yestrade-69-19230-2395865-z000",
+     1
+    ],
+    [
+     "law-admrul-2100000284150-annex-x0013-00",
+     4
+    ]
+   ],
+   "chunks_above": 10,
+   "chunks_above_from_top3_parents": 3,
+   "top_titles": [
+    "[별지 13] 자율준수무역거래자지정 신청서",
+    "[별지 제13호 서식] 자율준수무역거래자지정 신청서",
+    "[별지 13] 자율준수무역거래자지정 신청서(전략물자 수출입고시)"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-033",
+  "query": "피마자에서 뽑아내는 식물성 독소는 신경작용제 VX보다 얼마나 강하다고 해?",
+  "gold": [
+   "yestrade-62-2828"
+  ],
+  "gold_size": 2,
+  "bm25": {
+   "chunk_rank": 2,
+   "parent_rank": 2,
+   "top_score": 33.247955,
+   "gold_score": 23.157799,
+   "above": [
+    [
+     "yestrade-63-3179",
+     2
+    ]
+   ],
+   "chunks_above": 1,
+   "chunks_above_from_top3_parents": 1,
+   "top_titles": [
+    "[국내외동향] 미군, VX 신경작용제 대부분 폐기",
+    "생화학무기시리즈(5)_리신",
+    "생화학무기시리즈 8-생물작용제"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 2,
+   "parent_rank": 2,
+   "top_score": 0.76936144,
+   "gold_score": 0.76643634,
+   "above": [
+    [
+     "yestrade-62-5608-2391936",
+     1007
+    ]
+   ],
+   "chunks_above": 1,
+   "chunks_above_from_top3_parents": 1,
+   "top_titles": [
+    "2017 전략물자 품목해설서",
+    "생화학무기시리즈(5)_리신",
+    "[국내외동향] 미군, VX 신경작용제 대부분 폐기"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-037",
+  "query": "2006년 신문 연재 기사에서는 전략물자를 허가 없이 수출하면 우리나라와 미국에서 각각 어떤 처벌을 받는다고 했어?",
+  "gold": [
+   "yestrade-67-475"
+  ],
+  "gold_size": 3,
+  "bm25": {
+   "chunk_rank": 8,
+   "parent_rank": 7,
+   "top_score": 49.35211,
+   "gold_score": 33.787365,
+   "above": [
+    [
+     "yestrade-63-582",
+     1
+    ],
+    [
+     "yestrade-56-8259-2392868",
+     10
+    ],
+    [
+     "yestrade-56-8677-2393270",
+     11
+    ],
+    [
+     "yestrade-64-2949",
+     3
+    ],
+    [
+     "yestrade-64-2945",
+     4
+    ],
+    [
+     "yestrade-64-2946",
+     3
+    ]
+   ],
+   "chunks_above": 7,
+   "chunks_above_from_top3_parents": 4,
+   "top_titles": [
+    "전자신문, 전략물자 수출통제 기획특집 연재",
+    "홈닥터-반도체 — 허가없이 수출하면 어떤 처벌을 받게 되나요?",
+    "전략물자관리제도 리플렛 — 허가 없이 수출하면 어떤 처벌을 받게 되나요?"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 9,
+   "parent_rank": 7,
+   "top_score": 0.8221227,
+   "gold_score": 0.8012252,
+   "above": [
+    [
+     "yestrade-67-4702-2392089",
+     122
+    ],
+    [
+     "yestrade-67-481-2394250",
+     8
+    ],
+    [
+     "yestrade-69-20346-2395872",
+     26
+    ],
+    [
+     "yestrade-56-8259-2392868",
+     10
+    ],
+    [
+     "yestrade-69-318-2392339",
+     37
+    ],
+    [
+     "yestrade-64-2946",
+     3
+    ]
+   ],
+   "chunks_above": 8,
+   "chunks_above_from_top3_parents": 5,
+   "top_titles": [
+    "ieco 10k 01",
+    "ieco 10k 01",
+    "전략물자수출통제 강화를 위한 대외무역법 개정내용"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-037",
+  "query": "2006년 신문 연재 기사에서는 전략물자를 허가 없이 수출하면 우리나라와 미국에서 각각 어떤 처벌을 받는다고 했어?",
+  "gold": [
+   "yestrade-67-475"
+  ],
+  "gold_size": 3,
+  "bm25": {
+   "chunk_rank": 8,
+   "parent_rank": 7,
+   "top_score": 49.35211,
+   "gold_score": 33.787365,
+   "above": [
+    [
+     "yestrade-63-582",
+     1
+    ],
+    [
+     "yestrade-56-8259-2392868",
+     10
+    ],
+    [
+     "yestrade-56-8677-2393270",
+     11
+    ],
+    [
+     "yestrade-64-2949",
+     3
+    ],
+    [
+     "yestrade-64-2945",
+     4
+    ],
+    [
+     "yestrade-64-2946",
+     3
+    ]
+   ],
+   "chunks_above": 7,
+   "chunks_above_from_top3_parents": 4,
+   "top_titles": [
+    "전자신문, 전략물자 수출통제 기획특집 연재",
+    "홈닥터-반도체 — 허가없이 수출하면 어떤 처벌을 받게 되나요?",
+    "전략물자관리제도 리플렛 — 허가 없이 수출하면 어떤 처벌을 받게 되나요?"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 9,
+   "parent_rank": 7,
+   "top_score": 0.8221227,
+   "gold_score": 0.8012252,
+   "above": [
+    [
+     "yestrade-67-4702-2392089",
+     122
+    ],
+    [
+     "yestrade-67-481-2394250",
+     8
+    ],
+    [
+     "yestrade-69-20346-2395872",
+     26
+    ],
+    [
+     "yestrade-56-8259-2392868",
+     10
+    ],
+    [
+     "yestrade-69-318-2392339",
+     37
+    ],
+    [
+     "yestrade-64-2946",
+     3
+    ]
+   ],
+   "chunks_above": 8,
+   "chunks_above_from_top3_parents": 5,
+   "top_titles": [
+    "ieco 10k 01",
+    "ieco 10k 01",
+    "전략물자수출통제 강화를 위한 대외무역법 개정내용"
+   ]
+  }
+ },
+ {
+  "qid": "holdout-v1-050",
+  "query": "바세나르 전문가그룹에서 우리나라는 언제부터 의장국을 맡았고, 레이저 가공기계와 관련해서는 어떤 안건을 냈어?",
+  "gold": [
+   "yestrade-62-5605-2392867"
+  ],
+  "gold_size": 216,
+  "bm25": {
+   "chunk_rank": 12,
+   "parent_rank": 10,
+   "top_score": 43.51089,
+   "gold_score": 29.953598,
+   "above": [
+    [
+     "yestrade-62-2855",
+     2
+    ],
+    [
+     "yestrade-63-3193",
+     2
+    ],
+    [
+     "yestrade-guide-usage-guidance__strategic-material-introduction__international-export-control-systems-outline",
+     2
+    ],
+    [
+     "yestrade-56-5642-2393248",
+     116
+    ],
+    [
+     "yestrade-69-918",
+     1
+    ],
+    [
+     "yestrade-56-8673-2393195",
+     163
+    ],
+    [
+     "yestrade-56-9699-2393429",
+     128
+    ],
+    [
+     "yestrade-56-8675-2393140",
+     148
+    ]
+   ],
+   "chunks_above": 11,
+   "chunks_above_from_top3_parents": 5,
+   "top_titles": [
+    "국제수출통제체제 - 바세나르 체제",
+    "국제수출통제체제 - 바세나르 체제",
+    "[국내외동향] 2009년 춘계 바세나르 통제품목 개정 동향"
+   ]
+  },
+  "vector": {
+   "chunk_rank": 15,
+   "parent_rank": 9,
+   "top_score": 0.8061068,
+   "gold_score": 0.7596165,
+   "above": [
+    [
+     "yestrade-56-5642-2393248",
+     116
+    ],
+    [
+     "yestrade-56-8537-2393480",
+     162
+    ],
+    [
+     "yestrade-62-8572-2392899",
+     409
+    ],
+    [
+     "yestrade-56-8673-2393195",
+     163
+    ],
+    [
+     "yestrade-56-9699-2393429",
+     128
+    ],
+    [
+     "yestrade-67-3485-2392087-z001",
+     46
+    ],
+    [
+     "yestrade-63-3193",
+     2
+    ],
+    [
+     "yestrade-62-8574-2392813",
+     203
+    ]
+   ],
+   "chunks_above": 14,
+   "chunks_above_from_top3_parents": 9,
+   "top_titles": [
+    "2013년 포커스(겨울호)",
+    "2015년 포커스(여름호)",
+    "2013 연례보고서"
+   ]
+  }
+ }
+]

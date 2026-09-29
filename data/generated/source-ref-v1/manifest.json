@@ -1,0 +1,37 @@
+{
+  "status": "record_only_searched_once",
+  "frozen_at": "2026-09-29T11:18:38+09:00",
+  "purpose": "Held-out check for a rule that separates a question's source description (e.g. '2006년 신문 연재 기사에서는') from its content. The rule was designed from docs-v2-097/103/104/106 and holdout-v1-037; these 16 questions were written before the rule and are not used to choose it.",
+  "sample": "data/generated/source-ref-v1/frozen_sample.json",
+  "sample_sha256": "27b7dce65aecf5202fe9d53e64d7bbab1e3d4a5fdf6064b23c1742a6d83619ab",
+  "sample_script": "scripts/sample_source_reference.py",
+  "spec": "data/generated/source-ref-v1/queries_spec.json",
+  "spec_sha256": "3bc0bd8be1d6ef7845ed401092be6c63f8cebeb4d244097db8e886cfe4d090e1",
+  "queries_file": "data/queries_source_ref_v1.jsonl",
+  "queries_sha256": "f13d7aa043a3a3e688036a101edc7e67e864316c831d081ef211e2817421fcf9",
+  "queries": 16,
+  "excluded_after_reading": 0,
+  "gold_rule": "Parents holding every requirement phrase and published in the named source year (build_holdout_queries.py source_year).",
+  "limitations": [
+    "Questions and labels were written by the assistant from the target chunk only; human review is pending.",
+    "The author already knew the failure pattern being targeted, so the wording style may lean toward it. Sampling of documents and target chunks was seeded and blind to search.",
+    "Several target chunks are English EAR text, name lists or blank forms; they were kept rather than replaced.",
+    "Not committed to git at freeze time; the manifest hashes are the record."
+  ],
+  "use": "Kept as a record only (user decision 2026-09-29). Not a benchmark for choosing settings; do not tune against it.",
+  "searched": {
+    "date": "2026-09-29",
+    "engine": "title^1 + multi-index DFS + undated-document period boost (weight 4), judges off, k=5, core+docs",
+    "result": {
+      "evidence_recall_at_5": 0.812,
+      "top1": 0.688,
+      "hit_at_5": 0.812
+    },
+    "misses": {
+      "source-ref-v1-001": "English EAR text vs Korean question",
+      "source-ref-v1-004": "English EAR text vs Korean question",
+      "source-ref-v1-014": "the post is returned instead of its attachment that holds the answer"
+    },
+    "source_clause_rule": "Tried matching the source description on body only. No change here; regressed validation-v2 (top1 1.000->0.944) and date-validation-v1 (0.714->0.643). Rejected and reverted."
+  }
+}

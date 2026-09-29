@@ -3,7 +3,7 @@
   "created_at": "2026-09-16",
   "status": "draft_pending_user_review",
   "queries_file": "queries_docs_v2.jsonl",
-  "queries_sha256": "3c0e8b247435de3cd6dc1d957ee725b57febf1e559eecf5099b9686076410e1b",
+  "queries_sha256": "2328cfcc36aaeee92022bc3481c065b23f819516a45353643e2e6c00d4f643c7",
   "queries": 135,
   "categories": {
     "paraphrase": 34,
@@ -56,6 +56,7 @@
     "Validate all chunk IDs and quotes against final full parser output before retrieval comparisons.",
     "New-source relevance judgments cover 11 logical documents; other new sources may provide alternative evidence.",
     "docs-v2-121..135 quote identifiers that mostly occur once in the review corpus, so the gold is near-unique by construction; they are a regression guard for identifier lookup, not a difficulty test.",
+    "2026-09-29: docs-v2-127 query and reference_answer were rewritten to name the 사전거래보고서 form. The current 전략물자수출입고시 makes 제54조 the 상황허가 itself and 제54조의2 its exemption, so the old wording had a premise only the form's older edition supports. Gold and evidence labels are unchanged. Results before this date used the old wording, and the new wording names the form, so 127 is easier than before.",
     "docs-v2-neg-009..026 are newly authored against the review corpus and have not been run through retrieval or the answerability judge; the 18단계 numbers still refer to the first eight."
   ],
   "updated_at": "2026-09-21",
