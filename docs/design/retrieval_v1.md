@@ -28,10 +28,11 @@
 
 ## 두 검색기
 
-**어휘** — `build_query()`. `multi_match/best_fields`로 `title^3`, `body`,
-`title.standard^1.5`, `body.standard^0.5`를 친다. 제목이 본문보다 3배인 것은 사용자가
-문서 제목을 거의 그대로 부르는 경우가 많기 때문이고, `.standard` 부속 필드는 nori가
-잘못 쪼갠 경우의 보험이다.
+**어휘** — `build_query()`. `multi_match/most_fields`로 `title^1`, `body`를 친다(28·34단계).
+처음에는 `best_fields`로 `title^3`, `body`, `title.standard^1.5`, `body.standard^0.5`를 쳤다. 제목을 세게 친
+것은 사용자가 문서 제목을 거의 그대로 부르는 경우가 많기 때문이었고, `.standard` 부속 필드는 nori가 잘못 쪼갠
+경우의 보험이었다. 22단계가 `most_fields`로, 28단계가 `title^1`로, 34단계가 `.standard` 필드를 쿼리에서 뺐다.
+색인 매핑의 `standard` 하위 필드는 남아 있다.
 
 분석기는 `korean_nori`(색인)와 `korean_nori_search`(검색)로 나뉜다. 검색 쪽만 동의어를
 확장하고, **동의어는 품사 필터보다 먼저** 걸린다 — 품사 필터가 토큰을 지우면 위치에

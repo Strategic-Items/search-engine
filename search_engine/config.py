@@ -197,6 +197,21 @@ class Settings(BaseSettings):
     search_rerank_timeout_seconds: float = Field(default=30.0, gt=0)
     # 선택된 청크별로 0/1/2 관련도를 판정하고 무관(0) 청크만 제거한다.
     search_chunk_filter: bool = False
+    # 하이브리드에서 문서를 먼저 고르지 않고 두 검색기의 청크를 청크 단위 RRF로 합쳐 고른다.
+    # 청크 예산(최대 청크 수)과 1위 청크 점수 대비 컷오프 비율(0이면 예산만)은 docs 135·
+    # holdout 69에서 잰 곡선으로 골랐다(예산 10에서 비율 0.5/0.6/0.8이 청크 6.9/6.5/5.7개,
+    # 근거 Recall 0.863/0.858/0.860). 문서 융합 경로는 6.5개에 0.846이다.
+    # 기본은 꺼짐(문서 융합 뒤 문서 안에서 청크를 고르는 기존 경로).
+    search_chunk_first: bool = False
+    search_chunk_first_max_chunks: int = Field(default=10, ge=1, le=100)
+    search_chunk_first_cutoff_ratio: float = Field(default=0.8, ge=0.0, le=1.0)
+    # 청크는 여러 문서에서 조금씩 올라오므로, 문서 수를 따로 묶지 않으면 반환 문서가 늘어
+    # 문서 정밀도가 떨어진다.
+    search_chunk_first_max_documents: int = Field(default=5, ge=1, le=5)
+    # 청크 점수에 더하는 문서 합의의 배수(0이면 청크 RRF만).
+    search_chunk_first_agreement: float = Field(default=0.0, ge=0.0)
+    # 청크 RRF 앞에서 검색기별 원시 점수 트림(fusion_trim)을 적용할지.
+    search_chunk_first_trim: bool = False
     rag_top_k: int = Field(default=5, ge=1)
 
     # 각 리트리버 목록의 얼마나 들어가서 융합되는가. 위의 컷오프 비율과는 별도로, 다른 질문에 답한다: "아니오"가 아니라

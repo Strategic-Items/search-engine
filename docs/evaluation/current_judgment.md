@@ -137,6 +137,8 @@
 | 연도·반기 혼동 | 질문에 적힌 기간과 주제어가 제목과 맞는 후보로 세 번째 RRF 목록을 만들고 컷오프에서 보존. 날짜 진단 5위 내 10 → 14/14, CP 확인 4 → 8/8, 새 검증 36은 36/36. docs 135·holdout 69는 반환 배열까지 그대로 | [30단계](stages/applied/stage-30-period-disambiguation.md) |
 | 전달 청크의 Precision | LLM 청크 필터(기본 꺼짐)로 25.1% → 37.8%, Recall 손실 없음. 점수 컷오프만으로는 최고 68.9%, 제목 제거는 더 나빴다 | [31단계](stages/applied/stage-31-chunk-precision.md) |
 | 정답이 1위에 오지 않는 이유 | 정답은 대부분 후보 안에 있고 같은 주제의 방해 문서에 밀린다. 날짜 없는 문서의 기간 가산점만 반영(docs 1위 0.837 → 0.844). 컷오프 완화·사본 병합·부모 순위 RRF·출처 설명 분리·LLM 재정렬은 기각. docs-v2-127 질문을 현행 고시와 충돌하지 않게 고침 | [32단계](stages/applied/stage-32-why-the-answer-is-not-first.md) |
+| 청크를 먼저 고르는 파이프라인 | 문서 안 청크 순서(첫 청크는 벡터, 나머지는 청크 RRF)만 반영(개발 셋 +4문항, 손실 0). 청크 우선 파이프라인은 기본 꺼짐: 어떤 설정도 문서 우선과 같은 Recall에서 같은 문서 정밀도를 내지 못하고, 이득은 복수 근거 질의뿐이다 | [33단계](stages/applied/stage-33-chunk-first-pipeline.md) |
+| 어휘 검색의 `.standard` 필드 | 쿼리에서 뺌. docs 135·holdout 69는 한두 문항 차이(방향이 엇갈림), 식별자 질문 22개는 있는 쪽이 1문항 앞섬(127). 매핑은 그대로 | [34단계](stages/applied/stage-34-drop-standard-fields.md) |
 | 코퍼스를 섞을 때의 사본 판정 버그 | `download_copy_key`가 파일 이름만 봐서 FAQ 94건이 지워지던 것을 고침 | 26단계 5절 |
 
 ### 아직 열려 있는 것
@@ -149,7 +151,7 @@
 - **코퍼스 간 중복 문서.** docs 52부모 중 5건이 core에도 있고, 사본 판정은 파일 이름
   기준이라 못 잡는다.
 - **첨부가 파싱되지 않은 core 문서 22건, 거대 공지 4건의 첨부 분리.** 처리 기록을 찾지 못했다.
-- **docs 인덱스 재색인.** `search-docs-only`(2026-09-18)에 `period_hint`가 0건이다.
+- **docs 인덱스 재색인.** `search-docs-only`(2026-09-18)에 `period_hint`가 0건이다. 34단계가 `period_hint` 가산점과 시행일 필터를 지금은 영향 없지만 남겨 두었다. 재색인 뒤 `period_hint` 가산점과 "날짜 없는 문서" 가산점의 상호작용을 다시 잰다.
 - **라벨 확정.** 018·020의 공동 정답 추가는 끝났고, 사람 검수(`human_review: pending`)가 남았다.
 - **core 질의 93문항에 `evidence_groups`.** `queries_v1.jsonl`에 0건이라 core 방향은 청크 지표로 재지 못한다.
 

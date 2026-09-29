@@ -31,19 +31,12 @@ PERIOD = re.compile(r"(20\d{2})\s*년(?:\s*(\d{1,2})\s*월)?")
 HALF_YEAR = re.compile(r"(?<!\d)(20\d{2}|\d{2})\s*(?:년(?:도)?)?\s*(상|하)\s*반기")
 TOPIC_WORD = re.compile(r"[가-힣]{3,}|[A-Za-z]{2,}")
 
-# 요청에는 쿼리만 포함되므로, 사용자가 요청하는 문서의 종류
-# 텍스트에서 읽어야 한다. 이들은 필터가 아니라 종류를 들어 올리는 것이다: a
-# 잘못 읽는 비용은 순위에 영향을 주지만, 결코 답 자체에는 영향을 주지 않는다.
-GUIDE_TYPES = ("판정 안내", "허가 안내", "이용 안내")
-FORM_TYPES = ("민원서식",)
-INTENT_HINTS = (
-    (GUIDE_TYPES, re.compile(r"절차|방법|순서|어떻게|하려면|무엇인가요|어디서|이용방법")),
-    (FORM_TYPES, re.compile(r"서식|양식|신청서|서약서|진술서|별표|별지|내려받기|다운로드")),
-)
-SOURCE_TYPE_WEIGHT = 14
 # 더 새로운 판본이 대체한 양식은 검색 가능해야 한다 -- 사람들이 요청한다
 # 이전 판은 연도로 구분되지만, 기본적으로는 현재 판이 먼저 답변한다.
 CURRENT_EDITION_WEIGHT = 4
+# 지금 색인에는 `superseded_by`가 있는 문서가 없어서 이 가산점은 모든 문서에 똑같이 붙는다. 순서는 바꾸지
+# 못하지만 BM25 점수 전체를 4만큼 올려, 비율로 자르는 트림·컷오프가 덜 가파르게 작동한다(34단계에서 뺐더니
+# holdout 69의 Hit@5가 0.899에서 0.884로 1문항 내려가고 기간(타) 7의 문서 MRR이 0.857에서 0.786으로 내려갔다).
 
 
 def _requested_period(query: str) -> tuple[str, str] | None:
@@ -77,14 +70,6 @@ def _same_topic_in_title(query: str, title: str) -> bool:
     """연도·반기 외에 제목의 실제 주제어가 질문에도 등장하는지 확인한다."""
     return any(word not in ("상반기", "하반기") and word.casefold() in query.casefold()
                for word in TOPIC_WORD.findall(title))
-
-
-def _intent_boosts(query: str) -> list[dict]:
-    """쿼리가 요구하는 문서 종류를 사용자가 사용하는 단어로 강화한다."""
-    return [
-        {"filter": {"terms": {"source_type": list(types)}}, "weight": SOURCE_TYPE_WEIGHT}
-        for types, hint in INTENT_HINTS if hint.search(query)
-    ]
 
 
 # 공고·고시 번호. `제2026-598호`처럼 연도와 일련번호가 붙은 형태만 센다.
@@ -129,7 +114,9 @@ def build_query(query: str, as_of: date) -> dict:
             # 이 코퍼스에서. 필드를 합산하면 두 용어가 어휘적 하한선의 같은 쪽에 있게 된다.
             # 제목은 모든 청크에 반복된다. 여러 코퍼스를 함께 검색할 때 ^3은
             # 제목이 비슷한 새 문서를 과하게 올리므로 본문과 같은 가중치를 준다.
-            "fields": ["title^1", "body", "title.standard^1.5", "body.standard^0.5"],
+            # `.standard` 부속 필드는 쓰지 않는다: 있고 없고를 비교하니 docs 135와 holdout 69에서
+            # 차이가 한두 문항 안팎이었다(식별자 질문 22개에서는 있는 쪽이 1문항 앞섰다).
+            "fields": ["title^1", "body"],
             "type": "most_fields",
         }})
     if not should:
@@ -147,11 +134,10 @@ def build_query(query: str, as_of: date) -> dict:
     ]
     filters += _docket_filter(query)
     base = {"bool": {"should": should, "minimum_should_match": 1, "filter": filters}}
-    functions = _intent_boosts(query)
-    functions.append({
+    functions = [{
         "filter": {"bool": {"must_not": {"exists": {"field": "superseded_by"}}}},
         "weight": CURRENT_EDITION_WEIGHT,
-    })
+    }]
     period = _requested_period(query)
     if period:
         start, end = period
@@ -298,6 +284,86 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> l
     ]
 
 
+def _chunk_first(
+    ranked_lists: list[tuple[list[dict], float, str]], query: str, *, rrf_k: int,
+    max_chunks: int, cutoff_ratio: float, max_documents: int, chunks_per_document: int,
+    reporting_half: tuple[int, str] | None = None, agreement: float = 0.0,
+) -> list[list[dict]]:
+    """문서를 먼저 고르지 않고 청크를 고른다. 반환은 문서별로 묶인 청크 목록이다.
+
+    두 검색기의 청크를 청크 단위 RRF로 합치고, 그 청크 점수에 예산과 컷오프를 건다.
+    문서는 선택된 청크가 딸린 부모일 뿐이라 문서 단계에서 정답 청크가 잘리지 않는다.
+    문서 융합이 하던 예외는 청크 단위로 옮겼다: 어느 목록의 1위 청크와, 반기 질문에서
+    제목이 같은 반기·주제이면서 두 검색기 모두가 찾은 청크는 컷오프가 자르지 않는다.
+    """
+    lists = list(ranked_lists)
+    period_supported: set[str] = set()
+    if reporting_half:
+        def matches(hit: dict) -> bool:
+            title = hit["_source"].get("title", "")
+            return _same_reporting_half(title, reporting_half) and _same_topic_in_title(query, title)
+        by_retriever = {name: {hit["_id"] for hit in hits if matches(hit)}
+                        for hits, _, name in lists if name in ("bm25", "vector")}
+        period_hits = list({hit["_id"]: hit for hits, _, _ in lists
+                            for hit in hits if matches(hit)}.values())
+        if period_hits:
+            lists.append((period_hits, 1.0, "period"))
+            period_supported = by_retriever.get("bm25", set()) & by_retriever.get("vector", set())
+    score: dict[str, float] = {}
+    dense_rank: dict[str, int] = {}
+    leaders: set[str] = set()
+    chunks: dict[str, dict] = {}
+    for hits, weight, retriever in lists:
+        for rank, hit in enumerate(hits, 1):
+            chunk_id = hit["_id"]
+            chunks.setdefault(chunk_id, hit)
+            score[chunk_id] = score.get(chunk_id, 0.0) + weight / (rrf_k + rank)
+            if retriever == "vector":
+                dense_rank.setdefault(chunk_id, rank)
+            if rank == 1 and retriever != "period":
+                leaders.add(chunk_id)
+    if agreement:
+        # 문서 합의: 부모를 두 검색기가 모두 상위로 봤는가. 문서 융합이 쓰던 신호(목록마다 부모의
+        # 첫 청크 위치로 센 RRF)를 청크 점수에 더한다. 문서를 자르지 않고 순서에만 반영한다.
+        parent_score: dict[str, float] = {}
+        for hits, weight, retriever in lists:
+            if retriever == "period":
+                continue
+            seen_parents: set[str] = set()
+            for rank, hit in enumerate(hits, 1):
+                parent = hit["_source"].get("parent_id") or hit["_id"]
+                if parent not in seen_parents:
+                    seen_parents.add(parent)
+                    parent_score[parent] = parent_score.get(parent, 0.0) + weight / (rrf_k + rank)
+        for chunk_id in score:
+            source = chunks[chunk_id]["_source"]
+            score[chunk_id] += agreement * parent_score.get(source.get("parent_id") or chunk_id, 0.0)
+    ordered = sorted(score, key=lambda c: (-score[c], dense_rank.get(c, len(score) + 1), c))
+    floor = score[ordered[0]] * cutoff_ratio if ordered and cutoff_ratio else 0.0
+    groups: dict[str, list[dict]] = {}
+    claimed: dict[tuple[str, str], str] = {}
+    taken = 0
+    for chunk_id in ordered:
+        if taken == max_chunks:
+            break
+        if score[chunk_id] < floor and chunk_id not in leaders and chunk_id not in period_supported:
+            continue
+        source = chunks[chunk_id]["_source"]
+        parent = source.get("parent_id") or chunk_id
+        # 같은 문서의 사본은 먼저 오른 쪽이 자리를 차지하고, 다른 사본의 청크는 싣지 않는다.
+        edition = _edition_key(source)
+        if edition is not None and claimed.setdefault(edition, parent) != parent:
+            continue
+        group = groups.get(parent)
+        if group is None and len(groups) == max_documents:
+            continue
+        if group is not None and len(group) == chunks_per_document:
+            continue
+        groups.setdefault(parent, []).append({**chunks[chunk_id], "_score": score[chunk_id]})
+        taken += 1
+    return list(groups.values())
+
+
 def _edition_key(source: dict) -> tuple[str, str] | None:
     """같은 문서의 사본을 한데 묶는 열쇠. 묶을 수 없으면 None.
 
@@ -315,7 +381,7 @@ def _edition_key(source: dict) -> tuple[str, str] | None:
 
 
 def _candidates_by_parent(
-    ranked_lists: Iterable[tuple[list[dict], float, str]],
+    ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int = 60,
 ) -> dict[str, list[dict]]:
     """각 후보 청크를 그 부모 아래에 그룹화한다. 밀집 검색기의 순서가 먼저다.
 
@@ -337,7 +403,17 @@ def _candidates_by_parent(
             seen.add(hit["_id"])
             parent = hit["_source"].get("parent_id") or hit["_id"]
             by_parent.setdefault(parent, []).append(hit)
-    return by_parent
+    if len(ranked_lists) < 2:
+        return by_parent
+    # 첫 청크는 밀집이 고른 것을 지키고, 나머지 자리는 두 리스트의 청크 순위를 RRF로 합쳐 채운다.
+    # 밀집 순서만 따르면 어휘가 2위로 올린 청크가 여섯 자리 밖으로 밀린다(docs-v2-034: BM25 2위,
+    # 밀집 9위). 처음 여섯 개를 통째로 RRF에 맡기면 첫 청크 적중이 70.5% → 67.6%로 떨어졌다.
+    score: dict[str, float] = {}
+    for hits, weight, _ in ranked_lists:
+        for rank, hit in enumerate(hits, 1):
+            score[hit["_id"]] = score.get(hit["_id"], 0.0) + weight / (rrf_k + rank)
+    return {parent: [chunks[0], *sorted(chunks[1:], key=lambda c: -score[c["_id"]])]
+            for parent, chunks in by_parent.items()}
 
 
 def _with_passages(
@@ -479,6 +555,31 @@ def retrieve(
     if off_topic:
         return []
     ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
+    if mode == "hybrid" and len(ranked_lists) > 1 and settings.search_chunk_first:
+        # 원시 점수 트림: 각 검색기 목록의 끝을 자기 1위 점수 대비 비율로 먼저 자른다.
+        chunk_lists = ranked_lists if not settings.search_chunk_first_trim else [
+            (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
+            for hits, weight, retriever in ranked_lists]
+        groups = _chunk_first(
+            chunk_lists, query, rrf_k=settings.search_hybrid_rrf_k,
+            max_chunks=settings.search_chunk_first_max_chunks,
+            cutoff_ratio=settings.search_chunk_first_cutoff_ratio,
+            max_documents=min(k, settings.search_chunk_first_max_documents),
+            agreement=settings.search_chunk_first_agreement,
+            chunks_per_document=chunks_per_document or settings.search_chunks_per_document,
+            reporting_half=_reporting_half(query))
+        hits = []
+        for group in groups:
+            lead = group[0]
+            source = lead["_source"]
+            hits.append(SearchHit.model_validate({
+                **{key: value for key, value in source.items() if value is not None},
+                "id": lead["_id"], "parent_id": source.get("parent_id") or lead["_id"],
+                "score": lead["_score"],
+                "passages": [Passage(id=c["_id"], body=c["_source"].get("body", ""), score=c["_score"])
+                             for c in group[1:]],
+            }))
+        return _finish(query, _with_current_editions(client, alias, hits, k), settings, answerability)
     period_supported: set[str] = set()
     if len(ranked_lists) > 1:
         # 각 목록을 각각의 검색기의 교정된 비율로 먼저 자른다. 명시적인 `cutoff_ratio`는 전체 절단 정책을 덮어쓴다 -- 0을 전달하여 절단되지 않은 순위를 보려면 그것을 가져와야 하므로, 이 또한 건너뛴다.
@@ -568,7 +669,7 @@ def retrieve(
     if chunks_per_document is None:
         chunks_per_document = settings.search_chunks_per_document
     hits = _with_current_editions(client, alias, out, k)
-    by_parent = _candidates_by_parent(ranked_lists)
+    by_parent = _candidates_by_parent(ranked_lists, settings.search_hybrid_rrf_k)
     if rerank_chunks is None:
         rerank_chunks = settings.search_rerank_chunks
     # 선택과 순서는 하나의 결정이므로, 이는 _with_passages를 대체한다
@@ -581,13 +682,17 @@ def retrieve(
             and chunks_per_document >= 2
             and select_passages(query, hits, by_parent, chunks_per_document, settings)):
         hits = _with_passages(hits, by_parent, chunks_per_document)
+    return _finish(query, hits, settings, answerability)
+
+
+def _finish(query: str, hits: list[SearchHit], settings, answerability: bool | None) -> list[SearchHit]:
+    """청크 필터와 답변 가능 판정. 문서 우선 경로와 청크 우선 경로가 함께 쓴다."""
     if settings.search_chunk_filter:
         hits = filter_chunks(query, hits, settings)
     if answerability is None:
         answerability = settings.search_answerability_judge
     # 실제로 독자에게 전달될 문장들에 대해 마지막으로 판단한다:
     # 더 일찍 묻는다면 검색이 반환하는 텍스트와 다른 텍스트에 질문을 던지게 된다.
-    #
     if answerability and is_unanswerable(query, hits, settings):
         return []
     return hits
