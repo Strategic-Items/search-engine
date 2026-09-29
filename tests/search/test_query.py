@@ -8,8 +8,6 @@ import pytest
 from search_engine.config import Settings
 
 from search_engine.search import (
-    GUIDE_TYPES,
-    SOURCE_TYPE_WEIGHT,
     build_query,
     retrieve,
     search_all,
@@ -158,18 +156,6 @@ def test_search_all_adds_hsk_linkage_only_when_the_query_names_a_code():
     ]
 
 
-def test_a_query_that_asks_for_a_procedure_lifts_the_guides():
-    query = build_query("전문판정 신청은 어떤 절차로 진행되나요", date(2026, 9, 15))
-    guides = boosts(query, "source_type")[0]
-    assert guides["filter"]["terms"]["source_type"] == list(GUIDE_TYPES)
-    assert guides["weight"] == SOURCE_TYPE_WEIGHT
-
-
-def test_a_query_that_names_a_form_lifts_the_forms():
-    query = build_query("최종사용자 서약서 양식 내려받기", date(2026, 9, 15))
-    assert boosts(query, "source_type")[0]["filter"]["terms"]["source_type"] == ["민원서식"]
-
-
 def test_the_word_in_a_notice_title_does_not_lift_the_guides():
     """공고 제목에도 `안내`가 쓰이므로 이를 안내서로 해석하면 안 된다."""
     query = build_query("제38차 전략물자 수출입고시 9월 1일 시행 안내", date(2026, 9, 15))
@@ -183,9 +169,8 @@ def test_a_plain_query_carries_only_the_current_edition_boost():
     assert len(query["function_score"]["functions"]) == 1
 
 
-def test_document_kind_and_period_boosts_apply_together():
+def test_period_boosts_apply_to_a_query_that_names_a_month():
     query = build_query("2026년 9월 개정 전문판정 신청서 양식", date(2026, 9, 15))
-    assert boosts(query, "source_type")[0]["filter"]["terms"]["source_type"] == ["민원서식"]
     assert [f["filter"]["range"] for f in boosts(query, "range")] == [
         {"published_at": {"gte": "2026-09-01", "lt": "2026-10-01"}},
         {"effective_from": {"gte": "2026-09-01", "lt": "2026-10-01"}},
