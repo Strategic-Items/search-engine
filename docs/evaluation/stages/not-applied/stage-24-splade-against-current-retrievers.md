@@ -174,3 +174,29 @@ Precision도 31.4% → 38.1%다. hybrid의 어휘 검색기 후보로 볼 근거
 `comparison-135q-splade-dense-chunks-untrimmed.json`, 융합 코드는
 `scripts/evaluate_splade_dense_fusion.py`다. 기존 비교값의 원자료는
 `comparison-135q-most-fields.json`과 `comparison-135q-sparse-vs-bm25.json`이다.
+
+## 부록: 한국어 전용 SPLADE로 바꿔 본 기록 (2026-09-29)
+
+`PIXIE-Splade-v1.5`(한국어·영어 이중 언어) 대신 한국어 전용
+[`yjoonjang/splade-ko-v1`](https://huggingface.co/yjoonjang/splade-ko-v1)(skt/A.X-Encoder-base
+기반, 어휘 50,000)로 같은 스크립트와 같은 조건(135문항, 256토큰, 상위 256 term,
+같은 컷오프 ratio)을 돌렸다. 인코딩·검색기 외의 설정은 바꾸지 않았다.
+
+| 모델 | ratio | P@1 | Hit@5 | 반환분 P | 평균 반환 | MRR@5 |
+|---|---:|---:|---:|---:|---:|---:|
+| PIXIE-Splade-v1.5 | 0.97 | 95.6% | 96.3% | 91.0% | 1.24 | 0.9593 |
+| splade-ko-v1 | 0.97 | 91.1% | 91.1% | 87.1% | 1.21 | 0.9111 |
+| PIXIE-Splade-v1.5 | 0.95 | 95.6% | 96.3% | 87.9% | 1.29 | 0.9593 |
+| splade-ko-v1 | 0.95 | 91.1% | 92.6% | 82.4% | 1.30 | 0.9173 |
+
+**모든 지표에서 PIXIE-Splade-v1.5보다 낮다.** P@1은 129/135에서 123/135로 6문항
+줄었다. 인코딩 시간은 343초와 366초로 비슷했다. 문서당 sparse term 수는 평균
+1,458개에서 557개로 줄었다.
+
+한계는 두 가지다. 입력을 PIXIE와 같은 256토큰으로 잘랐지만 이 모델은 8192토큰까지
+받는다. 또 스크립트는 `AutoModelForMaskedLM`과 `max(log(1 + relu))` 풀링으로 읽으므로
+모델 카드의 sentence-transformers `SparseEncoder` 경로와 같다고 확인하지 않았다. 두
+조건을 바꿔 다시 재지는 않았으므로 이 결과는 위 조건에서의 비교다.
+
+원자료는 `data/generated/docs-v2/comparison-135q-splade-ko-v1-yjoonjang.json`이다.
+재현은 위 명령에서 `--model yjoonjang/splade-ko-v1`과 `--out`만 바꾸면 된다.
