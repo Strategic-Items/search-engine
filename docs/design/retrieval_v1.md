@@ -39,12 +39,12 @@
 문서를 이름으로 부르는 질의를 흐리게 만들기 때문이다.
 
 품사 stoptags에는 어미·조사에 더해 **VX·VCP·VCN**이 들어간다
-([12단계](../evaluation/stages/stage-12-auxiliary-verb-stoptags.md)). 보조용언을 남기면
+([12단계](../evaluation/stages/applied/stage-12-auxiliary-verb-stoptags.md)). 보조용언을 남기면
 `알려줘`의 `주`가 검색어가 된다.
 
 **밀집** — `build_vector_query()`. `embedding` 필드에 k-NN 코사인. 임베딩은
 `BGE-m3-ko`(1024차원, GGUF F16을 Ollama가 서빙,
-[15단계](../evaluation/stages/stage-15-adopt-bge-m3-ko.md)). 색인·질의 모두
+[15단계](../evaluation/stages/applied/stage-15-adopt-bge-m3-ko.md)). 색인·질의 모두
 `제목: …\n\n본문: …` 형식을 쓴다.
 
 ## 순위에 얹는 가점
@@ -70,14 +70,14 @@ RRF다. `weight / (60 + rank)`를 부모 문서별로 합산한다. **BM25 점�
 
 가중치는 질의 재작성용이다. 재작성 질의의 순위는 0.5로 들어가므로, 잘못된 재작성이
 문서를 *추가*할 수는 있어도 원 질의의 1위를 밀어내지는 못한다. 재작성은 기본 꺼짐이다
-([5·7단계](../evaluation/stages/stage-07-rewrite-after-model.md)).
+([5·7단계](../evaluation/stages/not-applied/stage-07-rewrite-after-model.md)).
 
 **RRF의 한계가 이 설계의 가장 큰 미결 문제다.** 순위 기반이라 "한쪽 검색기가 얼마나
 확신하는지"가 점수에 남지 않는다. 식별자가 정확히 일치해 어휘 경로가 1위를 최고점으로
 밀어올려도, 융합 후에는 그냥 1위일 뿐이다. 그 결과 융합이 더 나은 쪽보다 나쁜 경우가
-반복해서 관측된다 — [9단계](../evaluation/stages/stage-09-identifier-queries.md),
-[16단계](../evaluation/stages/stage-16-vector-decides-topicality.md),
-[17단계](../evaluation/stages/stage-17-sparse-instead-of-bm25.md).
+반복해서 관측된다 — [9단계](../evaluation/stages/not-applied/stage-09-identifier-queries.md),
+[16단계](../evaluation/stages/applied/stage-16-vector-decides-topicality.md),
+[17단계](../evaluation/stages/not-applied/stage-17-sparse-instead-of-bm25.md).
 
 리스트가 하나만 남으면 융합하지 않고 그 검색기의 원 점수를 쓴다. 이때 컷오프도 **그
 검색기의** 보정값을 쓴다 — 요청받은 모드의 것을 쓰면 코사인 원점수를 RRF용 비율로
@@ -94,7 +94,7 @@ bm25 0.90, vector 0.99, hybrid 0.95다. 절대값이 아닌 이유는 점수의 
 결과가 0건이 될 수 없다.
 
 **절대 바닥값** — 융합 *전에* 검색기별로 건다
-([14단계](../evaluation/stages/stage-14-absolute-score-floor.md)). 0건을 만들 수 있는
+([14단계](../evaluation/stages/applied/stage-14-absolute-score-floor.md)). 0건을 만들 수 있는
 유일한 장치다. 기본값은 0(꺼짐)이며, 배포의 `.env`에서 그 코퍼스로 측정한 값을 넣는다.
 비율과 달리 척도에 묶여 있어 기본값으로 배포할 수 없다.
 
@@ -108,7 +108,7 @@ bm25 0.90, vector 0.99, hybrid 0.95다. 절대값이 아닌 이유는 점수의 
 대가는 키워드 단독 모드가 짧은 질의에 0건을 돌려주는 것이고, **임베딩 장애로
 하이브리드가 어휘 검색으로 degrade하면 그 0건이 사용자에게 보인다.**
 코사인은 길이 정규화가 되어 같은 문제가 없다
-([16단계](../evaluation/stages/stage-16-vector-decides-topicality.md)).
+([16단계](../evaluation/stages/applied/stage-16-vector-decides-topicality.md)).
 
 ## 주제 판정은 밀집 경로가 한다
 
@@ -127,7 +127,7 @@ bm25 0.90, vector 0.99, hybrid 0.95다. 절대값이 아닌 이유는 점수의 
 그 구간은 채팅 모델에게 **"질문이 요구하는 사실이 이 본문에 적혀 있나"**를 물어 8건 중
 7건을 걸러낼 수 있다(`SEARCH_ANSWERABILITY_JUDGE`, 기본 꺼짐). 관련도를 재는 리랭커로는
 0건이다 — 이 질의들은 실제로 관련이 있기 때문이다
-([18단계](../evaluation/stages/stage-18-llm-answerability-judge.md)). 대가는 답할 수 있는
+([18단계](../evaluation/stages/applied/stage-18-llm-answerability-judge.md)). 대가는 답할 수 있는
 질문의 14.8%를 함께 거절하는 것이라 기본값으로 켜지 않는다.
 
 ## 결과를 만드는 마무리
@@ -140,12 +140,12 @@ bm25 0.90, vector 0.99, hybrid 0.95다. 절대값이 아닌 이유는 점수의 
 **문서당 청크** — 순위를 매긴 청크 하나만으로는 답이 부족한 경우가 많아, 같은 문서의
 다른 후보 청크를 최대 `SEARCH_CHUNKS_PER_DOCUMENT`(기본 6)개까지 함께 싣는다. **이미
 가져온 후보 풀에서 꺼내므로 추가 조회가 없다.** 순위 단위는 그대로 문서이고 반환
-단위만 넓힌 것이다([4·8단계](../evaluation/stages/stage-04-chunks-per-document.md)).
+단위만 넓힌 것이다([4·8단계](../evaluation/stages/applied/stage-04-chunks-per-document.md)).
 
 ## 현재 수치와 미결 항목
 
 docs v2 135문항, 문서 52개 코퍼스 기준
-([16단계](../evaluation/stages/stage-16-vector-decides-topicality.md)).
+([16단계](../evaluation/stages/applied/stage-16-vector-decides-topicality.md)).
 
 | 모드 | Precision@1 | Precision@5(반환분) | MRR@5 | p50 |
 |---|---:|---:|---:|---:|

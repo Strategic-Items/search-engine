@@ -99,7 +99,7 @@ BM25 최고점이 12.21인데 바닥값이 14.75였기 때문이다.
 BM25 바닥값이 켜져 있을 때는 약한 어휘 히트가 걸러진 채로 융합에 들어갔고, 식별자가
 정확히 일치한 질의에서는 어휘 쪽이 확신한 순위가 그대로 살아남았다. 바닥값을 걷자
 약한 히트가 함께 들어와 RRF가 그 확신을 희석한다. n=6이라 한두 문항의 차이지만,
-방향은 [9단계](stage-09-identifier-queries.md)·[17단계](stage-17-sparse-instead-of-bm25.md)가
+방향은 [9단계](../not-applied/stage-09-identifier-queries.md)·[17단계](../not-applied/stage-17-sparse-instead-of-bm25.md)가
 반복해 본 것과 같다 — 융합은 한쪽의 확신을 보존하지 못한다.
 
 ## 되돌림: BM25 바닥값을 다시 켠다 (2026-09-21)

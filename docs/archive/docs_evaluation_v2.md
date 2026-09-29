@@ -4,7 +4,7 @@
 > `nomic-embed-text`(768차원)이던 시점의 측정이며, 그 자체로는 정확하다. 다만 벡터의
 > 약세 원인은 검색 방식이 아니라 영어 중심 임베딩 모델이었다. `bge-m3`로 바꾼 뒤 같은
 > 질문에서 벡터가 문서 Recall@5 100%로 1위가 된다. 현재 결론은
-> [6단계](../evaluation/stages/stage-06-embedding-model.md)와 [7단계](../evaluation/stages/stage-07-rewrite-after-model.md)를 본다.
+> [6단계](../evaluation/stages/applied/stage-06-embedding-model.md)와 [7단계](../evaluation/stages/not-applied/stage-07-rewrite-after-model.md)를 본다.
 > 이 문서는 당시 기록으로 남긴다.
 
 결론(2026-09-16 당시): 이 평가셋에서는 BM25가 벡터와 하이브리드보다 정확하고 빠르다. 서버 설정은 변경하지 않았다.
@@ -50,7 +50,7 @@ BM25/벡터 후보 각각 50개. 아래 @5는 깊이 10 검색 결과를 잘라 
 - BM25도 003, 004, 007, 008, 019, 020의 정답 문서를 상위 5에서 놓친다.
 - BM25 문서 Recall은 85%지만 근거 Recall은 30%다. 정답 문서 탐색과 답이 있는 청크 선택은 분리해서 개선해야 한다.
 - 당시 결과는 BM25 기본 사용을 지지했다. 다만 벡터/하이브리드의 일반적 실패나 모델 자체의 원인까지 증명한 것은 아니었고, 다국어 임베딩 모델·쿼리/문서 입력 방식·후보 청크 중복·결합 방식을 별도로 실험할 필요를 남겼다.
-- **이후 확인된 것**: 그 중 다국어 임베딩 모델이 원인이었다. `bge-m3`로 교체하자 같은 질문에서 벡터가 문서 Recall@5 100%가 된다([6단계](../evaluation/stages/stage-06-embedding-model.md)). 또한 아래 "BM25도 003, 004, 007, 008, 019, 020을 놓친다"는 관찰은 `bge-m3` 벡터가 전부 상위 5에 넣으며 해소됐고, "근거 Recall 30%" 문제는 문서당 청크를 여럿 반환해 해결했다([4단계](../evaluation/stages/stage-04-chunks-per-document.md)).
+- **이후 확인된 것**: 그 중 다국어 임베딩 모델이 원인이었다. `bge-m3`로 교체하자 같은 질문에서 벡터가 문서 Recall@5 100%가 된다([6단계](../evaluation/stages/applied/stage-06-embedding-model.md)). 또한 아래 "BM25도 003, 004, 007, 008, 019, 020을 놓친다"는 관찰은 `bge-m3` 벡터가 전부 상위 5에 넣으며 해소됐고, "근거 Recall 30%" 문제는 문서당 청크를 여럿 반환해 해결했다([4단계](../evaluation/stages/applied/stage-04-chunks-per-document.md)).
 
 ## 재현 명령
 

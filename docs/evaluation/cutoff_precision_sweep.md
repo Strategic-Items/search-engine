@@ -127,7 +127,7 @@ bm25는 점수 스케일에 상한이 없어 비율 컷오프가 가장 덜 듣�
 그 경우였다. 즉 0.95라는 값은 "최고점 대비 95%"가 아니라 **"두 검색기 모두가 찾았을 것"**
 을 뜻했다.
 
-[21단계](stages/stage-21-fusion-cutoff-and-judge-polarity.md)가 이것을 고쳤다. 컷오프를
+[21단계](stages/applied/stage-21-fusion-cutoff-and-judge-polarity.md)가 이것을 고쳤다. 컷오프를
 융합 전에 검색기별로 걸고, 어떤 리스트든 1위로 꼽은 문서는 비율의 심판에서 제외한다.
 그 뒤 hybrid 기본값은 0.90이고, 위 표의 hybrid 열은 그 변경 **이전** 값이다.
 

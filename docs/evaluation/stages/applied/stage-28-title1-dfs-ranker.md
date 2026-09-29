@@ -28,7 +28,7 @@
 - 판정은 질문과 모범답안에 반환 청크를 대조하고, 완전 정답 가능성이 있는 부모의
   다른 청크도 확인했다. 모든 부모의 모든 청크를 한 줄씩 수동 검수한 것은 아니다.
   판정자는 assistant이며 사람 검수는 아직 없다.
-  [판정 원장](../../../data/generated/holdout-v1/title1_dfs_top5_audit.json)에 쌍별
+  [판정 원장](../../../../data/generated/holdout-v1/title1_dfs_top5_audit.json)에 쌍별
   상태와 근거 청크를 남겼다.
 
 ### 동일 질의의 변경 전후
@@ -47,8 +47,8 @@
 | holdout 69 · 근거 Recall@5 | 0.891 | 0.877 | −1.4p [−4.3, 0]p |
 | holdout 69 · 근거 Precision@5 하한 | 0.308 | 0.346 | +3.8p [−0.2, +8.2]p |
 
-수정 결과: [docs 135](../../../data/generated/holdout-v1/results/mixed-title1-dfs-top5-audited.json),
-[holdout 69](../../../data/generated/holdout-v1/results/holdout-title1-dfs-top5-audited.json).
+수정 결과: [docs 135](../../../../data/generated/holdout-v1/results/mixed-title1-dfs-top5-audited.json),
+[holdout 69](../../../../data/generated/holdout-v1/results/holdout-title1-dfs-top5-audited.json).
 Precision 하한은 아직 모든 비정답 청크를 개별적으로 무관하다고 판정하지 않았기
 때문이다. 문서 Precision도 상위 5위 밖의 정답 문서를 전수 조사한 값은 아니다.
 

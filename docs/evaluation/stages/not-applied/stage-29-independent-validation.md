@@ -28,8 +28,8 @@
 - FAQ 5, 공지 5, 공지 첨부 5, 알기쉬운 전략물자 4, 그 첨부 2, 동향 2,
   동향 첨부 2, 법령 별표 5, 안내 2, 국내외 소식 2, 기타 게시판 2: **36부모**.
 - 추출 목록과 지정 청크 ID는
-  [동결 매니페스트](../../../data/generated/validation-v2/frozen_sample.json)에 있다.
-  [추출 스크립트](../../../scripts/sample_independent_validation.py)는 코퍼스와
+  [동결 매니페스트](../../../../data/generated/validation-v2/frozen_sample.json)에 있다.
+  [추출 스크립트](../../../../scripts/sample_independent_validation.py)는 코퍼스와
   이전 라벨·판정 원장만 읽으며 검색 API나 검색 결과를 읽지 않는다.
 
 ### 다음 단계의 사전 약속
@@ -53,13 +53,13 @@
 
 ### 동결 자료
 
-- [질문 초안과 요구사항](../../../data/generated/validation-v2/queries_spec.json):
+- [질문 초안과 요구사항](../../../../data/generated/validation-v2/queries_spec.json):
   질문, 모범답안, 요구사항별 원문 문구, 지정 부모·청크.
-- [core 단독 질문셋](../../../data/queries_validation_v2.jsonl): 36문항, SHA-256
+- [core 단독 질문셋](../../../../data/queries_validation_v2.jsonl): 36문항, SHA-256
   `d44e49607289beaeaf28cda567df61b040c885cbdc4807787c6045f0877084ee`.
-- [core+docs 질문셋](../../../data/queries_validation_v2_combined.jsonl): 36문항, SHA-256
+- [core+docs 질문셋](../../../../data/queries_validation_v2_combined.jsonl): 36문항, SHA-256
   `d5f293dc1ff8ad96470ba2a0c44e99a69f583947cefe86c623fc92ad954c80fb`.
-- [매니페스트](../../../data/queries_validation_v2.manifest.json): 시드, 소스 해시,
+- [매니페스트](../../../../data/queries_validation_v2.manifest.json): 시드, 소스 해시,
   질의 해시와 동결 상태.
 
 `scripts/build_holdout_queries.py`로 요구사항의 문구를 84,413개 core 청크와 docs

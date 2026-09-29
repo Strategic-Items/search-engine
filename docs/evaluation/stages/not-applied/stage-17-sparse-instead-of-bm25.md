@@ -3,7 +3,7 @@
 > **이 단계의 코드는 측정 직후 제거됐다.** sparse 경로 전체를 걷어내고 나중에
 > 다시 판단하기로 했다. 이 문서는 그때 쓸 측정 기록이다.
 
-[16단계](stage-16-vector-decides-topicality.md)에서 어휘 바닥값을 걷자 하이브리드가
+[16단계](../applied/stage-16-vector-decides-topicality.md)에서 어휘 바닥값을 걷자 하이브리드가
 MRR 0.9259 → 0.9123으로 내려갔다. 어휘 절반이 융합에 노이즈를 넣는다는 뜻이다.
 그렇다면 그 절반을 더 나은 어휘 검색기로 바꾸면 되는가 — [10단계](stage-10-learned-sparse.md)의
 학습형 sparse로 BM25를 대체해 봤다.

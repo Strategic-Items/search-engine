@@ -38,7 +38,7 @@
 
 이는 기존 평가셋의 저장 후보에 대한 실험이다. 독립 새 질문, 무응답 질문, 실제 답변 품질, 필터와 무응답 판정자를 함께 켠 효과는 측정하지 않았다. 청크 Precision은 여전히 정답 라벨 기준 하한이며 LLM 0/1/2 등급은 사람 검수를 거치지 않았다. 화면의 기존 26.4%는 과거 무응답 판정자 사용 실행의 저장값이며 이번 37.78%와 실험 조건이 다르다.
 
-원자료: [평가 결과](../../../data/generated/chunk-filter-v1/evaluation.json). 재현: `.venv/bin/python scripts/evaluate_chunk_filter.py --workers 6`. 전체 테스트 245개 통과.
+원자료: [평가 결과](../../../../data/generated/chunk-filter-v1/evaluation.json). 재현: `.venv/bin/python scripts/evaluate_chunk_filter.py --workers 6`. 전체 테스트 245개 통과.
 
 ## 31.2 LLM을 끄고 점수 컷오프로 청크 Precision 80%를 시험한다 (2026-09-28) (옛 47단계)
 
@@ -71,7 +71,7 @@
 
 이번 재검색의 기본 청크 Precision은 27.36%다. 31.1절은 과거 저장된 후보의 25.14%를 기준으로 측정했으므로 둘의 차이를 컷오프 효과로 해석하지 않는다. 원자료 인덱스와 질의별 결과를 아래에 저장했다.
 
-[원자료](../../../data/generated/chunk-cutoff-v1/sweep.json), [실험 스크립트](../../../scripts/sweep_chunk_cutoff.py). 재현: `.venv/bin/python scripts/sweep_chunk_cutoff.py`. 읽기 전용 실험이며 API 재시작 및 운영 설정 변경 없이 실행했다.
+[원자료](../../../../data/generated/chunk-cutoff-v1/sweep.json), [실험 스크립트](../../../../scripts/sweep_chunk_cutoff.py). 재현: `.venv/bin/python scripts/sweep_chunk_cutoff.py`. 읽기 전용 실험이며 API 재시작 및 운영 설정 변경 없이 실행했다.
 
 ## 31.3 문서는 제목으로 찾고 청크는 본문만 점수 매긴다 (2026-09-28) (옛 48단계)
 
@@ -105,7 +105,7 @@
 
 지표는 기존 정답 청크 라벨 기준 하한이다. 조건·맥락까지 인정하는 23단계의 관련도 Precision과 다른 기준이다. 같은 평가셋에서 비교했으므로 독립 새 질문이나 실제 답변 품질에 대한 일반화를 주장하지 않는다. 본문 자체에 포함된 제목을 지웠을 때의 효과도 측정하지 않았다.
 
-[결과 원자료](../../../data/generated/body-only-chunks-v1/comparison.json), [실험 스크립트](../../../scripts/compare_body_only_chunks.py). 재현: `.venv/bin/python scripts/compare_body_only_chunks.py`. 캐시에는 후보 본문·기존 벡터·질의 벡터와 모델 및 인덱스명이 기록되며, 본문 전용 벡터는 모델명과 본문 해시로 구분한다.
+[결과 원자료](../../../../data/generated/body-only-chunks-v1/comparison.json), [실험 스크립트](../../../../scripts/compare_body_only_chunks.py). 재현: `.venv/bin/python scripts/compare_body_only_chunks.py`. 캐시에는 후보 본문·기존 벡터·질의 벡터와 모델 및 인덱스명이 기록되며, 본문 전용 벡터는 모델명과 본문 해시로 구분한다.
 
 ## 31.4 SPLADE를 현재 95% 청크 컷오프 결과와 같은 조건으로 비교한다 (2026-09-28) (옛 49단계)
 
@@ -136,4 +136,4 @@ SPLADE는 첫 청크 순서에서 개선됐지만 근거 Recall과 라벨 Precis
 
 저장된 SPLADE 모델 출력과 현재 벡터 검색을 결합한 오프라인 실험이다. 새 코퍼스 재학습·실시간 SPLADE 지연·무응답 안전성·생성 답변 품질·독립 새 질문의 성능은 측정하지 않았다. 운영 검색 설정은 바꾸지 않았다. 프론트는 질문 목록과 라우팅 섹션 사이의 SPLADE 비교를 이 실행으로 교체했다.
 
-[원자료](../../../data/generated/splade-cutoff95-v1/comparison.json), [재현 스크립트](../../../scripts/compare_splade_cutoff95.py). 실행: `.venv/bin/python scripts/compare_splade_cutoff95.py`.
+[원자료](../../../../data/generated/splade-cutoff95-v1/comparison.json), [재현 스크립트](../../../../scripts/compare_splade_cutoff95.py). 실행: `.venv/bin/python scripts/compare_splade_cutoff95.py`.

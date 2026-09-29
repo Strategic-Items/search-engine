@@ -43,15 +43,15 @@ class Settings(BaseSettings):
 # Ollama의 임베딩 엔드포인트를 노출하지 않을 수 있다.
 # 한국어 전용: 코퍼스와 질문은 모두 한국어이다. 한
 # 영어 중심 모델은 이를 거의 무작위로 점수 매긴다.
-# 자세한 내용은 docs/evaluation/stages/stage-06-embedding-model.md에 있다. 이를 대체한
+# 자세한 내용은 docs/evaluation/stages/applied/stage-06-embedding-model.md에 있다. 이를 대체한
 # 다국어 bge-m3도 한계가 있었고, 같은 구조를 한국어로 미세 조정한 모델은
 # 벡터 MRR@5를 0.9074에서 0.9407로 높였다.
-# (docs/evaluation/stages/stage-13-bge-m3-ko.md).
+# (docs/evaluation/stages/applied/stage-13-bge-m3-ko.md).
 #
 # Ollama에서 다른 모델처럼 실행할 수 있도록 GGUF로 제공한다. 제3자가 변환한 모델이므로
 # 원본 safetensors와 사전에 대조했다.
 # 채택: 25개 쿼리에 대해 코사인 0.99998 이상
-# (docs/evaluation/stages/stage-15-adopt-bge-m3-ko.md).
+# (docs/evaluation/stages/applied/stage-15-adopt-bge-m3-ko.md).
 #
 # 이 값을 변경하려면 모든 데이터셋의 재인덱싱과 SEARCH_SCORE_FLOOR_VECTOR의 재측정이 필요하다.
 # SEARCH_SCORE_FLOOR_VECTOR, 이는 이 모델의 스케일에서의 원시 코사인 값이다.
@@ -161,7 +161,7 @@ class Settings(BaseSettings):
     # 코퍼스가 답변할 수 없는 질문을 구분하는 유일한 측정 기준이다. 점수 하한선은 8개 중 0개를 거부하고,
     # 크로스-엔코더 재정렬기기는 8개 중 0개를 거부하며, 판정자는 7개를 거부한다. 그 대가로
     # 코퍼스가 답변할 수 있는 질문의 14.8%도 거부한다. 이것이 이 기능이 기본이 아니라 선택 사항인 이유이다.
-    # (docs/evaluation/stages/stage-18-llm-answerability-judge.md).
+    # (docs/evaluation/stages/applied/stage-18-llm-answerability-judge.md).
     # 반환된 각 문서의 자체 청크를 쿼리에 대비하여 재정렬하여,
     search_answerability_judge: bool = False
     # 답변을 담고 있는 청크가 독자(또는 판정자, 또는 RAG)가
@@ -177,7 +177,7 @@ class Settings(BaseSettings):
     # RRF는 순위를 기반으로 융합하고 그 순서를 혼란스럽게 합니다 -- 하이브리드의 rank-1 evidence recall은 벡터보다 24.6p 낮습니다.
 
 # 재랭킹은 그것을 되사오고 그 이상을 가져온다
-# (docs/evaluation/stages/stage-19-chunk-rerank-within-document.md)
+# (docs/evaluation/stages/applied/stage-19-chunk-rerank-within-document.md)
     search_rerank_chunks: bool = False
 # HTTP 사이카드, 임베딩과 챗과 마찬가지로: 크로스엔코더는 이 과정에서 빠진다.
 # {model, query, documents}를 받아들여 각 문서에 대한 점수를 반환하는 모든 엔드포인트는 작동한다.

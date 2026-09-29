@@ -1,6 +1,6 @@
 # 13단계: dragonkue/BGE-m3-ko는 bge-m3를 넘는가 (2026-09-18)
 
-[11단계](stage-11-qwen3-embedding.md)에서 `Qwen3-Embedding-0.6B`가 `bge-m3`를 넘지
+[11단계](../not-applied/stage-11-qwen3-embedding.md)에서 `Qwen3-Embedding-0.6B`가 `bge-m3`를 넘지
 못했다. 거기서 내린 진단은 두 가지였다 — dense가 잘하는 구간은 이미 포화이고, 남은
 구멍인 식별자는 임베딩의 문제가 아니라는 것. `dragonkue/BGE-m3-ko`는 같은 bge-m3를
 한국어로 추가 학습한 모델이라, 계열을 갈아타며 잃는 것 없이 그 진단을 다시 시험한다.
@@ -51,7 +51,7 @@ BM25가 양쪽 인덱스에서 MRR@5 0.8438로 같다. 대조군이 성립한다
 다만 n=4이므로 한 문항이다. 결론을 굳힐 수 있는 크기가 아니다.
 
 `identifier_number`는 0.500 그대로다. `제2026-598호`와 `제2026-584호`를 가르는 일은
-한국어 학습으로도 닫히지 않는다. [10단계](stage-10-learned-sparse.md)에서 학습형
+한국어 학습으로도 닫히지 않는다. [10단계](../not-applied/stage-10-learned-sparse.md)에서 학습형
 sparse가 이 구간을 1.000으로 채운 것과 맞물려, **이 항목만은 어휘 경로의 과제임이
 재확인**된다.
 
