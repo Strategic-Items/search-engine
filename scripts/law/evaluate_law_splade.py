@@ -21,7 +21,7 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.query import build_vector_query, retrieve
 
-QUERIES = Path("data/queries_law_v1.jsonl")
+from category import QUERIES, alias as category_alias, source as category_source  # noqa: E402
 K, PER_DOC, RRF_K = 5, 6, 60
 TRIM = {"splade": 0.90, "vector": 0.97}
 CANDIDATES = {"splade": 100, "vector": 50}
@@ -52,7 +52,7 @@ def main(splade_file: str) -> None:
     settings = get_settings()
     settings.search_chunk_filter = False
     client, embedder = create_client(settings), OllamaEmbedder(settings)
-    alias = settings.search_law_alias
+    alias = category_alias(settings)
     parent = {cid: cid.split("#")[0] for cid in sp["docs"]}
     index = {}
     for cid, vec in sp["docs"].items():

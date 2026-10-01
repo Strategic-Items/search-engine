@@ -163,6 +163,7 @@ def search_compare(request: SearchRequest) -> ModeComparison:
 # (id, 표시 이름, 별칭을 읽을 설정 이름)
 CATEGORIES = {
     "law": ("법령·고시", "search_law_alias"),
+    "admin": ("행정·업무", "search_admin_alias"),
 }
 # .env의 절대 하한과 답변 가능성 판정은 docs v2 코퍼스에서 맞춘 값이다. BM25는 코퍼스 통계와 함께 움직여서
 # 청크 673개짜리 법령 인덱스에서는 모든 결과를 자른다(21문항 중 10문항이 빈 결과). 카테고리별로 따로 재기 전까지 끈다.

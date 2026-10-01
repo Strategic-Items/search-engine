@@ -1,4 +1,4 @@
-"""법령·고시 카테고리(`search-law`) 검색을 청크 단위로 점검한다.
+"""카테고리 검색(법령·고시 `search-law`, 행정·업무 `search-admin`)을 청크 단위로 점검한다. CATEGORY=admin으로 행정·업무를 고른다.
 
 질문마다 필수 구절(`phrases`)을 적어 두면, 그 구절을 모두 담은 청크가 정답 청크가 된다.
 정답을 ID로 직접 적지 않아서 라벨이 실제 본문에 근거하는지 만들 때 검사되고, 청크를 다시 자르면 라벨도 따라온다.
@@ -18,7 +18,7 @@ from search_engine.client import create_client
 from search_engine.config import get_settings
 from search_engine.search.query import retrieve
 
-QUERIES = Path("data/queries_law_v1.jsonl")
+from category import CATEGORY, QUERIES, alias as category_alias, source as category_source  # noqa: E402
 _KEEP = re.compile(r"[^0-9A-Za-z가-힣]")
 K = 5
 MODES = ["bm25", "vector", "hybrid"]
@@ -49,26 +49,29 @@ SPECS = [
 ]
 
 
+from admin_specs import SPECS as ADMIN_SPECS  # noqa: E402
+
+
 def norm(text: str) -> str:
     return _KEEP.sub("", text).lower()
 
 
 def read_chunks() -> list[dict]:
-    path = Path(get_settings().search_law_source)
+    path = Path(category_source(get_settings()))
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 def build() -> None:
     chunks = read_chunks()
     rows, bad = [], []
-    for number, (kind, query, phrases) in enumerate(SPECS, 1):
+    for number, (kind, query, phrases) in enumerate(SPECS if CATEGORY == "law" else ADMIN_SPECS, 1):
         needles = [norm(p) for p in phrases]
         gold = [c for c in chunks if all(n in norm(c["body"] + " " + " ".join(c["heading_path"])) for n in needles)]
         if not gold:
             bad.append(query)
             continue
         rows.append({
-            "qid": f"law-v1-{number:03d}", "category": kind, "query": query, "phrases": phrases,
+            "qid": f"{CATEGORY}-v1-{number:03d}", "category": kind, "query": query, "phrases": phrases,
             "gold": sorted({c["parent_id"] for c in gold}),
             "evidence_groups": [[c["id"] for c in gold]],
         })
@@ -85,7 +88,7 @@ def evaluate() -> None:
     client = create_client(settings)
     # 청크 필터는 LLM 호출이라 검색 자체의 품질과 섞인다. 끄고 검색기만 잰다.
     settings.search_chunk_filter = False
-    alias = settings.search_law_alias
+    alias = category_alias(settings)
     print(f"{len(rows)}문항, 상위 {K}문서 창 기준, alias={alias}\n")
     print("| 모드 | 근거 Recall(청크) | 근거 Precision(청크, 하한) | 그 창에서 가능한 최대 | 문서 Precision | 문서 Hit | 첫 근거 청크 순위 평균 | 평균 청크 수 |\n|---|---|---|---|---|---|---|---|")
     misses = {}

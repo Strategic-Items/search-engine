@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     search_law_prefix: str = "search-law-v"
     # 파서가 만든 카테고리 청크를 복사하지 않고 직접 읽는다.
     search_law_source: str = "/Users/jeongbin/git/unstructured-doc-parser_ver2/data/category_chunks/01_법령고시/docs.jsonl"
+    # 행정·업무 카테고리도 같은 방식이다. 문서 속성 채움률이 낮아 법령용 속성 필드를 그대로 쓰되 값이 없으면 만들지 않는다.
+    search_admin_alias: str = "search-admin"
+    search_admin_prefix: str = "search-admin-v"
+    search_admin_source: str = "/Users/jeongbin/git/unstructured-doc-parser_ver2/data/category_chunks/02_행정업무/docs.jsonl"
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
     search_document_datasets: Literal["core,docs", "docs", "core"] = "core,docs"

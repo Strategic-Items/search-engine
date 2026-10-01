@@ -7,9 +7,14 @@
  - SPLADE·SPLADE+dense: 오프라인 점수에 같은 방식으로 건다(SPLADE+dense는 청크 RRF 점수).
 
     .venv/bin/python scripts/law/sweep_chunk_cutoff.py SPLADE_JSON [방식 이름 일부 ...]
+
+CUTOFF_UNIT=doc이면 문서 단위로 자른다: 문서 점수는 그 문서의 최고 청크 점수이고, 1위 문서 점수의 비율에 못 미치는 문서를
+뺀다(상위 5문서 안). 이때 청크 열은 문서 최고 청크 하나씩이라 청크 지표는 뜻이 없고 문서 Precision·Recall·Hit·평균 문서 수만 읽는다.
+청크 우선 hybrid는 문서 단위가 없어 빠진다.
 """
 
 import json
+import os
 import sys
 from datetime import date
 from pathlib import Path
@@ -19,9 +24,10 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.query import build_query, build_vector_query, retrieve
 
-QUERIES = Path("data/queries_law_v1.jsonl")
+from category import QUERIES, alias as category_alias, source as category_source  # noqa: E402
 K, PER_DOC, RRF_K = 5, 6, 60
-RATIOS = [0.0, 0.5, 0.7, 0.8, 0.9, 0.95, 0.99]
+UNIT = os.environ.get("CUTOFF_UNIT", "chunk")
+RATIOS = [0.0, 0.5, 0.7, 0.8, 0.9, 0.95, 0.99] + ([1.0] if UNIT == "doc" else [])
 
 
 def windows_by_score(chunks: list[tuple[str, float]], parent: dict[str, str], ratio: float) -> list[str]:
@@ -43,6 +49,21 @@ def windows_by_score(chunks: list[tuple[str, float]], parent: dict[str, str], ra
     return out
 
 
+def docs_by_score(chunks: list[tuple[str, float]], parent: dict[str, str], ratio: float) -> list[str]:
+    """점수 내림차순 청크 -> 문서 최고 점수가 1위 문서의 ratio 이상인 상위 K문서의 최고 청크 id들."""
+    best: dict[str, tuple[str, float]] = {}
+    for cid, score in chunks:
+        best.setdefault(parent[cid], (cid, score))
+    ranked = list(best.values())[:K]
+    if not ranked:
+        return []
+    return [cid for cid, score in ranked if score >= ranked[0][1] * ratio]
+
+
+if UNIT == "doc":
+    windows_by_score = docs_by_score
+
+
 def rrf_chunks(lists: list[list[tuple[str, float]]]) -> list[tuple[str, float]]:
     fused: dict[str, float] = {}
     for ranked in lists:
@@ -57,7 +78,7 @@ def main(splade_file: str, only: list[str]) -> None:
     settings = get_settings()
     settings.search_chunk_filter = False
     client, embedder = create_client(settings), OllamaEmbedder(settings)
-    alias = settings.search_law_alias
+    alias = category_alias(settings)
     parent = {cid: cid.split("#")[0] for cid in sp["docs"]}
     inverted: dict[str, list] = {}
     for cid, vec in sp["docs"].items():
@@ -114,14 +135,16 @@ def main(splade_file: str, only: list[str]) -> None:
             rrf_chunks([bm25_chunks(r), splade(r), dense_chunks(r)]), parent, x),
         "BM25+dense (청크 RRF)": lambda r, x: windows_by_score(rrf_chunks([bm25_chunks(r), dense_chunks(r)]), parent, x),
     }
+    if UNIT == "doc":
+        systems.pop("hybrid (BM25+dense, 청크 우선)")
     systems = {k: v for k, v in systems.items() if not only or any(o in k for o in only)}
     print(f"{len(rows)}문항, 상위 {K}문서·문서당 최대 {PER_DOC}청크, 청크 컷오프 비율별\n")
     for name, run in systems.items():
-        print(f"### {name}\n| 비율 | 근거 Recall(청크) | Precision(하한) | 그 창의 최대 | 평균 청크 수 | 문서 Precision | 문서 Recall | 평균 문서 수 |\n|---|---|---|---|---|---|---|---|")
+        print(f"### {name}\n| 비율 | 근거 Recall(청크) | Precision(하한) | 그 창의 최대 | 평균 청크 수 | 문서 Precision | 문서 Recall | 평균 문서 수 | 1위 문서 정답 |\n|---|---|---|---|---|---|---|---|---|")
         for ratio in RATIOS:
             found = 0
             precision, ceiling, sizes = [], [], []
-            doc_precision, doc_recall, doc_counts = [], [], []
+            doc_precision, doc_recall, doc_counts, top1 = [], [], [], 0
             for row in rows:
                 window = run(row, ratio)
                 gold = set(row["evidence_groups"][0])
@@ -132,10 +155,11 @@ def main(splade_file: str, only: list[str]) -> None:
                 ceiling.append(min(len(gold), n) / n if n else 0.0)
                 docs = {c.split("#")[0] for c in window}
                 doc_counts.append(len(docs))
+                top1 += bool(window) and window[0].split("#")[0] in row["gold"]
                 doc_precision.append(len(docs & set(row["gold"])) / len(docs) if docs else 0.0)
                 doc_recall.append(len(docs & set(row["gold"])) / len(row["gold"]))
             m = len(rows)
-            print(f"| {ratio} | {found}/{m} = {found / m:.3f} | {sum(precision) / m:.3f} | {sum(ceiling) / m:.3f} | {sum(sizes) / m:.1f} | {sum(doc_precision) / m:.3f} | {sum(doc_recall) / m:.3f} | {sum(doc_counts) / m:.1f} |")
+            print(f"| {ratio} | {found}/{m} = {found / m:.3f} | {sum(precision) / m:.3f} | {sum(ceiling) / m:.3f} | {sum(sizes) / m:.1f} | {sum(doc_precision) / m:.3f} | {sum(doc_recall) / m:.3f} | {sum(doc_counts) / m:.1f} | {top1}/{m} |")
         print()
 
 
