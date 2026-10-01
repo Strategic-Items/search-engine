@@ -13,7 +13,7 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.query import build_query, build_vector_query
 
-QUERIES = Path("data/queries_law_v1.jsonl")
+from category import QUERIES, alias as category_alias, source as category_source  # noqa: E402
 RRF_K = 60
 
 
@@ -25,10 +25,10 @@ def main(splade_file: str) -> None:
     sp = json.loads(Path(splade_file).read_text())
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
     chunks = {json.loads(line)["id"]: json.loads(line) for line in
-              Path(get_settings().search_law_source).read_text(encoding="utf-8").splitlines() if line.strip()}
+              Path(category_source(get_settings())).read_text(encoding="utf-8").splitlines() if line.strip()}
     settings = get_settings()
     client, embedder = create_client(settings), OllamaEmbedder(settings)
-    alias = settings.search_law_alias
+    alias = category_alias(settings)
     inverted: dict[str, list] = {}
     for cid, vec in sp["docs"].items():
         for token, weight in vec.items():

@@ -37,6 +37,8 @@ DATASETS = {
              "mapping": "document", "embed": True},
     "law": {"alias": "search_law_alias", "prefix": "search_law_prefix",
             "mapping": "law", "embed": True},
+    "admin": {"alias": "search_admin_alias", "prefix": "search_admin_prefix",
+              "mapping": "law", "embed": True},
     "callcenter": {"alias": "search_callcenter_alias", "prefix": "search_callcenter_prefix",
                    "mapping": "callcenter", "embed": True},
     "hsk": {"alias": "search_hsk_alias", "prefix": "search_hsk_prefix",
@@ -229,15 +231,15 @@ def rebuild(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Rebuild the OpenSearch read index from JSONL")
     parser.add_argument("jsonl", type=Path, nargs="?",
-                        help="law 데이터셋은 생략하면 SEARCH_LAW_SOURCE를 읽는다")
+                        help="law·admin 데이터셋은 생략하면 SEARCH_LAW_SOURCE·SEARCH_ADMIN_SOURCE를 읽는다")
     parser.add_argument("--dataset", choices=tuple(DATASETS), default="core")
     parser.add_argument("--manifest", type=Path,
                         help="Manifest from search-prepare; verifies count and SHA-256")
     args = parser.parse_args()
     if args.jsonl is None:
-        if args.dataset != "law":
+        if args.dataset not in ("law", "admin"):
             parser.error("jsonl is required")
-        args.jsonl = Path(get_settings().search_law_source)
+        args.jsonl = Path(getattr(get_settings(), f"search_{args.dataset}_source"))
     logging.basicConfig(level=logging.INFO)
     expected = {}
     if args.manifest:
