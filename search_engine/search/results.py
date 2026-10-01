@@ -30,6 +30,12 @@ class SearchHit(BaseModel):
     date_basis: str = "unknown"
     # 동일한 형태의 더 새로운 판이 존재할 때 설정되며, 호출자가 이를 알 수 있도록 한다.
     superseded_by: str | None = None
+    # 법령·고시 카테고리에서만 채워진다: 조문·별표 경로와 부모 문서의 속성.
+    heading_path: list[str] = []
+    doc_type: str = ""
+    doc_status: str = ""
+    doc_number: str = ""
+    issuer: str = ""
     # 이와 동일한 부모의 다른 조각들 중 일치한 것들, 최고 순위부터.
     # 질문에 대한 답변은 종종 다른 조각에 있으며, 그 조각은 이전에 버려졌었다.
     # 질문에 대한 답변은 종종 다른 조각에 있으며, 그 조각은 이전에 버려졌었다.

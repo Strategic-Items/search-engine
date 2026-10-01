@@ -5,6 +5,7 @@ from transformers import AutoModelForMaskedLM, AutoTokenizer
 ap = argparse.ArgumentParser()
 ap.add_argument("--corpus"); ap.add_argument("--queries"); ap.add_argument("--out")
 ap.add_argument("--device", default="mps"); ap.add_argument("--top", type=int, default=256)
+ap.add_argument("--doc-max-length", type=int, default=256)
 a = ap.parse_args()
 M = "telepix/PIXIE-Splade-v1.5"
 tok = AutoTokenizer.from_pretrained(M, trust_remote_code=True)
@@ -24,7 +25,7 @@ if a.corpus:
     rows = [json.loads(l) for l in open(a.corpus)]
     t = time.time(); vecs = []
     for s in range(0, len(rows), 8):
-        vecs += enc([f"제목: {r['title']}\n\n본문: {r['body']}" for r in rows[s:s+8]], 256)
+        vecs += enc([f"제목: {r['title']}\n\n본문: {r['body']}" for r in rows[s:s+8]], a.doc_max_length)
     res["docs"] = {r["id"]: v for r, v in zip(rows, vecs)}; res["doc_seconds"] = time.time() - t
 if a.queries:
     qs = [json.loads(l) for l in open(a.queries)]; qs = [q for q in qs if q.get("gold")]

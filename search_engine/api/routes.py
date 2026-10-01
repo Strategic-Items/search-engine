@@ -159,6 +159,59 @@ def search_compare(request: SearchRequest) -> ModeComparison:
         raise HTTPException(status_code=503, detail="search unavailable") from exc
 
 
+# 사용자가 카테고리를 고르고 검색한다. 카테고리마다 인덱스를 따로 두므로 새 카테고리는 여기에 한 줄을 더하면 된다.
+# (id, 표시 이름, 별칭을 읽을 설정 이름)
+CATEGORIES = {
+    "law": ("법령·고시", "search_law_alias"),
+}
+# .env의 절대 하한과 답변 가능성 판정은 docs v2 코퍼스에서 맞춘 값이다. BM25는 코퍼스 통계와 함께 움직여서
+# 청크 673개짜리 법령 인덱스에서는 모든 결과를 자른다(21문항 중 10문항이 빈 결과). 카테고리별로 따로 재기 전까지 끈다.
+CATEGORY_SCORE_FLOOR = 0.0
+
+
+def _category_alias(category: str) -> str:
+    if category not in CATEGORIES:
+        raise HTTPException(status_code=404, detail="unknown category")
+    return getattr(get_settings(), CATEGORIES[category][1])
+
+
+@app.get("/v1/categories")
+def list_categories() -> dict:
+    client = create_client()
+    categories = []
+    for category_id, (label, alias_setting) in CATEGORIES.items():
+        try:
+            count = client.count(index=getattr(get_settings(), alias_setting), ignore_unavailable=True)["count"]
+        except OpenSearchException:
+            count = None
+        categories.append({"id": category_id, "label": label, "chunks": count})
+    return {"categories": categories}
+
+
+@app.post("/v1/categories/{category}/search/compare")
+def search_category_compare(category: str, request: SearchRequest) -> ModeComparison:
+    alias = _category_alias(category)
+    try:
+        return search_modes(
+            create_client(), alias, request.query, date.today(), 5,
+            score_floor=CATEGORY_SCORE_FLOOR, answerability=False,
+        )
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="category search unavailable") from exc
+
+
+@app.get("/v1/categories/{category}/documents/{parent_id:path}")
+def read_category_document(category: str, parent_id: str) -> Document:
+    alias = _category_alias(category)
+    try:
+        document = fetch_document(create_client(), alias, parent_id)
+    except OpenSearchException as exc:
+        raise HTTPException(status_code=503, detail="category search unavailable") from exc
+    if document is None:
+        raise HTTPException(status_code=404, detail="document not found")
+    return document
+
+
 @app.post("/v1/callcenter/search")
 def search_callcenter(request: SearchRequest) -> SearchResults:
     """과거 상담 사례만 검색; 공식 RAG에 혼합하지 않는다."""

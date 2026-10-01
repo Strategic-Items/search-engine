@@ -15,8 +15,9 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder, embedding_text
 from search_engine.indexing.callcenter import CallCenterChunk
 from search_engine.indexing.documents import SearchDocument
+from search_engine.indexing.law import law_embedding_title, law_source
 from search_engine.indexing.identity import FIRST_CHUNK_INDEX, chunk_index, download_copies, period_hint
-from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body
+from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body, law_index_body
 from search_engine.indexing.synonyms import load_synonyms
 
 # 임베딩은 문서마다 한 번씩 부르면 호출 비용이 대부분을 차지한다. ollama는
@@ -34,6 +35,8 @@ DATASETS = {
              "mapping": "document", "embed": True},
     "docs": {"alias": "search_docs_alias", "prefix": "search_docs_prefix",
              "mapping": "document", "embed": True},
+    "law": {"alias": "search_law_alias", "prefix": "search_law_prefix",
+            "mapping": "law", "embed": True},
     "callcenter": {"alias": "search_callcenter_alias", "prefix": "search_callcenter_prefix",
                    "mapping": "callcenter", "embed": True},
     "hsk": {"alias": "search_hsk_alias", "prefix": "search_hsk_prefix",
@@ -72,7 +75,7 @@ def parent_identity(path: Path) -> tuple[set[str], dict[str, str]]:
     return download_copies(list(parents.values())), {k: v for k, v in hints.items() if v}
 
 
-def _sources(path: Path, callcenter: bool, dropped: list | None):
+def _sources(path: Path, callcenter: bool, dropped: list | None, law: bool = False):
     """줄마다 검증해 색인할 _source를 내놓는다. 임베딩은 아직 붙이지 않는다."""
     seen = set()
     copies, hints = (set(), {}) if callcenter else parent_identity(path)
@@ -90,6 +93,8 @@ def _sources(path: Path, callcenter: bool, dropped: list | None):
                 raise ValueError(f"duplicate document ID at line {line_no}: {doc_id}")
             seen.add(doc_id)
             source = doc.index_source()
+            if law:
+                source = law_source(source)
             if source["parent_id"] in copies:
                 if dropped is not None:
                     dropped.append(doc_id)
@@ -102,21 +107,23 @@ def _sources(path: Path, callcenter: bool, dropped: list | None):
 
 def document_actions(
     path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
-    dropped: list | None = None, batch: int = EMBED_BATCH,
+    dropped: list | None = None, batch: int = EMBED_BATCH, law: bool = False,
 ):
     """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
     pending: list[tuple[str, dict]] = []
 
     def flush():
         if embedder is not None:
-            vectors = embedder.embed([embedding_text(s["title"], s["body"]) for _, s in pending])
+            vectors = embedder.embed([
+                embedding_text(law_embedding_title(s) if law else s["title"], s["body"])
+                for _, s in pending])
             for (_, source), vector in zip(pending, vectors):
                 source["embedding"] = vector
         for doc_id, source in pending:
             yield {"_op_type": "index", "_index": index_name, "_id": doc_id, "_source": source}
         pending.clear()
 
-    for doc_id, source in _sources(path, callcenter, dropped):
+    for doc_id, source in _sources(path, callcenter, dropped, law):
         pending.append((doc_id, source))
         if len(pending) >= batch:
             yield from flush()
@@ -158,9 +165,10 @@ def rebuild(
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     alias = getattr(settings, spec["alias"])
     prefix = getattr(settings, spec["prefix"])
-    is_document = spec["mapping"] in ("document", "callcenter")
+    is_document = spec["mapping"] in ("document", "callcenter", "law")
     mapping = deepcopy(
         index_body(settings.search_embedding_dimensions) if spec["mapping"] == "document"
+        else law_index_body(settings.search_embedding_dimensions) if spec["mapping"] == "law"
         else callcenter_index_body(settings.search_embedding_dimensions)
         if spec["mapping"] == "callcenter" else HSK_INDEX_BODY
     )
@@ -176,7 +184,8 @@ def rebuild(
         embedder = OllamaEmbedder(settings) if spec["embed"] else None
         for ok, item in streaming_bulk(
             client, document_actions(path, index_name, embedder,
-                                     callcenter=spec["mapping"] == "callcenter", dropped=dropped),
+                                     callcenter=spec["mapping"] == "callcenter", dropped=dropped,
+                                     law=spec["mapping"] == "law"),
             chunk_size=500, max_retries=3, raise_on_error=True,
         ):
             if not ok:
@@ -219,11 +228,16 @@ def rebuild(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Rebuild the OpenSearch read index from JSONL")
-    parser.add_argument("jsonl", type=Path)
+    parser.add_argument("jsonl", type=Path, nargs="?",
+                        help="law 데이터셋은 생략하면 SEARCH_LAW_SOURCE를 읽는다")
     parser.add_argument("--dataset", choices=tuple(DATASETS), default="core")
     parser.add_argument("--manifest", type=Path,
                         help="Manifest from search-prepare; verifies count and SHA-256")
     args = parser.parse_args()
+    if args.jsonl is None:
+        if args.dataset != "law":
+            parser.error("jsonl is required")
+        args.jsonl = Path(get_settings().search_law_source)
     logging.basicConfig(level=logging.INFO)
     expected = {}
     if args.manifest:

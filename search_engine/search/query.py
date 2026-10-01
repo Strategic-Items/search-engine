@@ -765,7 +765,7 @@ class _SharedEmbedder:
 
 def search_modes(
     client: OpenSearch, alias: str, query: str, as_of: date, k: int = 5,
-    modes: Iterable[str] = MODES,
+    modes: Iterable[str] = MODES, **options,
 ) -> ModeComparison:
     """모든 모드를 통해 한 번의 쿼리를 실행하라, 그래서 모드들을 나란히 읽을 수 있게 하라.
 
@@ -776,7 +776,7 @@ def search_modes(
     for mode in modes:
         start = perf_counter()
         try:
-            hits = retrieve(client, alias, query, as_of, k, embedder, mode=mode)
+            hits = retrieve(client, alias, query, as_of, k, embedder, mode=mode, **options)
             error = ""
         except (OpenSearchException, httpx.HTTPError) as exc:
             hits, error = [], f"{type(exc).__name__}: {exc}"
