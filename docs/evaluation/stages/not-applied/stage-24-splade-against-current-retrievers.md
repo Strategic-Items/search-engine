@@ -8,7 +8,7 @@
 여기서 비교하는 것은 SPLADE 모델끼리가 아니다. 지금까지 실제 후보였던 다음 검색기다.
 
 - `bm25`: 22단계의 `most_fields`, `title^3`
-- `vector`: 운영 dense 모델 `dragonkue/BGE-m3-ko`
+- `dense`: 운영 dense 모델 `dragonkue/BGE-m3-ko`
 - `sparse`: 17단계의 BGE-M3 sparse head
 - `hybrid`: 현재 기본값인 BM25+dense RRF
 - `SPLADE`: `telepix/PIXIE-Splade-v1.5`
@@ -47,7 +47,7 @@ docker run --rm -e HF_HUB_OFFLINE=1 \
 |---|---:|---:|---:|---:|---:|---:|---:|
 | BM25 | 22단계 운영값 | 90.4% | 91.9% | 86.9% | 1.39 | 0.9099 | 18.6ms |
 | BGE-M3 sparse | ratio 0.95 | 90.4% | 91.9% | 89.4% | 1.25 | 0.9093 | 152.9ms |
-| dense vector | 22단계 운영값 | 94.1% | 94.1% | **92.3%** | 1.27 | 0.9407 | 75.4ms |
+| dense | 22단계 운영값 | 94.1% | 94.1% | **92.3%** | 1.27 | 0.9407 | 75.4ms |
 | **SPLADE** | **ratio 0.97** | **95.6%** | 96.3% | 91.0% | 1.24 | 0.9593 | 미측정 |
 | **hybrid** | **22단계 운영값** | 94.1% | **99.3%** | 90.9% | 1.46 | **0.9630** | 95.4ms |
 
