@@ -16,7 +16,7 @@
 
 ## 조건
 
-- 현재 코드에서 `build_query`의 `multi_match.fields`만 바꿔 재검색했다. 벡터 검색과 나머지 설정은 그대로다.
+- 현재 코드에서 `build_query`의 `multi_match.fields`만 바꿔 재검색했다. dense 검색과 나머지 설정은 그대로다.
 - 판정자·재작성·리랭커·LLM 청크 필터는 끄고 k=5, 기준일 2026-09-29에 재검색했다.
 - 청크 컷오프는 걸지 않았다. 정답표는 28단계 판정을 반영한 것이다.
 - 개발 셋: docs 135(`core,docs` 검색), holdout 69(`core` 검색). 식별자 질문은 두 셋의 `identifier_*` 범주다.

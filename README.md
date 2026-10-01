@@ -13,7 +13,7 @@ git 미추적 상태여서 수정 이력이 남지 않았기 때문이다. 출�
 ## 현재 제공하는 기능
 
 - `POST /v1/search`: 제목·본문의 한국어 형태소/BM25 검색과 Ollama 임베딩 HNSW
-  벡터 검색을 RRF로 결합한 하이브리드 검색,
+  dense 검색을 RRF로 결합한 하이브리드 검색,
   시행일 필터, 청크의 부모 문서 중복 제거. 결과 한 건은 문서 하나이며, 그 문서에서
   함께 검색된 다른 청크를 `passages`에 실어 보낸다. 검색어에 10자리 HSK 코드가
   있으면 HSK 연계표도 함께 정확 조회한다.
@@ -140,7 +140,7 @@ cd /Users/jeongbin/git/searchEngine
   --manifest /Users/jeongbin/git/unstructured-doc-parser/data/chunks/manifest.json
 ```
 
-그 다음 최신 파서 산출물로 세 검색 방식(BM25·벡터·하이브리드)을 비교한다. 이 명령은
+그 다음 최신 파서 산출물로 세 검색 방식(BM25·dense·하이브리드)을 비교한다. 이 명령은
 읽기 전용이며, 라이브 색인과 JSONL의 청크 ID·본문·벡터가 모두 일치하는지도 먼저
 검증한다. `--out` 파일에는 질문별 순위, Recall, 근거 청크 지표, 지연시간 원자료가 남는다.
 
@@ -219,21 +219,21 @@ cd /Users/jeongbin/git/searchEngine
 - Recall@k: 질문마다 `찾은 정답 부모 수 / 전체 정답 부모 수`를 계산한 평균(macro).
   모든 질문의 정답 수를 합산한 micro Recall도 JSON에 기록한다.
 - MRR@k: 첫 정답의 순위 역수 평균. k 안에 정답이 없으면 0.
-- p50/p95: 워밍업 후 단일 프로세스 검색 경로 시간. 벡터/하이브리드는 매번 Ollama
+- p50/p95: 워밍업 후 단일 프로세스 검색 경로 시간. dense/하이브리드는 매번 Ollama
   질의 임베딩을 포함하고 HTTP·LLM 답변 생성은 제외한다. 동시 부하/QPS 측정은 아니다.
 
 기본 API는 상위 5건이며 비교 도구는 상위 10건 요청으로 후보 수를 정하므로 두 결과가
 다를 수 있다. API 평가의 `--prepared`는 입력 파일 기준 색인 범위 확인이고, 비교 도구는
 실제 클러스터의 청크 ID·부모 ID·content hash·벡터 매핑까지 검증한다.
 
-임베딩 모델 선택이 벡터 검색 품질을 좌우한다. 같은 코퍼스·질문에서 `nomic-embed-text`는
-문서 Recall@5 22.1%, `bge-m3`는 100.0%였다. 벡터가 약해 보이면 방식보다 모델을 먼저 의심한다.
+임베딩 모델 선택이 dense 검색 품질을 좌우한다. 같은 코퍼스·질문에서 `nomic-embed-text`는
+문서 Recall@5 22.1%, `bge-m3`는 100.0%였다. dense가 약해 보이면 방식보다 모델을 먼저 의심한다.
 
 표현이 바뀐 질문("업체의 약속 문서" ↔ "수출자 서약서")은 `SEARCH_QUERY_REWRITE=true`로
 켜면 `OLLAMA_CHAT_MODEL`이 다시 쓴 검색어를 **원본과 함께** 검색해 순위를 가중 RRF로
 합친다. 원본을 대체하지 않으며, 재작성 가중치는 `SEARCH_QUERY_REWRITE_WEIGHT`(기본 0.5)다.
 기본값이 꺼짐인 이유는, `bge-m3`로 바꾼 뒤로는 **최선 구성에서 얻는 것이 없기 때문이다.**
-벡터 단독은 어휘 경로를 쓰지 않아 영향이 없고, 하이브리드는 Recall@5가 92.5%로 같은 채
+dense 단독은 어휘 경로를 쓰지 않아 영향이 없고, 하이브리드는 Recall@5가 92.5%로 같은 채
 p50만 95.3ms → 687.4ms가 된다. 재작성이 보정하던 표현 변경 질문을 임베딩 모델이 이미
 해결했다. BM25 단독에서는 여전히 Hit@1을 72.5% → 77.5%로 올리므로 어휘 검색만 쓰는
 경우에 한해 켤 만하다. 모델을 부르지 못하면 원본 질의만으로 검색해 결과를 좁힐 뿐
@@ -246,7 +246,7 @@ p50만 95.3ms → 687.4ms가 된다. 재작성이 보정하던 표현 변경 질
 
 단계별 실측은 [검색 성능 이력](docs/evaluation/performance_history.md)에, 재현 절차는 [공통 측정 조건과 재현](docs/evaluation/measurement_conditions.md)에 있다.
 [docs 검색 평가 v1](docs/archive/docs_evaluation_v1.md)과 [v2](docs/archive/docs_evaluation_v2.md)는
-`nomic-embed-text` 시점의 기록이며, 두 문서의 벡터·하이브리드 결론은 6단계에서 뒤집혔다.
+`nomic-embed-text` 시점의 기록이며, 두 문서의 dense·하이브리드 결론은 6단계에서 뒤집혔다.
 코퍼스·평가셋 변경에 따른 단계별 수치와 해석: [검색 성능 이력](docs/evaluation/performance_history.md).
 
 ### 자연어 평가셋 v2 (검토 후 실험)

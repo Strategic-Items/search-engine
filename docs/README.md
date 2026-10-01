@@ -50,5 +50,5 @@
 
 | 문서 | 왜 보관하는가 |
 |---|---|
-| [docs_evaluation_v1](archive/docs_evaluation_v1.md) | 임베딩이 `nomic-embed-text`(768차원)이던 시점. 벡터·하이브리드 수치 무효 |
-| [docs_evaluation_v2](archive/docs_evaluation_v2.md) | 같은 이유로 벡터 약세 진단이 6단계에서 뒤집힘 |
+| [docs_evaluation_v1](archive/docs_evaluation_v1.md) | 임베딩이 `nomic-embed-text`(768차원)이던 시점. dense·하이브리드 수치 무효 |
+| [docs_evaluation_v2](archive/docs_evaluation_v2.md) | 같은 이유로 dense 약세 진단이 6단계에서 뒤집힘 |

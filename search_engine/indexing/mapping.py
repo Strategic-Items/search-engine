@@ -93,6 +93,24 @@ def index_body(embedding_dimensions: int) -> dict:
     }
 
 
+def law_index_body(embedding_dimensions: int) -> dict:
+    """법령·고시 카테고리: 문서 매핑에 문서 속성과 조문 경로를 얹는다."""
+    body = index_body(embedding_dimensions)
+    body["mappings"]["properties"].update({
+        # 조문·별표 경로. 짧은 표 행 청크가 어느 별표의 것인지 BM25가 알 수 있게 한다.
+        "heading_path": {"type": "text", "analyzer": "korean_nori"},
+        "doc_type": {"type": "keyword"},
+        "doc_status": {"type": "keyword"},
+        "doc_number_norm": {"type": "keyword"},
+        "doc_number": {"type": "keyword", "index": False},
+        "issuer": {"type": "keyword"},
+        "revision_date": {"type": "date"},
+        "legal_structure": {"type": "keyword"},
+        "chunk_index": {"type": "integer"},
+    })
+    return body
+
+
 def callcenter_index_body(embedding_dimensions: int) -> dict:
     """과거 상담에 대한 검색 매핑, 공식 출처와 분리된 상태로."""
     body = index_body(embedding_dimensions)

@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     # 지식/RAG 별칭에서 제외되며, 전용 엔드포인트를 통해만 쿼리된다.
     search_callcenter_alias: str = "search-callcenter"
     search_callcenter_prefix: str = "search-callcenter-v"
+    # 법령·고시 카테고리 전용 인덱스. 사용자가 카테고리를 고르고 검색하므로 통합 검색 별칭과 섞지 않는다.
+    search_law_alias: str = "search-law"
+    search_law_prefix: str = "search-law-v"
+    # 파서가 만든 카테고리 청크를 복사하지 않고 직접 읽는다.
+    search_law_source: str = "/Users/jeongbin/git/unstructured-doc-parser_ver2/data/category_chunks/01_법령고시/docs.jsonl"
     search_hsk_alias: str = "search-hsk"
     search_hsk_prefix: str = "search-hsk-v"
     search_document_datasets: Literal["core,docs", "docs", "core"] = "core,docs"
