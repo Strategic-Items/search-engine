@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0}
+</style>
+<title>검색엔진 과정 설명 발표</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 레이아웃: 슬라이드 한 장이 한 섹션. 위 고정 막대의 번호로 이동하고 ←/→ 키도 쓴다. 검색 경로마다 색을 고정한다(키워드=파랑, 벡터=초록, LLM 판정=주황). */
+:root {
+  --bg: #F1F3F6;
+  --paper: #FFFFFF;
+  --ink: #12202F;
+  --muted: #55657A;
+  --line: #D8DEE7;
+  --tint: #F4F6FA;
+  --kw: #1F4FBF;
+  --kw-soft: #E4ECFC;
+  --vec: #12795A;
+  --vec-soft: #DDF1E9;
+  --llm: #B8500C;
+  --llm-soft: #FBEBDC;
+  --bad: #A8262E;
+  --mark: #FFE79A;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C121B; --paper: #141C29; --ink: #E4E9F1; --muted: #9AA8BC; --line: #27344A; --tint: #1A2434;
+    --kw: #7FA6F7; --kw-soft: #1B2B4C; --vec: #5CCBA0; --vec-soft: #15302A; --llm: #F2A468; --llm-soft: #3A2515;
+    --bad: #F08A90; --mark: #5A4A12; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C121B; --paper: #141C29; --ink: #E4E9F1; --muted: #9AA8BC; --line: #27344A; --tint: #1A2434;
+  --kw: #7FA6F7; --kw-soft: #1B2B4C; --vec: #5CCBA0; --vec-soft: #15302A; --llm: #F2A468; --llm-soft: #3A2515;
+  --bad: #F08A90; --mark: #5A4A12; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.7; padding-inline: 16px; padding-block: 0 48px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+h1 { font-size: clamp(32px, 5.5vw, 52px); font-weight: 700; letter-spacing: -0.015em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 18px; font-weight: 600; }
+p { margin: 0; }
+code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
+a { color: var(--kw); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--kw); outline-offset: 2px; }
+
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); margin-inline: -16px; padding: 8px 16px; display: flex; gap: 6px; overflow-x: auto; }
+.nav a { font-family: var(--font-mono); font-size: 13px; text-decoration: none; color: var(--muted); border: 1px solid var(--line); background: var(--paper); border-radius: 4px; padding: 3px 9px; white-space: nowrap; }
+.nav a.on { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+
+.slide { max-width: 1120px; margin: 28px auto 0; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 4vw, 48px); display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 56px; }
+.slide > * { min-width: 0; }
+.kicker { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em; color: var(--muted); }
+.lead { font-size: 19px; color: var(--muted); max-width: 70ch; }
+.note { font-size: 15px; color: var(--muted); max-width: 78ch; }
+.say { border-top: 1px dashed var(--line); padding-top: 12px; font-size: 15px; color: var(--muted); }
+.say b { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; color: var(--ink); margin-right: 8px; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; max-width: 78ch; }
+.callout { border-left: 3px solid var(--llm); background: var(--tint); padding: 12px 18px; max-width: 78ch; }
+.callout.kw { border-left-color: var(--kw); }
+.callout.vec { border-left-color: var(--vec); }
+.callout.bad { border-left-color: var(--bad); }
+
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 15px; line-height: 1.5; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--tint); font-weight: 600; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+td.n, th.n { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 12px; border: 1px solid currentColor; border-radius: 4px; padding: 0 7px; white-space: nowrap; }
+.t-kw { color: var(--kw); } .t-vec { color: var(--vec); } .t-llm { color: var(--llm); } .t-bad { color: var(--bad); } .t-mut { color: var(--muted); }
+
+.diagram { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--tint); }
+.diagram svg { display: block; min-width: 940px; width: 100%; height: auto; }
+.s-box { fill: var(--paper); stroke: var(--line); stroke-width: 1.5; }
+.s-kw { fill: var(--kw-soft); stroke: var(--kw); stroke-width: 1.5; }
+.s-vec { fill: var(--vec-soft); stroke: var(--vec); stroke-width: 1.5; }
+.s-llm { fill: var(--llm-soft); stroke: var(--llm); stroke-width: 2; stroke-dasharray: 6 4; }
+.s-t { font: 600 13px var(--font-body); fill: var(--ink); }
+.s-s { font: 400 11px var(--font-body); fill: var(--muted); }
+.s-lane { font: 500 12px var(--font-mono); fill: var(--muted); letter-spacing: 0.06em; }
+.s-arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1.5px solid; }
+
+dl.terms { display: grid; grid-template-columns: minmax(0, 13em) minmax(0, 1fr); gap: 14px 24px; margin: 0; }
+dl.terms dt { font-weight: 600; }
+dl.terms dd { margin: 0; max-width: 70ch; }
+@media (max-width: 640px) { dl.terms { grid-template-columns: minmax(0, 1fr); gap: 2px; } dl.terms dd { margin-bottom: 12px; } }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button { font: inherit; font-size: 15px; font-weight: 600; padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--muted); cursor: pointer; text-align: left; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--ink); background: var(--tint); }
+.q { font-size: 20px; font-weight: 600; max-width: 60ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font-family: var(--font-mono); font-size: 14px; border: 1px solid var(--kw); background: var(--kw-soft); color: var(--kw); border-radius: 4px; padding: 1px 8px; }
+.chips span.weak { border-style: dashed; color: var(--muted); background: transparent; border-color: var(--line); }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 860px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.col h3 { margin-bottom: 8px; }
+.col.kw h3 { color: var(--kw); } .col.vec h3 { color: var(--vec); }
+.hit { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; font-size: 14px; line-height: 1.55; }
+.hit.gold { border-color: var(--ink); background: var(--tint); }
+.hit .top { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.hit .rk { font-family: var(--font-mono); font-weight: 500; }
+.hit .sc { font-family: var(--font-mono); color: var(--muted); }
+.hit .ti { flex: 1 1 12em; min-width: 0; overflow-wrap: anywhere; }
+.hit .sn { color: var(--muted); margin-top: 4px; overflow-wrap: anywhere; }
+mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1px; }
+.final { border: 2px solid var(--ink); border-radius: 6px; padding: 12px 16px; }
+.pipe { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; list-style: none; margin: 0; padding: 0; }
+.pipe li { flex: 1 1 150px; background: var(--tint); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; font-size: 15px; line-height: 1.5; }
+.pipe li b { display: block; }
+.rrf { font-family: var(--font-mono); font-size: 16px; background: var(--tint); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; overflow-x: auto; }
+
+.stgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:860px){.stgrid{grid-template-columns:minmax(0,1fr)}}
+.stg{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--paper)}
+.stg-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stg-h .no{font-family:var(--font-mono);font-weight:600;background:var(--ink);color:var(--paper);border-radius:4px;padding:1px 8px;font-size:14px}
+.stg-h b{font-size:17px;flex:1 1 9em}
+.stg dl{margin:0;display:grid;grid-template-columns:3.8em minmax(0,1fr);gap:8px 12px;font-size:14.5px;line-height:1.55}
+.stg dt{font-family:var(--font-mono);font-size:12px;color:var(--muted);padding-top:3px}
+.stg dd{margin:0;min-width:0}
+.dl{display:inline-block;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:4px;padding:1px 8px;margin:0 6px 6px 0;background:var(--tint);color:var(--muted)}
+.dl i{font-style:normal;font-family:var(--font-body);color:var(--ink);margin-right:6px}
+.dl.good{border-color:var(--vec);color:var(--vec);background:var(--vec-soft)}
+.dl.bad{border-color:var(--bad);color:var(--bad)}
+.dl.good::before{content:"▲ "} .dl.bad::before{content:"▼ "}
+
+.s-bad{fill:var(--bad);fill-opacity:.12;stroke:var(--bad);stroke-width:1.5}
+.s-ok{fill:var(--vec-soft);stroke:var(--vec);stroke-width:2}
+.s-n{font:600 15px var(--font-body);fill:var(--ink)}
+.s-v{font:600 13px var(--font-mono);fill:var(--ink)}
+.s-r{font:600 13px var(--font-body);fill:var(--bad)}
+.b-kw{fill:var(--kw)} .b-vec{fill:var(--vec)} .b-bad{fill:var(--bad)} .b-mut{fill:var(--muted)} .b-llm{fill:var(--llm)}
+.s-cut{stroke:var(--bad);stroke-width:1.8;stroke-dasharray:6 4;fill:none}
+.s-grid{stroke:var(--line);stroke-width:1;fill:none}
+.s-plot{stroke:var(--muted);stroke-width:1.5;fill:none}
+
+.ex{border-left:3px solid var(--line);background:var(--tint);padding:6px 10px;margin:0 0 6px;font-size:14px;line-height:1.55;border-radius:0 4px 4px 0}
+.ex.up{border-left-color:var(--vec)} .ex.dn{border-left-color:var(--bad)}
+.ex > b:first-child{font-family:var(--font-mono);font-size:12px;margin-right:6px}
+.ex.up > b:first-child{color:var(--vec)} .ex.dn > b:first-child{color:var(--bad)}
+.ex em{font-style:normal;color:var(--muted)}
+</style>
+
+</head>
+<body>
+<nav class="nav" id="nav" aria-label="장표 이동"></nav>
+
+<!-- 1 -->
+<section class="slide" id="s1" data-title="표지">
+<div class="kicker">검색엔진 · 2026-09-30 회의 피드백 반영판</div>
+<h1>이 문서는 왜 나왔는가<br>검색 과정 설명</h1>
+<p class="lead">지난 발표는 결과 수치를 앞에 두었습니다. 이번에는 질문이 들어와서 답변 근거가 될 청크가 되기까지의 경로를 먼저 보여 드립니다. 수치는 그 경로가 맞는지 확인하는 뒷받침으로 뒤에 둡니다.</p>
+<div class="callout"><b>이번 과제의 범위.</b> 2차년도는 비정형 문서(RAG용)를 특정 도메인에서 검색할 수 있는지 사전 점검하는 단계입니다. 통합 검색과 최종 요약 레이어는 3차년도 사업입니다.</div>
+<div class="say"><b>말하기</b>피드백 두 가지를 순서에 반영했습니다. 구조도를 먼저, 그다음 한 질문의 이동 경로.</div>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s2" data-title="구조도">
+<div class="kicker">전체 구조</div>
+<h2>RAG 전체 구조: 판정 LLM은 검색 뒤, 답변 앞에 있다</h2>
+<div class="diagram" role="img" aria-label="RAG 구조도. 위쪽은 색인: 원본 문서, 파서 청킹, 청크 임베딩과 nori 색인, OpenSearch. 아래쪽은 질의: 질문, 키워드 검색과 벡터 검색, 트림과 RRF 융합, 컷오프와 청크 선택, 판정 LLM(기본 꺼짐), 답변 LLM.">
+<svg viewBox="0 0 1100 400" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs>
+<text class="s-lane" x="16" y="24">① 색인 (문서가 바뀔 때)</text>
+<rect class="s-box" x="16" y="38" width="220" height="64" rx="4"/><text class="s-t" x="126" y="64" text-anchor="middle">원본 문서</text><text class="s-s" x="126" y="82" text-anchor="middle">HWP · HWPX · PDF</text>
+<rect class="s-box" x="296" y="38" width="240" height="64" rx="4"/><text class="s-t" x="416" y="64" text-anchor="middle">파서와 청킹</text><text class="s-s" x="416" y="82" text-anchor="middle">청크 JSONL (평균 약 555자)</text>
+<rect class="s-box" x="596" y="38" width="240" height="64" rx="4"/><text class="s-t" x="716" y="64" text-anchor="middle">청크마다 두 가지로 저장</text><text class="s-s" x="716" y="82" text-anchor="middle">nori 토큰 + 임베딩 벡터</text>
+<rect class="s-box" x="896" y="38" width="188" height="64" rx="4"/><text class="s-t" x="990" y="64" text-anchor="middle">OpenSearch</text><text class="s-s" x="990" y="82" text-anchor="middle">청크가 검색 단위</text>
+<line class="s-arrow" x1="236" y1="70" x2="290" y2="70" marker-end="url(#ar)"/><line class="s-arrow" x1="536" y1="70" x2="590" y2="70" marker-end="url(#ar)"/><line class="s-arrow" x1="836" y1="70" x2="890" y2="70" marker-end="url(#ar)"/>
+<line class="s-arrow" x1="990" y1="102" x2="990" y2="176" stroke-dasharray="4 4"/>
+
+<text class="s-lane" x="16" y="182">② 질의 (질문마다)</text>
+<rect class="s-box" x="16" y="210" width="90" height="120" rx="4"/><text class="s-t" x="61" y="266" text-anchor="middle">질문</text>
+<rect class="s-kw" x="136" y="210" width="210" height="54" rx="4"/><text class="s-t" x="241" y="234" text-anchor="middle">키워드(BM25)</text><text class="s-s" x="241" y="252" text-anchor="middle">nori 토큰 → 청크 25개</text>
+<rect class="s-vec" x="136" y="276" width="210" height="54" rx="4"/><text class="s-t" x="241" y="300" text-anchor="middle">벡터(dense)</text><text class="s-s" x="241" y="318" text-anchor="middle">질문 임베딩 → 청크 50개</text>
+<rect class="s-box" x="386" y="210" width="160" height="120" rx="4"/><text class="s-t" x="466" y="256" text-anchor="middle">목록 다듬기</text><text class="s-s" x="466" y="276" text-anchor="middle">1위 점수 대비 트림</text><text class="s-s" x="466" y="294" text-anchor="middle">RRF로 문서 순위 융합</text>
+<rect class="s-box" x="586" y="210" width="170" height="120" rx="4"/><text class="s-t" x="671" y="256" text-anchor="middle">컷오프와 청크 선택</text><text class="s-s" x="671" y="276" text-anchor="middle">뒤처진 문서 제외</text><text class="s-s" x="671" y="294" text-anchor="middle">문서당 청크 6개</text>
+<rect class="s-llm" x="796" y="210" width="140" height="120" rx="4"/><text class="s-t" x="866" y="250" text-anchor="middle">판정 LLM</text><text class="s-s" x="866" y="270" text-anchor="middle">근거가 실제로</text><text class="s-s" x="866" y="286" text-anchor="middle">적혀 있나? 예/아니오</text><text class="s-s" x="866" y="308" text-anchor="middle">기본 꺼짐</text>
+<rect class="s-box" x="976" y="210" width="108" height="120" rx="4"/><text class="s-t" x="1030" y="262" text-anchor="middle">답변 LLM</text><text class="s-s" x="1030" y="282" text-anchor="middle">근거 청크로</text><text class="s-s" x="1030" y="298" text-anchor="middle">생성</text>
+<line class="s-arrow" x1="106" y1="237" x2="130" y2="237" marker-end="url(#ar)"/><line class="s-arrow" x1="106" y1="303" x2="130" y2="303" marker-end="url(#ar)"/>
+<line class="s-arrow" x1="346" y1="237" x2="380" y2="260" marker-end="url(#ar)"/><line class="s-arrow" x1="346" y1="303" x2="380" y2="280" marker-end="url(#ar)"/>
+<line class="s-arrow" x1="546" y1="270" x2="580" y2="270" marker-end="url(#ar)"/><line class="s-arrow" x1="756" y1="270" x2="790" y2="270" marker-end="url(#ar)"/><line class="s-arrow" x1="936" y1="270" x2="970" y2="270" marker-end="url(#ar)"/>
+<path class="s-arrow" d="M866,210 L866,356 L1030,356 L1030,336" stroke-dasharray="4 4" marker-end="url(#ar)"/><text class="s-s" x="948" y="374" text-anchor="middle">거절이면 "근거 없음"으로 종료</text>
+<path class="s-arrow" d="M990,176 L990,190 L241,190 L241,204" stroke-dasharray="4 4" marker-end="url(#ar)"/>
+</svg></div>
+<div class="legend"><span><i style="background:var(--kw-soft);border-color:var(--kw)"></i>키워드 검색</span><span><i style="background:var(--vec-soft);border-color:var(--vec)"></i>벡터 검색</span><span><i style="background:var(--llm-soft);border-color:var(--llm);border-style:dashed"></i>LLM 판정(선택 단계)</span></div>
+<div class="callout"><b>리랭킹이 아닙니다.</b> 판정 LLM은 최종 청크를 읽고 "질문이 요구하는 사실이 적혀 있는가"를 예/아니오로만 답합니다. 순서를 바꾸지 않고, 아니오이면 결과를 비웁니다. 이 저장소에서 판정 LLM, 청크 관련도 필터, 청크 재정렬은 모두 기본값 꺼짐입니다.</div>
+<div class="say"><b>말하기</b>이 그림에서 주황 점선 상자만 LLM이고 나머지는 모델 없이 계산입니다.</div>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s3" data-title="용어">
+<div class="kicker">용어 정리</div>
+<h2>벡터 검색이라고 부르던 것을 dense와 sparse로 나눈다</h2>
+<dl class="terms">
+<dt>dense 벡터 (벡터 검색)</dt><dd>문장 하나를 고정 길이 실수 벡터로 바꾼 것입니다. 모든 칸에 값이 있고, 의미가 비슷하면 가깝습니다(코사인). 우리 벡터 검색이 이것입니다(BGE-m3-ko).</dd>
+<dt>키워드 검색 (BM25)</dt><dd>벡터가 아닙니다. nori로 쪼갠 단어가 청크에 있는지 역색인에서 찾고, 단어 빈도와 희소성으로 점수를 냅니다. 벡터를 만들거나 저장하지 않습니다. 어휘 기반이라 정보검색에서 sparse 방식이라 부르기도 하지만, 우리 구현에서는 벡터 검색이 아닙니다.</dd>
+<dt>sparse 벡터</dt><dd>어휘 사전의 칸마다 가중치를 두고 대부분이 0인 벡터입니다. 우리 시스템에는 아직 없고, SPLADE가 이것을 만들어 저장합니다.</dd>
+<dt>learned sparse (SPLADE)</dt><dd>신경망이 어휘 가중치와 확장 어휘를 학습하는 sparse입니다. SPLADE는 sparse 벡터를 신경망이 만들어 저장하므로 도메인으로 재학습할 수 있습니다. BM25는 학습 대상이 아닙니다. 그래서 "SPLADE+벡터"가 아니라 "SPLADE(learned sparse) + dense"라고 부릅니다.</dd>
+<dt>하이브리드</dt><dd>현재 운영은 <b>BM25(키워드) + dense(벡터)</b>이고, 점수가 아니라 순위로 합칩니다(RRF, 5장).</dd>
+</dl>
+<div class="say"><b>말하기</b>앞으로 "키워드 검색"은 BM25(벡터 아님), "벡터 검색"은 dense로만 부릅니다.</div>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s5" data-title="처리 방식">
+<div class="kicker">처리 방식</div>
+<h2>키워드는 잘게 쪼개서, 벡터는 청크째로</h2>
+<div class="cols">
+<div class="col kw"><h3>키워드 검색 (BM25)</h3>
+<ul class="plain">
+<li>질문을 nori 형태소 분석기로 쪼갭니다. 조사와 어미는 버립니다(예: "쓰지 않는" → "쓸").</li>
+<li>도메인 동의어 사전을 검색 시점에 적용합니다.</li>
+<li>제목과 본문 두 필드의 점수를 더합니다(제목 가중치 1).</li>
+<li>점수는 색인 전체 통계로 계산합니다(두 색인을 함께 읽을 때 dfs 사용).</li>
+<li>단위는 <b>청크</b>이고, 후보는 25개입니다.</li>
+</ul></div>
+<div class="col vec"><h3>벡터 검색 (dense)</h3>
+<ul class="plain">
+<li><b>문서를 통으로 넣지 않습니다.</b> 파서가 자른 청크마다 제목과 본문을 합쳐 임베딩해 저장합니다.</li>
+<li>질문은 통째로 한 번 임베딩합니다.</li>
+<li>청크 벡터와의 코사인 유사도가 높은 청크 50개를 가져옵니다.</li>
+<li>어휘가 달라도 뜻이 같으면 잡힙니다. 번호와 코드는 약합니다.</li>
+</ul></div>
+</div>
+<div class="say"><b>말하기</b>두 검색기 모두 청크가 단위이고, 문서 순위는 그 뒤에 부모 문서로 묶어서 만듭니다.</div>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="s6" data-title="합치는 방식">
+<div class="kicker">하이브리드 합산</div>
+<h2>두 목록은 점수가 아니라 순위로 합친다</h2>
+<ol class="pipe">
+<li><b>1. 트림</b>각 목록을 자기 1위 점수 대비 비율로 자릅니다. BM25 90%, 벡터 97%.</li>
+<li><b>2. RRF</b>부모 문서마다 목록별 순위를 1/(60+순위)로 바꿔 더합니다.</li>
+<li><b>3. 컷오프</b>합친 점수가 뒤처진 문서를 버립니다. 각 목록의 1위 문서는 살립니다.</li>
+<li><b>4. 문서 안 청크 순서</b>첫 청크는 벡터가 고른 것, 나머지는 두 목록의 청크 순위를 RRF로 합쳐 채웁니다.</li>
+</ol>
+<div class="rrf">점수(문서) = Σ  1 / (60 + 순위<sub>목록</sub>)  &nbsp;&nbsp; 목록 = BM25, 벡터<br>동점이면 벡터 순위가 앞선 문서가 위</div>
+<div class="callout vec"><b>"최종 순위를 벡터 기준으로 다시 정렬했다"의 정확한 뜻.</b> 문서 순위는 RRF가 정합니다. 벡터 순위가 관여하는 곳은 둘입니다. 동점일 때의 순서, 그리고 문서 안에서 어떤 청크를 첫 번째로 보여 줄지. 리랭킹은 하지 않았습니다.</div>
+<div class="callout kw"><b>사례 A로 보는 계산.</b> 정답 문서의 BM25 점수 15.5는 1위 17.7의 88%라서 트림(90%)에서 BM25 목록을 빠져나갔습니다. 남은 것은 벡터 1위 한 표이고, 최종 점수 0.0164는 1/(60+1)과 같습니다.</div>
+<div class="say"><b>말하기</b>점수를 그대로 더하지 않는 이유는 BM25 점수와 코사인 값의 단위가 다르기 때문입니다.</div>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s7" data-title="판정 LLM">
+<div class="kicker">무응답 질문</div>
+<h2>판정 LLM은 답이 없는 질문을 거르지만 정상 질문도 일부 막는다</h2>
+<div class="tbl"><table>
+<thead><tr><th>측정</th><th class="n">판정 LLM 없음</th><th class="n">있음</th><th>읽는 법</th></tr></thead>
+<tbody>
+<tr><td>도메인 안, 근거 없는 질문 26개 거절</td><td class="n">0</td><td class="n">22</td><td>도메인 안 무응답은 판정 LLM 없이는 거의 못 걸렀습니다</td></tr>
+<tr><td>정상 질문 135개 중 오거절</td><td class="n">0</td><td class="n">7</td><td>거절이 늘면 정상 답도 함께 빠집니다</td></tr>
+<tr><td>문서 Recall</td><td class="n">97.65%</td><td class="n">91.05%</td><td>−6.60p</td></tr>
+<tr><td>문서 Precision</td><td class="n">90.90%</td><td class="n">92.74%</td><td>+1.84p</td></tr>
+</tbody></table></div>
+<ul class="plain">
+<li><b>도메인 밖 질문 12개를 모두 거절한 것은 근거가 약합니다.</b> 우리가 만든 질문이라 당연한 결과입니다. 이 수치는 발표에서 빼거나 한계와 함께 적습니다.</li>
+<li>판정 LLM은 프롬프트 우회와 비슷해 보이는 질문에 뚫릴 수 있습니다. <b>"100% 거절"이라고 말하지 않습니다.</b></li>
+<li>두 실행은 저장된 서로 다른 실행이라 차이 전체를 판정 LLM만의 효과로 볼 수 없습니다. 실행 간 변동은 1~2건입니다.</li>
+<li>비용: 검색 경로에 chat 모델이 들어가 약 2초가 더 듭니다.</li>
+</ul>
+<div class="say"><b>말하기</b>안전장치이지 보증이 아닙니다. 그래서 기본값은 꺼짐입니다.</div>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="s8" data-title="수치">
+<div class="kicker">참고 수치 · 과정 검증용</div>
+<h2>수치는 골든셋으로 과정이 맞는지 확인하는 용도다</h2>
+<p class="note">데이터가 바뀌면 수치는 전부 바뀝니다. 아래는 지금 고정된 공고문 질문 135개의 저장 실험 결과입니다.</p>
+<div class="tbl"><table>
+<thead><tr><th>무엇을 바꿨나</th><th>결과</th></tr></thead>
+<tbody>
+<tr><td>컷오프 없음</td><td>문서 Precision 20%대</td></tr>
+<tr><td>95% 청크 컷오프 적용</td><td>문서 Recall 90%, Precision 94%, 1위 적중 95.6%, 135문제 중 6개 오답</td></tr>
+<tr><td>yesTrade 3,293건을 공고문 52건에 섞기</td><td>청크 Recall 0.963 → 0.856, 청크 MRR 0.818 → 0.717 (원인은 색인마다 따로 계산되는 통계, 전역 통계와 제목 가중치 하향으로 문서 Precision +15.9p)</td></tr>
+<tr><td>새 질문 69개(holdout)에서 다시 재기</td><td>청크 Recall 0.963 → 0.906(같은 규모), 0.891(전체 규모). 튜닝값이 공고문 한 세트에 맞춰져 있었습니다</td></tr>
+</tbody></table></div>
+<div class="callout bad"><b>읽을 때 주의.</b> 근거 청크 Precision은 라벨된 청크만 세는 하한값이라 판단에 쓰지 않습니다. 근거 Recall이 높다는 것은 필요한 청크가 프롬프트에 들어갔다는 뜻이지 생성된 답이 정확하다는 측정이 아닙니다.</div>
+<div class="say"><b>말하기</b>이 표는 방향 확인용입니다. 고객에게는 4~5장의 경로 설명이 근거가 됩니다.</div>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s9" data-title="실험 결과">
+<div class="kicker">시도한 것</div>
+<h2>실험은 했지만 적용하지 않은 것과 그 이유</h2>
+<div class="tbl"><table>
+<thead><tr><th>시도</th><th>판정</th><th>이유</th></tr></thead>
+<tbody>
+<tr><td>질문별 라우팅(법령·조문·숫자·날짜면 키워드, 아니면 벡터)</td><td><span class="tag t-mut">미적용</span></td><td>하이브리드보다 나빠졌습니다</td></tr>
+<tr><td>SPLADE 단독 / 하이브리드 결합</td><td><span class="tag t-mut">미적용</span></td><td>단독은 BM25보다 미세하게 좋고 느렸습니다. 결합은 지표에 따라 오르내려 뚜렷한 이득이 없었습니다</td></tr>
+<tr><td>제목 가중치 3배, 동의어 치환</td><td><span class="tag t-mut">제거</span></td><td>공고문 단독에서는 도움이 됐지만 yesTrade와 합치면 악화됐습니다</td></tr>
+<tr><td>문서를 먼저 고르지 않고 청크를 먼저 고르기</td><td><span class="tag t-mut">기본 꺼짐</span></td><td>청크 Recall 0.892 대 0.895로 같고 문서 Precision이 0.719 → 0.503</td></tr>
+<tr><td>LLM으로 후보 재정렬 / 선택</td><td><span class="tag t-mut">기각</span></td><td>개발 셋은 오르고 동결 셋에서 내려갔습니다</td></tr>
+<tr><td>문서 안 청크 순서(첫 청크는 벡터, 나머지는 RRF)</td><td><span class="tag t-vec">적용</span></td><td>청크 Recall 0.875 → 0.892 (204문항), 문서 지표 그대로</td></tr>
+</tbody></table></div>
+<div class="say"><b>말하기</b>SPLADE는 도메인 재학습이 가능하다는 점이 남은 가능성입니다(10장).</div>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="s10" data-title="데이터 출처">
+<div class="kicker">데이터 출처</div>
+<h2>청크는 누가 어떻게 만들었나</h2>
+<div class="tbl"><table>
+<thead><tr><th></th><th>공고문 세트</th><th>yesTrade 세트</th></tr></thead>
+<tbody>
+<tr><td>원천</td><td>산업통상부 공고문 원본 52건(HWP, HWPX, PDF)</td><td>yesTrade 공개 게시판, FAQ, 법령. 3,293건, 2026-09-23 수집</td></tr>
+<tr><td>청킹</td><td>파서(unstructured-doc-parser)가 청크 JSONL을 만들고 이 저장소는 그 파일을 읽어 색인합니다</td><td>같은 파서로 새로 파싱</td></tr>
+<tr><td>이 저장소가 하는 일</td><td colspan="2">임베딩 생성, nori 색인, 검색. 청킹 기준은 바꾸지 않았습니다</td></tr>
+<tr><td>청크 수</td><td class="n">1,198</td><td class="n">84,413</td></tr>
+<tr><td>용도</td><td>질문 135개를 만들고 튜닝한 코퍼스. 재생성하지 않고 고정</td><td>튜닝에 쓰지 않은 데이터로 과적합을 재는 시험지</td></tr>
+</tbody></table></div>
+<div class="callout"><b>이 문서의 이름.</b> 공고문 세트는 코드명 docs, yesTrade 세트는 코드명 core이고 문서에 따라 holdout이라고도 부릅니다. 두 세트를 한 색인에서 함께 검색하는 것은 통합 검색(core+docs)입니다. 코드, 색인 별칭, 결과 파일 이름은 바꾸지 않았습니다.</div>
+<div class="callout"><b>확인할 것.</b> 파서 담당이 넘긴 JSON을 가공 없이 썼는지, 직접 한 처리가 있는지를 확정해 이 장에 적어야 합니다. 청킹 기준이 바뀌면 결과가 바뀝니다.</div>
+<div class="say"><b>말하기</b>청킹은 다른 팀원의 산출물이라는 점과, 메타데이터는 함께 협의한다는 점을 먼저 밝힙니다.</div>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="s11" data-title="재설계">
+<div class="kicker">다음 설계 · 설계안</div>
+<h2>비정형 문서 검색에 맞게 앞단을 다시 설계한다</h2>
+<p class="lead">yesTrade는 FAQ, 법령, 공지를 한 통에 넣은 통합 검색 성격이라 이번 타겟(비정형 문서 검색)에 맞지 않습니다. 원천 DB가 더러워지면 컷오프와 판정 LLM 같은 안전장치도 무력해집니다.</p>
+<ol class="pipe">
+<li><b>문서 카테고리 판별</b>비정형 문서 범주에 드는가</li>
+<li><b>정제</b>범주 밖과 중복을 제외</li>
+<li><b>청킹</b>파서 담당과 기준 협의</li>
+<li><b>메타데이터 부착</b>카탈로그·분류체계: 문서 유형(규정, 지침, 사업계획서 등)</li>
+<li><b>색인·필터 검색</b>유형 필터로 후보를 먼저 좁힘</li>
+</ol>
+<ul class="plain">
+<li>색인에는 시행일과 폐지일 필드가 이미 있고 검색 시점에 필터로 쓰입니다. 문서 유형 필드는 새로 추가해야 합니다.</li>
+<li><b>SPLADE 도메인 확장</b>: 전략물자 어휘로 확장·재학습할 수 있는지 확인합니다. CPU 학습은 약 16시간으로 예상(세부 조건 불명확)되어 증분 학습, 별도 학습 서버, 주 1회 학습을 검토합니다.</li>
+</ul>
+<div class="say"><b>말하기</b>이 장은 설계안입니다. 구현된 것이 아닙니다.</div>
+</section>
+
+<!-- 12 -->
+<section class="slide" id="s12" data-title="할 일">
+<div class="kicker">액션 아이템</div>
+<h2>할 일과 이 문서의 대응</h2>
+<div class="tbl"><table>
+<thead><tr><th>할 일</th><th>이 문서</th><th>상태</th></tr></thead>
+<tbody>
+<tr><td>RAG 전체 구조도, 판정 LLM 단계 표시</td><td>2장</td><td><span class="tag t-vec">초안</span></td></tr>
+<tr><td>토크나이징, 핵심어, 하이라이트, 벡터 처리 방식(통/분할), 하이브리드 합산 설명</td><td>4~5장</td><td><span class="tag t-vec">초안</span></td></tr>
+<tr><td>분석 MD 공유, 대표 사례(적중과 미적중) 시각화, dense/sparse 용어</td><td>3장 + 부록 링크</td><td><span class="tag t-llm">MD 공유는 아직, 대표 사례 시각화는 뺌</span></td></tr>
+<tr><td>비정형 문서 기준 프로세스 재설계, yesTrade 재검토</td><td>10장</td><td><span class="tag t-llm">설계안</span></td></tr>
+<tr><td>SPLADE 도메인 확장·증분 학습 가능성</td><td>10장</td><td><span class="tag t-bad">미착수</span></td></tr>
+<tr><td>청킹 데이터 출처와 가공 여부 확정, 메타데이터 협의</td><td>9장</td><td><span class="tag t-bad">확인 필요</span></td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 13 -->
+<section class="slide" id="s13" data-title="자료 위치">
+<div class="kicker">부록 · 흩어진 자료 정리</div>
+<h2>이 문서로 모은 자료의 원래 위치</h2>
+<div class="tbl"><table>
+<thead><tr><th>원래 위치</th><th>내용</th><th>이 문서에서</th></tr></thead>
+<tbody>
+<tr><td><a href="https://claude.ai/artifact/JWskfgBZbZBToy9Kz72GVZ">아티팩트 "core+docs 통합 검색 정리"</a> (2026-09-29)</td><td>26~34단계 측정, 처방과 기각</td><td>7·8장 수치와 표</td></tr>
+<tr><td><a href="https://claude.ai/artifact/UnxwQQ3Arit1rVy4PDeTah">같은 제목의 아티팩트</a> (2026-09-29)</td><td>위와 제목이 같음. 이번에 열지 않았고 어느 쪽이 최신인지 미확인</td><td>정리 대상</td></tr>
+<tr><td><a href="https://claude.ai/artifact/FQPuY23pdtWsY8HQtME8JJ">아티팩트 "전략물자 검색엔진 기록"</a> (2026-09-18)</td><td>이번에 열지 않음</td><td>필요하면 통합</td></tr>
+<tr><td><a href="https://claude.ai/artifact/55VRCPU5FRjdNZgjV4yRyG">아티팩트 "전략물자 상담 RAG 아키텍처"</a> (2026-09-04)</td><td>Spring AI + Redis 콜센터 상담 RAG 설계</td><td>검색엔진 발표와 별개라 제외</td></tr>
+<tr><td>~/git/frontend 정리 탭(컷오프, 판정 LLM A/B, SPLADE, 라우팅)</td><td>저장 실험 수치를 화면으로 보여 주는 앱</td><td>6·7·8장 수치</td></tr>
+<tr><td>searchEngine/docs/evaluation, design</td><td>단계별 기록, 현재 판단, RAG 설계</td><td>2·5장의 동작 설명(코드 기준)</td></tr>
+<tr><td>~/git/search-engine 의 Stage10 발표용 pptx v1~v22</td><td>옛 발표 자료. 이번에 열지 않음</td><td>반영 안 됨</td></tr>
+</tbody></table></div>
+<div class="say"><b>말하기</b>프론트 앱의 수치는 저장 실험 기준이라 실시간 검색 결과와 다를 수 있습니다.</div>
+</section>
+
+<!-- 14 -->
+<section class="slide" id="s14" data-title="13~34 한눈에">
+<div class="kicker">부록 · 13~34단계 변천</div>
+<h2>13단계부터 34단계까지: 무엇을 바꿨고 어떻게 됐나</h2>
+<p class="lead">13~22단계는 공고문 52문서·질문 135개 한 세트에서 튜닝했습니다. 23단계에서 채점 단위를 청크로 옮기고, 25~26단계에서 yesTrade를 섞어 과적합을 확인했습니다. 29단계부터는 새 점수를 올리기보다 왜 1위가 아닌지를 진단하는 쪽이었습니다. 자세한 수치와 예시는 다음 장부터 묶음별로 나옵니다.</p>
+<div class="tbl"><table>
+<thead><tr><th>단계</th><th>바꾼 것</th><th>핵심 결과</th><th>판정</th></tr></thead>
+<tbody>
+<tr><td><b>13</b></td><td>임베딩 bge-m3 → BGE-m3-ko</td><td>1위 적중 89.6 → 94.1%</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>14</b></td><td>점수 절대 바닥값</td><td>도메인 밖 12/12 걸러냄, 도메인 안 무응답은 못 거름</td><td><span class="tag t-vec">적용</span> 설정값</td></tr>
+<tr><td><b>15</b></td><td>변환본(GGUF) 채택, 바닥값 재측정</td><td>옛 바닥값을 두면 정답 13개가 사라짐</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>16</b></td><td>BM25 바닥값 해제</td><td>하이브리드 MRR 0.9259 → 0.9123, 되돌림</td><td><span class="tag t-bad">되돌림</span></td></tr>
+<tr><td><b>17</b></td><td>BM25 대신 sparse</td><td>어휘 짝으로는 나음, 융합하면 평균이 됨</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>18</b></td><td>LLM 판정(답이 적혀 있나)</td><td>무응답 22/26 포착, 정답 14.8% 오거절</td><td><span class="tag t-llm">선택 기능</span></td></tr>
+<tr><td><b>19</b></td><td>문서 안 청크를 리랭커로 재정렬</td><td>오거절 14.8 → 7.4%, 지연 +1.2초</td><td><span class="tag t-mut">기본 꺼짐</span></td></tr>
+<tr><td><b>20</b></td><td>문서 안 청크를 벡터 순서로</td><td>첫 청크 적중 41.9 → 65.2%, 오거절 14.8 → 5.2%, 지연 0</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>21</b></td><td>융합 전 트림, 목록 1위는 컷오프 면제</td><td>1위 적중 91.1 → 94.1%, Hit@5 94.1 → 97.8%</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>22</b></td><td>어휘 검색 best_fields → most_fields</td><td>Hit@5 99.3%, 반환분 정밀도 86.8 → 90.9%</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>23</b></td><td>채점 단위를 문서에서 청크로, 공고번호 필터, 사본 병합</td><td>무관 청크 124 → 71</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>24</b></td><td>SPLADE를 현재 검색기와 비교</td><td>SPLADE+dense 1위 94.8 → 97.8%, 판정 안 된 청크 19%</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>25</b></td><td>yesTrade를 섞을 때 손해의 원인 추적</td><td>원인은 색인마다 따로 계산되는 BM25 통계</td><td><span class="tag t-vec">적용</span> 전역 통계, 제목 1배</td></tr>
+<tr><td><b>26</b></td><td>새 코퍼스·질문 69개로 과적합 측정</td><td>1위 적중 0.948 → 0.841</td><td><span class="tag t-mut">측정</span></td></tr>
+<tr><td><b>27</b></td><td>질문별로 검색 방식 고르기</td><td>오라클 상한이 3문항분, 학습 라우터는 하이브리드를 못 넘음</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>28</b></td><td>제목 1배 + 전역 통계 판정</td><td>반환 문서 Precision 공고문 +15.9p, holdout +7.0p</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>29</b></td><td>새 검증 질문 36개를 검색 전에 동결</td><td>1위 34/36, 실패 둘은 연도·반기 혼동</td><td><span class="tag t-mut">측정</span></td></tr>
+<tr><td><b>30</b></td><td>질문의 연도·반기와 제목을 맞춰 보는 세 번째 순위 목록</td><td>날짜 진단 5위 내 10 → 14/14</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>31</b></td><td>전달 청크 Precision 올리기</td><td>LLM 필터 25.1 → 37.8%, 점수 컷오프는 최고 68.9%</td><td><span class="tag t-llm">선택 기능</span></td></tr>
+<tr><td><b>32</b></td><td>정답이 1위가 아닌 이유 진단</td><td>같은 주제인데 답 없는 문서가 1위를 뺏음. 처방 하나만 반영</td><td><span class="tag t-vec">일부 적용</span></td></tr>
+<tr><td><b>33</b></td><td>청크를 먼저 고르는 파이프라인</td><td>같은 재현율–정밀도 곡선 위. 문서 안 청크 순서만 반영</td><td><span class="tag t-vec">일부 적용</span></td></tr>
+<tr><td><b>34</b></td><td>효과 없는 어휘 검색 장치 제거</td><td>.standard 필드와 문서 종류 부스트 삭제</td><td><span class="tag t-vec">적용</span></td></tr>
+</tbody></table></div>
+<p class="note">다음 장의 카드는 <b>바꾼 것 → 결과 → 이유 → 한계</b> 순서입니다. 결과 칩의 ▲는 숫자 방향이 아니라 좋아졌다는 뜻, ▼는 나빠졌다는 뜻입니다.</p>
+<div class="say"><b>말하기</b>적용, 미적용, 되돌림이 섞여 있다는 점이 중요합니다. 뒤 장에서 각각 왜 그렇게 됐는지 실제 질문으로 보여 드립니다.</div>
+</section>
+
+<!-- 15 -->
+<section class="slide" id="s15" data-title="13~17 모델·바닥값">
+<div class="kicker">13~17단계 · 임베딩 모델과 점수 바닥값</div>
+<h2>모델을 바꾸자 오른 곳이 있고, 점수 하한선은 두 번 어긋났다</h2>
+<div class="diagram" id="fig15" role="img" aria-label="막대 그래프. BM25 최고점: 판정 신청 9.62, 전략물자 12.21, 수출허가 14.85, 사전거래보고서 서식 32.12, 도메인 밖 최고 14.36. 바닥값 14.75 아래의 짧은 질의는 0건이 된다."><svg viewBox="0 0 1100 310" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="24" text-anchor="start">16단계 · 질의별 BM25 최고점과 바닥값 14.75</text><text class="s-t" x="288" y="62" text-anchor="end">판정 신청 (정당한 짧은 질의)</text><rect class="b-kw" x="300" y="44" width="180" height="26" rx="3"/><text class="s-v" x="487.7011207970112" y="62" text-anchor="start">9.62</text><text class="s-t" x="288" y="102" text-anchor="end">전략물자 (정당한 짧은 질의)</text><rect class="b-kw" x="300" y="84" width="228" height="26" rx="3"/><text class="s-v" x="536.082191780822" y="102" text-anchor="start">12.21</text><text class="s-t" x="288" y="142" text-anchor="end">수출허가</text><rect class="b-kw" x="300" y="124" width="277" height="26" rx="3"/><text class="s-v" x="585.3972602739726" y="142" text-anchor="start">14.85</text><text class="s-t" x="288" y="182" text-anchor="end">사전거래보고서 서식 (긴 질의)</text><rect class="b-kw" x="300" y="164" width="600" height="26" rx="3"/><text class="s-v" x="908.0" y="182" text-anchor="start">32.12</text><text class="s-t" x="288" y="222" text-anchor="end">도메인 밖 질의 중 최고점</text><rect class="b-bad" x="300" y="204" width="268" height="26" rx="3"/><text class="s-v" x="576.2440846824409" y="222" text-anchor="start">14.36</text><line class="s-cut" x1="576" y1="36" x2="576" y2="250"/><text class="s-r" x="581.5292652552927" y="262" text-anchor="start">바닥값 14.75</text><text class="s-s" x="300" y="290" text-anchor="start">바닥값 아래는 0건. 정당한 짧은 질의 두 개가 도메인 밖 최고점보다도 낮아서, 바닥값은 관련성이 아니라 질의 길이를 재고 있었습니다.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">13</span><b>한국어 임베딩으로 교체</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>임베딩 모델을 다국어 bge-m3에서 한국어로 추가 학습한 BGE-m3-ko로 교체</dd><dt>결과</dt><dd><span class="dl good"><i>1위 적중</i>89.6 → 94.1%</span><span class="dl good"><i>반환분 정밀도</i>89.1 → 92.3%</span><span class="dl flat"><i>공고번호형</i>0.500 그대로</span></dd><dt>문서</dt><dd><div class="ex up"><b>들어옴</b>「연구장비를 잘 운영해서 기업을 도운 사람에게 주는 장관 표창…」 → <b>연구기반 통합관리 포상 추진계획(안)</b>이 1위. 전에는 <b>바이오헬스 우수 R&amp;D 유공 포상계획</b>이 1위. <em>"연구장비 운영"과 "연구기반 통합관리"의 뜻이 이어진 것으로 보임</em></div><div class="ex up"><b>들어옴</b>「상황허가 대상은 대외무역법 제19조의3하고 고시 몇 조…」 → <b>전략물자 등 수출통관에 관한 고시(신구조문대비표)</b>가 5위 밖에서 1위로. 전에는 대외무역법 시행령만 반복</div><div class="ex"><b>빠짐</b>정답이 빠진 질문 없음</div></dd><dt>이유</dt><dd>바꿔 묻기·상황 설명형이 +0.03 올랐습니다. "포화"라던 구간이 실은 다국어 모델의 천장이었습니다.</dd><dt>한계</dt><dd>제2026-598호와 제2026-584호는 못 가릅니다(임베딩에 일련번호가 안 실림).</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">14</span><b>점수 절대 바닥값</b><span class="tag t-vec">적용 · 설정값</span></div><dl><dt>바꾼 것</dt><dd>검색기마다 융합 전에 점수 하한을 두고, 하한 미만이면 결과 없음으로 처리</dd><dt>결과</dt><dd><span class="dl good"><i>도메인 밖 질문 걸러냄</i>12/12</span><span class="dl flat"><i>도메인 안 무응답</i>0~1/8</span></dd><dt>문서</dt><dd><div class="ex up"><b>걸러짐</b>「김치찌개 레시피 알려줘」, 「손흥민 득점」 → 반환 0건. <em>전략물자 문서 어느 것도 점수 하한을 못 넘음</em></div><div class="ex dn"><b>못 거름</b>「산업위기 지역 대출 이자 지원사업의 남은 예산이 얼마인지」 → 주제가 맞는 지원사업 공고 1건이 그대로 반환. <em>남은 예산은 문서에 없는데 점수는 정상 범위</em></div></dd><dt>이유</dt><dd>"김치찌개 레시피 알려줘", "손흥민 득점"은 0건이 됩니다.</dd><dt>한계</dt><dd>"산업위기 지역 대출 이자 지원사업의 남은 예산"처럼 주제는 맞고 답만 없는 질문은 통과합니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">15</span><b>변환본 채택 · 바닥값 재측정</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>서드파티 GGUF 변환본으로 서빙하고, 바닥값을 0.768 → 0.7063으로 다시 잼</dd><dt>결과</dt><dd><span class="dl good"><i>원본과 코사인</i>0.99998</span><span class="dl flat"><i>품질</i>소수점까지 동일</span></dd><dt>문서</dt><dd><div class="ex dn"><b>사라짐</b>옛 하한 0.768을 그대로 쓰면 정답이 있는 질문 13개의 결과가 0건. <em>새 모델의 정답 최저 코사인이 0.7135라서</em></div></dd><dt>이유</dt><dd>옛 바닥값 0.768을 그대로 두면 정답 135개 중 <b>13개가 조용히 사라졌습니다</b>.</dd><dt>한계</dt><dd>차원이 같아서 재색인을 빼먹어도 오류 없이 돌아갑니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">16</span><b>BM25 바닥값 해제 → 되돌림</b><span class="tag t-bad">되돌림</span></div><dl><dt>바꾼 것</dt><dd>BM25 바닥값을 걷고 벡터에 주제 판정을 맡겨 봄. 목록이 하나 남을 때의 컷오프 버그는 수정</dd><dt>결과</dt><dd><span class="dl bad"><i>하이브리드 MRR</i>0.9259 → 0.9123</span><span class="dl bad"><i>공고번호형</i>1.000 → 0.806</span></dd><dt>문서</dt><dd><div class="ex up"><b>들어옴</b>007 「러시아로 보내는 물건 중 별도 허가가 필요한 목록을 늘리겠다고…」 → <b>[행정예고] 공고문(전략물자수출입고시)</b>가 3위로 들어옴. 전에는 대외무역법 시행령만 반환</div><div class="ex dn"><b>밀림</b>121 「산업통상부공고 제2026-598호는 무엇에 관한 공고야?」 → 1위가 598호에서 <b>573호 국고보조금 통합관리지침</b>, 562호로 밀림. <em>약한 어휘 히트가 같이 들어와 "번호가 정확히 일치"라는 키워드의 확신이 희석됨</em></div><div class="ex dn"><b>빠짐</b>009 「계산하거나 신호를 감지하는 반도체를 어떤 종류로…」 → 정답 <b>제2026-598호 비메모리반도체 범위 고시</b>가 빠지고 해석 세부지침 하나만 남음</div></dd><dt>이유</dt><dd>"전략물자"의 BM25 12.21이 도메인 밖 최고 14.36보다 낮았습니다. 바닥값이 관련성이 아니라 <b>질의 길이</b>를 재고 있었습니다.</dd><dt>한계</dt><dd>되돌린 대가로 키워드 단독 모드는 "전략물자"에 0건을 냅니다(하이브리드 화면은 영향 없음).</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">17</span><b>BM25 대신 sparse</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>BM25 자리에 학습형 sparse(bge-m3)를 넣어 봄</dd><dt>결과</dt><dd><span class="dl good"><i>sparse 단독 1위</i>82.2 → 90.4%</span><span class="dl good"><i>하이브리드 MRR</i>0.9123 → 0.9259</span><span class="dl flat"><i>벡터 단독 0.9407</i>여전히 우세</span></dd><dt>문서</dt><dd><div class="ex up"><b>들어옴</b>065 「산업위기 지역 기업 이자 지원으로 이미 10억을 빌렸는데 다른 은행에서 5억 더…」 → <b>지역산업위기대응 이차보전 지원사업 2차 변경공고</b>가 1위. BM25는 <b>무역안보의 날 공모전 공고문</b>을 올림. <em>질문의 "이자 지원"과 문서의 "이차보전"처럼 어휘가 달라도 이어지는 경우로 보임</em></div><div class="ex dn"><b>빠짐</b>011 「영향 분석 자료를 붙이지 않은 이유를 확인할 문서」 → 정답 <b>규제영향분석서 미첨부 확인서</b>가 빠지고 <b>상무부 세미나 QnA</b>만 남음. <em>제목의 "규제영향분석서"를 풀어 쓴 질문에서 오히려 놓침</em></div></dd><dt>이유</dt><dd>공고번호형은 sparse 1.000, 벡터 0.500인데 <b>융합하면 0.708</b>입니다. 융합이 더 나은 쪽보다 나빴습니다.</dd><dt>한계</dt><dd>sparse 코드는 제거했습니다. 22단계에서 이 격차가 BM25 설정 결함이었음이 드러납니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 한국어 임베딩은 이득이 실재했고, 절대 점수 바닥값은 "우리 도메인 질문이 아니다"까지만 판정합니다. 16~17단계에서 "벡터 단독이 하이브리드를 이긴다"고 적었지만, 21단계에서 원인이 컷오프 버그였음이 확인되어 이 결론은 뒤집힙니다.</div>
+<div class="say"><b>말하기</b>모델을 바꾸면 그 위에 얹은 설정값도 다시 재야 한다는 것이 15단계의 요점입니다.</div>
+</section>
+
+<!-- 16 -->
+<section class="slide" id="s16" data-title="18~20 판정·청크순서">
+<div class="kicker">18~20단계 · 무응답 판정과 문서 안 청크 순서</div>
+<h2>거짓 거절의 절반은 판정자가 아니라 청크 순서 탓이었다</h2>
+<div class="diagram" id="fig16" role="img" aria-label="흐름도. 이전에는 RRF가 문서 안 청크 순서를 흩뜨려 정답 청크가 7위 밖으로 밀리고 판정자가 근거를 못 봐 거절한다. 20단계는 벡터 순서를 유지해 정답 청크가 앞 6개에 들고 판정을 통과한다."><svg viewBox="0 0 1100 310" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="22" text-anchor="start">이전 (RRF 융합 순서)</text><rect class="s-box" x="16" y="32" width="230" height="84" rx="4"/><text class="s-t" x="131.0" y="62.0" text-anchor="middle">문서 안 청크 순서</text><text class="s-s" x="131.0" y="80.0" text-anchor="middle">RRF가 순서를 흩뜨림</text><text class="s-s" x="131.0" y="96.0" text-anchor="middle">첫 청크 적중 41.9%</text><line class="s-arrow" x1="246" y1="74" x2="292" y2="74" marker-end="url(#ar16)"/><rect class="s-box" x="296" y="32" width="230" height="84" rx="4"/><text class="s-t" x="411.0" y="70.0" text-anchor="middle">정답 청크가 7~21위</text><text class="s-s" x="411.0" y="90.0" text-anchor="middle">후보 풀에는 100% 있음</text><line class="s-arrow" x1="526" y1="74" x2="572" y2="74" marker-end="url(#ar16)"/><rect class="s-box" x="576" y="32" width="230" height="84" rx="4"/><text class="s-t" x="691.0" y="70.0" text-anchor="middle">판정자·답변 모델은</text><text class="s-s" x="691.0" y="90.0" text-anchor="middle">문서당 앞 6개만 봄</text><line class="s-arrow" x1="806" y1="74" x2="852" y2="74" marker-end="url(#ar16)"/><rect class="s-bad" x="856" y="32" width="230" height="84" rx="4"/><text class="s-t" x="971.0" y="62.0" text-anchor="middle">근거가 안 보임</text><text class="s-s" x="971.0" y="80.0" text-anchor="middle">→ "답이 없다" 거절</text><text class="s-s" x="971.0" y="96.0" text-anchor="middle">오거절 14.8%</text><text class="s-lane" x="16" y="168" text-anchor="start">20단계 (벡터 순서를 유지)</text><rect class="s-vec" x="16" y="178" width="230" height="84" rx="4"/><text class="s-t" x="131.0" y="208.0" text-anchor="middle">문서 안 청크 순서</text><text class="s-s" x="131.0" y="226.0" text-anchor="middle">벡터 순서를 그대로</text><text class="s-s" x="131.0" y="242.0" text-anchor="middle">첫 청크 적중 65.2%</text><line class="s-arrow" x1="246" y1="220" x2="292" y2="220" marker-end="url(#ar16)"/><rect class="s-vec" x="296" y="178" width="230" height="84" rx="4"/><text class="s-t" x="411.0" y="216.0" text-anchor="middle">정답 청크가 앞쪽</text><text class="s-s" x="411.0" y="236.0" text-anchor="middle">6개 안 회수 85.2 → 90.3%</text><line class="s-arrow" x1="526" y1="220" x2="572" y2="220" marker-end="url(#ar16)"/><rect class="s-vec" x="576" y="178" width="230" height="84" rx="4"/><text class="s-t" x="691.0" y="216.0" text-anchor="middle">판정자·답변 모델은</text><text class="s-s" x="691.0" y="236.0" text-anchor="middle">앞 6개 안에 정답 청크</text><line class="s-arrow" x1="806" y1="220" x2="852" y2="220" marker-end="url(#ar16)"/><rect class="s-ok" x="856" y="178" width="230" height="84" rx="4"/><text class="s-t" x="971.0" y="208.0" text-anchor="middle">근거가 보임</text><text class="s-s" x="971.0" y="226.0" text-anchor="middle">→ 판정 통과</text><text class="s-s" x="971.0" y="242.0" text-anchor="middle">오거절 5.2%</text><text class="s-s" x="16" y="292" text-anchor="start">판정자 코드와 프롬프트는 그대로이고 청크 순서만 바꿨습니다. 지연은 0입니다. 19단계의 cross-encoder는 같은 효과에 1.2초가 더 들었습니다.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">18</span><b>LLM 답변가능성 판정</b><span class="tag t-llm">선택 기능 · 꺼짐</span></div><dl><dt>바꾼 것</dt><dd>최종 청크를 LLM이 읽고 "질문이 요구하는 사실이 적혀 있나"를 예/아니오로 판정</dd><dt>결과</dt><dd><span class="dl good"><i>무응답 포착</i>22/26</span><span class="dl bad"><i>정답 오거절</i>20/135 (14.8%)</span><span class="dl bad"><i>지연</i>+2초</span></dd><dt>문서</dt><dd><div class="ex up"><b>걸러짐</b>잔여 예산·접수자 수·합격자 실명처럼 <b>문서 주제는 맞지만 문서에 적혀 있지 않은 사실</b>을 묻는 질문 22/26이 반환 0건으로 바뀜</div><div class="ex dn"><b>사라짐</b>106 「한국산 제품의 성능이 미국산과 같다는 이유만으로 미국 수출허가를 신청해야 한다고 했어?」 → 정답 <b>상무부 세미나 QnA</b>가 빠짐. 발췌문에 "스펙이 동일하다는 이유로 수출허가를 신청할 필요는 없다"가 있는데 <em>전제를 부정하는 문장을 "요구된 사실 없음"으로 읽음</em></div></dd><dt>이유</dt><dd>리랭커는 0/8이었습니다. 무응답 문서도 실제로 관련이 있어서 관련도 점수로는 못 가릅니다.</dd><dt>한계</dt><dd>"2231호 통제가 지금도 유효한가"는 "10년간 유효"를 현재 상태로, 할당관세는 신청안(案)의 "8%"를 확정으로 읽었습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">19</span><b>문서 안 청크를 리랭커로 재정렬</b><span class="tag t-mut">기본 꺼짐</span></div><dl><dt>바꾼 것</dt><dd>문서 안 청크를 cross-encoder로 다시 정렬</dd><dt>결과</dt><dd><span class="dl good"><i>첫 청크 적중</i>45.1 → 73.6%</span><span class="dl good"><i>오거절</i>14.8 → 7.4%</span><span class="dl bad"><i>지연</i>+1.2초</span></dd><dt>문서</dt><dd><div class="ex up"><b>1위로</b>068 「휴직대체 근로자로 일하면 정규직·무기계약직으로 전환되는 자리야?」 → <b>(2026-587) 기간제 근로자(휴직대체) 채용 공고</b>는 이미 반환됐지만 "전환" 조항이 든 청크가 문서 안 21위. 재정렬로 1위. 069 「채용 서류를 퀵서비스로 보내도 접수돼?」의 "접수 방법" 청크도 20위 → 1위</div><div class="ex dn"><b>나빠짐</b>095 「2006년 기술이전 통제 자료…이메일이나 전화로만」 → <b>전략기술의 무형이전 통제</b>의 정답 청크가 10위 → 21위</div></dd><dt>이유</dt><dd>오거절 20건 중 10건은 정답 청크가 문서 안 <b>7위 밖</b>(068은 21위)이라 판정자가 근거를 못 본 것이었습니다.</dd><dt>한계</dt><dd>병합된 코드는 자른 뒤에 재정렬해서, 측정했던 이득이 하나도 나오지 않았습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">20</span><b>문서 안 청크를 벡터 순서로</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>문서 안 청크 순서를 RRF 대신 벡터 순서로, 첫 청크도 벡터가 고르게 함</dd><dt>결과</dt><dd><span class="dl good"><i>근거 첫 청크 적중</i>41.9 → 65.2%</span><span class="dl good"><i>오거절</i>14.8 → 5.2%</span><span class="dl good"><i>지연</i>0</span></dd><dt>문서</dt><dd><div class="ex up"><b>앞 6개로</b>정답 청크가 문서 안 7위 밖이던 질문(068·069 등)이 벡터 순서로 앞 6개에 들어옴. 지연 0</div><div class="ex dn"><b>밀려남</b>074 「청년인턴 최종 합격, 가족관계증명서와 기본증명서는 일반본으로…」 → <b>청년인턴 최종합격자 공고</b>의 제출서류 청크(#0003)를 BM25는 1위로 올렸는데 벡터 순서로 바뀌어 6개 창에서 빠짐 <em>(33단계에서 수정)</em></div></dd><dt>이유</dt><dd>RRF가 문서 안 청크 순서를 흩뜨리고 있었습니다. 리랭커 없이 같은 효과를 얻었습니다.</dd><dt>한계</dt><dd>cross-encoder를 더 얹으면 6개 안 회수가 오히려 1.3p 내려갑니다. 무응답 놓침 3건은 프롬프트의 몫입니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 진단이 정확하면 해법은 공짜였습니다. 리랭커를 붙이려던 것을 벡터 순서 한 줄로 얻었습니다. 판정 LLM은 여전히 기본 꺼짐이고, 이때 나온 "측정한 것과 구현한 것이 다를 수 있다"는 경고가 21단계에서 또 나옵니다.</div>
+<div class="say"><b>말하기</b>판정자를 탓하기 전에 판정자가 무엇을 봤는지부터 확인했더니 문제가 청크 순서였다는 사례입니다.</div>
+</section>
+
+<!-- 17 -->
+<section class="slide" id="s17" data-title="21~22 융합·필드">
+<div class="kicker">21~22단계 · 컷오프와 어휘 검색의 필드</div>
+<h2>정답을 찾아 놓고 두 번 버리고 있었다</h2>
+<div class="diagram" id="fig17" role="img" aria-label="그림 두 개. 왼쪽은 RRF 점수: 두 목록 모두 1위인 문서는 2/61이고 한 목록에서만 1위인 문서는 1/61로 비율 0.5라 컷오프 0.95에 잘린다. 오른쪽은 docs-v2-007의 어휘 점수: 선두 문서는 제목 토큰 받 7.031과 허가 4.431로 11.46, 정답 문서는 본문 토큰 다섯 개 합 7.80이다."><svg viewBox="0 0 1100 225" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="22" text-anchor="start">21단계 · 문서의 RRF 점수 (k=60)</text><text class="s-t" x="188" y="62" text-anchor="end">두 목록 모두 1위</text><rect class="b-vec" x="200" y="44" width="360" height="28" rx="3"/><text class="s-v" x="208" y="63" style="fill:#fff">2/61 = 0.0328 (비율 1.0)</text><text class="s-t" x="188" y="112" text-anchor="end">한 목록에서만 1위</text><rect class="b-kw" x="200" y="94" width="180" height="28" rx="3"/><text class="s-v" x="388" y="113" text-anchor="start">1/61 · 비율 0.5</text><line class="s-cut" x1="542" y1="36" x2="542" y2="136"/><text class="s-r" x="546.0" y="152" text-anchor="end">컷오프 0.95</text><text class="s-s" x="16" y="190" text-anchor="start">한 검색기만 찾은 문서는 비율이 0.5라 컷오프를 넘을 수 없었습니다. 135문항 중 132개가 이 구조였습니다.</text><text class="s-s" x="16" y="208" text-anchor="start">수정: 각 목록의 1위 문서는 컷오프에서 면제 → docs-v2-007·008이 되살아남</text><text class="s-lane" x="620" y="22" text-anchor="start">22단계 · docs-v2-007 어휘 점수 구성</text><text class="s-t" x="748" y="62" text-anchor="end">선두 문서 (제목 매칭)</text><rect class="b-llm" x="760" y="44" width="155" height="28" stroke="var(--paper)"/><text class="s-v" x="837.341" y="63" text-anchor="middle">받 7.031</text><rect class="b-kw" x="915" y="44" width="97" height="28" stroke="var(--paper)"/><text class="s-v" x="963.423" y="63" text-anchor="middle">허가 4.431</text><text class="s-v" x="1020.164" y="63" text-anchor="start">= 11.46</text><text class="s-t" x="748" y="112" text-anchor="end">정답 문서 (본문 매칭)</text><rect class="b-vec" x="760" y="94" width="54" height="28" stroke="var(--paper)"/><text class="s-v" x="786.851" y="113" text-anchor="middle">의견</text><rect class="b-vec" x="814" y="94" width="48" height="28" stroke="var(--paper)"/><text class="s-v" x="837.506" y="113" text-anchor="middle">러시아</text><rect class="b-vec" x="861" y="94" width="39" height="28" stroke="var(--paper)"/><text class="s-v" x="880.824" y="113" text-anchor="middle">보내</text><rect class="b-vec" x="900" y="94" width="19" height="28" stroke="var(--paper)"/><rect class="b-vec" x="919" y="94" width="13" height="28" stroke="var(--paper)"/><text class="s-v" x="939.6" y="113" text-anchor="start">= 7.80</text><text class="s-s" x="620" y="152" text-anchor="start">제목의 "받"(보조용언) 하나가 본문의 "러시아"보다 3배 점수를 내서 정답이 게이트에서 탈락.</text><text class="s-s" x="620" y="170" text-anchor="start">most_fields로 바꿔 본문 근거를 함께 세자 Hit@5 97.8 → 99.3%.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">21</span><b>융합 전 트림 · 목록 1위 컷오프 면제</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>검색기별로 먼저 자르고(BM25 90%, 벡터 97%), 각 목록의 1위 문서는 컷오프에서 면제, 동점은 벡터 순위로</dd><dt>결과</dt><dd><span class="dl good"><i>1위 적중</i>91.1 → 94.1%</span><span class="dl good"><i>Hit@5</i>94.1 → 97.8%</span><span class="dl bad"><i>반환분 정밀도</i>89.5 → 86.8%</span></dd><dt>문서</dt><dd><div class="ex up"><b>들어옴</b>007 「러시아로 보내는 물건 중 별도 허가가 필요한 목록을 늘리겠다고 의견을 받은 자료」 → <b>[행정예고] 공고문(전략물자수출입고시)</b>가 1위로. 전에는 <b>대외무역법 시행령 3건</b>이 앞. <em>벡터는 "러시아 상황허가 대상품목 추가"를 뜻으로 찾았지만 한 검색기만 찾아 컷오프에 잘렸음</em></div><div class="ex up"><b>들어옴</b>087 「중싱통신 거래 제한을 잠시 풀어 준 기간」 → <b>(160325) 한시적 완화</b>가 1위. 전에는 (160309) 수출금지 문서가 1위.</div><div class="ex dn"><b>1위 상실</b>121 「제2026-598호는 무엇에 관한 공고야?」 → 벡터의 <b>577호 포상 계획</b>이 1위, 598호는 2위. <em>벡터는 공고번호를 못 보고 동점을 벡터 순위로 깼음(23단계에서 번호 필터로 보완)</em></div></dd><dt>이유</dt><dd>docs-v2-007·008은 벡터 1위인데 하이브리드에서 20위 밖이었습니다. 한 검색기만 찾은 문서는 RRF 비율이 0.5라 컷오프 0.95를 못 넘었습니다.</dd><dt>한계</dt><dd>019(한국어 질문에 영문 서식)는 공유 토큰이 0이라 그대로입니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">22</span><b>어휘 검색 most_fields</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>제목과 본문 점수를 합산하도록 필드 결합을 best_fields에서 most_fields로 변경</dd><dt>결과</dt><dd><span class="dl good"><i>Hit@5</i>97.8 → 99.3%</span><span class="dl good"><i>반환분 정밀도</i>86.8 → 90.9%</span><span class="dl good"><i>키워드 단독 1위</i>82.2 → 90.4%</span><span class="dl bad"><i>판정 켠 오거절</i>5 → 7건</span></dd><dt>문서</dt><dd><div class="ex up"><b>들어옴</b>096 「2006년 기술이전 통제 자료에서 미국은 특정 고객만 읽을 수 있는 이메일 설계자료…」(키워드 검색) → <b>전략기술의 무형이전 통제</b>가 1위. 전에는 대외무역법 시행령 3건. <em>본문에 있는 "이메일·설계자료" 근거를 합산</em></div><div class="ex up"><b>들어옴</b>065 「이자 지원으로 10억을 빌렸는데 5억 더…」 → <b>이차보전 지원사업 2차 변경공고</b>가 1위. 전에는 <b>무역안보의 날 공모전</b>·<b>국고보조금 통합관리지침</b>이 앞</div><div class="ex dn"><b>빠짐</b>104 「일본 제조사가 영업비밀을 이유로 미국산 부품 비율을 안 알려 준다면…」 → 정답 <b>상무부 세미나 QnA</b>가 3위에서 5위 밖. <em>"미국산·수출금지"가 제목에 겹치는 중싱통신 문서 둘이 앞섬</em></div></dd><dt>이유</dt><dd>007의 선두는 제목 토큰 2개로 11.46점, 정답은 본문 토큰 5개 합 7.80점이라 <b>본문 근거가 버려졌습니다</b>.</dd><dt>한계</dt><dd>오거절 +2건(065, 072)은 정답이 문맥에 있는데 판정자가 조건부 규칙을 "없음"으로 읽은 것입니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 22단계까지의 수치(1위 적중 94.1%, Hit@5 99.3%)는 공고문 52문서만 색인한 조건이고 공고문 한 세트에서 튜닝한 값입니다. yesTrade를 섞으면 달라집니다(17장).</div>
+<div class="say"><b>말하기</b>16~17단계에서 "섞는 게 손해"라고 적은 결론이 21~22단계에서 설정 결함으로 뒤집혔다는 점을 짚습니다.</div>
+</section>
+
+<!-- 18 -->
+<section class="slide" id="s18" data-title="23~25 채점·yesTrade">
+<div class="kicker">23~25단계 · 채점 단위, SPLADE 재비교, yesTrade를 섞을 때</div>
+<h2>문서 점수로는 안 보이던 손해를 청크로 재고, yesTrade를 섞자 어휘 검색이 무너졌다</h2>
+<div class="diagram" id="fig18" role="img" aria-label="흐름도와 막대 그래프. 공고문 색인과 yesTrade 색인이 단어 러시아를 각각 0.42%와 5.54%로 세어 서로 다른 자로 채점한 점수가 한 순위표에 섞인다. 전역 통계로 바꾸면 1위 적중이 109에서 114, 제목 1배까지 걸면 119문항이 된다. 공고문만은 126이다."><svg viewBox="0 0 1100 350" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="22" text-anchor="start">25단계 · 색인 두 개를 한 질의로 던졌을 때</text><rect class="s-box" x="16" y="36" width="150" height="90" rx="4"/><text class="s-t" x="91.0" y="77.0" text-anchor="middle">질문</text><text class="s-s" x="91.0" y="97.0" text-anchor="middle">"러시아 …"</text><rect class="s-vec" x="226" y="36" width="300" height="40" rx="4"/><text class="s-t" x="376.0" y="52.0" text-anchor="middle">공고문 색인 · 러시아 0.42%</text><text class="s-s" x="376.0" y="72.0" text-anchor="middle">희귀어 → 높은 점수</text><rect class="s-kw" x="226" y="86" width="300" height="40" rx="4"/><text class="s-t" x="376.0" y="102.0" text-anchor="middle">yesTrade 색인 · 러시아 5.54%</text><text class="s-s" x="376.0" y="122.0" text-anchor="middle">흔한 말 → 낮은 점수</text><line class="s-arrow" x1="166" y1="68" x2="222" y2="58" marker-end="url(#ar18)"/><line class="s-arrow" x1="166" y1="96" x2="222" y2="104" marker-end="url(#ar18)"/><rect class="s-bad" x="586" y="36" width="230" height="90" rx="4"/><text class="s-t" x="701.0" y="69.0" text-anchor="middle">한 순위표에 섞임</text><text class="s-s" x="701.0" y="87.0" text-anchor="middle">같은 단어를 서로 다른 자로</text><text class="s-s" x="701.0" y="103.0" text-anchor="middle">채점한 점수를 비교</text><line class="s-arrow" x1="526" y1="56" x2="582" y2="74" marker-end="url(#ar18)"/><line class="s-arrow" x1="526" y1="106" x2="582" y2="90" marker-end="url(#ar18)"/><rect class="s-ok" x="876" y="36" width="208" height="90" rx="4"/><text class="s-t" x="980.0" y="69.0" text-anchor="middle">전역 통계 (dfs)</text><text class="s-s" x="980.0" y="87.0" text-anchor="middle">IDF·평균 길이를</text><text class="s-s" x="980.0" y="103.0" text-anchor="middle">두 색인 합쳐서 계산</text><line class="s-arrow" x1="816" y1="81" x2="872" y2="81" marker-end="url(#ar18)"/><text class="s-lane" x="16" y="160" text-anchor="start">1위 적중 문항 수 (135문항 중, 하이브리드)</text><text class="s-t" x="288" y="192" text-anchor="end">공고문 색인만</text><rect class="b-mut" x="300" y="174" width="560" height="26" rx="3"/><text class="s-v" x="868.0" y="192" text-anchor="start">126</text><text class="s-t" x="288" y="228" text-anchor="end">yesTrade를 섞음 (기본)</text><rect class="b-bad" x="300" y="210" width="484" height="26" rx="3"/><text class="s-v" x="792.4444444444445" y="228" text-anchor="start">109</text><text class="s-t" x="288" y="264" text-anchor="end">+ 전역 통계</text><rect class="b-kw" x="300" y="246" width="507" height="26" rx="3"/><text class="s-v" x="814.6666666666667" y="264" text-anchor="start">114</text><text class="s-t" x="288" y="300" text-anchor="end">+ 전역 통계 + 제목 1배</text><rect class="b-vec" x="300" y="282" width="529" height="26" rx="3"/><text class="s-v" x="836.8888888888889" y="300" text-anchor="start">119</text><text class="s-s" x="300" y="334" text-anchor="start">키워드 단독은 63 → 92문항, 벡터 단독은 121이라 손해는 어휘 검색기에서 났습니다.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">23</span><b>청크 채점 · 공고번호 필터 · 사본 병합</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>채점 단위를 문서에서 청크로, 공고번호가 있는 질문은 그 번호를 가진 문서만, 같은 문서 사본은 한 번만</dd><dt>결과</dt><dd><span class="dl good"><i>무관 청크(하이브리드)</i>124 → 71</span><span class="dl good"><i>무관 청크(벡터)</i>61 → 23</span><span class="dl flat"><i>근거 회수</i>96.3% 유지</span></dd><dt>문서</dt><dd><div class="ex up"><b>제거</b>「제2026-598호」 질문에 섞여 나오던 <b>577·573호 등 번호가 다른 공고</b> 청크 28개, <b>대외무역법 시행령의 hwp·pdf·hwpx 3벌 사본</b> 26개. 하이브리드 무관 청크 124 → 71</div><div class="ex dn"><b>손해</b>같은 문서 사본을 하나로 합칠 때 남은 판본에 근거가 적은 경우 벡터 단독의 근거 회수 92.6 → 92.2%</div></dd><dt>이유</dt><dd>"제2026-598호"를 물었는데 577·573호가 오던 청크 28개, 시행령 3벌 사본 26개가 무관 청크의 주범이었습니다.</dd><dt>한계</dt><dd>사본 병합은 벡터 단독에서 근거 회수를 92.6 → 92.2%로 조금 깎습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">24</span><b>SPLADE 재비교</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>BM25 자리에 SPLADE(학습형 sparse)를 넣고 dense와 융합해 비교</dd><dt>결과</dt><dd><span class="dl good"><i>1위 적중</i>94.8 → 97.8%</span><span class="dl good"><i>근거 회수</i>91.1 → 94.1%</span><span class="dl flat"><i>판정 안 된 청크</i>19%</span></dd><dt>문서</dt><dd><div class="ex up"><b>1위로</b>009 「계산하거나 신호를 감지하는 반도체를 어떤 종류로…」 → <b>제2026-598호 비메모리반도체 범위</b>가 1위 (BM25+dense는 해석 세부지침이 1위). <em>정답 문서의 주제가 계산·신호 감지용 비메모리반도체</em></div><div class="ex up"><b>1위로</b>083·084 중싱통신 → <b>(160309) 수출금지</b>가 1위 (BM25+dense는 (160325) 한시적 완화가 1위)</div><div class="ex dn"><b>놓침</b>019·127·128은 SPLADE+dense도 1위를 놓침. 전략물자수출입고시 주변 문서가 촘촘하게 겹치는 구간</div></dd><dt>이유</dt><dd>docs-v2-001은 SPLADE가 "에너지공기업 기술나눔 공고"를 1위(20.72)로 올렸습니다. 키워드는 제목의 일반어에 끌렸습니다.</dd><dt>한계</dt><dd>95% 컷오프 조건에서는 청크 회수 −0.37p, 첫 청크만 +2.2p였습니다. 온라인 지연은 미측정입니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">25</span><b>core 섞기: 색인 통계 전역화</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>두 색인을 한 질의로 검색할 때 BM25 통계(IDF)를 색인 전체로 합쳐 계산(dfs)</dd><dt>결과</dt><dd><span class="dl good"><i>1위 적중(하이브리드)</i>109 → 114문항</span><span class="dl good"><i>+제목 1배</i>119문항</span><span class="dl bad"><i>yesTrade를 섞으면 근거 회수</i>0.963 → 0.911</span></dd><dt>문서</dt><dd><div class="ex dn"><b>밀림</b>007 정답 <b>[행정예고] 공고문</b> → core FAQ <b>對러시아·벨라루스 수출통제 주요내용</b>이 1위. 017·018 「사전거래보고서…」 → FAQ <b>수출허가 면제 시 허가기관장에게 제출해야 되는 자료</b>가 1위, 정답 별지 16은 2위. 020 → <b>수출허가 안내</b> 가이드가 1위, 정답 <b>annexeds02 2</b>는 밀림</div><div class="ex"><b>이유</b>"수출허가"·"면제"처럼 두 색인에 다 흔한 낱말이 색인마다 다른 무게로 채점되어 FAQ 쪽 점수가 높게 나옴</div></dd><dt>이유</dt><dd>"러시아"가 공고문에서 0.42%, yesTrade에서 5.54%라 같은 단어가 색인마다 다른 무게로 채점됐습니다.</dd><dt>한계</dt><dd>남은 손해(126 → 119문항)의 원인은 찾지 못했습니다.</dd></dl></div></div>
+<div class="callout bad"><b>주의.</b> 25단계까지의 개선은 공고문 질문으로만 확인한 것입니다. 다음 장의 26단계가 이것을 새 데이터로 다시 잽니다.</div>
+<div class="say"><b>말하기</b>"문서를 맞혔다"와 "답이 적힌 청크를 줬다"는 다른 지표라는 점, 그리고 코퍼스를 섞으면 점수 척도가 어긋날 수 있다는 점이 요점입니다.</div>
+</section>
+
+<!-- 19 -->
+<section class="slide" id="s19" data-title="26~28 과적합">
+<div class="kicker">26~28단계 · 과적합 측정과 처방</div>
+<h2>새 데이터에서 다시 재니 튜닝값이 공고문에 맞춰져 있었다</h2>
+<div class="diagram" id="fig19" role="img" aria-label="막대 그래프. 문서 1위 적중률은 제목 3배 설정에서 튜닝 세트 0.948, 같은 규모 새 데이터 0.841, 전체 규모 0.754이고 제목 1배에서는 0.956, 0.870, 0.812이다."><svg viewBox="0 0 1100 335" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar19" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="22" text-anchor="start">26단계 · 문서 1위 적중률 (튜닝 세트 → 새 데이터)</text><text class="s-t" x="288" y="78" text-anchor="end">튜닝 세트 (공고문 52문서)</text><rect class="b-bad" x="300" y="44" width="493" height="26" rx="3"/><text class="s-v" x="800.96" y="62" text-anchor="start">0.948</text><rect class="b-vec" x="300" y="76" width="497" height="26" rx="3"/><text class="s-v" x="805.12" y="94" text-anchor="start">0.956</text><text class="s-t" x="288" y="154" text-anchor="end">새 데이터, 같은 규모 (70문서)</text><rect class="b-bad" x="300" y="120" width="437" height="26" rx="3"/><text class="s-v" x="745.3199999999999" y="138" text-anchor="start">0.841</text><rect class="b-vec" x="300" y="152" width="452" height="26" rx="3"/><text class="s-v" x="760.4" y="170" text-anchor="start">0.870</text><text class="s-t" x="288" y="230" text-anchor="end">새 데이터, 전체 (3,293문서)</text><rect class="b-bad" x="300" y="196" width="392" height="26" rx="3"/><text class="s-v" x="700.0799999999999" y="214" text-anchor="start">0.754</text><rect class="b-vec" x="300" y="228" width="422" height="26" rx="3"/><text class="s-v" x="730.24" y="246" text-anchor="start">0.812</text><rect class="b-bad" x="300" y="278" width="14" height="14"/><text class="s-s" x="322" y="290" text-anchor="start">현재 설정 (제목 3배)</text><rect class="b-vec" x="490" y="278" width="14" height="14"/><text class="s-s" x="512" y="290" text-anchor="start">제목 1배</text><text class="s-s" x="300" y="318" text-anchor="start">튜닝 세트에서는 두 설정이 비슷한데 새 데이터에서만 격차가 벌어집니다. 그래서 튜닝값이 공고문에 맞춰졌다고 봅니다.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">26</span><b>새 데이터로 과적합 측정</b><span class="tag t-mut">측정</span></div><dl><dt>바꾼 것</dt><dd>새 코퍼스(3,293부모)·새 질문 69개로 튜닝값을 다시 재고, 제목 3배와 1배를 비교</dd><dt>결과</dt><dd><span class="dl bad"><i>1위 적중(같은 규모)</i>0.948 → 0.841</span><span class="dl bad"><i>전체 규모</i>0.754</span><span class="dl good"><i>제목 1배로 바꾸면</i>0.870 / 0.812</span></dd><dt>문서</dt><dd><div class="ex up"><b>1위로</b>holdout-048 「해외 특허를 내려고 기술 자료를 외국 특허청에 제출하는데 기술 수출허가를 받아야 해?」 → 제목 1배에서 <b>수출통제 대상기술 안내2</b>가 1위. 제목 3배에서는 <b>해외출장자의 기술자료도 수출허가 대상이 되는지 여부</b> FAQ가 1위. <em>제목의 "기술자료" 일치가 본문 근거보다 크게 작용</em></div></dd><dt>이유</dt><dd>holdout-v1-048은 제목 3배에서 "해외출장자의 기술자료" FAQ가 1위, 1배에서 특허 출원 예외를 설명한 안내 책자가 1위였습니다.</dd><dt>한계</dt><dd>새 데이터에 더 어려운 문서(2006~2010년 기사, 2단 PDF)가 섞여 과적합과 난이도를 완전히 가르지는 못했습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">27</span><b>질문별 검색 방식 고르기</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>질문마다 키워드·벡터·하이브리드 중 골라 쓰는 라우터를 시험</dd><dt>결과</dt><dd><span class="dl flat"><i>오라클 상한</i>+3문항분</span><span class="dl bad"><i>"식별자면 키워드"</i>0.9037 (하이브리드 0.9630)</span><span class="dl flat"><i>학습 라우터</i>−0.74p / +0.49p</span></dd><dt>문서</dt><dd><div class="ex"><b>청크</b>074 「청년인턴 최종 합격…증명서」 → 세 방식이 모두 <b>청년인턴 최종합격자 공고</b>를 1위로 찾음. BM25가 실은 청크는 증명서 제출 조항(#0003), 하이브리드는 다른 청크들 <em>(검색 방식이 아니라 문서 안 청크 선택 문제)</em></div></dd><dt>이유</dt><dd>034·074는 세 방식이 같은 문서를 1위로 찾았고 실린 청크 6개만 달랐습니다. 검색 방식이 아니라 문서 안 청크 선택 문제였습니다.</dd><dt>한계</dt><dd>이 진단은 33단계로 이어졌습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">28</span><b>제목 1배 + 전역 통계 판정</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>25·26단계 처방(제목 1배, 전역 통계)을 코드에 고정하고, 새로 올라온 문서를 판정해 다시 잼</dd><dt>결과</dt><dd><span class="dl good"><i>반환 문서 정밀도(공고문)</i>0.596 → 0.755</span><span class="dl good"><i>(holdout)</i>0.539 → 0.609</span><span class="dl bad"><i>holdout 근거 회수</i>−1.4p</span></dd><dt>문서</dt><dd><div class="ex up"><b>1위로</b>holdout-013 「2011년 2월 전략물자관리제도 기본과정은 어떻게 신청…」 → <b>제28차 전략물자관리제도 기본과정 개최</b>가 1위. 전에는 제목이 비슷한 <b>기본과정 추가과정 개최</b>가 1위</div><div class="ex dn"><b>밀림</b>holdout-004 「서울에 있는 외국 대사관에 통제 대상 장비를 납품…」 → 정답 FAQ <b>주한 외국공관으로 …납품은 수출허가 대상</b>이 5위 밖. 새로 오른 <b>설계도 제공 시 수출허가 대상 여부</b>에는 공관 답이 없음</div><div class="ex dn"><b>1위 상실</b>holdout-052 「자가판정 교육 동영상을 안 보고 자가판정을 해 버렸는데…」 → 정답 <b>[발표3] 판정 관련 주요 FAQ</b>가 밀리고 제목에 "자가판정"이 있는 <b>온라인 자가판정 변경사항 안내</b>가 1위</div></dd><dt>이유</dt><dd>평균 반환 문서가 2.39 → 1.83개로 줄면서 정답 비율이 올랐습니다.</dd><dt>한계</dt><dd>holdout-v1-004(주한 외국공관 납품)는 정답 FAQ가 5위 밖으로 빠졌습니다. 이 한 문항에 맞춰 다시 튜닝하지 않았습니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 과적합은 실재했고, 처방(제목 1배, 전역 통계)은 새 데이터에서도 효과가 있었습니다. 그러나 이 질문들도 이미 열어 본 자료여서 독립 시험은 아닙니다. 그래서 29단계에서 질문을 검색 전에 동결했습니다.</div>
+<div class="say"><b>말하기</b>지금 표에 있는 개선 수치를 그대로 새 문서에 기대하면 안 된다는 근거가 이 장입니다.</div>
+</section>
+
+<!-- 20 -->
+<section class="slide" id="s20" data-title="29~30 날짜">
+<div class="kicker">29~30단계 · 새 질문 동결과 연도·반기 구별</div>
+<h2>같은 공고가 해마다 반복되면 연도와 반기를 구별하지 못했다</h2>
+<div class="diagram" id="fig20" role="img" aria-label="흐름도. 2025년 상반기 CP 보고 질문에서 정답 문서는 어휘 목록 5위, 벡터 목록 10위, 신설한 기간 목록에도 있고 RRF 융합 4위인데 최종 컷오프에서 탈락한다. 수정 후에는 두 목록에 있고 기간과 주제가 일치하면 컷오프에서 보존한다."><svg viewBox="0 0 1100 280" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar20" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="22" text-anchor="start">30단계 · 2025년 상반기 CP 보고 질문이 탈락하던 경로 (yestrade-69-18420)</text><rect class="s-box" x="16" y="50" width="170" height="150" rx="4"/><text class="s-t" x="101.0" y="113.0" text-anchor="middle">질문</text><text class="s-s" x="101.0" y="131.0" text-anchor="middle">"2025년 상반기</text><text class="s-s" x="101.0" y="147.0" text-anchor="middle">CP 보고 기한?"</text><rect class="s-kw" x="236" y="40" width="200" height="50" rx="4"/><text class="s-t" x="336.0" y="61.0" text-anchor="middle">어휘 목록</text><text class="s-s" x="336.0" y="81.0" text-anchor="middle">정답 5위</text><rect class="s-vec" x="236" y="105" width="200" height="50" rx="4"/><text class="s-t" x="336.0" y="126.0" text-anchor="middle">벡터 목록</text><text class="s-s" x="336.0" y="146.0" text-anchor="middle">정답 10위</text><rect class="s-llm" x="236" y="170" width="200" height="50" rx="4"/><text class="s-t" x="336.0" y="191.0" text-anchor="middle">기간 목록 (신설)</text><text class="s-s" x="336.0" y="211.0" text-anchor="middle">제목의 연도·반기+주제어 일치</text><line class="s-arrow" x1="186" y1="110" x2="232" y2="68" marker-end="url(#ar20)"/><line class="s-arrow" x1="186" y1="125" x2="232" y2="130" marker-end="url(#ar20)"/><line class="s-arrow" x1="186" y1="140" x2="232" y2="190" marker-end="url(#ar20)"/><rect class="s-box" x="496" y="80" width="170" height="110" rx="4"/><text class="s-t" x="581.0" y="131.0" text-anchor="middle">RRF 융합</text><text class="s-s" x="581.0" y="151.0" text-anchor="middle">정답은 4위</text><line class="s-arrow" x1="436" y1="65" x2="492" y2="115" marker-end="url(#ar20)"/><line class="s-arrow" x1="436" y1="130" x2="492" y2="135" marker-end="url(#ar20)"/><line class="s-arrow" x1="436" y1="195" x2="492" y2="160" marker-end="url(#ar20)"/><rect class="s-bad" x="726" y="80" width="170" height="110" rx="4"/><text class="s-t" x="811.0" y="123.0" text-anchor="middle">최종 컷오프 0.90</text><text class="s-s" x="811.0" y="141.0" text-anchor="middle">1위 대비 점수가 낮아</text><text class="s-s" x="811.0" y="157.0" text-anchor="middle">탈락</text><line class="s-arrow" x1="666" y1="135" x2="722" y2="135" marker-end="url(#ar20)"/><rect class="s-ok" x="936" y="80" width="148" height="110" rx="4"/><text class="s-t" x="1010.0" y="123.0" text-anchor="middle">수정 후</text><text class="s-s" x="1010.0" y="141.0" text-anchor="middle">두 목록에 있고 기간·</text><text class="s-s" x="1010.0" y="157.0" text-anchor="middle">주제가 일치하면 보존</text><line class="s-arrow" x1="896" y1="135" x2="932" y2="135" marker-end="url(#ar20)" stroke-dasharray="4 4"/><text class="s-s" x="16" y="262" text-anchor="start">"후보 밖이라 못 찾는다"는 처음 진단이 틀렸습니다. 후보 안에 있었고 컷오프가 버렸습니다. 날짜 진단 14문항 5위 내 정답 10 → 14, CP 확인 8문항 4 → 8.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">29</span><b>새 검증 질문 동결</b><span class="tag t-mut">측정</span></div><dl><dt>바꾼 것</dt><dd>무작위로 뽑은 36부모의 질문을 검색 전에 동결하고, 설정을 바꾸지 않고 평가</dd><dt>결과</dt><dd><span class="dl good"><i>1위 정답</i>27 → 34/36</span><span class="dl flat"><i>(정답표에 반환 근거를 추가한 뒤)</i></span></dd><dt>문서</dt><dd><div class="ex dn"><b>놓침</b>007 「2026년 상반기 CP 실적보고 제출 마감」 → 2014·2018년 자료가 앞. 036 「2020년 하반기 CP 실적보고·운영보고」 → 2019년 안내와 2024년 하반기 안내가 앞</div><div class="ex up"><b>정답 추가</b>024 「9B105·마하 0.9」 → 반환된 문서 세 건이 모두 정확히 답하는데 정답표에 없어 오답으로 셌음</div></dd><dt>이유</dt><dd>024(9B105·마하 0.9)는 반환 문서 세 건이 모두 정확히 답하는데 정답표에 없었습니다(라벨 누락).</dd><dt>한계</dt><dd>실패 둘은 CP 보고 질문입니다. 2026년 상반기를 물었는데 2014·2018년 자료가 앞에 나왔습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">30</span><b>연도·반기를 제목과 맞춰 보기</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>질문의 "YYYY년 상·하반기"가 제목과 맞는 청크로 세 번째 순위 목록을 만들고, 이런 문서는 컷오프에서 보존</dd><dt>결과</dt><dd><span class="dl good"><i>날짜 진단 5위 내 정답</i>10 → 14/14</span><span class="dl good"><i>CP 확인 5위 내</i>4 → 8/8</span><span class="dl flat"><i>기존 평가</i>변화 없음</span></dd><dt>문서</dt><dd><div class="ex up"><b>1위로</b>date-v1-004 「2022년 상반기 CP 실적보고의 제출 마감일」 → <b>실적보고(22년도 상반기) 작성 안내</b>가 1위. 전에는 <b>선택형 CP 구축 및 지원사업 안내</b>와 <b>2018년도 상반기 실적보고</b>. <em>제목의 "22년도 상반기"를 질문의 "2022년 상반기"로 맞춤</em></div><div class="ex up"><b>들어옴</b>validation-036 「2020년 하반기 CP 실적보고와 운영보고」 → <b>실적보고(20년도 하반기) 및 운영보고(20년도)</b>가 1위. 전에는 <b>2024 하반기 안내</b>가 앞</div><div class="ex dn"><b>한계</b>date-v1-005 「2022년 하반기」 → 정답은 5위 안에 들어왔지만 1위는 <b>2018하 CP 워크숍 발표 자료</b></div></dd><dt>이유</dt><dd>2025년 상반기 CP 문서는 어휘 5위·벡터 10위·융합 4위로 후보 안에 있었는데 최종 컷오프에서 탈락하고 있었습니다.</dd><dt>한계</dt><dd>진단셋이 작고 007·036은 설계에 쓴 사례라 독립 시험이 아닙니다. 날짜 진단의 1위는 10/14입니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 특정 문서 ID나 연도를 쓰지 않는 일반 규칙으로 고쳤고 기존 평가에는 변화가 없었습니다. 다만 일반화는 주장하지 않습니다.</div>
+<div class="say"><b>말하기</b>연례 공고처럼 제목과 본문이 거의 같은 문서는 검색기가 구별할 신호가 연도뿐이라는 사례입니다.</div>
+</section>
+
+<!-- 21 -->
+<section class="slide" id="s21" data-title="31~34 청크·정리">
+<div class="kicker">31~34단계 · 청크 Precision, 1위 진단, 청크 우선, 장치 정리</div>
+<h2>정밀도를 억지로 올리면 재현율이 무너지고, 1위를 뺏는 것은 답 없는 같은 주제 문서였다</h2>
+<div class="diagram" id="fig21" role="img" aria-label="산점도. 청크 컷오프를 강하게 할수록 Precision은 27%에서 69%로 오르지만 Recall은 96%에서 69%로 내려가고 목표인 Precision 80%에는 닿지 못한다. LLM 필터는 Recall 96.30%를 유지하며 Precision 37.78%가 된다."><svg viewBox="0 0 1100 375" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar21" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="currentColor" style="color:var(--muted)"/></marker></defs><text class="s-lane" x="16" y="22" text-anchor="start">31단계 · 청크 컷오프 강도별 Precision과 Recall (공고문 135문항)</text><line class="s-grid" x1="90" y1="60" x2="90" y2="320"/><text class="s-s" x="90" y="340" text-anchor="middle">60%</text><line class="s-grid" x1="240" y1="60" x2="240" y2="320"/><text class="s-s" x="240" y="340" text-anchor="middle">70%</text><line class="s-grid" x1="390" y1="60" x2="390" y2="320"/><text class="s-s" x="390" y="340" text-anchor="middle">80%</text><line class="s-grid" x1="540" y1="60" x2="540" y2="320"/><text class="s-s" x="540" y="340" text-anchor="middle">90%</text><line class="s-grid" x1="690" y1="60" x2="690" y2="320"/><text class="s-s" x="690" y="340" text-anchor="middle">100%</text><line class="s-grid" x1="90" y1="320" x2="690" y2="320"/><text class="s-s" x="82" y="324" text-anchor="end">20%</text><line class="s-grid" x1="90" y1="240" x2="690" y2="240"/><text class="s-s" x="82" y="244" text-anchor="end">40%</text><line class="s-grid" x1="90" y1="160" x2="690" y2="160"/><text class="s-s" x="82" y="164" text-anchor="end">60%</text><line class="s-grid" x1="90" y1="80" x2="690" y2="80"/><text class="s-s" x="82" y="84" text-anchor="end">80%</text><text class="s-s" x="390" y="362" text-anchor="middle">청크 Recall (정답 근거를 실었는가)</text><text class="s-s" x="24" y="180" transform="rotate(-90 24 180)" text-anchor="middle">청크 Precision</text><line class="s-cut" x1="90" y1="80" x2="690" y2="80"/><text class="s-r" x="96" y="72" text-anchor="start">목표 80%</text><polyline class="s-plot" points="634,291 607,230 468,160 351,134 223,124"/><circle class="b-kw" cx="634" cy="291" r="6"/><text class="s-s" x="644.5" y="282.56" text-anchor="start">컷오프 끔</text><circle class="b-kw" cx="607" cy="230" r="6"/><text class="s-s" x="616.5999999999999" y="222.2" text-anchor="start">컷오프 0.95</text><circle class="b-kw" cx="468" cy="160" r="6"/><text class="s-s" x="477.84999999999997" y="152.2" text-anchor="start">컷오프 0.98</text><circle class="b-kw" cx="351" cy="134" r="6"/><text class="s-s" x="361.15" y="126.27999999999997" text-anchor="start">컷오프 0.99</text><circle class="b-kw" cx="223" cy="124" r="6"/><text class="s-s" x="213.35000000000002" y="116.36000000000001" text-anchor="end">컷오프 1.0</text><circle class="b-llm" cx="634" cy="249" r="7"/><text class="s-v" x="622.5" y="252.88" text-anchor="end">LLM 필터 (37.8%)</text><text class="s-n" x="740" y="90" text-anchor="start">점수로 자를수록 Precision은 오르지만</text><text class="s-n" x="740" y="112" text-anchor="start">정답 근거도 함께 잘려 나갑니다.</text><text class="s-s" x="740" y="150" text-anchor="start">· 0.98: 59.95% / Recall 85.19%</text><text class="s-s" x="740" y="170" text-anchor="start">· 최고 68.91%지만 Recall도 68.89%</text><text class="s-s" x="740" y="190" text-anchor="start">· 80%를 넘은 조합은 45개 중 없음</text><text class="s-t" x="740" y="230" text-anchor="start">LLM 필터는 Recall을 96.30%로 유지한 채</text><text class="s-t" x="740" y="250" text-anchor="start">Precision을 25.14 → 37.78%로 올렸지만</text><text class="s-t" x="740" y="270" text-anchor="start">지연 p50 15초라 기본 꺼짐입니다.</text></svg></div>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">31</span><b>전달 청크 Precision 올리기</b><span class="tag t-llm">LLM 필터 선택 · 컷오프 기각</span></div><dl><dt>바꾼 것</dt><dd>LLM이 무관(0점) 청크만 제거하는 필터를 추가하고, 점수 컷오프 45조합도 시험</dd><dt>결과</dt><dd><span class="dl good"><i>청크 Precision</i>25.1 → 37.8%</span><span class="dl flat"><i>청크 Recall</i>96.3% 유지</span><span class="dl bad"><i>점수 컷오프 최고</i>Precision 68.9% / Recall 68.9%</span></dd><dt>문서</dt><dd><div class="ex"><b>참고</b>무관 청크의 76%는 정답 문서 안의 다른 절(신청 서식·제출 방법·문의처)이었음. 저장된 결과에는 제거된 청크가 기록되지 않아 문서 단위 사례는 없음</div><div class="ex dn"><b>잘림</b>점수 컷오프 0.98은 정답 근거 청크도 함께 잘라 Recall 96.3 → 85.2%</div></dd><dt>이유</dt><dd>점수로 자를수록 정답 근거도 같이 잘립니다(0.98: Precision 59.95%, Recall 85.19%).</dd><dt>한계</dt><dd>LLM 필터는 지연 p50 15초라 기본 꺼짐입니다. 80%는 어떤 조합도 못 넘었습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">32</span><b>정답이 1위가 아닌 이유</b><span class="tag t-vec">일부 적용</span></div><dl><dt>바꾼 것</dt><dd>원인을 분해하고 처방 7개를 시험. 날짜 정보가 없는 문서에도 기간 가산점 4를 주는 것 하나만 반영</dd><dt>결과</dt><dd><span class="dl good"><i>1위 적중(공고문)</i>0.837 → 0.844</span><span class="dl good"><i>반환 문서 정밀도</i>0.757 → 0.773</span><span class="dl flat"><i>나머지 처방</i>6개 기각</span></dd><dt>문서</dt><dd><div class="ex dn"><b>1위 못 함</b>103~106 「2005년 미국 수출통제 세미나에서는…」 → 1위는 <b>미국 전략물자 수출통제 세미나 개최</b> 안내문, 정답은 <b>상무부 세미나 QnA</b>. <em>제목이 질문의 출처 설명과 거의 같아 답이 없는 안내문이 앞섬</em></div><div class="ex up"><b>반영</b>날짜 정보가 없는 공고문 정답이 1위로(016, 095). 101은 근거 회수 0.5 → 1.0</div><div class="ex dn"><b>기각</b>LLM 목록 선택: 028 「바세나르용 서약서」 → 정답 별지 2의3 대신 <b>일반용 별지 2의2</b>를 고름</div></dd><dt>이유</dt><dd>1위를 뺏는 것은 같은 주제인데 답이 없는 문서였습니다. "2005년 미국 수출통제 세미나에서는"에 답 없는 세미나 개최 안내가 1위, 정답은 "상무부 세미나 QnA"였습니다.</dd><dt>한계</dt><dd>LLM 목록 선택은 공고문 0.844 → 0.904지만 검증 36은 1.000 → 0.917로 내려갑니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">33</span><b>청크 먼저 고르기</b><span class="tag t-vec">일부 적용</span></div><dl><dt>바꾼 것</dt><dd>문서 안 청크 순서를 "첫 청크는 벡터, 나머지는 청크 RRF"로. 청크를 먼저 고르는 파이프라인은 기본 꺼짐</dd><dt>결과</dt><dd><span class="dl good"><i>근거 회수</i>0.844 → 0.863</span><span class="dl flat"><i>(개발 셋 +4문항, 손실 0)</i></span><span class="dl bad"><i>청크 우선의 문서 정밀도</i>0.667 → 0.467</span></dd><dt>문서</dt><dd><div class="ex up"><b>실림</b>034 「정부 연구개발 과제의 기술 사용료…납부 방식 선택 확인서 조항을 없애려는 변경안」 → <b>기술료 통합요령 개정(안) 행정예고</b>의 정답 청크(#0000)가 문서 안 6개에 실림</div><div class="ex dn"><b>못 고침</b>020 「품목 기준 포괄 수출허가 영문 사용자 확인서」 → <b>4A102</b>가 <b>4·a·102</b>로 쪼개져 102개 청크에 걸려 정답이 후보에 없음</div></dd><dt>이유</dt><dd>034는 정답 청크가 BM25 2위·벡터 9위였는데 벡터 순이라 6개 밖으로 밀렸습니다.</dd><dt>한계</dt><dd>020은 "4A102"를 nori가 "4·a·102"로 쪼개 102개 청크에 걸려 못 고쳤습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">34</span><b>효과 없는 어휘 장치 정리</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>넣고 뺀 비교가 없던 장치를 하나씩 빼서 확인. .standard 필드와 문서 종류 부스트를 삭제</dd><dt>결과</dt><dd><span class="dl flat"><i>대부분 지표</i>변화 없음</span><span class="dl bad"><i>식별자 15문항 Hit</i>0.933 → 0.867</span></dd><dt>문서</dt><dd><div class="ex dn"><b>빠짐</b>127 「사전거래보고서 서식의 허가면제 사유 칸에서 제54조는…」 → <b>[별지 16] 사전거래보고서</b>의 정답 청크(#0001)를 못 실음. <em>조문 표기를 다르게 쪼개 보완하던 .standard 필드를 뺀 탓으로 보임</em></div><div class="ex"><b>삭제</b>문서 종류 부스트: 색인에 종류값이 있는 청크가 0개라 뺐을 때 결과 변화 0</div></dd><dt>이유</dt><dd>문서 종류 부스트는 대상 청크가 색인에 0개인 죽은 코드였습니다. 현행판 우대 +4는 상수로 작동해 유지했습니다.</dd><dt>한계</dt><dd>내려간 것은 127 한 문항입니다. 식별자 질문이 22개뿐이라 효과를 확인도 반증도 못 했습니다.</dd></dl></div></div>
+<div class="say"><b>말하기</b>32~33단계의 결론은 "1위를 뺏는 문서와 정답을 가를 신호가 검색기 안에 없다"입니다. 다음 처방은 도메인 하드 네거티브로 학습한 청크 리랭커입니다.</div>
+</section>
+
+<!-- 22 -->
+<section class="slide" id="s22" data-title="종합 한계">
+<div class="kicker">13~34단계 종합</div>
+<h2>세 번 반복된 함정과 아직 풀리지 않은 것</h2>
+<div class="cols">
+<div class="col">
+<h3>반복된 패턴</h3>
+<ul class="plain">
+<li><b>개발 셋에서 오르고 새 셋에서 내려감.</b> 26단계 1위 적중 0.948 → 0.841, 32단계 LLM 목록 선택(공고문 0.904인데 검증 36은 1.000 → 0.917), 33단계 문서 합의 가산(날짜 14의 근거 회수가 0.929 → 0.786).</li>
+<li><b>진단이 틀림.</b> 13단계 "포화"는 한국어 성능의 천장이었고, 16~17단계 "섞으면 손해"는 컷오프 버그였고, 21단계 "제목 가중치가 크다"는 필드 방식 문제였고, 30단계 "후보 밖"은 컷오프 탈락이었습니다.</li>
+<li><b>측정과 구현이 다름.</b> 19단계 리랭커는 자르기 전에 측정하고 자른 뒤에 구현했습니다. 21단계는 수치가 좋아 보이던 값을 회귀 테스트가 기각했습니다.</li>
+</ul>
+</div>
+<div class="col">
+<h3>풀리지 않은 것</h3>
+<ul class="plain">
+<li><b>같은 주제인데 답이 없는 문서.</b> 세미나 개최 안내 대 세미나 QnA, 2025년 상반기 대 하반기 공문 같은 경우입니다. BM25와 벡터 모두 가를 신호가 없습니다.</li>
+<li><b>도메인 안 무응답.</b> 판정 LLM 없이는 거의 못 거르고, 켜면 정상 질문 일부를 막고 2초가 듭니다. 기본 꺼짐입니다.</li>
+<li><b>조문·번호 질문.</b> 임베딩은 <b>제2026-598호</b>와 <b>제2026-584호</b>를 가르지 못하고, 조항 번호형은 평가셋이 4문항뿐입니다.</li>
+<li><b>영문·통제번호 질문.</b> 한국어 질문에 영문 서식(019), <b>4A102</b>가 nori에서 쪼개지는 경우(020)가 남았습니다.</li>
+</ul>
+</div>
+</div>
+<div class="callout bad"><b>측정의 한계.</b> 신규 질문과 판정은 모두 assistant가 작성했고 사람 검수 전입니다. 근거 Precision은 라벨된 청크만 세는 하한이고, 생성된 답변의 정확도는 측정하지 않았습니다. 판정자는 실행 간 1~2건이 흔들립니다.</div>
+<div class="say"><b>말하기</b>"수치가 올랐다"보다 "어떤 조건에서 왜 올랐고 어떤 조건에서 왜 내려갔는지"를 근거로 삼아야 한다는 것이 13~34단계의 교훈입니다.</div>
+</section>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide[data-title]"));
+  var nav = document.getElementById("nav");
+  slides.forEach(function(s,i){ var a=document.createElement("a"); a.href="#"+s.id; a.textContent=(i+1)+" "+s.dataset.title; a.dataset.id=s.id; nav.appendChild(a); });
+  var links = nav.querySelectorAll("a");
+  function mark(id){ links.forEach(function(a){ a.classList.toggle("on", a.dataset.id===id); }); }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) mark(e.target.id); }); }, {rootMargin:"-20% 0px -70% 0px"});
+    slides.forEach(function(s){ io.observe(s); });
+  }
+  mark(slides[0].id);
+  document.addEventListener("keydown", function(e){
+    if (e.target.closest && e.target.closest("button,input,textarea")) return;
+    var dir = e.key==="ArrowRight" ? 1 : e.key==="ArrowLeft" ? -1 : 0; if(!dir) return;
+    var cur = 0; slides.forEach(function(s,i){ if (s.getBoundingClientRect().top < window.innerHeight*0.4) cur = i; });
+    var nx = slides[Math.max(0, Math.min(slides.length-1, cur+dir))]; nx.scrollIntoView({behavior:"smooth"});
+  });
+})();
+</script>
+</body>
+</html>
