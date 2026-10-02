@@ -5,6 +5,10 @@ import re
 NUMBER = re.compile(r"(\d{4})\s*-\s*(\d{1,4})\s*호")
 
 
+def _joined(value) -> str | None:
+    return ", ".join(value) if isinstance(value, list) else value
+
+
 def law_source(source: dict) -> dict:
     """색인할 _source에 검색용 속성 필드를 더한다. 값이 없는 속성은 필드를 만들지 않는다.
 
@@ -23,7 +27,8 @@ def law_source(source: dict) -> dict:
         # 기존 검색 경로가 이미 읽는 유효 기간 필드에 연결한다.
         "effective_from": attrs.get("effective_date"),
         "effective_to": attrs.get("expiry_date"),
-        "superseded_by": attrs.get("superseded_by"),
+        # 파서는 대체한 고시 번호를 리스트로 준다. SearchHit은 문자열 하나만 받는다.
+        "superseded_by": _joined(attrs.get("superseded_by")),
     }
     source.update({key: value for key, value in fields.items() if value})
     return source

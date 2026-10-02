@@ -298,6 +298,10 @@ table.mini { border-collapse: collapse; font-size: 13.5px; } table.mini th, tabl
 .stnav button { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: var(--paper); padding: 10px 16px; }
 .stnav button:hover { background: var(--tint); }
 .stnav button[aria-current="true"] { background: var(--tint); box-shadow: inset 3px 0 0 var(--ink); }
+.stnav button.ap { box-shadow: inset 4px 0 0 var(--gc-line); } .stnav button.ap .nl { color: var(--gc-ink); }
+.stnav button.un { background: var(--bad-soft); box-shadow: inset 4px 0 0 var(--bad); } .stnav button.un .nl { color: var(--bad); }
+.stnav button[aria-current="true"] { box-shadow: inset 4px 0 0 var(--ink); outline: 2px solid var(--ink); outline-offset: -2px; }
+.stlg { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 8px 16px; font-size: 12.5px; border-bottom: 1px solid var(--line); } .stlg .ap { color: var(--gc-ink); } .stlg .un { color: var(--bad); }
 .stnav .nl { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .stnav .nt { display: block; font-size: 14px; font-weight: 600; line-height: 1.45; }
 .sv-h { display: flex; flex-direction: column; gap: 4px; }
@@ -307,6 +311,12 @@ table.mini { border-collapse: collapse; font-size: 13.5px; } table.mini th, tabl
 .sv-sec ul { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; max-width: 74ch; }
 .sv-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 @media (max-width: 900px) { .sv-two { grid-template-columns: minmax(0, 1fr); } }
+.brow { display: grid; grid-template-columns: minmax(8em, 15em) minmax(0, 1fr); gap: 4px 12px; align-items: center; padding: 6px 0; border-top: 1px dashed var(--line); } .bl { font-size: 13.5px; } .bcol { display: flex; flex-direction: column; gap: 3px; }
+.bline { display: grid; grid-template-columns: minmax(0, 1fr) 5.5em; gap: 8px; align-items: center; } .btr { height: 14px; background: var(--tint); border-radius: 3px; overflow: hidden; } .bbar { height: 100%; border-radius: 3px; } .bv { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; }
+.bs0 { background: var(--kw); } .bs1 { background: var(--vec); } .bs2 { background: var(--sp); } .lg i.bs0, .lg i.bs1, .lg i.bs2 { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; }
+.xrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 0; border-top: 1px dashed var(--line); } .xl { flex: 0 0 5.5em; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.xb { border: 1.5px solid var(--line); background: var(--paper); border-radius: 8px; padding: 6px 10px; font-size: 13px; line-height: 1.4; } .xb.ch { background: var(--gold); color: var(--gold-ink); border-color: var(--gold-ink); font-weight: 600; } .xb.off { background: var(--tint); color: var(--muted); border-style: dashed; }
+.xs { display: flex; flex-direction: column; gap: 4px; } .xa { color: var(--muted); } .lg i.xch, .lg i.xoff { display: inline-block; width: 12px; height: 10px; border-radius: 3px; margin-right: 4px; } .lg i.xch { background: var(--gold); } .lg i.xoff { border: 1.5px dashed var(--muted); }
 .fgt { margin: 6px 0 0; font-size: 15px; font-weight: 700; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
 .tile { border: 1px solid var(--line); border-radius: 10px; background: var(--paper); padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
@@ -737,6 +747,100 @@ var STG=[
   why:["정답 문서가 본문에서 모은 여러 토큰의 점수는 버려지고, 제목에서 한 토큰이 크게 맞은 다른 문서가 1위가 되었습니다.","제목 가중치를 낮추는 것이 아니라 계산 방식이 문제였습니다. 이 한 줄로 키워드 검색 자체의 결과가 올랐습니다."],
   metrics:"ret+judge"}
 ];
+var DSTG=[{"k": "d1", "num": 1, "l": "1단계", "t": "초기 기준선", "status": "측정", "head": "키워드 질문 50개로 처음 쟀을 때는 BM25가 가장 정확했습니다", "what": ["v1 키워드 성향 질문 50개를 초기 파서 스냅샷에 던진 첫 측정입니다. 검색은 바꾸지 않았습니다."], "why": ["이후 단계의 기준점이 필요했습니다.", "질문에 제목·공고번호·키워드가 그대로 들어 있어 어휘 검색에 유리한 세트였습니다. \"BM25가 가장 정확하다\"는 인상은 세트가 만든 것이고 6단계에서 뒤집힙니다."], "cond": "v1 키워드 50문항 · 초기 파서 스냅샷", "hd": ["검색", "Hit@1", "Recall@5"], "rows": [["BM25", "90.0%", "98.0%"], ["dense", "38.0%", "58.0%"], ["하이브리드", "68.0%", "87.0%"]], "note": null}, {"k": "d2", "num": 2, "l": "2단계", "t": "자연어 기준선", "status": "측정", "head": "질문을 자연어로 바꾸자 dense와 하이브리드의 약점이 드러났습니다", "what": ["코퍼스는 1단계와 같고 평가셋만 v2 자연어 질문 40개로 바꿨습니다."], "why": ["실제 사용자는 문서 제목을 그대로 묻지 않습니다. 표현을 바꿔 묻는 질문과 상황형 질문을 넣었습니다.", "바뀐 것이 질문뿐이라 1단계와의 차이는 성능 하락이 아니라 난이도 변화입니다. 이때 dense는 영어 중심 nomic-embed-text였습니다."], "cond": "v2 자연어 40문항 · 1단계와 같은 스냅샷", "hd": ["검색", "Hit@1", "Recall@5"], "rows": [["BM25", "72.5%", "85.0%"], ["dense", "12.5%", "22.1%"], ["하이브리드", "45.0%", "67.9%"]], "note": null}, {"k": "d3", "num": 3, "l": "3단계", "t": "최신 파서 재추출·재색인", "status": "측정", "head": "파서를 새로 돌려도 검색 성능은 거의 그대로였습니다", "what": ["파서를 최신 산출물로 바꿔 재색인하고 2단계와 같은 40문항으로 다시 쟀습니다."], "why": ["새 파서는 공고번호·기관·게시일 같은 메타데이터를 더 뽑았지만 검색 쿼리가 그 값을 쓰지 않았습니다.", "청크 1,041개의 ID가 전부 같고 본문도 1,039개가 같았습니다. 나머지 2개에는 이미지 마크다운만 추가됐습니다."], "cond": "v2 자연어 40문항", "hd": ["지표", "2단계", "3단계"], "rows": [["BM25 Hit@1", "72.5%", "72.5%"], ["dense Hit@1", "12.5%", "12.5%"], ["하이브리드 Hit@1", "45.0%", "42.5%"], ["하이브리드 Recall@5", "67.9%", "67.9%"]], "note": "하이브리드 Hit@1 차이는 40문항 중 1문항의 순위 차이입니다."}, {"k": "d4", "num": 4, "l": "4단계", "t": "문서당 청크 여러 개 반환", "status": "적용", "head": "문서는 찾았는데 근거 청크가 빠지던 문제를, 반환 단위만 넓혀 풀었습니다", "what": ["문서 순위는 그대로 두고, 문서마다 이미 가져온 후보에서 청크를 최대 4개까지 함께 돌려줍니다. 추가 질의는 없습니다.", "청크가 늘면 프롬프트 앞부분(근거 사용 규칙)이 조용히 잘려서 컨텍스트 창을 16,384로 키웠습니다."], "why": ["BM25 실패를 나눠 보니 정답 문서를 못 찾은 것은 6건, 문서는 찾았는데 반환 청크에 근거가 없는 것이 23건이었습니다.", "근거 청크는 대부분 후보 상위에 있었는데, 문서당 청크 1개만 남기는 중복 제거가 버리고 있었습니다."], "cond": "v2 자연어 40문항 · BM25 · 후보 100개 시뮬레이션", "hd": ["문서당 청크", "문서 Recall@5", "근거 Recall@5"], "rows": [["1 (종전)", "87.5%", "32.5%"], ["2", "87.5%", "42.5%"], ["4 (채택)", "87.5%", "72.5%"], ["5", "87.5%", "83.8%"]], "note": "문서 지표는 청크 수와 무관하게 같습니다. 5개는 프롬프트가 더 커져서 4개를 택했고, 8단계에서 6개로 늘렸습니다."}, {"k": "d5", "num": 5, "l": "5단계", "t": "질의 재작성 융합", "status": "기본 꺼짐", "head": "LLM이 질문을 다시 쓰면 조금 오르지만 검색이 38배 느려졌습니다", "what": ["채팅 모델이 질문을 검색어로 다시 쓰고, 원본과 재작성을 모두 검색해 가중 RRF(1 : 0.5)로 합칩니다. 재작성이 원본을 대체하지 않습니다."], "why": ["남은 실패 6건은 \"업체의 약속 문서\"와 \"수출자 서약서\"처럼 구 단위로 표현이 달라 동의어 사전으로 닿지 않았습니다.", "재작성만 쓰면 3B 모델이 없는 용어(특허공여제)를 지어내 오히려 낮아져서(83.8%), 원본보다 낮은 가중치로만 섞습니다."], "cond": "v2 자연어 40문항", "hd": ["지표", "4단계", "5단계"], "rows": [["BM25 Hit@1", "72.5%", "77.5%"], ["BM25 문서 Recall@5", "85.0%", "87.5%"], ["하이브리드 문서 Recall@5", "67.9%", "77.9%"], ["BM25 p50", "15.8ms", "605.5ms"]], "note": "1차 검색 제목을 넣어 재작성을 접지하는 방법은 더 나빠서(85.0 → 80.0%) 버렸습니다."}, {"k": "d6", "num": 6, "l": "6단계", "t": "임베딩 모델 교체", "status": "적용", "head": "dense가 약했던 것은 검색 방식이 아니라 영어 모델 탓이었습니다", "what": ["dense 임베딩을 nomic-embed-text(768차원)에서 다국어 bge-m3(1024차원)로 바꾸고 전체를 재색인했습니다."], "why": ["1~5단계 내내 dense 문서 Recall@5가 22.1%였습니다. 원인을 접두사 누락과 모델 선택으로 나눠 쟀습니다.", "접두사 누락은 6%p짜리 버그였고, 큰 원인은 영어 중심 모델로 한국어를 검색한 것이었습니다."], "cond": "v2 자연어 40문항 · 오프라인 정확 코사인", "hd": ["방식", "P@1", "Recall@5"], "rows": [["nomic (종전)", "12.5%", "23.8%"], ["nomic + 접두사 교정", "12.5%", "30.0%"], ["bge-m3", "87.5%", "100.0%"]], "note": "문서가 36개뿐이라 100%를 그대로 믿으면 안 됩니다. 색인 시간은 47초에서 155초가 됐습니다."}, {"k": "d7", "num": 7, "l": "7단계", "t": "모델 교체 후에도 재작성은 남는가", "status": "미적용", "head": "모델을 바꾸자 질의 재작성이 고치던 문제가 이미 풀려 있었습니다", "what": ["6단계 위에서 5단계의 질의 재작성을 다시 켜 같은 질문을 던졌습니다."], "why": ["재작성의 대상이던 표현 변경 6문항을 6단계 dense가 전부 상위 5에 넣습니다.", "품질은 같고 지연만 늘어서 기능은 설정으로 남기고 꺼 두었습니다."], "cond": "v2 자연어 40문항 · 문서 Recall@5와 p50", "hd": ["검색", "재작성 없음", "재작성"], "rows": [["BM25", "85.0% · 18.8ms", "87.5% · 529.3ms"], ["dense", "100.0% · 73.3ms", "100.0% · 98.2ms"], ["하이브리드", "92.5% · 95.3ms", "92.5% · 687.4ms"]], "note": null}, {"k": "d8", "num": 8, "l": "8단계", "t": "120문항 평가셋과 문서당 청크 6개", "status": "적용", "head": "평가셋을 120문항으로 키우고 문서당 청크를 6개로 늘렸습니다", "what": ["평가셋을 40문항에서 120문항으로, 코퍼스를 52개 문서·1,198청크로 바꿨습니다.", "문서당 청크를 4개에서 6개로 늘렸습니다. 리랭킹은 채택하지 않았습니다."], "why": ["4개일 때 근거를 놓친 dense 10문항 중 9건은 정답 청크가 문서 안 5~15위, 즉 4개 컷 바로 뒤에 있었습니다.", "16개에서 포화하지만 프롬프트가 33청크까지 커지고 생성 품질을 잴 평가셋이 없어 6개에서 멈췄습니다."], "cond": "docs v2 120문항 · dense", "hd": ["문서당 청크", "근거 Recall@5", "평균 토큰"], "rows": [["4", "92.5%", "6,736"], ["6 (채택)", "95.4%", "8,542"], ["8", "96.7%", "9,915"], ["16", "99.2%", "12,613"]], "note": "평가셋과 코퍼스가 바뀌어 1~7단계와 직접 비교하지 않습니다."}, {"k": "d9", "num": 9, "l": "9단계", "t": "식별자 질의 15문항 추가", "status": "측정", "head": "공고번호를 묻는 질문을 넣자 하이브리드가 BM25보다 못했습니다", "what": ["공고번호·조문번호·HSK 코드로 찾는 질문 15개(121~135)를 추가해 135문항으로 만들었습니다."], "why": ["120문항에 식별자 질문이 한 건도 없어서, BM25가 잘하는 구간을 잰 적이 없었습니다.", "RRF는 순위만 남겨 키워드 일치의 확신을 지웁니다. 121(제2026-598호)은 BM25 1위였지만 하이브리드에서 3위(최고점 대비 0.632)로 내려가 컷오프 0.95에 잘렸습니다."], "cond": "docs v2 135문항 · 컷오프 없이 MRR", "hd": ["유형", "BM25", "dense", "하이브리드"], "rows": [["공고번호 (6)", "0.917", "0.556", "0.778"], ["조문번호 (4)", "0.417", "0.300", "0.362"], ["혼합 (5)", "1.000", "0.900", "1.000"], ["의역 (34)", "0.860", "0.957", "0.924"]], "note": "전체 수치가 내려간 것은 검색이 나빠져서가 아니라 평가셋이 안 보던 구간을 물었기 때문입니다."}, {"k": "d10", "num": 10, "l": "10단계", "t": "학습형 sparse를 어휘 경로로", "status": "미적용", "head": "학습형 sparse는 정밀도를 맞추면 dense와 동률이었습니다", "what": ["bge-m3의 sparse 헤드로 질문·문서를 인코딩해 점곱으로 검색하는 sparse와, 이를 BM25와 섞는 hybrid_sparse를 135문항에 올렸습니다."], "why": ["9단계의 숙제는 어휘 경로의 확신을 융합 뒤까지 살리는 것이었습니다.", "같은 컷오프 비율이 모드마다 전혀 다른 강도로 작동합니다(0.90에서 sparse 1.40건, dense 4.44건). 그래서 반환분 정밀도를 맞춘 지점에서 비교했습니다."], "cond": "docs v2 135문항", "hd": ["모드 (비율)", "반환분 정밀도", "Hit@5", "MRR@5"], "rows": [["dense (0.99)", "89.1%", "91.9%", "0.9074"], ["sparse (0.95)", "89.4%", "91.9%", "0.9093"], ["hybrid (0.99)", "89.3%", "89.6%", "0.8963"], ["bm25 (0.97)", "80.3%", "82.2%", "0.8080"]], "note": "코드는 2026-09-21에 제거했습니다."}, {"k": "d11", "num": 11, "l": "11단계", "t": "Qwen3-Embedding-0.6B", "status": "미적용", "head": "더 새로운 임베딩 모델도 bge-m3를 넘지 못했습니다", "what": ["Qwen3-Embedding-0.6B로 별도 색인을 만들고, 질의 접두사가 있을 때와 없을 때를 모두 쟀습니다."], "why": ["6단계처럼 모델 교체로 한 번 더 큰 이득이 나는지 확인했습니다.", "공고번호형 MRR이 두 dense 모델에서 0.500으로 똑같았습니다. 남은 구멍은 임베딩 모델의 문제가 아닙니다."], "cond": "docs v2 135문항", "hd": ["모델", "P@1", "반환분 정밀도", "MRR@5"], "rows": [["bge-m3 (현행)", "89.6%", "89.1%", "0.9074"], ["Qwen3, 접두사 없음", "87.4%", "86.7%", "0.8778"], ["Qwen3, 접두사 적용", "90.4%", "87.9%", "0.9037"]], "note": "접두사 하나가 MRR 0.8778 → 0.9037을 만듭니다. 모델 비교에서 이걸 빠뜨리면 결론이 뒤집힙니다."}, {"k": "d12", "num": 12, "l": "12단계", "t": "구어체 어미가 검색을 망가뜨린다", "status": "적용", "head": "\"알려줘\"의 \"주\" 한 글자가 엉뚱한 문서를 1위로 올리고 정답을 잘라냈습니다", "what": ["nori 분석기의 제외 품사에 보조용언(VX)과 지정사(VCP·VCN)를 더했습니다."], "why": ["\"전략물자 알려줘\"에서 \"주\"가 표 각주 \"주 :\"에 걸려 무관한 문서가 14.37점으로 1위가 됐습니다.", "컷오프 기준선이 12.94로 올라가 정답 4건이 모두 잘리고 1건만 남았습니다."], "cond": "docs v2 135문항 · 문장 끝만 바꾼 구어체 셋 · BM25", "hd": ["조건", "P@1", "Hit@5", "MRR@5"], "rows": [["수정 전 · 정식", "80.0%", "86.7%", "0.8265"], ["수정 전 · 구어체", "76.3%", "83.0%", "0.7898"], ["수정 후 · 정식", "82.2%", "88.1%", "0.8438"], ["수정 후 · 구어체", "82.2%", "88.1%", "0.8438"]], "note": "dense MRR은 0.9074로 그대로여서 변화가 분석기에서 왔음을 확인했습니다. 부정 보조용언 \"않\"도 함께 빠지는 대가가 있습니다."}, {"k": "d17", "num": 17, "l": "17단계", "t": "BM25 대신 sparse를 섞으면", "status": "미적용", "head": "BM25 자리에 sparse를 넣으면 어휘 짝으로는 낫지만 융합하면 평균이 됐습니다", "what": ["dense와 섞는 어휘 검색기를 BM25에서 학습형 sparse(bge-m3)로 바꿔 봤습니다."], "why": ["16단계에서 BM25 바닥값을 걷자 하이브리드 MRR이 0.9259에서 0.9123으로 내려가, 어휘 쪽을 더 나은 검색기로 바꿔 봤습니다.", "공고번호형은 sparse 1.000, dense 0.500인데 융합하면 0.708로, 더 나은 쪽보다 나빴습니다."], "cond": "docs v2 135문항", "hd": ["지표", "BM25", "sparse"], "rows": [["어휘 검색 단독 1위", "82.2%", "90.4%"], ["하이브리드 MRR", "0.9123", "0.9259"], ["dense 단독 MRR (참고)", "0.9407", "0.9407"]], "note": "sparse 경로는 제거했습니다. 22단계에서 이 격차가 BM25 설정 결함이었음이 드러납니다."}, {"k": "d23", "num": 23, "l": "23단계", "t": "채점 단위를 청크로", "status": "적용", "head": "검색이 아니라 재는 자를 문서에서 청크로 바꿨습니다", "what": ["근거 청크 지표를 주 지표로, 문서 지표를 진단용으로 바꾸고 근거 Precision·MRR을 더했습니다.", "청크로 재자 드러난 무관 청크를 좇아 공고번호 필터와 내려받기 사본 병합을 넣었습니다."], "why": ["답변 모델이 받는 것은 문서가 아니라 청크입니다.", "문서 단위로는 만점인 질문도 청크로 보면 정답이 아닌 청크가 많이 섞여 있었습니다."], "cond": "docs v2 135문항", "hd": ["지표", "이전", "이후"], "rows": [["전달된 무관 청크", "124", "71"], ["근거 Recall@5 (하이브리드 − dense)", "-", "+5.9p"]], "note": "22단계 순위를 다시 재도 하이브리드 우위는 유지됐습니다(문서 P@1은 dense와 동률)."}, {"k": "d24", "num": 24, "l": "24단계", "t": "SPLADE를 같은 135문항에 세움", "status": "미적용", "head": "SPLADE+dense가 현재 BM25+dense보다 1위를 더 맞혔지만 바로 바꾸지는 않았습니다", "what": ["학습형 SPLADE(telepix/PIXIE-Splade-v1.5)를 지금까지의 검색기들과 같은 135문항에서 비교했습니다."], "why": ["BM25가 질문의 핵심보다 고빈도 일반어에 끌리는 문제를 학습형 sparse가 메우는지 보려 했습니다.", "판정되지 않은 청크가 19%라 선택 편향이 남고, 첫 근거 순위와 온라인 비용도 재지 않았습니다."], "cond": "docs v2 135문항", "hd": ["지표", "BM25+dense", "SPLADE+dense"], "rows": [["문서 P@1", "94.8%", "97.8%"], ["청크 근거 Recall", "91.1%", "94.1%"], ["직접 답 Precision (판정분)", "31.4%", "38.1%"]], "note": null}, {"k": "d25", "num": 25, "l": "25단계", "t": "core를 docs 질의셋에 섞으면", "status": "적용", "head": "core를 섞으면 깎인 원인은 코퍼스가 아니라 인덱스마다 따로 계산되는 BM25 통계였습니다", "what": ["검색기는 그대로 두고 읽는 인덱스 별칭만 docs에서 core+docs로 바꿔 원인을 추적했습니다.", "여러 인덱스를 함께 검색할 때 BM25 통계를 전역으로 맞추게 했습니다(28단계에서 반영 확인)."], "why": ["core를 섞으면 근거 Recall@5가 0.9630에서 0.9111로 5.2p 떨어졌고, 정답은 모두 색인 안에 있어 순위 문제였습니다.", "IDF가 인덱스마다 따로 계산돼 \"러시아\"가 docs에서 0.42%, core에서 5.54%로 다른 자로 채점됐습니다. 청크 폭주·컷오프·청크 길이는 원인이 아니었습니다."], "cond": "docs v2 135문항 · core+docs", "hd": ["맞힌 문항", "따로 계산", "전역 통계"], "rows": [["BM25", "63", "92"], ["하이브리드", "109", "114"]], "note": "손해는 어휘 검색기에서만 났습니다(bm25 −59, dense −9)."}, {"k": "d26", "num": 26, "l": "26단계", "t": "튜닝이 docs에 과적합됐는가", "status": "측정", "head": "처음 보는 문서와 질문에서 재자 1위 적중이 떨어졌습니다", "what": ["core를 새로 수집해 홀드아웃 코퍼스와 질문 69개를 만들고, 질문은 엔진을 돌리기 전에 동결했습니다."], "why": ["1~25단계의 튜닝값은 모두 docs 한 세트를 보고 골랐습니다.", "하이브리드 자체는 새 데이터에서도 가장 나았고, 제목 가중치를 낮추는 쪽이 이득이라는 신호가 28단계로 이어졌습니다."], "cond": "docs v2 135문항 · holdout 69문항", "hd": ["지표", "값"], "rows": [["문서 1위 적중 (docs)", "0.948"], ["같은 규모의 새 데이터", "0.841"], ["전체 규모 (84k청크)", "0.754"], ["제목 가중치 1로 낮추면", "+5.8p"]], "note": null}, {"k": "d27", "num": 27, "l": "27단계", "t": "질의마다 검색 방식을 고르기", "status": "미적용", "head": "질문마다 검색 방식을 골라도 얻을 것이 거의 없었습니다", "what": ["질문 성격에 따라 키워드만, dense만, 하이브리드를 고르는 라우터를 시험했습니다."], "why": ["식별자 질문은 BM25, 의역은 dense가 낫다면 고르는 쪽이 이길 수 있다고 봤습니다.", "회수할 수 있는 손실은 방식 선택이 아니라 문서 안 청크 선택 문제였습니다."], "cond": "docs v2 135문항", "hd": ["시험", "결과"], "rows": [["완벽히 고르는 오라클 (docs)", "하이브리드 대비 +3문항분"], ["식별자 규칙 라우터", "근거 Recall@5 0.9037 (더 나쁨)"], ["학습 라우터", "−0.74%p / +0.49%p (구간이 0 포함)"]], "note": "모든 질문이 하이브리드를 타도록 고정했습니다."}, {"k": "d28", "num": 28, "l": "28단계", "t": "제목 1배 + 다중 인덱스 DFS", "status": "적용", "head": "제목 가중치를 낮추고 인덱스 간 BM25를 맞추자 반환 문서 정밀도가 올랐습니다", "what": ["제목 가중치를 title^3에서 title^1로 낮추고, 여러 인덱스를 함께 검색할 때 dfs_query_then_fetch로 BM25 통계를 전역으로 맞췄습니다.", "랭커를 고정하고 새로 올라온 상위 결과의 라벨만 판정했습니다."], "why": ["26단계에서 제목 가중치를 낮추는 쪽이 새 데이터에서 이득이었습니다.", "25단계에서 찾은 인덱스별 통계 문제를 함께 고쳤습니다."], "cond": "docs v2 135문항 · holdout 69문항", "hd": ["지표", "이전", "이후"], "rows": [["반환 문서 Precision@5 (docs)", "0.596", "0.755"], ["반환 문서 Precision@5 (holdout)", "-", "+7.0p"], ["근거를 잃은 문항", "-", "1 (holdout-v1-004)"]], "note": "혼합 코퍼스 평가기의 색인 범위 오류도 이 단계에서 고쳤습니다."}, {"k": "d29", "num": 29, "l": "29단계", "t": "새 검증 질문을 동결하고 평가", "status": "측정", "head": "검색 전에 고정한 새 질문 36개에서 1위 34개를 맞혔습니다", "what": ["36개 부모 문서를 무작위로 뽑아 질문과 정답을 검색 전에 커밋하고, 설정을 바꾸지 않고 평가했습니다."], "why": ["튜닝에 쓰지 않은 질문으로 지금 설정을 확인하려 했습니다.", "남은 실패 두 건이 연도·보고 기간 혼동이어서 30단계로 이어졌습니다."], "cond": "검증 36문항 · core+docs", "hd": ["항목", "결과"], "rows": [["1위 적중", "34 / 36"], ["남은 실패", "007 · 036 (연도·기간 혼동)"]], "note": "반환 근거를 정답 대안으로 추가한 뒤의 값입니다."}, {"k": "d30", "num": 30, "l": "30단계", "t": "연도·반기가 비슷한 문서를 구별", "status": "적용", "head": "질문의 연도·반기와 제목을 맞춰 보는 세 번째 순위 목록을 더했습니다", "what": ["질문에 연도·반기가 있으면, 후보 중 제목이 같은 기간이고 주제어도 맞는 문서로 세 번째 RRF 목록을 만듭니다. 이런 후보는 컷오프에서 보존합니다."], "why": ["같은 공고가 해마다 반복되면 2025년 상반기와 하반기 문서를 BM25도 dense도 가르지 못했습니다.", "새 문서를 끌어오거나 다른 연도를 지우지는 않습니다."], "cond": "날짜 진단 14문항 · CP 확인 8문항", "hd": ["질문셋", "이전", "이후"], "rows": [["날짜 진단 (5위 안)", "10 / 14", "14 / 14"], ["CP 확인", "4 / 8", "8 / 8"], ["docs 135 · holdout 69", "-", "반환 배열까지 동일"]], "note": "질문셋이 작고 특정 유형에 치우쳐 있어 일반화는 주장하지 않습니다."}, {"k": "d31", "num": 31, "l": "31단계", "t": "전달 청크의 Precision 올리기", "status": "기본 꺼짐", "head": "점수로 청크를 자르면 정답도 같이 잘리고, LLM 필터는 너무 느렸습니다", "what": ["LLM이 청크를 0(무관)·1(조건·맥락)·2(직접 근거)로 매겨 0점만 걸러 내는 필터를 만들었습니다(기본 꺼짐).", "점수 컷오프 45조합과 제목을 뺀 청크 점수, SPLADE도 함께 시험했습니다."], "why": ["문서 컷오프 뒤에도 정답 문서 안의 다른 절(신청 서식·제출 방법·문의처)이 함께 전달됐습니다.", "점수로 자를수록 정답 근거도 같이 잘렸고, 목표 80%를 넘은 조합은 없었습니다."], "cond": "docs v2 135문항", "hd": ["방식", "청크 Precision", "청크 Recall"], "rows": [["기준 (끔)", "25.1%", "96.3%"], ["LLM 필터", "37.8%", "96.3%"], ["점수 컷오프 0.98", "60.0%", "85.2%"], ["점수 컷오프 최고", "68.9%", "68.9%"]], "note": "LLM 필터는 지연 p50이 15초라 기본 꺼짐입니다."}, {"k": "d32", "num": 32, "l": "32단계", "t": "정답이 1위에 오지 않는 이유", "status": "일부 적용", "head": "1위를 뺏는 것은 같은 주제인데 답이 없는 문서였습니다", "what": ["원인을 나누고 처방 7개를 시험해, 날짜를 모르는 문서에도 기간 가산점(+4)을 주는 것 하나만 반영했습니다.", "컷오프 완화, FAQ 사본 병합, 부모 순위 RRF, 출처 설명 분리, LLM 재정렬과 목록 선택은 기각했습니다."], "why": ["정답은 대부분 후보 안에 있었습니다(놓친 19문항 모두 한 검색기 상위 약 20위 안).", "\"2005년 미국 수출통제 세미나에서는\"에 답 없는 세미나 개최 안내가 1위, 정답 \"상무부 세미나 QnA\"가 뒤였습니다."], "cond": "docs v2 135문항 · 검증 36문항", "hd": ["지표", "이전", "이후"], "rows": [["문서 1위 적중 (docs)", "0.837", "0.844"], ["반환 문서 Precision", "0.757", "0.773"], ["LLM 목록 선택: 검증 36 1위 (기각)", "1.000", "0.917"]], "note": null}, {"k": "d33", "num": 33, "l": "33단계", "t": "청크를 먼저 고르는 파이프라인", "status": "일부 적용", "head": "청크를 먼저 골라도 같은 재현율–정밀도 곡선 위에 있었습니다", "what": ["청크를 먼저 고르고 문서는 그 부모로 정하는 파이프라인을 만들었지만 기본 꺼짐입니다.", "문서 안 청크 순서만 반영했습니다. 첫 청크는 dense, 나머지는 청크 단위 RRF 순서입니다."], "why": ["예산·컷오프·문서 상한·합의 가산·트림 모두 같은 곡선 위에 있어, 같은 Recall에서 문서 우선만큼의 문서 정밀도를 내지 못했습니다.", "034는 정답 청크가 BM25 2위·dense 9위인데 dense 순서만 쓰다 6개 밖으로 밀렸습니다."], "cond": "개발 셋", "hd": ["지표", "이전", "이후"], "rows": [["근거 회수 (문서 안 순서 반영)", "0.844", "0.863"], ["청크 우선의 문서 정밀도", "0.667", "0.467"], ["복수 근거 질문 Recall (청크 우선)", "0.776", "0.81~0.86"]], "note": "근거 회수는 개발 셋 +4문항, 손실 0, 95% 구간 하한 0입니다."}, {"k": "d34", "num": 34, "l": "34단계", "t": "어휘 검색에서 효과 없는 장치 제거", "status": "적용", "head": "넣고 뺀 비교가 없던 장치를 하나씩 빼 보고, 효과 없는 것을 걷어냈습니다", "what": [".standard 부속 필드를 쿼리에서 빼고, 문서 종류 부스트를 지웠습니다.", "현행판 우대 +4, 기간 가산점, 시행일 필터, 동의어 20그룹은 남겼습니다."], "why": ["넣고 뺀 차이가 개발 셋에서 한두 문항이고 방향이 엇갈렸습니다.", "문서 종류 부스트는 색인에 종류값이 있는 청크가 0개라 작동하지 않던 코드였습니다."], "cond": "docs v2 135문항", "hd": ["장치", "판정", "근거"], "rows": [[".standard 필드", "쿼리에서 뺌", "식별자 15문항 Hit 0.933 → 0.867 (127 한 문항)"], ["문서 종류 부스트", "지움", "결과 변화 0"], ["현행판 우대 +4", "유지", "상수로 작동"]], "note": "식별자 질문이 22개뿐이라 효과를 확인도 반증도 못 했습니다."}, {"k": "d35", "num": 35, "l": "35단계", "t": "SPLADE 도메인 파인튜닝 (질의 108개)", "status": "미적용", "head": "전략물자 질문으로 SPLADE를 학습시켰지만 좋아지지 않았습니다", "what": ["전략물자 청크 54곳에서 질의 108개를 직접 써서 PIXIE-Splade를 파인튜닝했습니다.", "오답 후보에 평가 정답 청크가 섞인 것을 찾아 빼고 다시 돌렸습니다."], "why": ["비슷한 문서가 촘촘히 겹치는 구간(019·127·128)을 고치려 했습니다.", "기준 모델이 합성 질의를 이미 1위로 풀어서 배울 신호가 거의 없었습니다."], "cond": "docs v2 135문항 · SPLADE 단독 문서 P@1", "hd": ["설정", "P@1", "이긴 / 진 문항"], "rows": [["기준 (학습 안 함)", "130", "-"], ["a2", "127", "0 / 3"], ["b2 (최고)", "129", "1 / 2"], ["c2", "128", "0 / 2"]], "note": "오답 후보 540건 중 124건(23%)이 평가 질의의 근거 청크였습니다. 고쳐도 이득으로 바뀌지 않았습니다."}, {"k": "d36", "num": 36, "l": "36단계", "t": "SPLADE+dense를 현재 hybrid와 비교", "status": "미적용", "head": "처음 보는 문서에서 SPLADE+dense가 더 나았지만 아직 확정할 수 없습니다", "what": ["현재 운영 하이브리드를 다시 재서, 튜닝 세트와 처음 보는 문서·질문(holdout) 두 곳에서 SPLADE+dense와 나란히 놓았습니다.", "지연과 인덱스 크기도 처음으로 쟀습니다."], "why": ["24단계의 신호는 튜닝 세트 한 곳에서만 나왔습니다.", "처음 보는 문서에서 이득이 더 커서 튜닝 세트만의 이득은 아닙니다. 검색 지연은 5~15ms, 질의 인코딩은 CPU 66ms입니다."], "cond": "docs v2 135문항 · holdout-small 69문항", "hd": ["지표", "현재 hybrid", "SPLADE+dense"], "rows": [["문서 P@1 (docs)", "96.3%", "98.5%"], ["문서 P@1 (holdout)", "85.5%", "89.9%"], ["Hit@5 (holdout)", "92.8%", "97.1%"], ["반환분 정밀도 (holdout)", "65.7%", "80.4%"]], "note": "P@1 차이의 95% 구간이 두 세트 모두 0을 포함하고, 첫 근거 청크 순위는 조금 뒤로 갑니다. 운영 기본값은 바꾸지 않았습니다."}, {"k": "d37", "num": 37, "l": "37단계", "t": "카테고리를 고르고 검색", "status": "적용", "head": "카테고리별 인덱스와 검색 경로를 새로 붙였습니다", "what": ["법령·고시(청크 673개), 행정·업무(청크 183개) 인덱스와, 카테고리 ID를 받는 범용 API·화면을 만들었습니다. 통합 인덱스는 건드리지 않았습니다.", "이 경로에서는 BM25 하한과 답변 가능성 판정을 끕니다."], "why": ["docs 기준 BM25 하한 14.75가 법령 인덱스에서 21문항 중 10문항을 빈 결과로 만들었고, 판정도 기각을 일으켰습니다.", "못 싣는 이유는 라벨, 청킹(번호 목록 분할로 조문 제목 소실), 옛 판이 최신 판보다 앞서는 문제였습니다."], "cond": "법령 21문항 · 행정 30문항 (본문을 보고 쓴 점검용)", "hd": ["카테고리", "dense", "하이브리드", "BM25"], "rows": [["법령·고시 근거 Recall", "0.952", "0.905", "0.762"], ["행정·업무 근거 Recall", "0.933", "0.933", "0.833"]], "note": "같은 창 크기에서 SPLADE가 BM25보다 높지만 차이는 한두 문항이고, 서비스에는 붙이지 않았습니다."}, {"k": "d38", "num": 38, "l": "38단계", "t": "합성 질의 2,702개로 SPLADE 재파인튜닝", "status": "미적용", "head": "어려운 질문만 25배로 늘려 학습해도 채택 기준을 넘지 못했습니다", "what": ["30B 모델로 만든 질의 중 기준 SPLADE가 어려워하는 것만 골라 학습 예시 2,702개를 만들고, 평가 정답 청크는 오답 후보에서 뺐습니다."], "why": ["35단계는 학습 신호가 약했다고 봤습니다. 이번에는 첫 스텝 손실이 1.7(35단계 0.24)로 배울 신호가 있었습니다.", "청크 1위 적중은 올랐지만 상위 5청크 회수는 그대로여서 문서 단위 이득이 상쇄됐습니다."], "cond": "SPLADE 단독 문서 P@1 (문항 수)", "hd": ["세트", "기준", "A", "C", "D", "E"], "rows": [["docs_v2 (135)", "130", "126", "125", "126", "125"], ["holdout-small (69)", "61", "60", "63", "63", "63"], ["검증 (36)", "30", "31", "33", "31", "32"]], "note": "사전에 정한 기준(깨끗한 두 세트 합 +3 이상, docs_v2 129 이상)을 통과한 설정이 없습니다."}, {"k": "d39", "num": 39, "l": "39단계", "t": "BM25·dense 후보 수 스윕", "status": "적용", "head": "후보 수는 병목이 아니어서 dense 후보를 50개에서 25개로 낮췄습니다", "what": ["BM25 5~100개 × dense 10~200개, 25조합을 같은 질문·같은 임베딩으로 돌렸습니다.", "SEARCH_VECTOR_CANDIDATES 기본값을 50에서 25로 낮췄습니다. BM25 후보는 25개 그대로입니다."], "why": ["후보 수가 성능에 얼마나 영향을 주는지 잰 기록이 없었습니다.", "25개 이상이면 지표가 소수점까지 같아, 두 검색기의 후보 수를 맞췄습니다."], "cond": "docs v2 135문항 · 판정·필터 끔", "hd": ["BM25", "dense", "문서 P@1", "근거 Recall"], "rows": [["5", "10", "96.3%", "95.9%"], ["25", "50 (이전)", "95.6%", "95.6%"], ["25", "25 (현행)", "95.6%", "95.6%"], ["100", "200", "95.6%", "95.6%"]], "note": "개발 셋 하나만 썼고 지연은 재지 않았습니다. 이 탐색기의 질문별 결과는 dense 50개로 실행한 값입니다."}];
+(function(){
+  var NUM={s13:13,s16:14,s18:18,s19:19,s20:20,s21:21,s22:22};
+  STG.forEach(function(x){ x.num=NUM[x.k]; });
+  DSTG.forEach(function(x){ SG.nodes.push({k:x.k,l:x.l,t:x.t}); STG.push({k:x.k,num:x.num,metrics:"doc",doc:x,head:x.head,what:x.what,why:x.why}); });
+  STG.sort(function(a,b){ return a.num-b.num; });
+})();
+function stgKey(n){ return STGN[n]||(DSTG.some(function(x){return String(x.num)===String(n);})?"d"+n:null); }
+
+var DFIG={
+ 1:[{t:"질문 유형 v1(키워드) 50개에서 첫 문서 적중",u:"%",max:100,rows:[["BM25",[90.0]],["dense",[38.0]],["하이브리드",[68.0]]]}],
+ 2:[{t:"자연어 40개로 바꾸자 첫 문서 적중이 이렇게 갈렸습니다",u:"%",max:100,rows:[["BM25",[72.5]],["dense",[12.5]],["하이브리드",[45.0]]]}],
+ 3:[{t:"파서를 새로 돌려도 지표는 그대로입니다 (하이브리드 1위의 차이는 1문항)",u:"%",max:100,s:["2단계","3단계"],rows:[["BM25 첫 문서 적중",[72.5,72.5]],["dense 첫 문서 적중",[12.5,12.5]],["하이브리드 첫 문서 적중",[45.0,42.5]],["하이브리드 Recall@5",[67.9,67.9]]]}],
+ 4:[{t:"문서당 반환 청크 수에 따른 근거 Recall@5 (문서 Recall은 87.5%로 고정)",u:"%",max:100,hl:3,rows:[["1개 (종전)",[32.5]],["2개",[42.5]],["3개",[55.0]],["4개 (채택)",[72.5]],["5개",[83.8]]]}],
+ 5:[{t:"재작성으로 오른 정도",u:"%",max:100,s:["4단계","5단계"],rows:[["BM25 첫 문서 적중",[72.5,77.5]],["하이브리드 문서 Recall@5",[67.9,77.9]]]},{t:"대신 검색 시간(p50)이 38배가 됐습니다",u:"ms",max:650,s:["4단계","5단계"],rows:[["BM25 p50",[15.8,605.5]]]}],
+ 6:[{t:"dense 문서 Recall@5",u:"%",max:100,hl:2,rows:[["nomic (종전)",[23.8]],["nomic + 접두사 교정",[30.0]],["bge-m3",[100.0]]]}],
+ 7:[{t:"품질은 그대로, 검색 시간(p50)만 늘었습니다",u:"ms",max:700,s:["재작성 없음","재작성"],rows:[["BM25",[18.8,529.3]],["dense",[73.3,98.2]],["하이브리드",[95.3,687.4]]]}],
+ 8:[{t:"문서당 청크 수에 따른 dense 근거 Recall@5",u:"%",max:100,hl:1,rows:[["4개",[92.5]],["6개 (채택)",[95.4]],["8개",[96.7]],["16개",[99.2]]]}],
+ 9:[{t:"식별자 질문 MRR@5: 공고번호는 BM25가 앞섭니다",u:"",max:1,s:["BM25","dense","하이브리드"],rows:[["공고번호 (6)",[0.917,0.556,0.778]],["조문번호 (4)",[0.417,0.300,0.362]],["혼합 (5)",[1.000,0.900,1.000]],["의역 (34)",[0.860,0.957,0.924]]]}],
+ 10:[{t:"반환분 정밀도를 맞춰 비교하면 sparse와 dense는 동률입니다",u:"%",max:100,rows:[["dense (0.99)",[89.1]],["sparse (0.95)",[89.4]],["hybrid (0.99)",[89.3]],["BM25 (0.97)",[80.3]]]}],
+ 11:[{t:"MRR@5: 접두사를 줘도 bge-m3를 넘지 못했습니다",u:"",max:1,hl:0,rows:[["bge-m3 (현행)",[0.9074]],["Qwen3, 접두사 없음",[0.8778]],["Qwen3, 접두사 적용",[0.9037]]]}],
+ 12:[{t:"BM25 MRR@5: 수정 후 구어체가 정식 질문과 같아졌습니다",u:"",max:1,s:["수정 전","수정 후"],rows:[["정식 질문",[0.8265,0.8438]],["구어체 질문",[0.7898,0.8438]]]}],
+ 17:[{t:"어휘 검색기를 sparse로 바꾸면",u:"",max:100,s:["BM25","sparse"],rows:[["어휘 단독 1위 적중 (%)",[82.2,90.4]],["하이브리드 MRR (×100)",[91.2,92.6]]]}],
+ 23:[{t:"질문당 전달된 정답 아닌 청크(무관 청크) 수",u:"개",max:130,s:["이전","이후"],rows:[["135문항 합계",[124,71]]]}],
+ 24:[{t:"SPLADE+dense가 현재 BM25+dense보다 앞선 지표",u:"%",max:100,s:["BM25+dense","SPLADE+dense"],rows:[["문서 P@1",[94.8,97.8]],["청크 근거 Recall",[91.1,94.1]],["직접 답 Precision",[31.4,38.1]]]}],
+ 25:[{t:"맞힌 문항 수 (135문항)",u:"",max:135,s:["인덱스마다 따로 계산","전역 통계"],rows:[["BM25",[63,92]],["하이브리드",[109,114]]]}],
+ 26:[{t:"문서 1위 적중: 처음 보는 데이터일수록 떨어졌습니다",u:"",max:1,rows:[["docs (튜닝 세트)",[0.948]],["같은 규모의 새 데이터",[0.841]],["전체 규모 (84k청크)",[0.754]]]}],
+ 28:[{t:"반환 문서 Precision@5 (docs)",u:"",max:1,s:["제목 3배","제목 1배+전역 통계"],rows:[["docs 135문항",[0.596,0.755]]]}],
+ 29:[{t:"검색 전에 고정한 새 질문 36개",u:"문항",max:36,rows:[["1위 적중",[34]]]}],
+ 30:[{t:"연도·반기 구별 진단 (5위 안에 든 문항)",u:"문항",s:["이전","이후"],rows:[["날짜 진단 (14문항)",[10,14],14],["CP 확인 (8문항)",[4,8],8]]}],
+ 31:[{t:"청크를 자를수록 Precision은 오르지만 Recall도 같이 떨어집니다",u:"%",max:100,s:["Precision","Recall"],rows:[["기준 (끔)",[25.1,96.3]],["LLM 필터",[37.8,96.3]],["점수 컷오프 0.98",[60.0,85.2]],["점수 컷오프 최고",[68.9,68.9]]]}],
+ 32:[{t:"기간 가산점 하나만 반영한 효과",u:"",max:1,s:["이전","이후"],rows:[["문서 1위 적중",[0.837,0.844]],["반환 문서 Precision",[0.757,0.773]]]}],
+ 33:[{t:"문서 안 청크 순서는 올랐지만, 청크 우선 파이프라인은 정밀도가 떨어졌습니다",u:"",max:1,s:["이전","이후"],rows:[["근거 회수 (문서 안 순서)",[0.844,0.863]],["문서 정밀도 (청크 우선)",[0.667,0.467]]]}],
+ 34:[{t:"장치를 걷어낸 뒤 식별자 15문항 Hit (127 한 문항 차이)",u:"",max:1,s:["이전","이후"],rows:[["식별자 15문항 Hit",[0.933,0.867]]]}],
+ 35:[{t:"SPLADE 단독 문서 P@1 (135문항 중): 학습한 모델이 기준을 넘지 못했습니다",u:"",max:135,hl:0,rows:[["기준 (학습 안 함)",[130]],["a2",[127]],["b2 (최고)",[129]],["c2",[128]]]}],
+ 36:[{t:"SPLADE+dense가 처음 보는 문서에서 더 크게 앞섰습니다",u:"%",max:100,s:["현재 hybrid","SPLADE+dense"],rows:[["P@1 (docs)",[96.3,98.5]],["P@1 (holdout)",[85.5,89.9]],["Hit@5 (holdout)",[92.8,97.1]],["반환분 정밀도 (holdout)",[65.7,80.4]]]}],
+ 37:[{t:"카테고리 인덱스의 근거 Recall (본문을 보고 쓴 점검용 질문)",u:"",max:1,s:["dense","하이브리드","BM25"],rows:[["법령·고시 (21문항)",[0.952,0.905,0.762]],["행정·업무 (30문항)",[0.933,0.933,0.833]]]}],
+ 38:[{t:"학습 문서군에서는 내려가고 처음 보는 문서에서는 올랐습니다 (문항 수)",u:"",s:["기준","설정 C"],rows:[["docs_v2 (135)",[130,125],135],["holdout-small (69)",[61,63],69],["검증 (36)",[30,33],36]]}],
+ 39:[{t:"후보 수를 25개 이상으로 두면 결과가 같습니다",u:"%",max:100,s:["문서 P@1","근거 Recall"],rows:[["BM25 5 · dense 10",[96.3,95.9]],["BM25 25 · dense 50 (이전)",[95.6,95.6]],["BM25 25 · dense 25 (현행)",[95.6,95.6]],["BM25 100 · dense 200",[95.6,95.6]]]}]
+};
+
+var DFLOW={
+ 4:{b:["질문",["BM25","dense"],"문서 순위(RRF)","문서당 청크 1개 반환"],a:["질문",["BM25","dense"],"문서 순위(RRF)","*후보 풀에서 문서당 청크 최대 4개"],n:"문서 순위는 그대로이고 반환 단위만 넓어졌습니다. 추가 질의는 없습니다."},
+ 5:{b:["질문",["BM25","dense"],"RRF","결과"],a:["질문",["원본으로 검색","*LLM 재작성으로 검색 (가중치 0.5)"],"*가중 RRF","결과"],n:"기본값은 꺼짐입니다. 재작성은 문서를 추가할 수는 있어도 원본의 1위를 밀어내지 못합니다."},
+ 6:{b:["질문","nomic-embed-text (768차원)","kNN 검색"],a:["질문","*bge-m3 (1024차원)","kNN 검색"],n:"차원이 달라 모든 데이터셋을 다시 색인해야 했습니다."},
+ 8:{b:["문서 순위","문서당 청크 4개"],a:["문서 순위","*문서당 청크 6개"],n:"평가셋도 40문항에서 120문항으로 바뀌었습니다."},
+ 10:{b:["질문",["BM25","dense"],"RRF"],a:["질문",["~학습형 sparse (실험)","dense"],"RRF"],n:"정밀도를 맞추면 dense와 동률이라 채택하지 않았고 코드를 제거했습니다."},
+ 11:{b:["질문","bge-m3","kNN 검색"],a:["질문","~Instruct 접두사 + Qwen3-Embedding (실험)","kNN 검색"],n:"질의에만 접두사가 붙는 비대칭 모델입니다. 채택하지 않았습니다."},
+ 12:{b:["질문","nori 분석 (알리 + 어 + 주 + 어)","토큰 [알리, 주]","BM25"],a:["질문","nori 분석","*보조용언(VX) 제거","토큰 [알리]","BM25"],n:"\"주\" 한 토큰이 각주 \"주 :\"에 걸려 엉뚱한 문서가 1위가 되던 경로를 막았습니다."},
+ 17:{b:["질문",["BM25","dense"],"RRF"],a:["질문",["~sparse (실험)","dense"],"RRF"],n:"융합하면 sparse의 강점이 평균으로 묻혀 채택하지 않았습니다."},
+ 23:{b:["질문","검색","문서 단위 채점"],a:["질문","*공고번호 필터","검색","*내려받기 사본 병합","*청크 단위 채점"],n:"검색 결과가 아니라 재는 자가 바뀌었고, 무관 청크를 줄이는 필터가 따라 붙었습니다."},
+ 24:{b:["질문",["BM25","dense"],"RRF"],a:["질문",["~SPLADE (비교)","dense"],"RRF"],n:"비교 실험이라 운영 경로는 바뀌지 않았습니다."},
+ 25:{b:["질문","별칭 2개(docs·core)","*인덱스마다 따로 IDF 계산","한 순위표"],a:["질문","별칭 2개(docs·core)","*전역 통계로 IDF 계산 (DFS)","한 순위표"],n:"원인은 코퍼스가 아니라 합치는 방식이었습니다."},
+ 27:{b:["질문",["BM25","dense"],"RRF(항상 하이브리드)"],a:["질문","~라우터가 방식 선택",["~BM25만","~dense만","~하이브리드"]],n:"어떤 라우터도 하이브리드를 넘지 못해 채택하지 않았습니다."},
+ 28:{b:["질문","BM25 (제목 ×3)","인덱스마다 통계"],a:["질문","BM25 (*제목 ×1)","*전역 통계 (dfs_query_then_fetch)"],n:"제목 가중치를 낮추고 인덱스 간 통계를 맞췄습니다."},
+ 30:{b:["질문",["BM25","dense"],"RRF (목록 2개)","컷오프"],a:["질문",["BM25","dense","*연도·반기·주제어가 제목과 맞는 후보"],"*RRF (목록 3개)","*일치 후보는 컷오프에서 보존"],n:"질문에 연도·반기가 있을 때만 세 번째 목록이 생깁니다."},
+ 31:{b:["문서 컷오프","문서 안 청크 선택","프롬프트"],a:["문서 컷오프","문서 안 청크 선택","*LLM 관련도 필터 (0점 제거, 기본 꺼짐)","프롬프트"],n:"지연 p50이 15초라 기본 꺼짐입니다."},
+ 32:{b:["연도를 대는 질문",["발행일·시행일이 그 해에 듦 → +6","추정 날짜(period_hint)가 그 해에 듦 → +4","추정 날짜가 다른 해임 → 0","날짜 필드가 하나도 없음 → 0"]],a:["연도를 대는 질문",["발행일·시행일이 그 해에 듦 → +6","추정 날짜(period_hint)가 그 해에 듦 → +4","추정 날짜가 다른 해임 → 0","*날짜 필드가 하나도 없음 → 질문의 해와 상관없이 +4"]],n:"날짜를 아예 모르는 문서는 그 해가 아니라고 말할 근거가 없어서 추정 날짜 일치(+4)와 같은 점수를 받습니다. 확인된 날짜 일치(+6)보다는 뒤에 섭니다. 문서에 날짜가 채워지면 이 규칙에서 빠져 +6/+4/0 중 하나로 옮겨 갑니다. docs 인덱스는 대부분 날짜가 비어 있어서, 이전에는 그 해 날짜가 붙은 core의 방해 문서만 가산점을 받았습니다."},
+ 33:{b:["문서 RRF","컷오프","문서 안 청크 선택"],a:["~청크 RRF","~청크 컷오프","~부모 문서로 묶기"],bl:"현행(문서 우선)",al:"청크 우선 (기본 꺼짐)",n:"문서 안 청크 순서(첫 청크는 dense, 나머지는 청크 RRF)만 반영했습니다."},
+ 34:{b:["질문","BM25 쿼리: 제목 · 본문 · .standard 부속 필드","문서 종류 부스트","현행판 우대 +4"],a:["질문","BM25 쿼리: 제목 · 본문","~문서 종류 부스트 삭제","현행판 우대 +4"],n:"종류값이 색인에 0개라 부스트는 작동하지 않던 코드였습니다."},
+ 35:{b:["PIXIE-Splade 기준 모델","평가"],a:["PIXIE-Splade 기준 모델","~도메인 합성 질의 108개 + 어려운 오답으로 파인튜닝","평가"],n:"채택하지 않았습니다."},
+ 36:{b:["질문",["BM25","dense"],"RRF"],a:["질문",["~SPLADE","dense"],"RRF"],bl:"현행 하이브리드",al:"비교 대상",n:"운영 경로에는 붙이지 않았습니다."},
+ 37:{b:["질문","통합 검색(core + docs)","답변"],a:["질문","*카테고리 선택","*카테고리 인덱스 (search-law · search-admin)","BM25 하한·판정 끔","답변"],n:"통합 인덱스는 건드리지 않고 새 경로를 하나 더 붙였습니다."},
+ 38:{b:["PIXIE-Splade 기준 모델","평가"],a:["PIXIE-Splade 기준 모델","~어려운 합성 질의 2,702개로 재파인튜닝","평가"],n:"채택 기준을 통과하지 못했습니다."},
+ 39:{b:["BM25 후보 25개","dense 후보 50개","RRF"],a:["BM25 후보 25개","*dense 후보 25개","RRF"],n:"성능이 같아 후보 수만 줄였습니다."}
+};
+function flowDoc(n){
+  var f=DFLOW[n]; if(!f) return "";
+  function box(x){ if(Array.isArray(x)) return '<div class="xs">'+x.map(box).join("")+'</div>';
+    var c=x[0]==="*"?"ch":(x[0]==="~"?"off":""), t=(c?x.slice(1):x);
+    return '<div class="xb '+c+'">'+esc(t).replace(/\*/g,"")+'</div>'; }
+  function row(l,a){ return '<div class="xrow"><span class="xl">'+esc(l)+'</span>'+a.map(function(x,i){ return (i?'<span class="xa">→</span>':'')+box(x); }).join("")+'</div>'; }
+  return '<div class="fig"><div class="fh"><b>처리 흐름이 어떻게 바뀌었나</b><span class="lg"><i class="xch"></i>바뀐 곳</span><span class="lg"><i class="xoff"></i>시험만 했거나 꺼짐</span></div>'+row(f.bl||"이전",f.b)+row(f.al||"이후",f.a)+(f.n?'<p class="note" style="margin:6px 0 0">'+esc(f.n)+'</p>':'')+'</div>';
+}
+function figDoc(f){
+  var sc=f.s||[], lg=sc.length>1?'<div class="fh" style="margin:2px 0 6px">'+sc.map(function(x,i){return '<span class="lg"><i class="bs'+i+'"></i>'+esc(x)+'</span>';}).join("")+'</div>':'';
+  var body=f.rows.map(function(r,ri){
+    var mx=r[2]||f.max;
+    return '<div class="brow"><div class="bl">'+esc(r[0])+'</div><div class="bcol">'+r[1].map(function(v,i){
+      var w=Math.max(1,Math.min(100,v/mx*100)), c=(sc.length>1?'bs'+i:(f.hl===ri?'bs1':'bs0'));
+      return '<div class="bline"><div class="btr"><div class="bbar '+c+'" style="width:'+w+'%"></div></div><b class="bv">'+v+(f.u||"")+'</b></div>';
+    }).join("")+'</div></div>';
+  }).join("");
+  return '<div class="fig"><div class="fh"><b>'+esc(f.t)+'</b></div>'+lg+body+'</div>';
+}
+function panelDoc(S){
+  var d=S.doc, cls=(d.status==="적용"||d.status==="일부 적용")?"ap":"un";
+  var figs=flowDoc(d.num)+(DFIG[d.num]||[]).map(figDoc).join("");
+  return figs+'<p class="note"><span class="an-s '+cls+'">'+esc(d.status)+'</span> &nbsp;'+esc(d.cond)+'</p>'+
+   '<table class="tbl"><thead><tr>'+d.hd.map(function(h){return '<th>'+esc(h)+'</th>';}).join("")+'</tr></thead><tbody>'+
+   d.rows.map(function(r){ return '<tr>'+r.map(function(c){return '<td>'+esc(c)+'</td>';}).join("")+'</tr>'; }).join("")+'</tbody></table>'+
+   (d.note?'<p class="note">'+esc(d.note)+'</p>':'')+
+   '<p class="note">이 단계는 질문별로 다시 돌린 자료가 없어서 단계 문서(docs/evaluation/stages)의 수치를 옮겼습니다. 단계마다 평가셋과 코퍼스가 달라 다른 단계의 수치와 바로 비교하지 않습니다.</p>';
+}
 function stageInfo(k){ return SG.nodes.filter(function(n){return n.k===k;})[0]; }
 function prevRetKey(k){ var ks=["s0","s13","s16","s21","s22"], i=ks.indexOf(k); return i>0?ks[i-1]:null; }
 function prevJudgeKey(k){ var ks=["s18","s20","s21","s22"], i=ks.indexOf(k); return i>0?ks[i-1]:null; }
@@ -849,9 +953,9 @@ function panelStageBody(S){
 function renderStage(){
   var S=STG.filter(function(x){return x.k===st.stage;})[0]||STG[0], n=stageInfo(S.k);
   var nav=document.getElementById("stnav");
-  nav.innerHTML=STG.map(function(x){ var i=stageInfo(x.k); return '<button type="button" data-stage="'+x.k+'"'+(x.k===S.k?' aria-current="true"':'')+'><span class="nl">'+esc(i.l)+'</span><span class="nt">'+esc(i.t)+'</span></button>'; }).join("");
+  nav.innerHTML='<div class="stlg"><span class="ap">● 코드에 들어감</span><span class="un">● 안 들어감(기본 꺼짐·미적용·측정)</span></div>'+STG.map(function(x){ var i=stageInfo(x.k), a=x.doc?(x.doc.status==="적용"||x.doc.status==="일부 적용"):x.k!=="s19"; return '<button type="button" class="'+(a?'ap':'un')+'" data-stage="'+x.k+'"'+(x.k===S.k?' aria-current="true"':'')+'><span class="nl">'+esc(i.l)+(a?' · 적용':' · 안 들어감')+'</span><span class="nt">'+esc(i.t)+'</span></button>'; }).join("");
   var el=document.getElementById("detail");
-  el.innerHTML='<div class="wrap"><div class="sv-h"><span class="sl">'+esc(n.l)+' · '+esc(n.t)+'</span><h2 class="big">'+esc(S.head)+'</h2></div><div class="panel" role="tabpanel"><div class="sv-two"><div class="sv-sec"><h2>무엇을 고쳤나</h2><ul>'+S.what.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul></div><div class="sv-sec"><h2>왜 고쳤나</h2><ul>'+S.why.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul></div></div><h2 style="margin-top:6px">얼마나 나아졌나 (docs 정답형 135문항·무응답 26문항 기준)</h2>'+panelStageBody(S)+'</div></div>';
+  el.innerHTML='<div class="wrap"><div class="sv-h"><span class="sl">'+esc(n.l)+' · '+esc(n.t)+'</span><h2 class="big">'+esc(S.head)+'</h2></div><div class="panel" role="tabpanel"><div class="sv-two"><div class="sv-sec"><h2>무엇을 고쳤나</h2><ul>'+S.what.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul></div><div class="sv-sec"><h2>왜 고쳤나</h2><ul>'+S.why.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul></div></div>'+(S.doc?'<h2 style="margin-top:6px">단계 기록의 측정값</h2>'+panelDoc(S):'<h2 style="margin-top:6px">얼마나 나아졌나 (docs 정답형 135문항·무응답 26문항 기준)</h2>'+panelStageBody(S))+'</div></div>';
   el.scrollTop=0;
 }
 
@@ -859,10 +963,10 @@ function ap(rows){ return '<dl class="an-p">'+rows.map(function(r){ return '<dt>
 function V(x){ return '<span class="v">'+x+'</span>'; }
 function W(x){ return '<span class="w">'+x+'</span>'; }
 var STGN={"13":"s13","14":"s16","15":"s16","16":"s16","18":"s18","19":"s19","20":"s20","21":"s21","22":"s22"};
-function tag(nums,un){ return nums.map(function(n){ var k=STGN[n], st=tagState(n,un), lab=stLabel(n), a=' class="an-s '+st+'" data-gn="'+n+'" data-st="'+st+'"'; return k?'<button type="button"'+a+' data-stage="'+k+'" title="이 단계의 변경 내용 보기">'+lab+'</button>':'<span'+a+'>'+lab+'</span>'; }).join(""); }
+function tag(nums,un){ return nums.map(function(n){ var k=stgKey(n), st=tagState(n,un), lab=stLabel(n), a=' class="an-s '+st+'" data-gn="'+n+'" data-st="'+st+'"'; return k?'<button type="button"'+a+' data-stage="'+k+'" title="이 단계의 변경 내용 보기">'+lab+'</button>':'<span'+a+'>'+lab+'</span>'; }).join(""); }
 function an(cls,n,title,stg,desc,rows,un){ return '<div class="an '+cls+'"><div class="an-h"><span class="an-n">'+n+'</span><span class="an-t">'+title+'</span>'+tag(stg,un)+'</div>'+(rows?ap(rows):'')+'</div>'; }
 
-var UNUSED={"10":1,"17":1,"24":1,"35":1,"36":1,"1":1,"2":1,"3":1,"7":1,"9":1,"11":1,"26":1,"27":1,"29":1,"spl":1};
+var UNUSED={"38":1,"10":1,"17":1,"24":1,"35":1,"36":1,"1":1,"2":1,"3":1,"7":1,"9":1,"11":1,"26":1,"27":1,"29":1,"spl":1};
 function tagState(n,un){ return (un&&un.indexOf(String(n))>=0)||UNUSED[n]?"un":"ap"; }
 function stLabel(n){ return n==="spl"?"SPLADE":n+"단계"; }
 function gtag(x,y,label,k,st,gn){ var w=label.length*9.2+16; st=st||tagState(parseInt(label,10)); gn=gn||parseInt(label,10); return '<g'+(k?' data-stage="'+k+'"':'')+' data-gn="'+gn+'" data-st="'+st+'"><rect class="gt '+st+'" x="'+(x-w)+'" y="'+y+'" width="'+w+'" height="24" rx="12"/><text class="gtt '+st+'" x="'+(x-w/2)+'" y="'+(y+17)+'" text-anchor="middle">'+label+'</text></g>'; }
@@ -875,7 +979,7 @@ function fnode(o){
   var right=o.x+o.w-14, tx=right, row=0, mx=o.mx||(o.x+o.w/2+20);
   (o.g||[]).slice().reverse().forEach(function(g){ var lab=stLabel(g), w=lab.length*9.2+16;
     if(tx<right&&tx-w<mx){ row++; tx=right; }
-    s+=gtag(tx,o.y-13-row*28,lab,STGN[g],tagState(g,o.un),g); tx-=w+6; });
+    s+=gtag(tx,o.y-13-row*28,lab,stgKey(g),tagState(g,o.un),g); tx-=w+6; });
   return s+'</g>';
 }
 function fline(d,cls,label,lx,ly,lcls,anchor,marker){ return '<path class="'+cls+'" d="'+d+'" marker-end="url(#'+(marker||"ah")+')"/>'+(label?'<text class="el '+(lcls||"")+'" x="'+lx+'" y="'+ly+'" text-anchor="'+(anchor||"middle")+'">'+label+'</text>':''); }
@@ -897,7 +1001,7 @@ function archSvg(){
   s+='<g>';
   s+='<text class="nt" x="-500" y="150" style="font-size:18px;fill:var(--sp)">SPLADE 길 · BM25 대신 시험 (현재 미사용)</text>';
   s+=fline('M300,172 H-260 V196','lns','',0,0,'','','ahs');
-  s+=fnode({c:"spl",tip:"spl1",g:["24","35"],x:-500,y:200,w:480,h:170,n:"1",t:"질문을 어휘 가중치로 (SPLADE)",l:["telepix/PIXIE-Splade-v1.5","질문을 읽고 어휘 전체에 가중치를 매김","질문에 없는 연관어도 가중치를 받음","상위 256개 term만 남김"]});
+  s+=fnode({c:"spl",tip:"spl1",g:["24","35","38"],x:-500,y:200,w:480,h:170,n:"1",t:"질문을 어휘 가중치로 (SPLADE)",l:["telepix/PIXIE-Splade-v1.5","질문을 읽고 어휘 전체에 가중치를 매김","질문에 없는 연관어도 가중치를 받음","상위 256개 term만 남김"]});
   s+=fnode({c:"spl",tip:"spl2",g:["10","17"],x:-500,y:440,w:480,h:196,n:"2",t:"점곱으로 청크 점수 계산",l:["청크도 색인할 때 같은 방식으로 변환","(제목+본문 256토큰, 상위 256 term)","질문 가중치 × 청크 가중치의 합","OpenSearch rank_features · neural_sparse"]});
   s+=fnode({c:"spl",tip:"spl3",g:["24","36"],x:-500,y:706,w:480,h:170,n:"3",t:"후보 자르기",l:["1위 점수의 97% 미만은 버림","(점수 분포가 달라 BM25와 다른 비율)","문서 점수 = 부모별 최고 청크 점수"]});
   s+=fline('M-260,370 V440','lns','질문 가중치',-244,412,'els','start','ahs')+fline('M-260,636 V706','lns','청크별 점수',-244,678,'els','start','ahs');
@@ -912,7 +1016,7 @@ function archSvg(){
   s+=fline('M300,370 V440','lnk','질문 토큰',284,412,'elk','end','ahk')+fline('M300,636 V706','lnk','청크별 점수',316,678,'elk','start','ahk');
   // dense 레인
   s+=fnode({c:"vec",tip:"d1",x:660,y:200,w:480,h:170,n:"1",t:"질문을 벡터로 (임베딩)",g:["13","15","11"],l:["BGE-m3-ko (Ollama · GGUF F16)","질문 문장을 통째로 1번 · 어절 분해 없음","1024차원 벡터 1개"]});
-  s+=fnode({c:"vec",tip:"d2",x:660,y:440,w:480,h:196,n:"2",t:"가까운 청크 찾기 (kNN)",g:["6"],l:["HNSW 색인 · 코사인 유사도","청크 벡터는 색인할 때 미리 계산","(제목: … 본문: … 형태로 임베딩)"]});
+  s+=fnode({c:"vec",tip:"d2",x:660,y:440,w:480,h:196,n:"2",t:"가까운 청크 찾기 (kNN)",g:["6","39"],l:["HNSW 색인 · 코사인 유사도","청크 벡터는 색인할 때 미리 계산","(제목: … 본문: … 형태로 임베딩)"]});
   s+=fnode({c:"vec",tip:"d3",x:660,y:706,w:480,h:170,n:"3",t:"후보 자르기",g:["14","16","21"],l:["① 하한 0.7063 미만 청크는 버림","② 1위 점수의 97% 미만 청크는 버림","전부 버려지면 → 검색 종료 (빨간 점선)"]});
   s+=fline('M900,370 V440','lnv','질문 벡터',916,412,'elv','start','ahv')+fline('M900,636 V706','lnv','청크별 유사도',916,678,'elv','start','ahv');
   // 합류
@@ -955,19 +1059,19 @@ function panelArch(){
   var a3=an("kw","① · 3","후보 자르기",["14","21"],"",[
     ["후보 수",V("25")+"개"],["절대 하한",V("14.75")],["1위의",W("90%")+" 미만 제거"],["다 버려지면","종료 아님"]]);
   var b1=an("vec","② · 1","질문 → 벡터",["13","15","11"],"",[["모델",V("BGE-m3-ko")],["차원",V("1024")]]);
-  var b2=an("vec","② · 2","가까운 청크 찾기",[],"",[["색인",V("HNSW")+" 코사인"],["후보 수",V("50")+"개"]]);
+  var b2=an("vec","② · 2","가까운 청크 찾기",["6","39"],"",[["색인",V("HNSW")+" 코사인"],["후보 수",V("25")+"개"]]);
   var b3=an("vec","② · 3","후보 자르기",["14","16","21"],"",[
     ["절대 하한",V("0.7063")],["1위의",W("97%")+" 미만 제거"],["다 버려지면",'<span class="off">검색 종료</span>']]);
   var m1=an("mg","③","문서 단위 RRF 합산",["21"],"",[["점수",V("Σ 가중치 × 1/(60+자리)")],["자리","목록 안 <b>청크</b> 위치 (문서 순서가 아님)"],["키워드 : dense",W("1.0 : 1.0")],["기간 질문","제목이 맞는 후보로 3번째 목록 1.0 추가"],["최고점",V("2/61 = 0.0328")+" (두 목록 1위)"],["한 목록만",V("1/61 = 0.0164")+" (최고점의 정확히 절반)"],["동점","dense 자리 → 청크 ID 순"]]);
   var m2=an("mg","④","컷오프",["21","9"],"",[["컷오프 선","1위 RRF 점수 × "+W("0.90")],["선 아래라도 유지","어느 목록의 1위 청크인 문서 · 기간 일치 문서"],["절대 하한","RRF 점수에는 없음 (①에서 검색기별로 적용)"],["사본","같은 제목·발행일은 먼저 오른 1개만"],["문서 수",V("최대 5")+"개"]]);
-  var m3=an("mg","⑤","문서 안 청크 고르기",["4","8","19","20"],"",[["문서당",V("최대 6")+"개"],["첫 청크","dense가 고른 것"],["나머지","청크 단위 RRF 점수 순 (문서 RRF와 별개)"],["후보 풀","① 비율 자르기 전 목록 (키워드 25 + dense 50, 하한 통과분)"]]);
+  var m3=an("mg","⑤","문서 안 청크 고르기",["4","8","19","20"],"",[["문서당",V("최대 6")+"개"],["첫 청크","dense가 고른 것"],["나머지","청크 단위 RRF 점수 순 (문서 RRF와 별개)"],["후보 풀","① 비율 자르기 전 목록 (키워드 25 + dense 25, 하한 통과분)"]]);
   var m4=an("mg","⑥","판정 LLM (선택)",["18","21"],"",[["기본값",OFF+" (.env는 켬)"],["읽는 문서",V("3")+"개"],["temperature",V("0.0")]]);
   var m5=an("mg","⑦","답변",[],"",[["답변 LLM",V("qwen3-vl-30b-a3b")],["temperature",V("0.4")],["근거 없으면","고정 문구"]]);
   var o1=an("opt","선택","청크 LLM 필터",["31"],"",[["기본값",OFF+" (.env는 켬)"]],["31"]);
   var o2=an("opt","선택","cross-encoder 재정렬",["19"],"",[["기본값",OFF]],["19"]);
   var o3=an("opt","선택","청크 우선 파이프라인",["33"],"",[["기본값",OFF]],["33"]);
   var ms=an("opt","측정","측정·검증 단계",["23","25","1","2","3","26","29"],"",[["성격","검색 기능이 아니라 재는 방법·기준선·검증 기록"]]);
-  var zoomBar='<div class="archbar"><span class="note">2026-09-30 설정 기준 · 초록 태그 = 지금 쓰는 단계, 빨간 점선 태그 = 안 쓰는 단계 · 태그를 올리면 설명, 누르면 그 단계로 이동</span><button type="button" class="zb" data-zoom="-1">− 작게</button><button type="button" class="zb" data-zoom="1">크게 +</button></div>';
+  var zoomBar='<div class="archbar"><span class="note">2026-10-02 설정 기준 · 초록 태그 = 지금 쓰는 단계, 빨간 점선 태그 = 안 쓰는 단계 · 태그를 올리면 설명, 누르면 그 단계로 이동</span><button type="button" class="zb" data-zoom="-1">− 작게</button><button type="button" class="zb" data-zoom="1">크게 +</button></div>';
   return '<div class="wrap" style="max-width:none"><div class="sv-h"><span class="sl">구조도</span><h2 class="big">질문이 답변이 되기까지 어떻게 흘러가나</h2></div>'+zoomBar+
    '<div id="ar-flow" style="overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:14px">'+archSvg()+'</div>'+
    '<h2 style="margin-top:14px">각 상자의 설정값</h2>'+
@@ -982,7 +1086,7 @@ function panelArch(){
 }
 function panelMeta(){
   var Y='<td class="y">●</td>', N='<td class="n">–</td>';
-  function row(f,ex,fl,bo,rs,pr,note){ return '<tr><td><code>'+f+'</code></td><td>'+ex+'</td>'+(fl?Y:N)+(bo?Y:N)+(rs?Y:N)+(pr?Y:N)+'<td>'+note+'</td></tr>'; }
+  function row(f,desc,ex,fl,bo,rs,pr,note){ return '<tr><td><code>'+f+'</code></td><td>'+desc+'</td><td>'+ex+'</td>'+(fl?Y:N)+(bo?Y:N)+(rs?Y:N)+(pr?Y:N)+'<td>'+note+'</td></tr>'; }
   return '<div class="em">'+
   '<p class="note" id="mt-flow">청크마다 붙은 메타데이터가 검색의 어느 지점에서 쓰이는지 정리했습니다. 코드는 <code>query.py</code>·<code>indexer.py</code>·<code>guardrail.py</code>, 수치는 지금 떠 있는 색인에서 센 값입니다.</p>'+
   '<div class="steps">'+
@@ -994,16 +1098,16 @@ function panelMeta(){
   '</div>'+
 
   '<h2 id="mt-fields">필드별로 어디에 쓰이나</h2>'+
-  '<table><thead><tr><th>필드</th><th>예</th><th>필터</th><th>가산점</th><th>결과<br>정리</th><th>프롬프트</th><th>쓰임</th></tr></thead><tbody>'+
-    row('effective_from','2026-09-01',1,0,0,1,'기준일보다 뒤면 제외. 없으면 통과. 연·월 가산점 대상. 프롬프트에는 “시행일”로, 없으면 “확인 필요”')+
-    row('effective_to','2027-12-31',1,0,0,0,'기준일 이전에 끝났으면 제외. 없으면 통과')+
-    row('published_at','2026-09-01',0,1,1,0,'연·월 가산점 대상. 사본 묶음 키(제목+발행일)')+
-    row('period_hint','본문 앞머리가 말하는 시점',0,1,0,0,'발행일이 비어 있을 때만 붙는 추정값. 연·월 가산점(+4)에만 쓰고 사본·대체 판정에는 안 씀')+
-    row('superseded_by','다음 판 문서 ID',0,1,1,1,'없으면 현행판 +4. 있으면 옛 판 뒤에 현행 문서를 붙이고 프롬프트에 “대체됨” 표시')+
-    row('title (제목 부분)','제38차 전략물자수출입고시 개정 안내',0,0,1,1,'<code>" — "</code> 앞부분을 사본 묶음 키로 씀. 프롬프트 머리말에 들어감')+
-    row('source_type','공지사항 · FAQ · 민원서식',0,0,0,1,'프롬프트 머리말 첫 칸. 검색 점수에는 안 씀')+
-    row('source_url','yestrade 게시글 주소',0,0,0,1,'프롬프트 머리말과 응답에 출처로 표시')+
-    row('공고번호 (질문 쪽)','제2026-598호',1,0,0,0,'질문에서 번호를 읽어 제목·본문에 그 번호가 든 청크만 남김. 메타데이터 필드가 아니라 본문과 대조')+
+  '<table><thead><tr><th>필드</th><th>무슨 값인가</th><th>예</th><th>필터</th><th>가산점</th><th>결과<br>정리</th><th>프롬프트</th><th>쓰임</th></tr></thead><tbody>'+
+    row('effective_from','문서가 효력을 갖기 시작하는 날(시행일). 개정 고시처럼 “9.1부터 시행”이 있는 문서에 채워짐','2026-09-01',1,0,0,1,'기준일보다 뒤면 제외. 없으면 통과. 연·월 가산점 대상. 프롬프트에는 “시행일”로, 없으면 “확인 필요”')+
+    row('effective_to','문서의 효력이 끝나는 날(종료일). 한시적 안내·기간이 정해진 공고에만 있음','2027-12-31',1,0,0,0,'기준일 이전에 끝났으면 제외. 없으면 통과')+
+    row('published_at','게시글이 올라온 날(발행일). 시행일과 다를 수 있음','2026-09-01',0,1,1,0,'연·월 가산점 대상. 사본 묶음 키(제목+발행일)')+
+    row('period_hint','발행일이 비었을 때 본문 앞머리에서 읽어 낸 시점의 추정값. 확정된 날짜가 아님','본문 앞머리가 말하는 시점',0,1,0,0,'발행일이 비어 있을 때만 붙는 추정값. 연·월 가산점(+4)에만 쓰고 사본·대체 판정에는 안 씀')+
+    row('superseded_by','이 문서를 대체한 다음 판 문서의 ID. 비어 있으면 아직 현행판','다음 판 문서 ID',0,1,1,1,'없으면 현행판 +4. 있으면 옛 판 뒤에 현행 문서를 붙이고 프롬프트에 “대체됨” 표시')+
+    row('title (제목 부분)','문서 제목에서 <code>" — "</code> 앞부분. 같은 문서인지 가릴 때 이 부분만 비교함','제38차 전략물자수출입고시 개정 안내',0,0,1,1,'<code>" — "</code> 앞부분을 사본 묶음 키로 씀. 프롬프트 머리말에 들어감')+
+    row('source_type','문서가 어느 게시판·종류에서 왔는지(공지사항, FAQ, 민원서식 등)','공지사항 · FAQ · 민원서식',0,0,0,1,'프롬프트 머리말 첫 칸. 검색 점수에는 안 씀')+
+    row('source_url','원문 게시글의 인터넷 주소. 답변의 출처 링크가 됨','yestrade 게시글 주소',0,0,0,1,'프롬프트 머리말과 응답에 출처로 표시')+
+    row('공고번호 (질문 쪽)','사용자 질문에 적힌 고시·공고 번호. 문서 필드가 아니라 질문에서 읽어 냄','제2026-598호',1,0,0,0,'질문에서 번호를 읽어 제목·본문에 그 번호가 든 청크만 남김. 메타데이터 필드가 아니라 본문과 대조')+
   '</tbody></table>'+
   '<p class="cap">같은 필터는 키워드와 dense 두 검색에 똑같이 걸립니다. dense는 가산점을 줄 수 없어(kNN은 function_score를 못 씀) 유효기간 조건만 중복해서 겁니다.</p>'+
 
@@ -1273,6 +1377,12 @@ function move(d){ var v=vis(); if(!v.length) return; var i=v.findIndex(function(
     E["36"]={l:"36단계",t:"SPLADE+dense를 현재 hybrid와 같은 조건에서 비교",d:"24단계의 신호가 튜닝 세트 한 곳에서만 나온 것이라, 현재 운영 hybrid를 다시 재서 처음 보는 문서와 질의에서 비교했습니다. SPLADE+dense가 여러 지표에서 앞섰지만 P@1 신뢰구간이 0에 걸쳐 운영 기본값은 바꾸지 않았습니다.",
       ex:'검색 지연은 5~15ms로 작았지만, SPLADE 인코딩이 오래 걸려(약 2.4시간) 일부 세트는 재지 못했습니다.',
       svg:T(["지표 (처음 보는 문서)","현재 hybrid","SPLADE+dense"],[["문서 P@1","85.5%","89.9%"],["Hit@5","92.8%","97.1%"],["반환분 정밀도","65.7%","80.4%"]],[0,1,2])};
+    E["38"]={l:"38단계",t:"합성 질의 2,702개로 SPLADE 재파인튜닝",d:"35단계는 학습 신호가 약했다고 보고, 30B 모델이 만든 질의 중 기준 SPLADE가 어려워하는 것만 골라 25배로 늘려 다시 학습했습니다(오답 후보에서 평가 정답 청크는 제외). 사전에 정한 채택 기준을 통과한 설정이 없어 채택하지 않았습니다.",
+      ex:'처음 보는 문서에서는 조금 오르고(청크 1위 적중 0.710 → 0.783) 학습 문서군(docs_v2)에서는 내려갔습니다(130 → 125~126). 상위 5청크 회수는 그대로여서 문서 단위 이득이 상쇄됐습니다.',
+      svg:T(["문서 1위 (SPLADE 단독)","기준","최고 설정 C"],[["docs_v2 135","130","125"],["holdout-small 69","61","63"],["검증 36","30","33"]],[1,2])};
+    E["39"]={l:"39단계",t:"BM25·dense 후보 수를 바꿔 보고 dense를 25개로",d:"hybrid가 BM25에서 25개, dense에서 50개 청크를 가져오던 값이 성능에 미치는 영향을 BM25 5~100개 × dense 10~200개 25조합으로 쟀습니다. 25개 이상이면 지표가 같아서 dense 후보만 50에서 25로 낮췄습니다.",
+      ex:'개발 셋(docs_v2 135문항) 한 곳만 썼고 지연은 재지 않았습니다. 이 탐색기에 담긴 질문별 결과는 50개일 때 실행한 값입니다.',
+      svg:T(["BM25","dense","문서 P@1","근거 Recall"],[["5","10","96.3","95.9"],["25","50 (이전)","95.6","95.6"],["25","25 (현행)","95.6","95.6"],["100","200","95.6","95.6"]],[2])};
     TF.spl1={l:"SPLADE ① · 질문을 어휘 가중치로",t:"질문에 없는 연관어까지 가중치를 줌",d:"telepix/PIXIE-Splade-v1.5가 질문을 읽고 어휘 전체에 대한 가중치를 매깁니다. 가중치가 큰 상위 256개 term만 남깁니다. 질문에 없는 연관 단어도 가중치를 받아서 표현이 달라도 닿을 수 있고, 자주 나오는 일반어의 영향은 학습으로 줄어듭니다.",
       ex:'docs-v2-001에서 BM25는 질문의 핵심인 에너지·특허보다 제목의 일반어(기술·사업화·공고)에 끌렸습니다. 이 구멍을 메우는지 보려고 시험한 길입니다.',
       svg:T(["","BM25 길","SPLADE 길"],[["질문 처리","형태소로 쪼갠 내용어","어휘 전체에 가중치"],["연관어","동의어 사전 20그룹","학습으로 확장"],["일반어 영향","IDF로 보정","학습으로 낮춤"],["서빙","OpenSearch만","인코더 서버 필요"]])};
