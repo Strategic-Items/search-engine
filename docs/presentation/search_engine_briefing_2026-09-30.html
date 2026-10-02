@@ -379,13 +379,25 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 </section>
 
 <!-- 14 -->
-<section class="slide" id="s14" data-title="13~34 한눈에">
-<div class="kicker">부록 · 13~34단계 변천</div>
-<h2>13단계부터 34단계까지: 무엇을 바꿨고 어떻게 됐나</h2>
-<p class="lead">13~22단계는 공고문 52문서·질문 135개 한 세트에서 튜닝했습니다. 23단계에서 채점 단위를 청크로 옮기고, 25~26단계에서 yesTrade를 섞어 과적합을 확인했습니다. 29단계부터는 새 점수를 올리기보다 왜 1위가 아닌지를 진단하는 쪽이었습니다. 자세한 수치와 예시는 다음 장부터 묶음별로 나옵니다.</p>
+<section class="slide" id="s14" data-title="1~39 한눈에">
+<div class="kicker">부록 · 1~39단계 변천</div>
+<h2>1단계부터 39단계까지: 무엇을 바꿨고 어떻게 됐나</h2>
+<p class="lead">1~12단계는 평가셋이 40문항에서 135문항으로 커지는 동안 임베딩·청크 수·분석기를 정했습니다. 수치는 평가셋이 달라 단계 사이에 이어 비교하지 않습니다. 13~22단계는 공고문 52문서·질문 135개 한 세트에서 튜닝했습니다. 23단계에서 채점 단위를 청크로 옮기고, 25~26단계에서 yesTrade를 섞어 과적합을 확인했습니다. 29단계부터는 새 점수를 올리기보다 왜 1위가 아닌지를 진단하는 쪽이었고, 35~38단계는 SPLADE를 도메인에 맞춰 학습해 봤으나 채택하지 않았습니다. 37단계부터 법령·행정 카테고리가 붙었고 39단계는 후보 수를 정리했습니다. 자세한 수치와 예시는 다음 장부터 묶음별로 나옵니다.</p>
 <div class="tbl"><table>
 <thead><tr><th>단계</th><th>바꾼 것</th><th>핵심 결과</th><th>판정</th></tr></thead>
 <tbody>
+<tr><td><b>1</b></td><td>v1 키워드 질문 50개로 첫 측정</td><td>1위 적중 BM25 90.0 / dense 38.0 / 하이브리드 68.0%</td><td><span class="tag t-mut">기준선</span></td></tr>
+<tr><td><b>2</b></td><td>질문을 자연어 40개로 교체</td><td>BM25 72.5 / dense 12.5 / 하이브리드 45.0%. 난이도가 달라진 것</td><td><span class="tag t-mut">기준선</span></td></tr>
+<tr><td><b>3</b></td><td>최신 파서로 재추출·재색인</td><td>청크 1,041개 ID 전부 동일, 지표 거의 그대로</td><td><span class="tag t-mut">변화 없음</span></td></tr>
+<tr><td><b>4</b></td><td>문서당 청크 4개 반환</td><td>근거 Recall@5 32.5 → 72.5%, 문서 지표는 87.5% 고정</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>5</b></td><td>질의 재작성 융합</td><td>BM25 1위 72.5 → 77.5%, 지연 15.8 → 605ms(38배)</td><td><span class="tag t-mut">기본 꺼짐</span></td></tr>
+<tr><td><b>6</b></td><td>임베딩 nomic → bge-m3</td><td>dense Recall@5 22.1 → 100%(36문서 한정)</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>7</b></td><td>모델 교체 뒤에도 재작성이 필요한가</td><td>하이브리드 품질 동일, 지연 95 → 687ms</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>8</b></td><td>120문항 평가셋, 문서당 청크 6개</td><td>근거 Recall@5 dense 92.5 → 95.4%</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>9</b></td><td>식별자 질문 15개 추가</td><td>식별자 구간에서 BM25 우세, 하이브리드는 컷오프에 정답이 잘림</td><td><span class="tag t-mut">측정</span></td></tr>
+<tr><td><b>10</b></td><td>학습형 sparse를 어휘 경로로</td><td>정밀도를 맞추면 dense와 동률 (89.4 대 89.1%)</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>11</b></td><td>Qwen3-Embedding-0.6B</td><td>접두사를 줘도 bge-m3와 동률, 반환분 정밀도 89.1 → 87.9%</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>12</b></td><td>보조용언(VX)을 검색 토큰에서 제외</td><td>구어체 BM25 MRR 0.790 → 0.844, dense는 변화 없음</td><td><span class="tag t-vec">적용</span></td></tr>
 <tr><td><b>13</b></td><td>임베딩 bge-m3 → BGE-m3-ko</td><td>1위 적중 89.6 → 94.1%</td><td><span class="tag t-vec">적용</span></td></tr>
 <tr><td><b>14</b></td><td>점수 절대 바닥값</td><td>도메인 밖 12/12 걸러냄, 도메인 안 무응답은 못 거름</td><td><span class="tag t-vec">적용</span> 설정값</td></tr>
 <tr><td><b>15</b></td><td>변환본(GGUF) 채택, 바닥값 재측정</td><td>옛 바닥값을 두면 정답 13개가 사라짐</td><td><span class="tag t-vec">적용</span></td></tr>
@@ -408,9 +420,31 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 <tr><td><b>32</b></td><td>정답이 1위가 아닌 이유 진단</td><td>같은 주제인데 답 없는 문서가 1위를 뺏음. 처방 하나만 반영</td><td><span class="tag t-vec">일부 적용</span></td></tr>
 <tr><td><b>33</b></td><td>청크를 먼저 고르는 파이프라인</td><td>같은 재현율–정밀도 곡선 위. 문서 안 청크 순서만 반영</td><td><span class="tag t-vec">일부 적용</span></td></tr>
 <tr><td><b>34</b></td><td>효과 없는 어휘 검색 장치 제거</td><td>.standard 필드와 문서 종류 부스트 삭제</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>35</b></td><td>전략물자 도메인 합성 질의 108개로 SPLADE 파인튜닝</td><td>기준 130/135, 최고 설정 129. 겨냥한 3문항은 못 고침</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>36</b></td><td>SPLADE+dense를 현재 하이브리드와 같은 조건에서 비교</td><td>처음 보는 문서 1위 85.5 → 89.9%, 신뢰구간이 0을 포함</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>37</b></td><td>카테고리 인덱스(법령·고시, 행정·업무) 경로 추가</td><td>21·30문항 점검. BM25 하한이 결과를 비워 판정을 끔</td><td><span class="tag t-vec">적용</span></td></tr>
+<tr><td><b>38</b></td><td>합성 질의 2,702개로 SPLADE 재파인튜닝</td><td>처음 보는 문서 +, 학습 문서군 −. 채택 기준 미달</td><td><span class="tag t-mut">미적용</span></td></tr>
+<tr><td><b>39</b></td><td>BM25·dense 후보 수 25조합 스윕</td><td>25개 이상은 지표가 같음. dense 후보 50 → 25</td><td><span class="tag t-vec">적용</span></td></tr>
 </tbody></table></div>
 <p class="note">다음 장의 카드는 <b>바꾼 것 → 결과 → 이유 → 한계</b> 순서입니다. 결과 칩의 ▲는 숫자 방향이 아니라 좋아졌다는 뜻, ▼는 나빠졌다는 뜻입니다.</p>
 <div class="say"><b>말하기</b>적용, 미적용, 되돌림이 섞여 있다는 점이 중요합니다. 뒤 장에서 각각 왜 그렇게 됐는지 실제 질문으로 보여 드립니다.</div>
+</section>
+
+<!-- 14a -->
+<section class="slide" id="s14a" data-title="1~7 기준선·모델">
+<div class="kicker">1~7단계 · 기준선, 청크 수, 임베딩 모델</div>
+<h2>키워드 질문에서는 BM25가 이겼지만, 자연어로 바꾸고 모델을 고치자 순위가 뒤집혔다</h2>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">1</span><b>초기 기준선</b><span class="tag t-mut">기준선</span></div><dl><dt>바꾼 것</dt><dd>없음. v1 키워드 성향 질문 50개를 초기 파서 스냅샷에 던진 첫 측정</dd><dt>결과</dt><dd><span class="dl flat"><i>BM25 1위</i>90.0%</span><span class="dl flat"><i>dense</i>38.0%</span><span class="dl flat"><i>하이브리드</i>68.0%</span></dd><dt>이유</dt><dd>질문에 제목·공고번호가 그대로 들어 있어 어휘 검색에 유리한 세트였습니다.</dd><dt>한계</dt><dd>"BM25가 가장 정확하다"는 인상은 세트가 만든 것이고 6단계에서 뒤집힙니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">2</span><b>자연어 기준선</b><span class="tag t-mut">기준선</span></div><dl><dt>바꾼 것</dt><dd>코퍼스는 그대로, 질문을 자연어 40개로 교체</dd><dt>결과</dt><dd><span class="dl flat"><i>BM25 1위</i>72.5%</span><span class="dl flat"><i>dense</i>12.5%</span><span class="dl flat"><i>하이브리드</i>45.0%</span></dd><dt>이유</dt><dd>표현을 바꿔 묻는 질문과 상황형 질문을 넣자 dense의 약점이 드러났습니다.</dd><dt>한계</dt><dd>1단계와의 차이는 성능 하락이 아니라 난이도 변화입니다. 이때 dense는 영어 중심 nomic-embed-text였습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">3</span><b>최신 파서 재추출</b><span class="tag t-mut">변화 없음</span></div><dl><dt>바꾼 것</dt><dd>파서 산출물을 최신으로 바꿔 재색인</dd><dt>결과</dt><dd><span class="dl flat"><i>청크</i>1,041개, ID 전부 동일</span><span class="dl flat"><i>Recall@5</i>동일</span></dd><dt>이유</dt><dd>새 파서는 공고번호·기관·게시일 같은 메타데이터를 더 뽑았지만 검색 쿼리가 쓰지 않고, 본문과 청크 경계는 거의 같았습니다.</dd><dt>한계</dt><dd>하이브리드 1위 45.0 → 42.5%는 40문항 중 1문항 차이입니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">4</span><b>문서당 청크 여러 개 반환</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>문서 순위는 그대로 두고 문서마다 청크를 최대 4개까지 함께 반환</dd><dt>결과</dt><dd><span class="dl good"><i>근거 Recall@5</i>32.5 → 72.5%</span><span class="dl flat"><i>문서 Recall@5</i>87.5% 고정</span></dd><dt>이유</dt><dd>실패 40문항 중 23건은 문서는 찾았는데 반환 청크에 근거가 없었습니다. 근거 청크는 이미 후보 안에 있어서 반환 단위만 넓히면 됐습니다.</dd><dt>한계</dt><dd>청크가 늘면 프롬프트가 커집니다. Ollama가 넘친 앞부분을 조용히 버려서 컨텍스트 창을 16,384로 키웠습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">5</span><b>질의 재작성 융합</b><span class="tag t-mut">기본 꺼짐</span></div><dl><dt>바꾼 것</dt><dd>LLM이 질문을 검색어로 다시 쓰고, 원본과 함께 검색해 가중 RRF로 합침</dd><dt>결과</dt><dd><span class="dl good"><i>BM25 1위</i>72.5 → 77.5%</span><span class="dl good"><i>하이브리드 Recall@5</i>67.9 → 77.9%</span><span class="dl bad"><i>BM25 지연</i>15.8 → 605ms</span></dd><dt>이유</dt><dd>재작성만 쓰면 오히려 낮아집니다(83.8%). 3B 모델이 없는 용어(특허공여제)를 지어내서, 원본보다 낮은 가중치 0.5로만 섞습니다.</dd><dt>한계</dt><dd>검색이 38배 느려집니다. 1차 검색 제목을 넣어 접지하는 대안은 더 나빠서(85.0 → 80.0%) 버렸습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">6</span><b>임베딩 모델 교체</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>nomic-embed-text(768차원) → bge-m3(1024차원)</dd><dt>결과</dt><dd><span class="dl good"><i>dense 1위</i>12.5 → 87.5%</span><span class="dl good"><i>Recall@5</i>23.8 → 100%</span></dd><dt>이유</dt><dd>접두사 누락은 6%p짜리 버그였고, 큰 쪽은 영어 모델로 한국어를 검색한 것이었습니다. dense의 약세는 검색 방식이 아니라 모델 선택의 결과였습니다.</dd><dt>한계</dt><dd>문서가 36개뿐이라 100%를 그대로 믿으면 안 됩니다. 전체 재색인이 필요하고 색인이 47초에서 155초가 됐습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">7</span><b>모델 교체 뒤 재작성</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>6단계 위에서 5단계 재작성을 다시 켜 봄</dd><dt>결과</dt><dd><span class="dl flat"><i>하이브리드 Recall@5</i>92.5% 동일</span><span class="dl bad"><i>p50</i>95 → 687ms</span><span class="dl bad"><i>MRR@5</i>0.8500 → 0.8475</span></dd><dt>이유</dt><dd>재작성이 고치던 표현 변경 6문항을 6단계 dense가 이미 전부 상위 5에 넣습니다.</dd><dt>한계</dt><dd>기능은 설정으로 남기고 기본값은 꺼짐입니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> dense가 약했던 것은 검색 방식 탓이 아니라 영어 모델 탓이었습니다. 재작성은 모델이 바뀌자 필요가 없어졌습니다. 1~5단계 수치는 nomic 색인에서 얻은 것이라 지금 색인으로는 재현되지 않습니다.</div>
+<div class="say"><b>말하기</b>1단계와 2단계는 코퍼스가 같고 질문만 다릅니다. 점수가 내려간 것은 성능이 아니라 난이도입니다. 6단계에서 모델을 바꾸자 같은 질문에서 dense가 22%에서 100%가 됩니다.</div>
+</section>
+
+<section class="slide" id="s14b" data-title="8~12 평가셋·식별자">
+<div class="kicker">8~12단계 · 120·135문항 평가셋, 식별자 질문, 분석기</div>
+<h2>평가셋을 키우자 하이브리드의 약점이 드러났고, 구어체 어미 한 토큰이 컷오프를 흔들었다</h2>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">8</span><b>120문항 평가셋 · 문서당 청크 6개</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>평가셋을 120문항(코퍼스 1,198청크, 52문서)으로 키우고 문서당 청크를 6으로</dd><dt>결과</dt><dd><span class="dl flat"><i>dense 1위</i>94.2%</span><span class="dl flat"><i>dense Recall@5</i>99.2%</span><span class="dl good"><i>dense 근거 Recall@5</i>92.5 → 95.4%</span></dd><dt>이유</dt><dd>근거를 놓친 10문항 중 9건은 문서 안 5~15위, 즉 4개 컷 바로 뒤에 있었습니다. n=16에서 포화하지만 프롬프트가 33청크로 커져 생성 품질을 확인할 수 없어 6에서 멈췄습니다.</dd><dt>한계</dt><dd>1~7단계와 직접 비교할 수 없습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">9</span><b>식별자 질의 15문항 추가</b><span class="tag t-mut">측정</span></div><dl><dt>바꾼 것</dt><dd>공고번호·조문번호·HSK 코드로 찾는 질문 15개를 135문항에 추가</dd><dt>결과</dt><dd><span class="dl bad"><i>하이브리드 Hit@5</i>100 → 66.7%</span><span class="dl flat"><i>공고번호형 MRR</i>BM25 0.917 / dense 0.556 / 하이브리드 0.778</span></dd><dt>문서</dt><dd><div class="ex dn"><b>잘림</b>121 「제2026-598호」 → BM25는 1위지만 RRF에서는 3위(최고점 대비 0.632)로 밀려 컷오프 0.95에 잘림</div></dd><dt>이유</dt><dd>RRF는 순위만 남겨 키워드가 정확히 일치했다는 확신이 점수에서 사라집니다. dense는 598호와 584호를 구별하지 못합니다.</dd><dt>한계</dt><dd>전체 수치가 내려간 것은 검색이 나빠져서가 아니라 평가셋이 안 보던 구간을 물어봤기 때문입니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">10</span><b>학습형 sparse를 어휘 경로로</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>bge-m3의 sparse 헤드로 검색하는 sparse, BM25와 섞는 hybrid_sparse를 135문항에 올림</dd><dt>결과</dt><dd><span class="dl flat"><i>sparse 정밀도</i>89.4%</span><span class="dl flat"><i>dense</i>89.1%</span><span class="dl bad"><i>BM25</i>80.3%</span></dd><dt>이유</dt><dd>같은 컷오프 비율이 모드마다 전혀 다른 강도로 작동합니다(0.90에서 sparse 1.40건, dense 4.44건). 모드 비교는 비율이 아니라 반환 건수나 정밀도를 맞춰 읽어야 합니다.</dd><dt>한계</dt><dd>넓게 가져가는 구간에서는 dense가 낫습니다. 코드는 9월 21일에 제거했습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">11</span><b>Qwen3-Embedding-0.6B</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>임베딩을 Qwen3-Embedding-0.6B로 바꿔 재색인</dd><dt>결과</dt><dd><span class="dl bad"><i>접두사 없이 MRR</i>0.9074 → 0.8778</span><span class="dl flat"><i>접두사 있으면 MRR</i>0.9037</span><span class="dl bad"><i>반환분 정밀도</i>89.1 → 87.9%</span></dd><dt>이유</dt><dd>비대칭 모델이라 질의 접두사가 필요합니다. 공정하게 재도 bge-m3와 동률입니다.</dd><dt>한계</dt><dd>공고번호형은 두 dense 모델이 0.500으로 똑같아서, 남은 구멍은 임베딩 모델의 문제가 아닙니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">12</span><b>구어체 어미가 검색을 망가뜨림</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>nori 분석기의 제외 품사에 보조용언(VX)과 지정사를 추가</dd><dt>결과</dt><dd><span class="dl good"><i>구어체 BM25 MRR</i>0.790 → 0.844</span><span class="dl good"><i>구어체 질의</i>정식 질의와 같은 점수</span><span class="dl flat"><i>dense MRR</i>0.9074 변화 없음</span></dd><dt>문서</dt><dd><div class="ex dn"><b>노이즈 1위</b>「전략물자 알려줘」 → 「알려줘」가 알리+어+주로 쪼개지고 `주`가 국제체제 표3의 각주 「주 :」에 걸려 1위(14.37). 컷오프 기준선이 올라가 정답 4건이 전부 잘리고 1건만 남음</div></dd><dt>이유</dt><dd>제목 필드에서 희귀한 `주` 한 토큰의 IDF가 내용어를 다 합친 것보다 높았습니다. dense가 변하지 않은 것이 원인이 분석기라는 대조군입니다.</dd><dt>한계</dt><dd>부정 보조용언 `않`도 함께 빠집니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 9단계에서 식별자 질문을 넣고서야 RRF가 키워드의 확신을 지우고 컷오프가 정답을 자른다는 것이 보였습니다. 평가셋이 묻지 않던 구간은 측정되지 않은 구간이었습니다. 12단계의 원인도 컷오프를 끌어올린 엉뚱한 1위였습니다.</div>
+<div class="say"><b>말하기</b>10~11단계는 모델과 sparse를 바꿔도 공고번호형은 그대로라는 것을 확인했고, 이 격차가 BM25 설정 결함이었음은 22단계에서 드러납니다.</div>
 </section>
 
 <!-- 15 -->
@@ -482,15 +516,24 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 <div class="say"><b>말하기</b>32~33단계의 결론은 "1위를 뺏는 문서와 정답을 가를 신호가 검색기 안에 없다"입니다. 다음 처방은 도메인 하드 네거티브로 학습한 청크 리랭커입니다.</div>
 </section>
 
+<!-- 21a -->
+<section class="slide" id="s21a" data-title="35~39 SPLADE·카테고리">
+<div class="kicker">35~39단계 · SPLADE 파인튜닝, 카테고리 검색, 후보 수</div>
+<h2>도메인으로 SPLADE를 학습해도 이득이 없었고, 새 카테고리에서는 경로를 붙이는 데서 막혔다</h2>
+<div class="stgrid"><div class="stg"><div class="stg-h"><span class="no">35</span><b>SPLADE 도메인 파인튜닝(질의 108개)</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>전략물자 청크 54곳에서 질의 108개를 직접 써서 PIXIE-Splade를 파인튜닝</dd><dt>결과</dt><dd><span class="dl flat"><i>기준</i>130/135</span><span class="dl bad"><i>최고 설정</i>129</span><span class="dl flat"><i>겨냥한 3문항</i>019·127·128 못 고침</span></dd><dt>이유</dt><dd>기준 모델이 합성 질의를 이미 풀어서 배울 신호가 없었고, 오답 후보의 23%(124/540)에 평가 정답 청크가 섞여 있었습니다. 고쳐도 이득으로 바뀌지 않았습니다.</dd><dt>한계</dt><dd>약점은 비슷한 문서끼리의 구분 문제라 질의 두 개로는 가르칠 수 없습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">36</span><b>SPLADE+dense 대 현재 하이브리드</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>현재 하이브리드를 오늘 다시 재서 튜닝 세트와 처음 보는 문서 69문항에서 나란히 비교</dd><dt>결과</dt><dd><span class="dl good"><i>튜닝 세트 1위</i>96.3 → 98.5%</span><span class="dl good"><i>처음 보는 문서 1위</i>85.5 → 89.9%</span><span class="dl good"><i>반환분 정밀도</i>65.7 → 80.4%</span></dd><dt>이유</dt><dd>낯선 문서에서 이득이 더 커서 튜닝 세트만의 이득이 아닙니다. 검색 지연은 5~15ms, 질의 인코딩이 CPU 66ms로 가장 큽니다.</dd><dt>한계</dt><dd>1위 차이의 95% 구간이 0을 포함하고(−1.4~+10.1p), 첫 근거 청크 순위는 조금 뒤로 갑니다. 기본값은 바꾸지 않았습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">37</span><b>카테고리 검색 경로</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>법령·고시(청크 673개), 행정·업무(청크 183개) 인덱스를 카테고리 ID로 고르는 범용 API와 화면</dd><dt>결과</dt><dd><span class="dl flat"><i>법령 근거 Recall</i>dense 0.952 / 하이브리드 0.905 / BM25 0.762</span><span class="dl flat"><i>행정 근거 Recall</i>dense 0.933 / 하이브리드 0.933 / BM25 0.833</span></dd><dt>이유</dt><dd>docs 기준 BM25 하한 14.75가 법령 인덱스에서 21문항 중 10문항을 빈 결과로 만들었고 답변 가능성 판정도 기각을 일으켜서 이 경로에서는 끕니다. 실패 원인은 청킹과 라벨, 옛 판이 앞서는 문제였습니다.</dd><dt>한계</dt><dd>질문 21·30개는 본문을 보고 쓴 점검용입니다. 같은 창 크기에서 SPLADE가 BM25보다 높지만 차이는 한두 문항입니다. 서비스에는 아직 붙이지 않았습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">38</span><b>합성 질의 2,702개로 재파인튜닝</b><span class="tag t-mut">미적용</span></div><dl><dt>바꾼 것</dt><dd>30B 모델이 만든 질의 중 기준 모델이 어려워하는 것만 골라 25배 늘려 학습</dd><dt>결과</dt><dd><span class="dl bad"><i>학습 문서군 1위(기준 130)</i>125~126</span><span class="dl good"><i>처음 보는 문서 1위(기준 61)</i>63</span><span class="dl good"><i>검증 36문항(기준 30)</i>31~33</span></dd><dt>이유</dt><dd>청크 1위 적중은 올랐지만(0.710 → 0.783) 상위 5청크 회수는 그대로여서 문서 단위 이득이 상쇄됐습니다. 정규화를 없애도 문서당 term이 줄어, 희소화의 원인은 학습 자체였습니다.</dd><dt>한계</dt><dd>사전에 정한 채택 기준(깨끗한 두 세트 +3, 학습 문서군 129 이상)을 통과한 설정이 없습니다. 법령·행정 코퍼스는 질의가 적어 확정하지 못했습니다.</dd></dl></div><div class="stg"><div class="stg-h"><span class="no">39</span><b>후보 수 스윕</b><span class="tag t-vec">적용</span></div><dl><dt>바꾼 것</dt><dd>BM25 5~100개 × dense 10~200개, 25조합을 같은 질문과 임베딩으로 측정</dd><dt>결과</dt><dd><span class="dl flat"><i>25개 이상</i>1위 95.6 / Hit@5 97.8 / 근거 Recall 95.6 동일</span><span class="dl flat"><i>BM25 5~10개</i>근거 Recall 95.9</span></dd><dt>이유</dt><dd>후보 수는 이 세트에서 병목이 아닙니다. 성능이 같아서 dense 후보 기본값만 50에서 25로 낮췄습니다.</dd><dt>한계</dt><dd>개발 셋 하나만 썼고 지연은 재지 않았습니다. 서버를 재시작해야 반영됩니다.</dd></dl></div></div>
+<div class="callout"><b>이 묶음의 결론.</b> 35단계와 38단계는 모두 처음 보는 문서에서는 조금 오르고 학습 문서군에서는 내려갑니다. 학습한 SPLADE는 채택하지 않았습니다. 학습하지 않은 PIXIE-Splade+dense는 36단계에서 이득이 보였지만 신뢰구간이 0을 포함해 운영에는 넣지 않았습니다.</div>
+<div class="say"><b>말하기</b>35~38단계의 교훈은 학습 데이터에서 오답 후보로 평가 정답이 섞이면 결과가 오염된다는 것과, 사전에 채택 기준을 정해 두면 결론이 흔들리지 않는다는 것입니다.</div>
+</section>
+
 <!-- 22 -->
 <section class="slide" id="s22" data-title="종합 한계">
-<div class="kicker">13~34단계 종합</div>
+<div class="kicker">1~39단계 종합</div>
 <h2>세 번 반복된 함정과 아직 풀리지 않은 것</h2>
 <div class="cols">
 <div class="col">
 <h3>반복된 패턴</h3>
 <ul class="plain">
-<li><b>개발 셋에서 오르고 새 셋에서 내려감.</b> 26단계 1위 적중 0.948 → 0.841, 32단계 LLM 목록 선택(공고문 0.904인데 검증 36은 1.000 → 0.917), 33단계 문서 합의 가산(날짜 14의 근거 회수가 0.929 → 0.786).</li>
+<li><b>개발 셋에서 오르고 새 셋에서 내려감.</b> 38단계 파인튜닝은 처음 보는 문서에서만 오르고 학습 문서군에서 130 → 125~126으로 내려갔습니다. 26단계 1위 적중 0.948 → 0.841, 32단계 LLM 목록 선택(공고문 0.904인데 검증 36은 1.000 → 0.917), 33단계 문서 합의 가산(날짜 14의 근거 회수가 0.929 → 0.786).</li>
 <li><b>진단이 틀림.</b> 13단계 "포화"는 한국어 성능의 천장이었고, 16~17단계 "섞으면 손해"는 컷오프 버그였고, 21단계 "제목 가중치가 크다"는 필드 방식 문제였고, 30단계 "후보 밖"은 컷오프 탈락이었습니다.</li>
 <li><b>측정과 구현이 다름.</b> 19단계 리랭커는 자르기 전에 측정하고 자른 뒤에 구현했습니다. 21단계는 수치가 좋아 보이던 값을 회귀 테스트가 기각했습니다.</li>
 </ul>
@@ -506,7 +549,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 </div>
 </div>
 <div class="callout bad"><b>측정의 한계.</b> 신규 질문과 판정은 모두 assistant가 작성했고 사람 검수 전입니다. 근거 Precision은 라벨된 청크만 세는 하한이고, 생성된 답변의 정확도는 측정하지 않았습니다. 판정자는 실행 간 1~2건이 흔들립니다.</div>
-<div class="say"><b>말하기</b>"수치가 올랐다"보다 "어떤 조건에서 왜 올랐고 어떤 조건에서 왜 내려갔는지"를 근거로 삼아야 한다는 것이 13~34단계의 교훈입니다.</div>
+<div class="say"><b>말하기</b>"수치가 올랐다"보다 "어떤 조건에서 왜 올랐고 어떤 조건에서 왜 내려갔는지"를 근거로 삼아야 한다는 것이 1~39단계의 교훈입니다.</div>
 </section>
 
 <script>

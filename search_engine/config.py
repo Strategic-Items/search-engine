@@ -90,7 +90,7 @@ class Settings(BaseSettings):
     # OLLAMA_EMBEDDING_MODEL과 정확히 일치해야 하며, 둘 중 하나를 변경하면 재인덱싱이 필요하다.
     # 모든 데이터셋의 경우, 매핑이 인덱스당 벡터 너비를 고정하기 때문에.
     search_embedding_dimensions: int = Field(default=1024, ge=1)
-    search_vector_candidates: int = Field(default=50, ge=1, le=1_000)
+    search_vector_candidates: int = Field(default=25, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
     # 반환되는 문서당 포함되는 청크 수. 랭킹은 여전히 하나의 문서를 반환한다.
     # 슬롯당; 이는 단지 그 문서의 어느 정도가 함께 제공되는지를 결정한다.
