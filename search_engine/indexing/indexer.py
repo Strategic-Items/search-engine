@@ -112,6 +112,8 @@ def document_actions(
     path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
     dropped: list | None = None, batch: int = EMBED_BATCH, law: bool = False,
     sparse: SparseEncoder | None = None,
+    sparse_heading_path: bool = False,
+    dense_heading_path: bool = True,
 ):
     """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
     pending: list[tuple[str, dict]] = []
@@ -119,13 +121,15 @@ def document_actions(
     def flush():
         if embedder is not None:
             vectors = embedder.embed([
-                embedding_text(law_embedding_title(s) if law else s["title"], s["body"])
+                embedding_text(law_embedding_title(s) if law and dense_heading_path else s["title"], s["body"])
                 for _, s in pending])
             for (_, source), vector in zip(pending, vectors):
                 source["embedding"] = vector
         if sparse is not None:
-            # 측정(38단계)과 같은 입력이다: 조문 경로를 붙이지 않은 제목과 본문.
-            terms = sparse.encode_documents([embedding_text(s["title"], s["body"]) for _, s in pending])
+            # 기본은 학습·측정 당시의 title+body. 옵션을 켜면 dense와 같은 제목 경로를 추가한다.
+            terms = sparse.encode_documents([
+                embedding_text(law_embedding_title(s) if law and sparse_heading_path else s["title"], s["body"])
+                for _, s in pending])
             for (_, source), weights in zip(pending, terms):
                 source["splade"] = weights
         for doc_id, source in pending:
@@ -196,7 +200,9 @@ def rebuild(
         for ok, item in streaming_bulk(
             client, document_actions(path, index_name, embedder,
                                      callcenter=spec["mapping"] == "callcenter", dropped=dropped,
-                                     law=spec["mapping"] == "law", sparse=sparse),
+                                     law=spec["mapping"] == "law", sparse=sparse,
+                                     sparse_heading_path=settings.search_splade_include_heading_path,
+                                     dense_heading_path=settings.search_dense_include_heading_path),
             chunk_size=500, max_retries=3, raise_on_error=True,
         ):
             if not ok:

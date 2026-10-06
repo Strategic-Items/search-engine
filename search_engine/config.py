@@ -90,6 +90,9 @@ class Settings(BaseSettings):
     # OLLAMA_EMBEDDING_MODEL과 정확히 일치해야 하며, 둘 중 하나를 변경하면 재인덱싱이 필요하다.
     # 모든 데이터셋의 경우, 매핑이 인덱스당 벡터 너비를 고정하기 때문에.
     search_embedding_dimensions: int = Field(default=1024, ge=1)
+    # 법령·행정 dense 입력에 제목 경로를 덧붙인다. 끄면 title+body로 색인한다.
+    # 기존 벡터에는 소급 적용되지 않으므로 입력을 바꾸면 재색인이 필요하다.
+    search_dense_include_heading_path: bool = True
     search_vector_candidates: int = Field(default=25, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
     # 반환되는 문서당 포함되는 청크 수. 랭킹은 여전히 하나의 문서를 반환한다.
@@ -225,6 +228,9 @@ class Settings(BaseSettings):
     # 카테고리 검색(법령·행정·민원FAQ)의 어휘 검색기: 38단계에서 파인튜닝한 SPLADE(설정 C).
     # 비워 두면 카테고리 검색도 BM25를 쓴다. 가중치(약 570MB)는 저장소 밖에 두고 경로를 지정한다.
     search_splade_model: str = ""
+    # 기존 title+body 입력과 제목 경로를 더한 입력을 같은 모델로 비교할 수 있게 한다.
+    # 색인 입력 옵션이므로 변경 후 해당 카테고리의 SPLADE 벡터를 다시 만들어야 한다.
+    search_splade_include_heading_path: bool = False
     # 문서·질의 인코딩 길이는 38단계 측정(256)과 같다. 512로 늘려도 청크 Recall은 변하지 않았다.
     search_splade_doc_max_length: int = Field(default=256, ge=8, le=512)
     search_splade_query_max_length: int = Field(default=256, ge=8, le=512)
