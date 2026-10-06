@@ -13,6 +13,8 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8,<10", "pytest-asyncio>=0.24,<2"]
+# 카테고리 검색의 SPLADE(38단계 파인튜닝 모델)를 돌릴 때만 필요하다.
+sparse = ["torch>=2.4", "transformers>=4.44"]
 
 [project.scripts]
 search-index = "search_engine.indexing.indexer:main"

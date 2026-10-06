@@ -3,7 +3,9 @@
 from search_engine.search.document import fetch_document
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
 from search_engine.search.query import (
+    CATEGORY_MODES,
     MODES,
+    build_splade_query,
     build_query,
     build_vector_query,
     retrieve,
@@ -24,6 +26,7 @@ from search_engine.search.results import (
 )
 
 __all__ = [
+    "CATEGORY_MODES",
     "Document",
     "DocumentChunk",
     "MODES",
@@ -35,6 +38,7 @@ __all__ = [
     "SearchHit",
     "SearchResults",
     "build_query",
+    "build_splade_query",
     "build_vector_query",
     "extract_hsk_code",
     "fetch_document",

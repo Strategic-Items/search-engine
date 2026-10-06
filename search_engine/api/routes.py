@@ -12,8 +12,11 @@ from search_engine.client import create_client
 from search_engine.config import get_settings
 from search_engine.api.schemas import RagRequest, SearchRequest
 from search_engine.rag import pipeline
+from search_engine.sparse import sparse_enabled
 from search_engine.search import (
+    CATEGORY_MODES,
     Document,
+    MODES,
     ModeComparison,
     SearchResults,
     fetch_document,
@@ -192,10 +195,17 @@ def list_categories() -> dict:
 @app.post("/v1/categories/{category}/search/compare")
 def search_category_compare(category: str, request: SearchRequest) -> ModeComparison:
     alias = _category_alias(category)
+    settings = get_settings()
+    # SPLADE 모델이 설정돼 있으면 SPLADE가 BM25 자리를 맡고 hybrid는 청크 단위 RRF로 합친다(38·40단계 측정 기준).
+    # 설정이 없으면 예전대로 BM25다.
+    splade = sparse_enabled(settings)
+    options = {"lexical": "splade", "chunk_first": True,
+               "chunk_first_cutoff_ratio": settings.search_category_cutoff_ratio} if splade else {}
     try:
         return search_modes(
             create_client(), alias, request.query, date.today(), 5,
-            score_floor=CATEGORY_SCORE_FLOOR, answerability=False,
+            modes=CATEGORY_MODES if splade else MODES,
+            score_floor=CATEGORY_SCORE_FLOOR, answerability=False, **options,
         )
     except OpenSearchException as exc:
         raise HTTPException(status_code=503, detail="category search unavailable") from exc

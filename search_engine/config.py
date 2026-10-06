@@ -221,6 +221,17 @@ class Settings(BaseSettings):
     search_chunk_first_agreement: float = Field(default=0.0, ge=0.0)
     # 청크 RRF 앞에서 검색기별 원시 점수 트림(fusion_trim)을 적용할지.
     search_chunk_first_trim: bool = False
+
+    # 카테고리 검색(법령·행정·민원FAQ)의 어휘 검색기: 38단계에서 파인튜닝한 SPLADE(설정 C).
+    # 비워 두면 카테고리 검색도 BM25를 쓴다. 가중치(약 570MB)는 저장소 밖에 두고 경로를 지정한다.
+    search_splade_model: str = ""
+    # 문서·질의 인코딩 길이는 38단계 측정(256)과 같다. 512로 늘려도 청크 Recall은 변하지 않았다.
+    search_splade_doc_max_length: int = Field(default=256, ge=8, le=512)
+    search_splade_query_max_length: int = Field(default=256, ge=8, le=512)
+    search_splade_top_terms: int = Field(default=256, ge=1, le=1024)
+    search_splade_min_weight: float = Field(default=0.01, ge=0.0)
+    # 카테고리 hybrid는 청크 단위 RRF 뒤 1위 청크 점수의 이 비율로 자른다(40단계 측정 기준 0.95).
+    search_category_cutoff_ratio: float = Field(default=0.95, ge=0.0, le=1.0)
     rag_top_k: int = Field(default=5, ge=1)
 
     # 각 리트리버 목록의 얼마나 들어가서 융합되는가. 위의 컷오프 비율과는 별도로, 다른 질문에 답한다: "아니오"가 아니라
@@ -233,6 +244,9 @@ class Settings(BaseSettings):
     # 96.3%에서 97.0%로 증가한다; 0.90은 둘 다 포기했다(91.1% / 93.3%)
     search_fusion_trim_bm25: float = Field(default=0.90, ge=0.0, le=1.0)
     search_fusion_trim_vector: float = Field(default=0.97, ge=0.0, le=1.0)
+    # SPLADE 단독의 문서 컷오프. 38단계 측정이 SPLADE에 쓴 0.97을 그대로 둔다.
+    search_cutoff_ratio_splade: float = Field(default=0.97, ge=0.0, le=1.0)
+    search_score_floor_splade: float = Field(default=0.0, ge=0.0)
 
     def fusion_trim_ratio(self, retriever: str) -> float:
         return {
@@ -245,6 +259,7 @@ class Settings(BaseSettings):
             "bm25": self.search_cutoff_ratio_bm25,
             "vector": self.search_cutoff_ratio_vector,
             "hybrid": self.search_cutoff_ratio_hybrid,
+            "splade": self.search_cutoff_ratio_splade,
         }[mode]
 
     def score_floor(self, mode: str) -> float:
@@ -252,6 +267,7 @@ class Settings(BaseSettings):
             "bm25": self.search_score_floor_bm25,
             "vector": self.search_score_floor_vector,
             "hybrid": self.search_score_floor_hybrid,
+            "splade": self.search_score_floor_splade,
         }[mode]
 
     @property
