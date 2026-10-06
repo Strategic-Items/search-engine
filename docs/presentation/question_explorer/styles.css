@@ -323,6 +323,53 @@ table.mini { border-collapse: collapse; font-size: 13.5px; } table.mini th, tabl
 .em .meta-property-tags span { padding: 3px 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
 .em .meta-unused { margin-top: 14px; padding: 9px 12px; border: 1px dashed var(--line); border-radius: 8px; text-align: center; color: var(--muted); font-size: 12px; }
 .em .meta-use-card .meta-use-note { color: var(--muted); font-size: 13px; }
+.em .meta-catalog { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.em .meta-field-scroll { overflow-x: auto; }
+.em .meta-field-scroll table { min-width: 640px; table-layout: fixed; }
+.em .meta-field-scroll th:first-child { width: 26%; }
+.em .meta-field-scroll th:nth-child(2) { width: 27%; }
+.em .meta-field-scroll td:first-child { white-space: normal; }
+.em .meta-field-scroll code { overflow-wrap: anywhere; }
+.em .meta-field-example { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.em .meta-lineage-table table { min-width: 650px; }
+.em .meta-lineage-table th:first-child { width: 31%; }
+.em .meta-lineage-table th:nth-child(2) { width: 33%; }
+.em .meta-lineage-table td { font-size: 14px; overflow-wrap: anywhere; }
+.em .meta-lineage-name { display: block; margin-bottom: 9px; font-size: 15px; }
+.em .meta-field-link { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.em .meta-field-link code { font-size: 12px; font-weight: 500; }
+.em .meta-field-link code:first-child { color: var(--vec); background: var(--vec-soft); }
+.em .meta-field-link code:last-child { color: var(--kw); background: var(--kw-soft); }
+.em .meta-field-link > span { color: var(--muted); margin-left: 12px; line-height: 1; }
+.em .meta-transform-kind { display: inline-block; padding: 2px 7px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); font-size: 11px; font-weight: 650; }
+.em .meta-lineage-rule { margin: 8px 0 0; font-size: 13px; }
+.em .meta-lineage-detail { margin-top: 10px; font-size: 12px; font-weight: 400; }
+.em .meta-lineage-detail p { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+.em .meta-lineage-values { display: grid; gap: 7px; margin-top: 10px; }
+.em .meta-lineage-values div { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 6px; align-items: start; }
+.em .meta-lineage-values span { color: var(--muted); }
+.em .meta-lineage-values code { font-size: 12px; }
+@media (max-width: 760px) {
+  .em .meta-lineage-table table { min-width: 0; border: 0; }
+  .em .meta-lineage-table table, .em .meta-lineage-table tbody, .em .meta-lineage-table tr, .em .meta-lineage-table td { display: block; width: 100%; }
+  .em .meta-lineage-table thead { display: none; }
+  .em .meta-lineage-table tr { margin-bottom: 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .em .meta-lineage-table td { border-right: 0; }
+  .em .meta-lineage-table td:last-child { border-bottom: 0; }
+  .em .meta-lineage-table td::before { content: attr(data-label); display: block; color: var(--muted); font-size: 11px; margin-bottom: 6px; font-weight: 500; }
+}
+.em .meta-supersession { grid-column: 1 / -1; scroll-margin-top: 20px; }
+.em .meta-supersession h3 code { display: inline-block; color: var(--accent); font-size: 15px; vertical-align: middle; overflow-wrap: anywhere; }
+.em .meta-supersession-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.em .meta-replacement-link { display: flex; flex-direction: column; align-items: center; padding: 10px 0; color: var(--accent); gap: 4px; }
+.em .meta-replacement-link code { font-size: 12px; overflow-wrap: anywhere; }
+.em .meta-replacement-link > span { font-size: 24px; line-height: 1; }
+.em .meta-edition-results { margin: 0; padding-left: 24px; display: grid; gap: 10px; }
+.em .meta-edition-results li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); font-size: 13px; }
+.em .meta-edition-results li:last-child { border-color: var(--accent); background: var(--accent-soft); }
+.em .meta-edition-results strong, .em .meta-edition-results span { display: block; }
+.em .meta-edition-results span { color: var(--muted); font-size: 12px; margin-top: 3px; }
+@media (max-width: 700px) { .em .meta-supersession-examples { grid-template-columns: minmax(0, 1fr); gap: 0; } }
 @media (max-width: 1000px) { .em .meta-use-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 480px) { .em .meta-use-card { padding: 16px; } .em .meta-demo { padding: 12px; } }
 .em table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 15px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
