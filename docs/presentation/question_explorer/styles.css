@@ -465,3 +465,5 @@ tr.hl td { background: var(--gc); color: var(--gc-ink); font-weight: 700; }
 .goldbar.miss { background: var(--bad-soft); border-color: var(--bad); color: var(--ink); }
 .goldbar.miss .pin { background: var(--bad); color: var(--paper); border-color: var(--bad); }
 .goldbar.miss .no { opacity: 1; color: var(--bad); font-weight: 600; }
+.gd { padding: 20px 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); box-shadow: 0 8px 24px rgba(16,28,43,.05); }
+.gd h2 { margin: 0 0 8px; }
