@@ -9,6 +9,7 @@
 
 import argparse
 import json
+import os
 import re
 import sys
 from datetime import date
@@ -50,6 +51,13 @@ SPECS = [
 
 
 from admin_specs import SPECS as ADMIN_SPECS  # noqa: E402
+from law50_specs import SPECS as LAW50_SPECS  # noqa: E402
+
+
+def _specs() -> list:
+    if CATEGORY == "admin":
+        return ADMIN_SPECS
+    return LAW50_SPECS if os.environ.get("SPECS") == "law50" else SPECS
 
 
 def norm(text: str) -> str:
@@ -64,14 +72,14 @@ def read_chunks() -> list[dict]:
 def build() -> None:
     chunks = read_chunks()
     rows, bad = [], []
-    for number, (kind, query, phrases) in enumerate(SPECS if CATEGORY == "law" else ADMIN_SPECS, 1):
+    for number, (kind, query, phrases) in enumerate(_specs(), 1):
         needles = [norm(p) for p in phrases]
         gold = [c for c in chunks if all(n in norm(c["body"] + " " + " ".join(c["heading_path"])) for n in needles)]
         if not gold:
             bad.append(query)
             continue
         rows.append({
-            "qid": f"{CATEGORY}-v1-{number:03d}", "category": kind, "query": query, "phrases": phrases,
+            "qid": f"{os.environ.get('QID_PREFIX', CATEGORY + '-v1')}-{number:03d}", "category": kind, "query": query, "phrases": phrases,
             "gold": sorted({c["parent_id"] for c in gold}),
             "evidence_groups": [[c["id"] for c in gold]],
         })

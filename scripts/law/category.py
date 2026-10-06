@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 CATEGORY = os.environ.get("CATEGORY", "law")
-QUERIES = Path(f"data/queries_{CATEGORY}_v1.jsonl")
+QUERIES = Path(os.environ.get("QUERIES_FILE", f"data/queries_{CATEGORY}_v1.jsonl"))
 
 
 def alias(settings) -> str:
