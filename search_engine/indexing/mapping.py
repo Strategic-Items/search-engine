@@ -107,6 +107,8 @@ def law_index_body(embedding_dimensions: int) -> dict:
         "revision_date": {"type": "date"},
         "legal_structure": {"type": "keyword"},
         "chunk_index": {"type": "integer"},
+        # 38단계 파인튜닝 SPLADE의 희소 벡터(term → 가중치). 모델이 없으면 비워 둔다.
+        "splade": {"type": "rank_features"},
     })
     return body
 

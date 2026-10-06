@@ -14,6 +14,7 @@ from search_engine.search.answerability import is_unanswerable
 from search_engine.search.rerank import select_passages
 from search_engine.search.chunk_filter import filter_chunks
 from search_engine.search.rewrite import rewrite_query
+from search_engine.sparse import encode_query as encode_sparse_query
 from search_engine.search.results import (
     ModeComparison,
     ModeResults,
@@ -168,6 +169,17 @@ def build_query(query: str, as_of: date) -> dict:
                                "score_mode": "sum", "boost_mode": "sum"}}
 
 
+def build_splade_query(terms: dict[str, float], as_of: date) -> dict:
+    """SPLADE 희소 벡터 검색: 질의 term 가중치와 청크의 `splade` 필드를 내적한다.
+
+    유효 기간 필터는 밀집 검색과 같은 것을 건다.
+    """
+    return {"bool": {
+        "must": [{"neural_sparse": {"splade": {"query_tokens": terms}}}],
+        "filter": _validity_filters(as_of),
+    }}
+
+
 def _validity_filters(as_of: date) -> list[dict]:
     """k-NN에서 중복된 필터링, 쿼리가 function_score를 사용할 수 없기 때문에."""
     return [
@@ -303,12 +315,13 @@ def _chunk_first(
             title = hit["_source"].get("title", "")
             return _same_reporting_half(title, reporting_half) and _same_topic_in_title(query, title)
         by_retriever = {name: {hit["_id"] for hit in hits if matches(hit)}
-                        for hits, _, name in lists if name in ("bm25", "vector")}
+                        for hits, _, name in lists if name in ("bm25", "splade", "vector")}
         period_hits = list({hit["_id"]: hit for hits, _, _ in lists
                             for hit in hits if matches(hit)}.values())
         if period_hits:
             lists.append((period_hits, 1.0, "period"))
-            period_supported = by_retriever.get("bm25", set()) & by_retriever.get("vector", set())
+            period_supported = (by_retriever.get("bm25", set()) | by_retriever.get("splade", set())) \
+                & by_retriever.get("vector", set())
     score: dict[str, float] = {}
     dense_rank: dict[str, int] = {}
     leaders: set[str] = set()
@@ -460,6 +473,10 @@ def _rewritten_queries(query: str, strict: bool) -> list[str]:
 
 
 MODES = ("bm25", "vector", "hybrid")
+# 카테고리 검색은 SPLADE가 BM25 자리를 맡는다. "splade"는 그 단독 모드이고,
+# hybrid는 `lexical="splade"`일 때 SPLADE와 밀집 검색을 합친다.
+CATEGORY_MODES = ("splade", "vector", "hybrid")
+ALL_MODES = ("bm25", "splade", "vector", "hybrid")
 
 
 def retrieve(
@@ -470,6 +487,8 @@ def retrieve(
     cutoff_ratio: float | None = None,
     score_floor: float | None = None, answerability: bool | None = None,
     rerank_chunks: bool | None = None,
+    lexical: str = "bm25", chunk_first: bool | None = None,
+    chunk_first_cutoff_ratio: float | None = None,
 ) -> list[SearchHit]:
     """`alias`에서 검색한다. 이는 여러 인덱스를 쉼표로 구분하여 명명할 수 있다.
 
@@ -477,8 +496,12 @@ def retrieve(
 """
     settings = get_settings()
     mode = mode or settings.search_mode
-    if mode not in MODES:
+    if mode not in ALL_MODES:
         raise ValueError(f"unknown search mode: {mode}")
+    if lexical not in ("bm25", "splade"):
+        raise ValueError(f"unknown lexical retriever: {lexical}")
+    if mode == "splade":
+        lexical = "splade"
     if k < 1:
         raise ValueError("k must be positive")
     # (hits, weight, retriever): 검색기 정보는 유지되어야 하므로, 검색에서
@@ -516,7 +539,14 @@ def retrieve(
 
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
-    if mode in ("bm25", "hybrid"):
+    if mode in ("bm25", "splade", "hybrid") and lexical == "splade":
+        # 질의 인코딩이 실패하면(모델 미설정·torch 없음) 조용히 BM25로 돌아가지 않고 그대로 알린다.
+        terms = encode_sparse_query(query.strip())
+        add_response(client.search(
+            index=alias, body={"query": build_splade_query(terms, as_of)},
+            size=lexical_candidates, ignore_unavailable=not strict,
+        ), "splade", "splade")
+    elif mode in ("bm25", "hybrid"):
         lexical_options = {"search_type": "dfs_query_then_fetch"} if "," in alias else {}
         lexical = client.search(
             index=alias, body={"query": build_query(query, as_of)},
@@ -555,7 +585,9 @@ def retrieve(
     if off_topic:
         return []
     ranked_lists = [entry for entry in ranked_lists if entry[0]] or [([], 1.0, mode)]
-    if mode == "hybrid" and len(ranked_lists) > 1 and settings.search_chunk_first:
+    if chunk_first is None:
+        chunk_first = settings.search_chunk_first
+    if mode == "hybrid" and len(ranked_lists) > 1 and chunk_first:
         # 원시 점수 트림: 각 검색기 목록의 끝을 자기 1위 점수 대비 비율로 먼저 자른다.
         chunk_lists = ranked_lists if not settings.search_chunk_first_trim else [
             (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
@@ -563,7 +595,8 @@ def retrieve(
         groups = _chunk_first(
             chunk_lists, query, rrf_k=settings.search_hybrid_rrf_k,
             max_chunks=settings.search_chunk_first_max_chunks,
-            cutoff_ratio=settings.search_chunk_first_cutoff_ratio,
+            cutoff_ratio=(settings.search_chunk_first_cutoff_ratio
+                          if chunk_first_cutoff_ratio is None else chunk_first_cutoff_ratio),
             max_documents=min(k, settings.search_chunk_first_max_documents),
             agreement=settings.search_chunk_first_agreement,
             chunks_per_document=chunks_per_document or settings.search_chunks_per_document,
@@ -606,9 +639,10 @@ def retrieve(
                     name: {hit["_source"].get("parent_id") or hit["_id"] for hit in hits
                            if _same_reporting_half(hit["_source"].get("title", ""), reporting_half)
                            and _same_topic_in_title(query, hit["_source"].get("title", ""))}
-                    for hits, _, name in ranked_lists if name in ("bm25", "vector")
+                    for hits, _, name in ranked_lists if name in ("bm25", "splade", "vector")
                 }
-                period_supported = by_retriever.get("bm25", set()) & by_retriever.get("vector", set())
+                period_supported = (by_retriever.get("bm25", set()) | by_retriever.get("splade", set())) \
+                    & by_retriever.get("vector", set())
         ranked = _rrf(fusable, settings.search_hybrid_rrf_k)
     else:
         # 리트리버의 원래 점수를 유지하고, 각 부모에 대해 최고의 청크만 유지한다.

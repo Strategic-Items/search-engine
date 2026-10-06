@@ -19,6 +19,7 @@ from search_engine.indexing.law import law_embedding_title, law_source
 from search_engine.indexing.identity import FIRST_CHUNK_INDEX, chunk_index, download_copies, period_hint
 from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body, law_index_body
 from search_engine.indexing.synonyms import load_synonyms
+from search_engine.sparse import SparseEncoder, sparse_enabled
 
 # 임베딩은 문서마다 한 번씩 부르면 호출 비용이 대부분을 차지한다. ollama는
 # 병렬 요청을 직렬로 처리하므로(2026-09-22 측정, 4병렬이 1.6배에 그친다)
@@ -110,6 +111,7 @@ def _sources(path: Path, callcenter: bool, dropped: list | None, law: bool = Fal
 def document_actions(
     path: Path, index_name: str, embedder: OllamaEmbedder | None = None, *, callcenter: bool = False,
     dropped: list | None = None, batch: int = EMBED_BATCH, law: bool = False,
+    sparse: SparseEncoder | None = None,
 ):
     """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
     pending: list[tuple[str, dict]] = []
@@ -121,6 +123,11 @@ def document_actions(
                 for _, s in pending])
             for (_, source), vector in zip(pending, vectors):
                 source["embedding"] = vector
+        if sparse is not None:
+            # 측정(38단계)과 같은 입력이다: 조문 경로를 붙이지 않은 제목과 본문.
+            terms = sparse.encode_documents([embedding_text(s["title"], s["body"]) for _, s in pending])
+            for (_, source), weights in zip(pending, terms):
+                source["splade"] = weights
         for doc_id, source in pending:
             yield {"_op_type": "index", "_index": index_name, "_id": doc_id, "_source": source}
         pending.clear()
@@ -184,10 +191,12 @@ def rebuild(
         indexed = 0
         dropped: list[str] = []
         embedder = OllamaEmbedder(settings) if spec["embed"] else None
+        # 카테고리(law 매핑) 인덱스에만 SPLADE 벡터를 싣는다. 모델이 설정돼 있을 때만.
+        sparse = SparseEncoder(settings) if spec["mapping"] == "law" and sparse_enabled(settings) else None
         for ok, item in streaming_bulk(
             client, document_actions(path, index_name, embedder,
                                      callcenter=spec["mapping"] == "callcenter", dropped=dropped,
-                                     law=spec["mapping"] == "law"),
+                                     law=spec["mapping"] == "law", sparse=sparse),
             chunk_size=500, max_retries=3, raise_on_error=True,
         ):
             if not ok:
