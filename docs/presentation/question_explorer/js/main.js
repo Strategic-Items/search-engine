@@ -1,6 +1,6 @@
-var VIEWS={d:[["q","질문별"],["s","단계별"],["a","구조도"],["e","메타데이터"]], c:[["cq","질문별"],["cs","단계별"],["c","결과 요약"]]};
+var VIEWS={d:[["q","질문별"],["s","단계별"],["a","구조도"],["e","메타데이터"]], c:[["cq","질문별"],["cs","단계별"],["c","결과 요약"],["cm","메타데이터"]]};
 var BRAND={d:["질문별 검색 경로 탐색기","docs 정답형 135문항과 무응답 대상 38문항을 지금 운영 설정(문서 우선, 판정 LLM 끔)으로 다시 돌린 결과입니다."],c:["카테고리별 검색 탐색기","법령·고시, 행정·업무, 민원FAQ를 각자 인덱스에서 따로 찾는 경로(37단계부터)를 점검한 결과입니다."]};
-function modeOf(v){ return v==="cq"||v==="cs"||v==="c"?"c":"d"; }
+function modeOf(v){ return v==="cq"||v==="cs"||v==="c"||v==="cm"?"c":"d"; }
 function setView(v,nohash){
   var m=modeOf(v), prev=st.mode||"d"; st.view=v;
   if(st.mode!==m||!document.getElementById("viewsw").children.length){
@@ -12,13 +12,19 @@ function setView(v,nohash){
     if(m==="c"&&!/^d3[789]$/.test(st.stage)) st.stage="d37";
     if(m==="d"&&prev==="c"&&/^d3[789]$/.test(st.stage)) st.stage="s13";
   }
+  if(v==="cq"&&CQS.set!==CATSEL){
+    CQS.set=CATSEL;
+    var firstCategoryQuestion=CQ.filter(function(x){return x.set===CATSEL;})[0];
+    if(firstCategoryQuestion) CQS.id=firstCategoryQuestion.id;
+  }
   document.getElementById("modesw").querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.mode===m?"true":"false"); });
   document.getElementById("viewsw").querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.view===v?"true":"false"); });
+  if(m==="c") renderCategorySelector();
   var q=v==="q", cq=v==="cq", lst=q||cq;
-  document.getElementById("tools").hidden=!q; document.getElementById("ctools").hidden=!cq; document.getElementById("list").hidden=!lst; document.getElementById("stnav").hidden=lst; document.getElementById("catsw").hidden=(v!=="c");
+  document.getElementById("tools").hidden=!q; document.getElementById("list").hidden=!lst; document.getElementById("stnav").hidden=lst; document.getElementById("catsw").hidden=(m!=="c");
   document.getElementById("side").classList.toggle("sv",!lst);
-  if(q){ renderList(); renderDetail(); } else if(cq) renderCq(); else if(v==="s"||v==="cs") renderStage(); else if(v==="e") renderMeta(); else if(v==="c") renderCat(); else renderArch();
-  if(!nohash){ if(v==="s") location.hash="stage-"+st.stage; else if(v==="cs") location.hash="cat-stage-"+st.stage; else if(v==="a") location.hash="arch"; else if(v==="e") location.hash="meta"; else if(v==="c") location.hash="cat"; else if(v==="cq") location.hash="cat-q-"+CQS.id; else if(st.id) location.hash=st.id; }
+  if(q){ renderList(); renderDetail(); } else if(cq) renderCq(); else if(v==="s"||v==="cs") renderStage(); else if(v==="e") renderMeta(); else if(v==="c") renderCat(); else if(v==="cm") renderCategoryMeta(); else renderArch();
+  if(!nohash){ if(v==="s") location.hash="stage-"+st.stage; else if(v==="cs") location.hash="cat-stage-"+st.stage; else if(v==="a") location.hash="arch"; else if(v==="e") location.hash="meta"; else if(v==="c") location.hash="cat"; else if(v==="cm") location.hash="cat-meta"; else if(v==="cq") location.hash="cat-q-"+CQS.id; else if(st.id) location.hash=st.id; }
 }
 (function(){
   var seg=document.getElementById("seg");
@@ -258,11 +264,12 @@ function setView(v,nohash){
     if(id==="arch"){ if(st.view!=="a") setView("a",true); return; }
     if(id==="meta"){ if(st.view!=="e") setView("e",true); return; }
     if(id==="cat"){ if(st.view!=="c") setView("c",true); return; }
-    if(id.indexOf("cat-q-")===0){ var cid=id.slice(6); if(CQ.some(function(x){return x.id===cid;})){ CQS.id=cid; if(st.view!=="cq") setView("cq",true); else renderCq(); } return; }
+    if(id==="cat-meta"){ if(st.view!=="cm") setView("cm",true); return; }
+    if(id.indexOf("cat-q-")===0){ var cid=id.slice(6), cq=CQ.filter(function(x){return x.id===cid;})[0]; if(cq){ CQS.id=cid; CQS.set=cq.set; CATSEL=cq.set; if(st.view!=="cq") setView("cq",true); else renderCq(); } return; }
     if(id.indexOf("cat-stage-")===0){ var ck=id.slice(10); if(/^d3[789]$/.test(ck)){ st.stage=ck; setView("cs",true); } return; }
     if(id.indexOf("stage-")===0){ var sk=id.slice(6); if(STG.some(function(x){return x.k===sk;})){ if(st.view==="s"&&st.stage===sk) return; st.stage=sk; setView("s",true); } return; }
     if(Q.some(function(q){return q.id===id;})) select(id,true); });
   var start=location.hash.slice(1); if(!Q.some(function(q){return q.id===start;})) start="docs-v2-001";
   select(start,true);
-  var h0=location.hash.slice(1); if(h0==="arch") setView("a",true); else if(h0==="meta") setView("e",true); else if(h0==="cat") setView("c",true); else if(h0.indexOf("cat-q-")===0&&CQ.some(function(x){return x.id===h0.slice(6);})){ CQS.id=h0.slice(6); setView("cq",true); } else if(/^cat-stage-d3[789]$/.test(h0)){ st.stage=h0.slice(10); setView("cs",true); } else if(h0.indexOf("stage-")===0 && STG.some(function(x){return x.k===h0.slice(6);})){ st.stage=h0.slice(6); setView("s",true); }
+  var h0=location.hash.slice(1); if(h0==="arch") setView("a",true); else if(h0==="meta") setView("e",true); else if(h0==="cat") setView("c",true); else if(h0==="cat-meta") setView("cm",true); else if(h0.indexOf("cat-q-")===0){ var initialCq=CQ.filter(function(x){return x.id===h0.slice(6);})[0]; if(initialCq){ CQS.id=initialCq.id; CQS.set=initialCq.set; CATSEL=initialCq.set; setView("cq",true); } } else if(/^cat-stage-d3[789]$/.test(h0)){ st.stage=h0.slice(10); setView("cs",true); } else if(h0.indexOf("stage-")===0 && STG.some(function(x){return x.k===h0.slice(6);})){ st.stage=h0.slice(6); setView("s",true); }
 })();

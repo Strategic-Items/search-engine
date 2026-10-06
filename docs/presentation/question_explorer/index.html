@@ -11,7 +11,7 @@
 <div class="app">
   <button type="button" class="sidebtn" id="sideopen" title="목록 펴기">▶ 목록</button>
   <aside class="side" id="side" aria-label="질문 목록">
-    <div class="brand"><button type="button" class="sidebtn" id="sideclose" title="목록 접기">◀ 접기</button><div class="modesw" id="modesw" role="tablist" aria-label="검색 종류"><button type="button" role="tab" data-mode="d" aria-pressed="true">질문별 검색</button><button type="button" role="tab" data-mode="c" aria-pressed="false">카테고리별 검색</button></div><h1 id="bh">질문별 검색 경로 탐색기</h1><p id="bp">docs 정답형 135문항과 무응답 대상 38문항을 지금 운영 설정(문서 우선, 판정 LLM 끔)으로 다시 돌린 결과입니다.</p><div class="viewsw" id="viewsw" role="group" aria-label="보기 방식"></div><div class="viewsw" id="catsw" role="group" aria-label="카테고리" hidden></div></div>
+    <div class="brand"><button type="button" class="sidebtn" id="sideclose" title="목록 접기">◀ 접기</button><div class="modesw" id="modesw" role="tablist" aria-label="검색 종류"><button type="button" role="tab" data-mode="d" aria-pressed="true">질문별 검색</button><button type="button" role="tab" data-mode="c" aria-pressed="false">카테고리별 검색</button></div><h1 id="bh">질문별 검색 경로 탐색기</h1><p id="bp">docs 정답형 135문항과 무응답 대상 38문항을 지금 운영 설정(문서 우선, 판정 LLM 끔)으로 다시 돌린 결과입니다.</p><div class="viewsw" id="catsw" role="group" aria-label="카테고리" hidden></div><div class="viewsw" id="viewsw" role="group" aria-label="보기 방식"></div></div>
     <div class="tools" id="tools">
       <div class="seg" id="seg" role="group" aria-label="결과"></div>
       <div class="pair"><select id="who" aria-label="누가 정답을 찾았나"></select><select id="cat" aria-label="질문 유형"></select></div>
@@ -19,7 +19,6 @@
       <input id="txt" type="search" placeholder="질문이나 번호로 찾기" aria-label="질문 검색">
       <div class="cnt" id="cnt"></div>
     </div>
-    <div class="tools" id="ctools" hidden></div>
     <div class="list" id="list" role="listbox" aria-label="질문"></div>
     <div class="stnav" id="stnav" hidden></div>
   </aside>
