@@ -39,3 +39,42 @@ def law_embedding_title(source: dict) -> str:
     path = " > ".join(source.get("heading_path") or [])
     title = source["title"]
     return f"{title} — {path}" if path else title
+
+
+LAW_NUMBER = re.compile(r"제\s*(\d{4,6})\s*호")
+
+
+def _number_key(value: str | None) -> str | None:
+    """고시 `2015-145`, 법령 `30418`처럼 같은 문서 번호를 같은 문자열로 만든다."""
+    if not value:
+        return None
+    match = NUMBER.search(value)
+    if match:
+        return f"{match.group(1)}-{int(match.group(2))}"
+    match = LAW_NUMBER.search(value)
+    return match.group(1) if match else None
+
+
+def resolve_superseded(parents: dict[str, dict]) -> dict[str, str]:
+    """`superseded_by`가 번호로 적힌 문서의 대체 문서를 부모 문서 ID로 푼다.
+
+    파서는 대체 관계를 고시·법령 번호로 주는 경우가 많은데 새 판을 붙이는 검색은 부모 ID만 읽는다.
+    `parents`는 부모 ID마다 `superseded_by`, `doc_number`, `doc_status`, `chunks`를 가진 사전이다.
+    번호 하나가 본문·신구대비표·개정문 같은 여러 문서에 걸리므로 시행된 판(`개정`)을 안(案)보다,
+    청크가 많은 문서를 적은 문서보다 먼저 고른다. 번호를 가진 문서가 없으면 풀지 않는다(키를 두지 않는다).
+    """
+    by_number: dict[str, list[str]] = {}
+    for parent_id, info in parents.items():
+        key = _number_key(info.get("doc_number"))
+        if key:
+            by_number.setdefault(key, []).append(parent_id)
+    resolved: dict[str, str] = {}
+    for parent_id, info in parents.items():
+        target = info.get("superseded_by")
+        if not target or target in parents:
+            continue
+        candidates = [c for c in by_number.get(_number_key(target) or "", []) if c != parent_id]
+        if candidates:
+            resolved[parent_id] = min(candidates, key=lambda c: (
+                parents[c].get("doc_status") != "개정", -parents[c].get("chunks", 0), c))
+    return resolved

@@ -220,6 +220,8 @@ class Settings(BaseSettings):
     # 청크는 여러 문서에서 조금씩 올라오므로, 문서 수를 따로 묶지 않으면 반환 문서가 늘어
     # 문서 정밀도가 떨어진다.
     search_chunk_first_max_documents: int = Field(default=5, ge=1, le=5)
+    # 판본을 지정하지 않은 질문에서 `superseded_by`가 있는 문서의 청크 점수에 곱한다. 1이면 끈다(43단계).
+    search_chunk_first_superseded_weight: float = Field(default=1.0, ge=0.0, le=1.0)
     # 청크 점수에 더하는 문서 합의의 배수(0이면 청크 RRF만).
     search_chunk_first_agreement: float = Field(default=0.0, ge=0.0)
     # 청크 RRF 앞에서 검색기별 원시 점수 트림(fusion_trim)을 적용할지.

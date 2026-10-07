@@ -70,3 +70,29 @@ def test_document_agreement_lifts_a_document_both_lists_found_through_different_
     # 청크만 보면 b1·x1(각 목록 1위)이 앞서지만, 문서 A는 두 검색기가 함께 올린 문서다
     assert select(lex, vec)[0][0] in ("b1", "x1")
     assert {c for c in select(lex, vec, agreement=1.0)[0]} == {"a1", "a2"}
+
+
+def retired(chunk_id, parent):
+    item = chunk(chunk_id, parent)
+    item["_source"]["superseded_by"] = "01_새판"
+    return item
+
+
+def pick(query, weight):
+    # 옛 판 R이 두 목록 모두에서 근소하게 앞서고, 새 판 N이 바로 뒤에 온다
+    lex = [retired("r1", "R"), chunk("n1", "N")]
+    vec = [retired("r1", "R"), chunk("n1", "N")]
+    options = dict(rrf_k=60, max_chunks=10, cutoff_ratio=0.0, max_documents=5, chunks_per_document=6)
+    groups = _chunk_first([(lex, 1.0, "bm25"), (vec, 1.0, "vector")], query,
+                          superseded_weight=weight, **options)
+    return [[c["_id"] for c in group] for group in groups]
+
+
+def test_a_retired_edition_is_scored_down_when_the_question_names_no_edition():
+    assert pick("처리기간은 며칠인가요", 1.0) == [["r1"], ["n1"]]
+    assert pick("처리기간은 며칠인가요", 0.5) == [["n1"], ["r1"]]
+
+
+def test_a_question_that_names_an_edition_keeps_the_retired_edition_first():
+    assert pick("2015년 개정안의 처리기간은", 0.5) == [["r1"], ["n1"]]
+    assert pick("17차 개정에서 정의는", 0.5) == [["r1"], ["n1"]]

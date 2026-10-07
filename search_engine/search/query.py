@@ -40,6 +40,16 @@ CURRENT_EDITION_WEIGHT = 4
 # holdout 69의 Hit@5가 0.899에서 0.884로 1문항 내려가고 기간(타) 7의 문서 MRR이 0.857에서 0.786으로 내려갔다).
 
 
+# 질문이 판본을 직접 지정하는 표현. 이런 질문은 옛 판·개정안·신구대비를 찾는 것이라 현행 우대를 걸지 않는다.
+EDITION_HINT = re.compile(
+    r"(?:19|20)\d{2}\s*년|\d+\s*차\b|제?\s*\d{4}\s*-\s*\d+\s*호|제\s*\d{5}\s*호|\(\d{5}\)"
+    r"|개정\s*\(?안\)?|개정안|신구|예고|관보|부처\s*협의|최신|현행|\d{2}\.\s?\d{1,2}\.\s?\d{1,2}")
+
+
+def names_edition(query: str) -> bool:
+    return bool(EDITION_HINT.search(query))
+
+
 def _requested_period(query: str) -> tuple[str, str] | None:
     """'2024년 3월' 형식의 질의가 요구하는 반개구간 날짜 범위를 반환한다."""
     match = PERIOD.search(query)
@@ -300,6 +310,7 @@ def _chunk_first(
     ranked_lists: list[tuple[list[dict], float, str]], query: str, *, rrf_k: int,
     max_chunks: int, cutoff_ratio: float, max_documents: int, chunks_per_document: int,
     reporting_half: tuple[int, str] | None = None, agreement: float = 0.0,
+    superseded_weight: float = 1.0,
 ) -> list[list[dict]]:
     """문서를 먼저 고르지 않고 청크를 고른다. 반환은 문서별로 묶인 청크 목록이다.
 
@@ -351,6 +362,12 @@ def _chunk_first(
         for chunk_id in score:
             source = chunks[chunk_id]["_source"]
             score[chunk_id] += agreement * parent_score.get(source.get("parent_id") or chunk_id, 0.0)
+    if superseded_weight < 1.0 and not names_edition(query):
+        # 질문이 판본을 지정하지 않으면 다른 판이 대체한 문서의 청크 점수를 깎는다. 지우지는 않아서
+        # 그 문서만 근거를 가진 질문은 순서만 밀리고, 컷오프 안에 남으면 그대로 반환된다.
+        for chunk_id in score:
+            if chunks[chunk_id]["_source"].get("superseded_by"):
+                score[chunk_id] *= superseded_weight
     ordered = sorted(score, key=lambda c: (-score[c], dense_rank.get(c, len(score) + 1), c))
     floor = score[ordered[0]] * cutoff_ratio if ordered and cutoff_ratio else 0.0
     groups: dict[str, list[dict]] = {}
@@ -599,6 +616,7 @@ def retrieve(
                           if chunk_first_cutoff_ratio is None else chunk_first_cutoff_ratio),
             max_documents=min(k, settings.search_chunk_first_max_documents),
             agreement=settings.search_chunk_first_agreement,
+            superseded_weight=settings.search_chunk_first_superseded_weight,
             chunks_per_document=chunks_per_document or settings.search_chunks_per_document,
             reporting_half=_reporting_half(query))
         hits = []
