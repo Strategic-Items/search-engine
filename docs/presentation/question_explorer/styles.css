@@ -34,6 +34,9 @@ button { cursor: pointer; }
 .seg button { border: 0; background: var(--paper); padding: 6px 4px; font-size: 13px; font-weight: 600; color: var(--muted); border-right: 1px solid var(--line); }
 .seg button:last-child { border-right: 0; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.cqflt button { font-size: 12px; line-height: 1.3; }
+.seg.cqflt .n { display: block; margin-left: 0; }
+.cqflt { background: var(--paper); grid-template-columns: repeat(4, 1fr); position: sticky; top: 0; z-index: 1; border-radius: 0; border-width: 0 0 1px 0; }
 .seg .n { font-family: var(--font-mono); font-weight: 400; margin-left: 4px; opacity: 0.8; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .tools select, .tools input { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 6px 10px; font-size: 13.5px; }
@@ -199,6 +202,39 @@ table.mini { border-collapse: collapse; font-size: 13.5px; } table.mini th, tabl
 .cdet .pin { justify-self: start; margin: 0; }
 .cbody2 { padding: 6px 14px 12px; font-size: 14px; line-height: 1.75; max-height: 300px; overflow: auto; overflow-wrap: anywhere; border-top: 1px dashed var(--line); }
 @media (max-width: 900px) { .cdet > summary { grid-template-columns: 4.2em 1fr; } .cdet .prev { display: none; } }
+.cq-outdoc { border-radius: 14px; box-shadow: 0 5px 18px rgba(20,35,55,.06); }
+.cq-outdoc.g { box-shadow: 0 5px 18px rgba(15,122,88,.10); }
+.cq-outhead { display: grid; grid-template-columns: auto minmax(0,1fr) auto auto; align-items: center; gap: 8px 12px; padding: 13px 16px; background: var(--tint); }
+.cq-outdoc.g .cq-outhead { background: var(--gc); }
+.cq-outhead .dn { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; padding: 5px 9px; border-radius: 8px; color: var(--paper); background: var(--ink); }
+.cq-outdoc.g .cq-outhead .dn { background: var(--gc-line); }
+.cq-outhead .dt { font-size: 16px; line-height: 1.4; }
+.cq-outhead .dm { white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; background: var(--paper); color: var(--muted); opacity: 1; }
+.cq-docid { display: flex; align-items: flex-start; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12.5px; }
+.cq-docid > span { flex: 0 0 auto; font-weight: 700; }
+.cq-docid code { min-width: 0; overflow-wrap: anywhere; color: var(--ink); font-size: 12px; }
+.cq-outdoc .crows { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--bg); }
+.cq-outchunk { overflow: hidden; border-radius: 11px; background: var(--paper); }
+.cq-outchunk > summary { display: grid; grid-template-columns: auto auto minmax(120px,1fr) minmax(100px,auto); grid-template-areas: "ids ranks prev markers"; gap: 12px; align-items: center; padding: 10px 12px; font-size: 13px; }
+.cq-chunk-id { grid-area: ids; display: flex; align-items: center; gap: 9px; white-space: nowrap; }
+.cq-chunk-id .ord { font-size: 13px; }
+.cq-chunk-id .cid { color: var(--muted); background: var(--tint); border-radius: 6px; padding: 3px 7px; }
+.cq-ranks { grid-area: ranks; display: flex; gap: 7px; white-space: nowrap; }
+.cq-ranks .rn { border-radius: 7px; padding: 4px 7px; background: var(--tint); font-size: 12px; }
+.cq-ranks .rn i { color: var(--muted); }
+.cq-outchunk .prev { grid-area: prev; line-height: 1.45; }
+.cq-outchunk .cq-markers { grid-area: markers; display: flex; justify-content: flex-end; align-items: center; gap: 6px; flex-wrap: wrap; }
+.cq-outchunk[open] .prev { display: none; }
+.cq-outchunk.g > summary { background: var(--gc); }
+@media (max-width: 900px) {
+  .cq-outhead { grid-template-columns: auto minmax(0,1fr); grid-template-areas: "rank title" "status count"; }
+  .cq-outhead .dn { grid-area: rank; }
+  .cq-outhead .dt { grid-area: title; }
+  .cq-outhead .pin, .cq-outhead > .tag { grid-area: status; justify-self: start; }
+  .cq-outhead .dm { grid-area: count; justify-self: end; }
+  .cq-outchunk > summary { grid-template-columns: minmax(0,1fr) auto; grid-template-areas: "ids markers" "ranks ranks" "prev prev"; gap: 8px; }
+  .cq-outchunk .cq-markers { justify-content: flex-end; }
+}
 .crows { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
 .crow { display: grid; grid-template-columns: 4.2em 7.5em minmax(5.5em,auto) 8.5em 8.5em; gap: 8px; align-items: center; padding: 3px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; overflow-x: auto; }
 .crow.g { background: var(--gc); border-color: var(--gc-line); color: var(--gc-ink); }
@@ -323,6 +359,12 @@ table.mini { border-collapse: collapse; font-size: 13.5px; } table.mini th, tabl
 .em .meta-property-tags span { padding: 3px 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
 .em .meta-unused { margin-top: 14px; padding: 9px 12px; border: 1px dashed var(--line); border-radius: 8px; text-align: center; color: var(--muted); font-size: 12px; }
 .em .meta-use-card .meta-use-note { color: var(--muted); font-size: 13px; }
+/* 카드마다 실제로 쓰는 청크 필드 이름. */
+.em .meta-fields-used { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.em .meta-fields-label { display: block; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+.em .meta-fields-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.em .meta-fields-chips code { font-size: 12px; font-weight: 500; color: var(--kw); background: var(--kw-soft); }
+.em .meta-use-card .meta-fields-note { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
 .em .meta-catalog { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .em .meta-field-scroll { overflow-x: auto; }
 .em .meta-field-scroll table { min-width: 640px; table-layout: fixed; }
@@ -437,7 +479,11 @@ table.mini { border-collapse: collapse; font-size: 13.5px; } table.mini th, tabl
 .case.bad { border-color: var(--bad); background: var(--bad-soft); color: var(--ink); }
 .case .cq { font-size: 14.5px; font-weight: 600; line-height: 1.5; } .case .cc2 { font-size: 13px; }
 .case .cn { font-family: var(--font-mono); font-size: 12px; opacity: .8; }
-.tbl { border-collapse: collapse; font-size: 13.5px; } .tbl th, .tbl td { border-bottom: 1px solid var(--line); padding: 5px 14px 5px 0; text-align: left; font-variant-numeric: tabular-nums; } .tbl th { font-weight: 600; color: var(--muted); font-size: 12.5px; }
+.tbl-scroll { max-width: 100%; overflow-x: auto; }
+.tbl-card { width: 100%; max-width: 100%; }
+.tbl-card .tbl-h { margin: 0 0 4px; font-size: 15px; }
+.tbl-h { margin: 8px 0 2px; font-size: 14px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; } .tbl th, .tbl td { border-bottom: 1px solid var(--line); padding: 5px 14px 5px 0; text-align: left; font-variant-numeric: tabular-nums; } .tbl th { font-weight: 600; color: var(--muted); font-size: 12.5px; }
 
 /* 걸러지는 과정 그림 */
 .fig { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); padding: 14px 18px 8px; }
@@ -561,3 +607,4 @@ tr.hl td { background: var(--gc); color: var(--gc-ink); font-weight: 700; }
 .goldbar.miss .no { opacity: 1; color: var(--bad); font-weight: 600; }
 .gd { padding: 20px 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); box-shadow: 0 8px 24px rgba(16,28,43,.05); }
 .gd h2 { margin: 0 0 8px; }
+.em table.doct { margin-top: 12px; }
