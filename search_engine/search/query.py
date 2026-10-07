@@ -103,8 +103,11 @@ def _docket_filter(query: str) -> list[dict]:
     if not match:
         return []
     phrase = f"{match.group(1)} {int(match.group(2))}"
+    # 번호가 머리말 청크에만 있는 문서(공고 머리말 + 개정이유 청크)는 구절 일치만으로는 나머지
+    # 청크가 후보에서 빠진다. 문서 번호를 색인해 둔 문서는 그 번호로도 문서 전체를 지목한다.
     return [{"bool": {"should": [{"match_phrase": {field: phrase}}
-                                 for field in ("body", "title")],
+                                 for field in ("body", "title")]
+                      + [{"term": {"doc_number_norm": f"{match.group(1)}-{int(match.group(2))}"}}],
                       "minimum_should_match": 1}}]
 
 
@@ -179,14 +182,15 @@ def build_query(query: str, as_of: date) -> dict:
                                "score_mode": "sum", "boost_mode": "sum"}}
 
 
-def build_splade_query(terms: dict[str, float], as_of: date) -> dict:
+def build_splade_query(terms: dict[str, float], as_of: date, query: str = "") -> dict:
     """SPLADE 희소 벡터 검색: 질의 term 가중치와 청크의 `splade` 필드를 내적한다.
 
-    유효 기간 필터는 밀집 검색과 같은 것을 건다.
+    유효 기간과 공고 번호 필터는 밀집 검색과 같은 것을 건다. 번호는 문서를 지목하므로
+    어휘 검색기 어느 쪽이든 번호를 못 맞춘 문서가 후보에 끼면 안 된다.
     """
     return {"bool": {
         "must": [{"neural_sparse": {"splade": {"query_tokens": terms}}}],
-        "filter": _validity_filters(as_of),
+        "filter": _validity_filters(as_of) + _docket_filter(query),
     }}
 
 
@@ -560,7 +564,7 @@ def retrieve(
         # 질의 인코딩이 실패하면(모델 미설정·torch 없음) 조용히 BM25로 돌아가지 않고 그대로 알린다.
         terms = encode_sparse_query(query.strip())
         add_response(client.search(
-            index=alias, body={"query": build_splade_query(terms, as_of)},
+            index=alias, body={"query": build_splade_query(terms, as_of, query)},
             size=lexical_candidates, ignore_unavailable=not strict,
         ), "splade", "splade")
     elif mode in ("bm25", "hybrid"):

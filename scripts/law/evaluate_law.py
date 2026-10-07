@@ -99,7 +99,7 @@ def build() -> None:
 def single_window(client, embedder, alias, query: str, mode: str, ratio: float) -> list[str]:
     """splade·dense 단독: 검색기 청크 점수에서 1위의 ratio 미만을 자르고 상위 K문서·문서당 6청크로 창을 만든다."""
     if mode == "splade":
-        body = {"query": build_splade_query(encode_sparse_query(query.strip()), date.today())}
+        body = {"query": build_splade_query(encode_sparse_query(query.strip()), date.today(), query)}
         size = 100
     else:
         body = {"query": build_vector_query(embedder.embed_query(query), date.today(), 50, query)}
