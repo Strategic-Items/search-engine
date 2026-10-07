@@ -5,7 +5,7 @@ var STGN={"13":"s13","14":"s16","15":"s16","16":"s16","18":"s18","19":"s19","20"
 function tag(nums,un){ return nums.map(function(n){ var k=stgKey(n), st=tagState(n,un), lab=stLabel(n), a=' class="an-s '+st+'" data-gn="'+n+'" data-st="'+st+'"'; return k?'<button type="button"'+a+' data-stage="'+k+'" title="이 단계의 변경 내용 보기">'+lab+'</button>':'<span'+a+'>'+lab+'</span>'; }).join(""); }
 function an(cls,n,title,stg,desc,rows,un){ return '<div class="an '+cls+'"><div class="an-h"><span class="an-n">'+n+'</span><span class="an-t">'+title+'</span>'+tag(stg,un)+'</div>'+(rows?ap(rows):'')+'</div>'; }
 
-var UNUSED={"38":1,"10":1,"17":1,"24":1,"35":1,"36":1,"1":1,"2":1,"3":1,"7":1,"9":1,"11":1,"26":1,"27":1,"29":1,"spl":1};
+var UNUSED={"38":1,"40":1,"43":1,"45":1,"10":1,"17":1,"24":1,"35":1,"36":1,"1":1,"2":1,"3":1,"7":1,"9":1,"11":1,"26":1,"27":1,"29":1,"spl":1};
 function tagState(n,un){ return (un&&un.indexOf(String(n))>=0)||UNUSED[n]?"un":"ap"; }
 function stLabel(n){ return n==="spl"?"SPLADE":n+"단계"; }
 function gtag(x,y,label,k,st,gn){ var w=label.length*9.2+16; st=st||tagState(parseInt(label,10)); gn=gn||parseInt(label,10); return '<g'+(k?' data-stage="'+k+'"':'')+' data-gn="'+gn+'" data-st="'+st+'"><rect class="gt '+st+'" x="'+(x-w)+'" y="'+y+'" width="'+w+'" height="24" rx="12"/><text class="gtt '+st+'" x="'+(x-w/2)+'" y="'+(y+17)+'" text-anchor="middle">'+label+'</text></g>'; }
@@ -18,7 +18,7 @@ function fnode(o){
   var right=o.x+o.w-14, tx=right, row=0, mx=o.mx||(o.x+o.w/2+20);
   (o.g||[]).slice().reverse().forEach(function(g){ var lab=stLabel(g), w=lab.length*9.2+16;
     if(tx<right&&tx-w<mx){ row++; tx=right; }
-    s+=gtag(tx,o.y-13-row*28,lab,stgKey(g),tagState(g,o.un),g); tx-=w+6; });
+    s+=gtag(tx,o.y-13-row*28,lab,stgKey(g),o.c==="spl"?"ap":tagState(g,o.un),g); tx-=w+6; });
   return s+'</g>';
 }
 function fline(d,cls,label,lx,ly,lcls,anchor,marker){ return '<path class="'+cls+'" d="'+d+'" marker-end="url(#'+(marker||"ah")+')"/>'+(label?'<text class="el '+(lcls||"")+'" x="'+lx+'" y="'+ly+'" text-anchor="'+(anchor||"middle")+'">'+label+'</text>':''); }
@@ -38,7 +38,7 @@ function archSvg(){
   s+='<g><rect class="gt un" x="660" y="376" width="64" height="24" rx="12"/><text class="gtt un" x="692" y="393" text-anchor="middle">미사용</text><text class="el" x="732" y="393">빨간 점선 = 안 쓰는 것</text></g>';
   s+='<g transform="translate(0,255)">';
   s+='<g>';
-  s+='<text class="nt" x="-500" y="150" style="font-size:18px;fill:var(--sp)">SPLADE 길 · BM25 대신 시험 (현재 미사용)</text>';
+  s+='<text class="nt" x="-500" y="150" style="font-size:18px;fill:var(--sp)">SPLADE</text>';
   s+=fline('M300,172 H-260 V196','lns','',0,0,'','','ahs');
   s+=fnode({c:"spl",tip:"spl1",g:["24","35","38"],x:-500,y:200,w:480,h:170,n:"1",t:"질문을 어휘 가중치로 (SPLADE)",l:["telepix/PIXIE-Splade-v1.5","질문을 읽고 어휘 전체에 가중치를 매김","질문에 없는 연관어도 가중치를 받음","상위 256개 term만 남김"]});
   s+=fnode({c:"spl",tip:"spl2",g:["10","17"],x:-500,y:440,w:480,h:196,n:"2",t:"점곱으로 청크 점수 계산",l:["청크도 색인할 때 같은 방식으로 변환","(제목+본문 256토큰, 상위 256 term)","질문 가중치 × 청크 가중치의 합","OpenSearch rank_features · neural_sparse"]});

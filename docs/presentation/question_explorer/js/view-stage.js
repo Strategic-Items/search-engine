@@ -1,7 +1,7 @@
 (function(){
   var NUM={s13:13,s16:14,s18:18,s19:19,s20:20,s21:21,s22:22};
   STG.forEach(function(x){ x.num=NUM[x.k]; });
-  DSTG.forEach(function(x){ SG.nodes.push({k:x.k,l:x.l,t:x.t}); STG.push({k:x.k,num:x.num,metrics:"doc",doc:x,head:x.head,what:x.what,why:x.why}); });
+  DSTG.forEach(function(x){ SG.nodes.push({k:x.k,l:x.l,t:x.t,d:x.what&&x.what[0]}); STG.push({k:x.k,num:x.num,metrics:"doc",doc:x,head:x.head,what:x.what,why:x.why}); });
   STG.sort(function(a,b){ return a.num-b.num; });
 })();
 function stgKey(n){ return STGN[n]||(DSTG.some(function(x){return String(x.num)===String(n);})?"d"+n:null); }
@@ -85,9 +85,9 @@ function figDoc(f){
 function panelDoc(S){
   var d=S.doc, cls=(d.status==="적용"||d.status==="일부 적용")?"ap":"un";
   var figs=flowDoc(d.num)+(DFIG[d.num]||[]).map(figDoc).join("");
+  var tables=d.tables||[{hd:d.hd,rows:d.rows}], tbl=tables.map(function(t){ return '<section class="card tbl-card">'+(t.title?'<h3 class="tbl-h">'+esc(t.title)+'</h3>':'')+'<div class="tbl-scroll"><table class="tbl"><thead><tr>'+t.hd.map(function(h){return '<th>'+esc(h)+'</th>';}).join("")+'</tr></thead><tbody>'+t.rows.map(function(r){ return '<tr>'+r.map(function(c){return '<td>'+esc(c)+'</td>';}).join("")+'</tr>'; }).join("")+'</tbody></table></div></section>'; }).join("");
   return figs+'<p class="note"><span class="an-s '+cls+'">'+esc(d.status)+'</span> &nbsp;'+esc(d.cond)+'</p>'+
-   '<table class="tbl"><thead><tr>'+d.hd.map(function(h){return '<th>'+esc(h)+'</th>';}).join("")+'</tr></thead><tbody>'+
-   d.rows.map(function(r){ return '<tr>'+r.map(function(c){return '<td>'+esc(c)+'</td>';}).join("")+'</tr>'; }).join("")+'</tbody></table>'+
+   tbl+
    (d.note?'<p class="note">'+esc(d.note)+'</p>':'')+
    '<p class="note">이 단계는 질문별로 다시 돌린 자료가 없어서 단계 문서(docs/evaluation/stages)의 수치를 옮겼습니다. 단계마다 평가셋과 코퍼스가 달라 다른 단계의 수치와 바로 비교하지 않습니다.</p>';
 }
@@ -200,7 +200,7 @@ function panelStageBody(S){
   out+=qsec;
   return out;
 }
-function stgList(){ return st.mode==="c"?STG.filter(function(x){return x.num>=37;}):STG; }
+function stgList(){ return st.mode==="c"?STG.filter(function(x){return !!x.doc&&x.num>=37;}):STG; }
 function renderStage(){
   var L=stgList(), S=L.filter(function(x){return x.k===st.stage;})[0]||L[0], c38=st.mode==="c"&&S.k==="d38", n=stageInfo(S.k);
   var nav=document.getElementById("stnav");

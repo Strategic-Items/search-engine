@@ -1,16 +1,24 @@
-var VIEWS={d:[["q","질문별"],["s","단계별"],["a","구조도"],["e","메타데이터"]], c:[["cq","질문별"],["cs","단계별"],["c","결과 요약"],["cm","메타데이터"]]};
+var VIEWS={d:[["q","질문별"],["s","단계별"],["a","구조도"],["e","메타데이터"]], c:[["cq","질문별"],["c","결과 요약"],["cm","메타데이터"]]};
 var BRAND={d:["질문별 검색 경로 탐색기","docs 정답형 135문항과 무응답 대상 38문항을 지금 운영 설정(문서 우선, 판정 LLM 끔)으로 다시 돌린 결과입니다."],c:["카테고리별 검색 탐색기","법령·고시, 행정·업무, 민원FAQ를 각자 인덱스에서 따로 찾는 경로(37단계부터)를 점검한 결과입니다."]};
-function modeOf(v){ return v==="cq"||v==="cs"||v==="c"||v==="cm"?"c":"d"; }
+function modeOf(v){ return v==="cq"||v==="cs"||v==="ca"||v==="c"||v==="cm"||v==="cmc"?"c":"d"; }
+function categoryStageExists(k){ return STG.some(function(x){return x.k===k&&!!x.doc&&x.num>=37;}); }
+function categoryViews(){ return CATSEL==="common"?[["cs","단계별"],["ca","구조도"],["cmc","메타데이터"]]:VIEWS.c; }
 function setView(v,nohash){
-  var m=modeOf(v), prev=st.mode||"d"; st.view=v;
-  if(st.mode!==m||!document.getElementById("viewsw").children.length){
+  var m=modeOf(v), prev=st.mode||"d";
+  if(m==="c"){
+    if(v==="cs"||v==="ca"||v==="cmc") CATSEL="common";
+    else if(CATSEL==="common") v="cs";
+  }
+  st.view=v;
+  if(m==="c"||st.mode!==m||!document.getElementById("viewsw").children.length){
     st.mode=m;
-    document.getElementById("viewsw").innerHTML=VIEWS[m].map(function(x){ return '<button type="button" data-view="'+x[0]+'" aria-pressed="false">'+x[1]+'</button>'; }).join("");
-    document.getElementById("viewsw").style.gridTemplateColumns="repeat("+VIEWS[m].length+",1fr)";
+    var views=m==="c"?categoryViews():VIEWS[m];
+    document.getElementById("viewsw").innerHTML=views.map(function(x){ return '<button type="button" data-view="'+x[0]+'" aria-pressed="false">'+x[1]+'</button>'; }).join("");
+    document.getElementById("viewsw").style.gridTemplateColumns="repeat("+views.length+",1fr)";
     document.getElementById("bh").textContent=BRAND[m][0]; document.getElementById("bp").textContent=BRAND[m][1];
     document.title=BRAND[m][0];
-    if(m==="c"&&!/^d3[789]$/.test(st.stage)) st.stage="d37";
-    if(m==="d"&&prev==="c"&&/^d3[789]$/.test(st.stage)) st.stage="s13";
+    if(m==="c"&&!categoryStageExists(st.stage)) st.stage="d37";
+    if(m==="d"&&prev==="c"&&categoryStageExists(st.stage)) st.stage="s13";
   }
   if(v==="cq"&&CQS.set!==CATSEL){
     CQS.set=CATSEL;
@@ -23,8 +31,8 @@ function setView(v,nohash){
   var q=v==="q", cq=v==="cq", lst=q||cq;
   document.getElementById("tools").hidden=!q; document.getElementById("list").hidden=!lst; document.getElementById("stnav").hidden=lst; document.getElementById("catsw").hidden=(m!=="c");
   document.getElementById("side").classList.toggle("sv",!lst);
-  if(q){ renderList(); renderDetail(); } else if(cq) renderCq(); else if(v==="s"||v==="cs") renderStage(); else if(v==="e") renderMeta(); else if(v==="c") renderCat(); else if(v==="cm") renderCategoryMeta(); else renderArch();
-  if(!nohash){ if(v==="s") location.hash="stage-"+st.stage; else if(v==="cs") location.hash="cat-stage-"+st.stage; else if(v==="a") location.hash="arch"; else if(v==="e") location.hash="meta"; else if(v==="c") location.hash="cat"; else if(v==="cm") location.hash="cat-meta"; else if(v==="cq") location.hash="cat-q-"+CQS.id; else if(st.id) location.hash=st.id; }
+  if(q){ renderList(); renderDetail(); } else if(cq) renderCq(); else if(v==="s"||v==="cs") renderStage(); else if(v==="e") renderMeta(); else if(v==="c") renderCat(); else if(v==="cm") renderCategoryMeta(); else if(v==="cmc") renderCategoryCommonMeta(); else if(v==="ca") renderCategoryArch(); else renderArch();
+  if(!nohash){ if(v==="s") location.hash="stage-"+st.stage; else if(v==="cs") location.hash="cat-stage-"+st.stage; else if(v==="ca") location.hash="cat-arch"; else if(v==="a") location.hash="arch"; else if(v==="e") location.hash="meta"; else if(v==="c") location.hash="cat"; else if(v==="cm") location.hash="cat-meta"; else if(v==="cmc") location.hash="cat-common-meta"; else if(v==="cq") location.hash="cat-q-"+CQS.id; else if(st.id) location.hash=st.id; }
 }
 (function(){
   var seg=document.getElementById("seg");
@@ -220,7 +228,7 @@ function setView(v,nohash){
     E["36"]={l:"36단계",t:"SPLADE+dense를 현재 hybrid와 같은 조건에서 비교",d:"24단계의 신호가 튜닝 세트 한 곳에서만 나온 것이라, 현재 운영 hybrid를 다시 재서 처음 보는 문서와 질의에서 비교했습니다. SPLADE+dense가 여러 지표에서 앞섰지만 P@1 신뢰구간이 0에 걸쳐 운영 기본값은 바꾸지 않았습니다.",
       ex:'검색 지연은 5~15ms로 작았지만, SPLADE 인코딩이 오래 걸려(약 2.4시간) 일부 세트는 재지 못했습니다.',
       svg:T(["지표 (처음 보는 문서)","현재 hybrid","SPLADE+dense"],[["문서 P@1","85.5%","89.9%"],["Hit@5","92.8%","97.1%"],["반환분 정밀도","65.7%","80.4%"]],[0,1,2])};
-    E["38"]={l:"38단계",t:"합성 질의 2,702개로 SPLADE 재파인튜닝",d:"35단계는 학습 신호가 약했다고 보고, 30B 모델이 만든 질의 중 기준 SPLADE가 어려워하는 것만 골라 25배로 늘려 다시 학습했습니다(오답 후보에서 평가 정답 청크는 제외). 사전에 정한 채택 기준을 통과한 설정이 없어 채택하지 않았습니다.",
+    E["38"]={l:"38단계",t:"합성 질의 2,702개로 SPLADE 재파인튜닝",d:"35단계는 학습 신호가 약했다고 보고, 30B 모델이 만든 질의 중 기준 SPLADE가 어려워하는 것만 골라 25배로 늘려 다시 학습했습니다(오답 후보에서 평가 정답 청크는 제외). docs·core의 채택 기준은 넘지 못했지만 설정 C를 카테고리 검색에 적용했습니다. docs·core는 BM25를 유지합니다.",
       ex:'처음 보는 문서에서는 조금 오르고(청크 1위 적중 0.710 → 0.783) 학습 문서군(docs_v2)에서는 내려갔습니다(130 → 125~126). 상위 5청크 회수는 그대로여서 문서 단위 이득이 상쇄됐습니다.',
       svg:T(["문서 1위 (SPLADE 단독)","기준","최고 설정 C"],[["docs_v2 135","130","125"],["holdout-small 69","61","63"],["검증 36","30","33"]],[1,2])};
     E["39"]={l:"39단계",t:"BM25·dense 후보 수를 바꿔 보고 dense를 25개로",d:"hybrid가 BM25에서 25개, dense에서 50개 청크를 가져오던 값이 성능에 미치는 영향을 BM25 5~100개 × dense 10~200개 25조합으로 쟀습니다. 25개 이상이면 지표가 같아서 dense 후보만 50에서 25로 낮췄습니다.",
@@ -230,7 +238,7 @@ function setView(v,nohash){
       ex:'docs-v2-001에서 BM25는 질문의 핵심인 에너지·특허보다 제목의 일반어(기술·사업화·공고)에 끌렸습니다. 이 구멍을 메우는지 보려고 시험한 길입니다.',
       svg:T(["","BM25 길","SPLADE 길"],[["질문 처리","형태소로 쪼갠 내용어","어휘 전체에 가중치"],["연관어","동의어 사전 20그룹","학습으로 확장"],["일반어 영향","IDF로 보정","학습으로 낮춤"],["서빙","OpenSearch만","인코더 서버 필요"]])};
     TF.spl2={l:"SPLADE ② · 점곱으로 청크 점수 계산",t:"질문 가중치 × 청크 가중치",d:"청크도 색인할 때 같은 방식(제목+본문 256토큰, 상위 256 term)으로 변환해 OpenSearch의 rank_features 필드에 저장합니다. 검색은 neural_sparse 질의로 질문 가중치와 청크 가중치를 곱해 더한 값이 점수입니다.",
-      ex:'문서당 term이 평균 1,458개(docs)라 인덱스가 작고, 검색 지연은 5~15ms로 작았습니다.',
+      ex:'검색 지연은 5~15ms로 작았습니다.',
       svg:T(["항목","내용"],[["색인","제목+본문 256토큰 → sparse 벡터"],["저장","rank_features 필드"],["검색","neural_sparse 질의 (점곱)"],["지연","검색 5~15ms"]])};
     TF.spl3={l:"SPLADE ③ · 후보 자르기",t:"1위의 97% 미만은 버림",d:"모델마다 점수 분포가 달라 BM25와 같은 숫자를 쓰지 않고, SPLADE는 1위 점수의 97%(ratio 0.97)를 기준으로 자릅니다. 청크 점수를 먼저 구한 뒤 부모 문서별 최고 청크 점수를 문서 점수로 씁니다.",
       ex:'이 결과를 BM25 대신 dense와 RRF로 합산한 것이 36단계의 SPLADE+dense 비교입니다. 지금 운영에는 쓰지 않습니다.',
@@ -252,7 +260,7 @@ function setView(v,nohash){
   document.getElementById("detail").addEventListener("click",function(e){
     var t=e.target.closest("[data-tab]"); if(t){ st.tab=t.dataset.tab; var y=document.getElementById("detail").scrollTop; renderDetail(); document.getElementById("detail").scrollTop=y; return; }
     var zb=e.target.closest("[data-zoom]"); if(zb){ var sv=document.getElementById("flowsvg"), cur=parseFloat(sv.style.width)||100; sv.style.width=Math.max(60,Math.min(240,cur+(+zb.dataset.zoom)*20))+"%"; return; }
-    var stb=e.target.closest("[data-stage]"); if(stb){ st.stage=stb.dataset.stage; if(st.view!=="s") setView("s"); else { renderStage(); location.hash="stage-"+st.stage; } return; }
+    var stb=e.target.closest("[data-stage]"); if(stb){ st.stage=stb.dataset.stage; setView(st.mode==="c"?"cs":"s"); return; }
     var op=e.target.closest("button[data-open]"); if(op){ var pp=op.dataset.open.split("|"); st.tab="stg"; select(pp[0]); var tg=document.getElementById("tl-"+pp[1]); if(tg) tg.scrollIntoView({block:"start"}); return; }
     var go=e.target.closest("button[data-go]"); if(go&&!go.disabled){ var el=document.getElementById(go.dataset.go); if(el) el.scrollIntoView({block:"start",behavior:"smooth"}); return; }
     var c=e.target.closest("button[data-chunk]"); if(c&&st.view==="q"){ st.chunk=+c.dataset.chunk; var y2=document.getElementById("detail").scrollTop; renderDetail(); document.getElementById("detail").scrollTop=y2; }
@@ -263,13 +271,15 @@ function setView(v,nohash){
   window.addEventListener("hashchange",function(){ var id=location.hash.slice(1);
     if(id==="arch"){ if(st.view!=="a") setView("a",true); return; }
     if(id==="meta"){ if(st.view!=="e") setView("e",true); return; }
-    if(id==="cat"){ if(st.view!=="c") setView("c",true); return; }
-    if(id==="cat-meta"){ if(st.view!=="cm") setView("cm",true); return; }
-    if(id.indexOf("cat-q-")===0){ var cid=id.slice(6), cq=CQ.filter(function(x){return x.id===cid;})[0]; if(cq){ CQS.id=cid; CQS.set=cq.set; CATSEL=cq.set; if(st.view!=="cq") setView("cq",true); else renderCq(); } return; }
-    if(id.indexOf("cat-stage-")===0){ var ck=id.slice(10); if(/^d3[789]$/.test(ck)){ st.stage=ck; setView("cs",true); } return; }
+    if(id==="cat-arch"){ setView("ca",true); return; }
+    if(id==="cat"){ if(CATSEL==="common") CATSEL="law100"; if(st.view!=="c") setView("c",true); return; }
+    if(id==="cat-meta"){ if(CATSEL==="common") CATSEL="law100"; if(st.view!=="cm") setView("cm",true); return; }
+    if(id==="cat-common-meta"){ if(st.view!=="cmc") setView("cmc",true); return; }
+    if(id.indexOf("cat-q-")===0){ var cid=id.slice(6), cq=CQ.filter(function(x){return x.id===cid;})[0]; if(cq){ CQS.id=cid; CQS.set=cq.set; CATSEL=cq.set; setView("cq",true); } return; }
+    if(id.indexOf("cat-stage-")===0){ var ck=id.slice(10); if(categoryStageExists(ck)){ st.stage=ck; setView("cs",true); } return; }
     if(id.indexOf("stage-")===0){ var sk=id.slice(6); if(STG.some(function(x){return x.k===sk;})){ if(st.view==="s"&&st.stage===sk) return; st.stage=sk; setView("s",true); } return; }
     if(Q.some(function(q){return q.id===id;})) select(id,true); });
   var start=location.hash.slice(1); if(!Q.some(function(q){return q.id===start;})) start="docs-v2-001";
   select(start,true);
-  var h0=location.hash.slice(1); if(h0==="arch") setView("a",true); else if(h0==="meta") setView("e",true); else if(h0==="cat") setView("c",true); else if(h0==="cat-meta") setView("cm",true); else if(h0.indexOf("cat-q-")===0){ var initialCq=CQ.filter(function(x){return x.id===h0.slice(6);})[0]; if(initialCq){ CQS.id=initialCq.id; CQS.set=initialCq.set; CATSEL=initialCq.set; setView("cq",true); } } else if(/^cat-stage-d3[789]$/.test(h0)){ st.stage=h0.slice(10); setView("cs",true); } else if(h0.indexOf("stage-")===0 && STG.some(function(x){return x.k===h0.slice(6);})){ st.stage=h0.slice(6); setView("s",true); }
+  var h0=location.hash.slice(1); if(h0==="arch") setView("a",true); else if(h0==="meta") setView("e",true); else if(h0==="cat-arch") setView("ca",true); else if(h0==="cat") setView("c",true); else if(h0==="cat-meta") setView("cm",true); else if(h0==="cat-common-meta") setView("cmc",true); else if(h0.indexOf("cat-q-")===0){ var initialCq=CQ.filter(function(x){return x.id===h0.slice(6);})[0]; if(initialCq){ CQS.id=initialCq.id; CQS.set=initialCq.set; CATSEL=initialCq.set; setView("cq",true); } } else if(h0.indexOf("cat-stage-")===0&&categoryStageExists(h0.slice(10))){ st.stage=h0.slice(10); setView("cs",true); } else if(h0.indexOf("stage-")===0 && STG.some(function(x){return x.k===h0.slice(6);})){ st.stage=h0.slice(6); setView("s",true); }
 })();

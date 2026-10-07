@@ -17,12 +17,15 @@ from pathlib import Path
 
 from search_engine.client import create_client
 from search_engine.config import get_settings
-from search_engine.search.query import retrieve
+from datetime import date as _date  # noqa: F401
+from search_engine.embeddings import OllamaEmbedder
+from search_engine.search.query import CATEGORY_MODES, build_splade_query, build_vector_query, encode_sparse_query, retrieve
 
 from category import CATEGORY, QUERIES, alias as category_alias, source as category_source  # noqa: E402
 _KEEP = re.compile(r"[^0-9A-Za-z가-힣]")
 K = 5
-MODES = ["bm25", "vector", "hybrid"]
+SINGLE_RATIO = {"splade": 0.80, "vector": 0.93}  # 탐색기에서 정한 단독 모드 청크 컷오프(청크 최대 10, 문서 5, 문서당 6)
+MODES = list(CATEGORY_MODES)  # splade, vector, hybrid — bm25는 카테고리 검색에서 쓰지 않는다
 
 # (유형, 질문, 필수 구절). 유형: natural=일상어 질문, identifier=고시 번호·통제번호, table=표 행, annex=별표.
 SPECS = [
@@ -52,11 +55,14 @@ SPECS = [
 
 from admin_specs import SPECS as ADMIN_SPECS  # noqa: E402
 from law50_specs import SPECS as LAW50_SPECS  # noqa: E402
+from law100_specs import SPECS as LAW100_SPECS  # noqa: E402
 
 
 def _specs() -> list:
     if CATEGORY == "admin":
         return ADMIN_SPECS
+    if os.environ.get("SPECS") == "law100":
+        return LAW100_SPECS
     return LAW50_SPECS if os.environ.get("SPECS") == "law50" else SPECS
 
 
@@ -90,14 +96,44 @@ def build() -> None:
     print(f"{len(rows)}문항 -> {QUERIES} (질문당 정답 청크 중앙값 {sorted(sizes)[len(sizes) // 2]}, 최대 {max(sizes)})")
 
 
+def single_window(client, embedder, alias, query: str, mode: str, ratio: float) -> list[str]:
+    """splade·dense 단독: 검색기 청크 점수에서 1위의 ratio 미만을 자르고 상위 K문서·문서당 6청크로 창을 만든다."""
+    if mode == "splade":
+        body = {"query": build_splade_query(encode_sparse_query(query.strip()), date.today(), query)}
+        size = 100
+    else:
+        body = {"query": build_vector_query(embedder.embed_query(query), date.today(), 50, query)}
+        size = 50
+    hits = client.search(index=alias, body=body, size=size, _source=False)["hits"]["hits"]
+    if not hits:
+        return []
+    floor = hits[0]["_score"] * ratio
+    docs, out = [], []
+    for h in hits:
+        if h["_score"] < floor:
+            break
+        doc = h["_id"].split("#")[0]
+        if doc not in docs:
+            if len(docs) == K:
+                continue
+            docs.append(doc)
+        if len(out) < 10 and sum(c.split("#")[0] == doc for c in out) < 6:
+            out.append(h["_id"])
+    return out
+
+
 def evaluate() -> None:
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
     settings = get_settings()
     client = create_client(settings)
+    embedder = OllamaEmbedder(settings)
     # 청크 필터는 LLM 호출이라 검색 자체의 품질과 섞인다. 끄고 검색기만 잰다.
     settings.search_chunk_filter = False
     alias = category_alias(settings)
-    print(f"{len(rows)}문항, 상위 {K}문서 창 기준, alias={alias}\n")
+    # 서비스 카테고리 경로(routes.py)와 같은 옵션: SPLADE 어휘 + 청크 우선 + 청크 컷오프. CUTOFF=0이면 컷오프 없이 잰다.
+    ratio = float(os.environ.get("CUTOFF", settings.search_category_cutoff_ratio))
+    options = {"lexical": "splade", "chunk_first": True, "chunk_first_cutoff_ratio": ratio}
+    print(f"{len(rows)}문항, 청크 컷오프 {ratio}, 상위 {K}문서 창 기준, alias={alias}\n")
     print("| 모드 | 근거 Recall(청크) | 근거 Precision(청크, 하한) | 그 창에서 가능한 최대 | 문서 Precision | 문서 Hit | 첫 근거 청크 순위 평균 | 평균 청크 수 |\n|---|---|---|---|---|---|---|---|")
     misses = {}
     for mode in MODES:
@@ -107,9 +143,13 @@ def evaluate() -> None:
         # 오답으로 세어진다. 그래서 청크 Precision은 하한이다.
         chunk_precision, doc_precision, ceiling = [], [], []
         for row in rows:
-            hits = retrieve(client, alias, row["query"], date.today(), K, mode=mode, score_floor=0.0,
-                            answerability=False)
-            window = [c for h in hits for c in h.chunk_ids]
+            if mode == "hybrid":
+                hits = retrieve(client, alias, row["query"], date.today(), K, mode=mode, score_floor=0.0,
+                                answerability=False, **options)
+                window = [c for h in hits for c in h.chunk_ids]
+            else:
+                window = single_window(client, embedder, alias, row["query"], mode, SINGLE_RATIO[mode])
+                hits = [type("H", (), {"parent_id": d})() for d in dict.fromkeys(c.split("#")[0] for c in window)]
             gold = set(row["evidence_groups"][0])
             sizes.append(len(window))
             chunk_precision.append(sum(c in gold for c in window) / len(window) if window else 0.0)

@@ -40,6 +40,16 @@ CURRENT_EDITION_WEIGHT = 4
 # holdout 69의 Hit@5가 0.899에서 0.884로 1문항 내려가고 기간(타) 7의 문서 MRR이 0.857에서 0.786으로 내려갔다).
 
 
+# 질문이 판본을 직접 지정하는 표현. 이런 질문은 옛 판·개정안·신구대비를 찾는 것이라 현행 우대를 걸지 않는다.
+EDITION_HINT = re.compile(
+    r"(?:19|20)\d{2}\s*년|\d+\s*차\b|제?\s*\d{4}\s*-\s*\d+\s*호|제\s*\d{5}\s*호|\(\d{5}\)"
+    r"|개정\s*\(?안\)?|개정안|신구|예고|관보|부처\s*협의|최신|현행|\d{2}\.\s?\d{1,2}\.\s?\d{1,2}")
+
+
+def names_edition(query: str) -> bool:
+    return bool(EDITION_HINT.search(query))
+
+
 def _requested_period(query: str) -> tuple[str, str] | None:
     """'2024년 3월' 형식의 질의가 요구하는 반개구간 날짜 범위를 반환한다."""
     match = PERIOD.search(query)
@@ -93,8 +103,11 @@ def _docket_filter(query: str) -> list[dict]:
     if not match:
         return []
     phrase = f"{match.group(1)} {int(match.group(2))}"
+    # 번호가 머리말 청크에만 있는 문서(공고 머리말 + 개정이유 청크)는 구절 일치만으로는 나머지
+    # 청크가 후보에서 빠진다. 문서 번호를 색인해 둔 문서는 그 번호로도 문서 전체를 지목한다.
     return [{"bool": {"should": [{"match_phrase": {field: phrase}}
-                                 for field in ("body", "title")],
+                                 for field in ("body", "title")]
+                      + [{"term": {"doc_number_norm": f"{match.group(1)}-{int(match.group(2))}"}}],
                       "minimum_should_match": 1}}]
 
 
@@ -169,14 +182,15 @@ def build_query(query: str, as_of: date) -> dict:
                                "score_mode": "sum", "boost_mode": "sum"}}
 
 
-def build_splade_query(terms: dict[str, float], as_of: date) -> dict:
+def build_splade_query(terms: dict[str, float], as_of: date, query: str = "") -> dict:
     """SPLADE 희소 벡터 검색: 질의 term 가중치와 청크의 `splade` 필드를 내적한다.
 
-    유효 기간 필터는 밀집 검색과 같은 것을 건다.
+    유효 기간과 공고 번호 필터는 밀집 검색과 같은 것을 건다. 번호는 문서를 지목하므로
+    어휘 검색기 어느 쪽이든 번호를 못 맞춘 문서가 후보에 끼면 안 된다.
     """
     return {"bool": {
         "must": [{"neural_sparse": {"splade": {"query_tokens": terms}}}],
-        "filter": _validity_filters(as_of),
+        "filter": _validity_filters(as_of) + _docket_filter(query),
     }}
 
 
@@ -300,6 +314,7 @@ def _chunk_first(
     ranked_lists: list[tuple[list[dict], float, str]], query: str, *, rrf_k: int,
     max_chunks: int, cutoff_ratio: float, max_documents: int, chunks_per_document: int,
     reporting_half: tuple[int, str] | None = None, agreement: float = 0.0,
+    superseded_weight: float = 1.0,
 ) -> list[list[dict]]:
     """문서를 먼저 고르지 않고 청크를 고른다. 반환은 문서별로 묶인 청크 목록이다.
 
@@ -351,6 +366,12 @@ def _chunk_first(
         for chunk_id in score:
             source = chunks[chunk_id]["_source"]
             score[chunk_id] += agreement * parent_score.get(source.get("parent_id") or chunk_id, 0.0)
+    if superseded_weight < 1.0 and not names_edition(query):
+        # 질문이 판본을 지정하지 않으면 다른 판이 대체한 문서의 청크 점수를 깎는다. 지우지는 않아서
+        # 그 문서만 근거를 가진 질문은 순서만 밀리고, 컷오프 안에 남으면 그대로 반환된다.
+        for chunk_id in score:
+            if chunks[chunk_id]["_source"].get("superseded_by"):
+                score[chunk_id] *= superseded_weight
     ordered = sorted(score, key=lambda c: (-score[c], dense_rank.get(c, len(score) + 1), c))
     floor = score[ordered[0]] * cutoff_ratio if ordered and cutoff_ratio else 0.0
     groups: dict[str, list[dict]] = {}
@@ -543,7 +564,7 @@ def retrieve(
         # 질의 인코딩이 실패하면(모델 미설정·torch 없음) 조용히 BM25로 돌아가지 않고 그대로 알린다.
         terms = encode_sparse_query(query.strip())
         add_response(client.search(
-            index=alias, body={"query": build_splade_query(terms, as_of)},
+            index=alias, body={"query": build_splade_query(terms, as_of, query)},
             size=lexical_candidates, ignore_unavailable=not strict,
         ), "splade", "splade")
     elif mode in ("bm25", "hybrid"):
@@ -599,6 +620,7 @@ def retrieve(
                           if chunk_first_cutoff_ratio is None else chunk_first_cutoff_ratio),
             max_documents=min(k, settings.search_chunk_first_max_documents),
             agreement=settings.search_chunk_first_agreement,
+            superseded_weight=settings.search_chunk_first_superseded_weight,
             chunks_per_document=chunks_per_document or settings.search_chunks_per_document,
             reporting_half=_reporting_half(query))
         hits = []

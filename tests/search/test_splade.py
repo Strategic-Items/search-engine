@@ -108,3 +108,18 @@ def test_category_search_falls_back_to_bm25_without_a_model(monkeypatch):
     seen = category_compare(monkeypatch, "")
     assert seen["modes"] == MODES
     assert "lexical" not in seen["options"]
+
+
+def test_splade_query_carries_the_docket_filter_like_the_dense_query():
+    body = build_splade_query({"t1": 0.5}, AS_OF, "공고 제2026-496호 개정이유")
+    assert len(body["bool"]["filter"]) == 3
+    clauses = body["bool"]["filter"][2]["bool"]["should"]
+    assert {"match_phrase": {"body": "2026 496"}} in clauses
+    assert {"term": {"doc_number_norm": "2026-496"}} in clauses
+
+
+def test_docket_filter_names_the_whole_document_by_its_indexed_number():
+    from search_engine.search.query import _docket_filter
+    assert _docket_filter("개정이유를 알려줘") == []
+    clauses = _docket_filter("제2011-275호")[0]["bool"]["should"]
+    assert {"term": {"doc_number_norm": "2011-275"}} in clauses
