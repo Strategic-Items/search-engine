@@ -398,4 +398,3 @@ def _drop_repeated_headers(chunks: list[dict], document_id: str) -> list[dict]:
     if len(keep) == len(chunks):
         return chunks
     return [{**chunk, "chunk_id": f"{document_id}#{i}"} for i, chunk in enumerate(keep)]
-

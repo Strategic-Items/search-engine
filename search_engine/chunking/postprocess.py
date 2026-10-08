@@ -15,6 +15,9 @@ _IMAGE_PLACEHOLDER_LINE = re.compile(r"^\s*!\[page \d+ image\]\(#page-\d+\)\s*$"
 # `chunk_elements()`가 셀 텍스트 없는 표 자리에 넣는 대체 문구. 색인할 내용이 아니다.
 _EMPTY_TABLE_LINE = re.compile(r"^\s*\[표 셀 텍스트 없음\]\s*$", re.MULTILINE)
 _BLANK_RUNS = re.compile(r"\n{3,}")
+# 번들 마크다운은 표 칸 안 줄바꿈을 `<br>`로 쓴다. 색인 본문에서는 공백으로 이어야 한다: 필수 구절이 `<br>`로 끊기고,
+# SPLADE 문서 토큰(256)을 `<br>` 하나가 3개씩 먹어 뒤쪽 낱말이 잘린다(법령 150문항 중 103·120·128).
+_CELL_BREAK = re.compile(r"(?:[ \t]*<br\s*/?>[ \t]*)+", re.IGNORECASE)
 
 _TABLE_LINE = re.compile(r"^\s*\||\|\s*$")
 _NOT_PROSE = re.compile(r"[|\-\s:*#_·.,()\[\]「」｢｣“”‘’\"'/]+")
@@ -22,7 +25,8 @@ _TABLE_SCAFFOLD_PROSE_CHARS = 40
 
 
 def index_text(text: str) -> str:
-    """색인 본문에서 페이지 주석, 내용 없는 이미지 자리표시, 빈 표 대체 문구를 걷어낸다."""
+    """색인 본문에서 페이지 주석, 내용 없는 이미지 자리표시, 빈 표 대체 문구를 걷어내고 칸 줄바꿈(`<br>`)을 공백으로 잇는다."""
+    text = _CELL_BREAK.sub(" ", text)
     text = _PAGE_MARKER_LINE.sub("", text)
     text = _IMAGE_PLACEHOLDER_LINE.sub("", text)
     text = _EMPTY_TABLE_LINE.sub("", text)
