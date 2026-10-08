@@ -106,7 +106,7 @@ function catDetail(k){
   return '<h2 id="'+info.id+'">'+info.head+'</h2>'+
   '<p class="note"><b>코퍼스.</b> '+info.corpus+'</p>'+
   '<p class="cap">놓친 질문은 SPLADE '+catList(st.miss[0])+', dense '+catList(st.miss[1])+', hybrid '+catList(st.miss[2])+'입니다. '+(k==="law100"?'놓친 질문의 원인은 아래 표에 적었습니다.':'놓친 질문 하나하나의 원인은 읽어서 확인하지 않았습니다.')+'</p>'+
-  catTable(k);
+  cqChunkCatalog(k)+catTable(k);
 }
 function catRead(){
   var big=CQ.filter(function(x){return x.n>=10;}).map(function(x){return x.id+'('+x.n+'개)';});
@@ -152,6 +152,7 @@ function renderCategorySelector(){
     var view=st.view;
     if(CATSEL==="common") view=(st.view==="cm"?"cmc":(st.view==="cs"||st.view==="ca"?st.view:"cs"));
     else view=(st.view==="cmc"?"cm":(st.view==="cs"||st.view==="ca"?"cq":st.view));
+    if(view==="ck"&&CATSEL!=="law100") view="cq";
     setView(view);
   };
 }
@@ -269,8 +270,9 @@ function cqPanel(d,x){
   if(tab==="out") return cqOutP(d,x);
   if(tab==="ans") return cqAns(d,x);
   if(tab==="stg") return cqStg(d,x);
-  var mx=Math.max.apply(null,d.qt.map(function(t){return t[1];}).concat([0.001]));
-  var chips=d.qt.map(function(t){ var al=Math.min(0.75,0.08+0.67*t[1]/mx); return '<span class="spchip" style="--a:'+al.toFixed(2)+'" title="질문 가중치 '+t[1]+'">'+esc(t[0])+'</span>'; }).join("");
+  var qt=d.qt.filter(function(t){return t[0]!=="?";});
+  var mx=Math.max.apply(null,qt.map(function(t){return t[1];}).concat([0.001]));
+  var chips=qt.map(function(t){ var al=Math.min(0.75,0.08+0.67*t[1]/mx); return '<span class="spchip" style="--a:'+al.toFixed(2)+'" title="질문 가중치 '+t[1]+'">'+esc(t[0])+'</span>'; }).join("");
   var terms=[]; d.sp.concat(d.sp_gold||[]).forEach(function(h){ (h.t||[]).forEach(function(x2){ if(terms.indexOf(x2[0])<0) terms.push(x2[0]); }); });
   return cqBar2(d)+'<div><h2>질문을 이렇게 바꿔서 찾았습니다 (SPLADE)</h2><div class="chips" style="margin-top:8px">'+chips+'</div></div><h2>SPLADE 검색 상위 5 · 점수</h2>'+cqHits(d.sp,"sp",terms,d)+(d.sp_gold&&d.sp_gold.length?'<h2>상위 5 밖 정답 청크 · 단어별 기여 비교</h2><p class="note">비교용 정답 청크입니다. 실제 검색 순위·합산·반환 결과에는 포함하지 않습니다. 점수는 SPLADE 벡터와 질문 벡터의 내적입니다(현재 색인에 없는 청크는 저장 본문을 다시 인코딩한 근사값).</p>'+cqHits(d.sp_gold,"sp",terms,d):'');
 }
@@ -351,13 +353,143 @@ function cqAns(d,x){
   return cqBar2(d)+'<div class="verdict"><b>이 질문의 판정·답변은 측정하지 않았습니다</b><p>이 탭의 수치는 검색 단계(SPLADE, dense, 합산, 컷오프)만 오프라인으로 잰 것입니다. 판정 LLM과 답변 LLM은 돌리지 않았고, SPLADE는 서비스 검색에 붙어 있지 않습니다. 그래서 판정 결과와 답변 예시는 없습니다.</p></div>'+
   '<p class="note" style="margin-top:12px">서비스 구조대로라면 최종 반환의 <b>문서 '+n+'건·청크 '+m+'개</b>가 답변 LLM에 근거로 넘어갑니다. 판정 LLM은 기본값이 꺼짐이고, 켜면 앞 문서 3개를 읽고 질문이 요구하는 사실이 적혀 있는지 예/아니오로 답해 아니오이면 결과를 비웁니다. 카테고리 검색 경로는 판정을 끈 상태로 둡니다.</p>';
 }
+function cqChunkImpact(x,e){
+  var all=window.CATEGORY_CHUNKING_IMPACT||{}, m=((all.measurements||{})[x.set+'-'+x.i]||{})[e.commit];
+  if(!m) return '';
+  function num(n){return n.toFixed(4);}
+  function signed(n){return (n>0?'+':'')+num(n);}
+  function rank(n){return n==null?'근거 미충족':n+'위';}
+  function row(name,a,b){return '<tr><td>'+name+'</td><td>'+num(a)+'</td><td>'+num(b)+'</td><td>'+signed(b-a)+'</td></tr>';}
+  function ranks(label,field,before,after){before=before||m.before;after=after||m.after;return '<tr><td>'+label+'</td>'+[0,1,2].map(function(i){return '<td>'+rank(before[field][i])+' → '+rank(after[field][i])+'</td>';}).join('')+'</tr>';}
+  function contributions(title,entries,unit){
+    return '<details class="chunk-impact-terms"><summary>'+title+'</summary><p class="cap">'+unit+'</p><table class="catq"><thead><tr><th>질문 어절·토큰</th><th>이전 기여</th><th>이후 기여</th><th>변화</th></tr></thead><tbody>'+entries.slice(0,10).map(function(t){return '<tr><td>'+esc(t.word||t.token)+'</td><td>'+num(t.before)+'</td><td>'+num(t.after)+'</td><td>'+signed(t.after-t.before)+'</td></tr>';}).join('')+'</tbody></table></details>';
+  }
+  return '<section class="chunk-impact"><h3>'+esc(x.i)+'번 · 파서·청킹 결과를 교체한 추가 측정</h3><p class="note">모델과 배경 문서를 고정하고, 이 문서의 청크만 Git 수정 전·후로 교체했습니다. 아래 점수는 위에서 비교한 청크, 순위는 대상 문서에서 필수 답 구절을 포함한 첫 청크 기준입니다.</p>'+
+    '<table class="catq"><thead><tr><th>비교 청크 점수</th><th>이전</th><th>이후</th><th>변화</th></tr></thead><tbody>'+row('dense 코사인',m.before.denseCosine,m.after.denseCosine)+row('SPLADE 내적',m.before.spladeScore,m.after.spladeScore)+'</tbody></table>'+
+    '<table class="catq"><thead><tr><th>대상 문서의 완전한 답 근거</th><th>SPLADE</th><th>dense</th><th>Hybrid</th></tr></thead><tbody>'+ranks('후보 순위', 'candidateRanks')+ranks('컷오프 뒤 반환 순위','returnedRanks')+'</tbody></table>'+
+    (m.globalBefore?'<table class="catq"><thead><tr><th>질문 전체의 필수 근거</th><th>SPLADE</th><th>dense</th><th>Hybrid</th></tr></thead><tbody>'+ranks('컷오프 뒤 반환 순위','returnedRanks',m.globalBefore,m.globalAfter)+'</tbody></table><p class="cap">질문 전체 비교에서는 이 커밋으로 모델 입력이 바뀐 문서 '+m.globalChangedParents+'개를 함께 교체했습니다. 허용된 정답 문서들의 반환 청크를 함께 읽어 필수 구절·단위 충족을 셉니다. 다른 문서가 이미 답을 반환한 경우 대상 문서가 좋아져도 질문 전체는 그대로일 수 있습니다.</p>':'')+
+    (m.changedSegment?'<details class="chunk-impact-terms"><summary>수정한 본문 구간의 영향도</summary><p class="cap">추가·교체된 줄을 수정 후 청크에서 제거했을 때의 점수 감소량입니다. 양수는 그 구간이 점수를 높였다는 뜻입니다. 문맥 상호작용이 포함된 삭제 실험입니다.</p><p>dense 코사인 감소: <b>'+signed(m.changedSegment.denseDrop)+'</b> · SPLADE 점수 감소: <b>'+signed(m.changedSegment.spladeDrop)+'</b></p><pre>'+esc(m.changedSegment.text||'본문 줄 변화 없음 · 제목 경로 변경')+'</pre></details>':'')+
+    contributions('dense: 질문 어절별 영향도 전후',m.denseWords,'어절 하나를 지웠을 때 감소하는 코사인 값입니다. 음수는 해당 어절을 지우면 점수가 오름을 뜻합니다. 기여도 변화가 큰 순서로 표시합니다.')+
+    contributions('SPLADE: 질문 토큰별 점수 기여 전후',m.spladeTokens,'질문 토큰 가중치 × 청크 토큰 가중치입니다. 확장 토큰도 포함하며, 점수 기여 변화가 큰 순서로 표시합니다.')+
+    '<p class="cap">dense 점수가 오르더라도 경쟁 청크·컷오프 때문에 반환 순위는 그대로일 수 있습니다. 정확한 코사인·희소 내적으로 계산한 오프라인 비교이며 실제 ANN 재색인 결과는 아닙니다. 단위 질문(111·125·143)은 단위까지 있어야 근거 충족으로 셌습니다.</p></section>';
+}
+function cqChunkMeasuredSummary(x,e){
+  var m=((((window.CATEGORY_CHUNKING_IMPACT||{}).measurements)||{})[x.set+'-'+x.i]||{})[e.commit];
+  if(!m||!m.globalBefore) return '';
+  var a=m.globalBefore.returnedRanks[2], b=m.globalAfter.returnedRanks[2], status;
+  if(a==null&&b!=null) status='질문 전체: 완전한 근거 미반환 → Hybrid '+b+'위 반환';
+  else if(a!=null&&b==null) status='질문 전체: Hybrid '+a+'위 → 완전한 근거 미반환';
+  else if(a==null) status='질문 전체: 수정 전후 모두 완전한 근거 미충족';
+  else status='질문 전체: Hybrid '+a+'위 → '+b+'위'+(a===b?' (반환 순위 동일)':'');
+  return '<br><b>'+esc(status)+'</b><br>비교 청크: dense '+m.before.denseCosine.toFixed(4)+' → '+m.after.denseCosine.toFixed(4)+' · SPLADE '+m.before.spladeScore.toFixed(4)+' → '+m.after.spladeScore.toFixed(4);
+}
+function cqChunkEntries(x){ return (window.CATEGORY_CHUNKING_HISTORY||{})[x.set+'-'+x.i]||[]; }
+function cqChunkStory(d,x,phase){
+  var entries=cqChunkEntries(x).filter(function(e){return !phase||e.phase===phase;});
+  function excerpt(body){ return body.length>650?body.slice(0,650)+'…':body; }
+  function path(e){return e.path.length?e.path.join(' → '):'제목 경로 없음';}
+  return entries.map(function(e){
+    var before=excerpt(e.before.body), after=excerpt(e.after.body);
+    if(e.commit==='e1749ca'&&e.beforeFootnote) before+='\n\n[별도 각주 #0022]\n'+e.beforeFootnote.slice(e.beforeFootnote.indexOf('※※'));
+    var ranks=e.beforeRanks?'<p class="chunk-story-label">이전 후보: SPLADE '+e.beforeRanks[0]+'위 · dense '+e.beforeRanks[1]+'위 · 합산 '+e.beforeRanks[2]+'위<br>이후 41단계 반환: SPLADE '+e.afterRanks[0]+'위 · dense '+e.afterRanks[1]+'위 · Hybrid '+e.afterRanks[2]+'위</p>':'';
+    var source='<a href="'+e.url+'" target="_blank" rel="noopener">파서 '+e.commit+'</a>'+(e.searchUrl?' · <a href="'+e.searchUrl+'" target="_blank" rel="noopener">이전 검색 기록</a>':'');
+    return '<section class="chunk-story"><div class="chunk-story-kicker">청킹 변경 · '+esc(e.date.slice(0,10))+' · '+esc(e.commit)+'</div><h2>'+esc(e.title)+'</h2><p class="chunk-story-question">질문: '+esc(x.q)+'</p>'+
+      '<span class="tag '+(e.kind==='retrieval'?'t-ok':'t-mut')+'">'+esc(e.rankNote.replace('수정 전후 검색 재측정 기록 없음','당시 검색 전후 기록 없음'))+'</span>'+ranks+
+      '<div class="chunk-story-grid"><article class="chunk-story-before"><h3>① 이전 문제</h3><p>'+esc(e.problem)+'</p><p class="chunk-story-label">'+esc(e.before.id.split('#').pop())+' · '+esc(path(e.before))+'</p><pre>'+esc(before)+'</pre></article>'+
+      '<article class="chunk-story-after"><h3>② 청킹 수정 후</h3><p>'+esc(e.change)+'</p><p class="chunk-story-label">'+esc(e.after.id.split('#').pop())+' · '+esc(path(e.after))+'</p><pre>'+esc(after)+'</pre></article></div>'+
+      '<div class="chunk-story-result"><b>무엇이 개선됐나</b>'+esc(e.benefit)+cqChunkMeasuredSummary(x,e)+(e.kind==='retrieval'?'<br><b>'+esc(e.rankNote)+'</b>':'')+'</div>'+
+      cqChunkImpact(x,e)+'<details class="chunk-story-evidence"><summary>Git 전후 본문 전체와 근거 보기</summary><p>'+source+'</p><p>수정 전</p><pre>'+esc(e.before.body)+'</pre><p>수정 후</p><pre>'+esc(e.after.body)+'</pre></details>'+
+      '<p class="chunk-story-evidence">'+esc(e.comparisonNote||'관련 근거 청크의 구조 변경을 Git에서 확인했습니다. 당시 저장된 검색 전후 평가가 없는 경우 구조 개선 기록으로 표시합니다. 추가 통제 측정은 dense·SPLADE 영향도 표에서 확인합니다.')+'</p></section>';
+  }).join('');
+}
+function cqChunkPhase(d,x,phase){
+  var titles={before37:'청킹 · 37단계 이전',before41:'청킹 · 41단계 평가 전',after45:'청킹 · 45단계 이후 추가 기록'};
+  var body=cqChunkStory(d,x,phase);
+  return body?'<div class="tl-card chunk" id="cq-chunk-'+phase+'"><div class="tl-box"><div class="tl-h"><span class="sl">청킹</span><span class="st">'+titles[phase]+'</span></div>'+body+'</div></div>':'';
+}
+function cqChunkCatalog(k){
+  var entries=Object.keys(window.CATEGORY_CHUNKING_HISTORY||{}).filter(function(id){return id.indexOf(k+'-')===0;});
+  if(!entries.length) return '';
+  function measurements(id){return Object.values(((window.CATEGORY_CHUNKING_IMPACT||{}).measurements||{})[id]||{});}
+  function outcome(m){var a=(m.globalBefore||m.before).returnedRanks[2], b=(m.globalAfter||m.after).returnedRanks[2];return a==null?(b==null?0:1):(b==null?-1:(a>b?1:(a<b?-1:0)));}
+  entries.sort(function(a,b){return measurements(b).filter(function(m){return outcome(m)>0;}).length-measurements(a).filter(function(m){return outcome(m)>0;}).length||a.localeCompare(b);});
+  return '<details class="card"><summary><b>청킹 변경·영향도 기록 · 질문 '+entries.length+'개</b></summary><p class="note">질문 번호를 누르면 단계별 변화의 청킹 전후 기록을 엽니다. 점수·기여도·고정 배경 반환 순위 비교를 함께 보여줍니다.</p><table class="catq"><thead><tr><th>질문</th><th>청킹 변경</th><th>추가 통제 측정</th></tr></thead><tbody>'+entries.map(function(id){
+    var es=window.CATEGORY_CHUNKING_HISTORY[id], ms=measurements(id);
+    var description=ms.length?'dense 점수 상승 '+ms.filter(function(m){return m.delta.denseCosine>0.00001;}).length+'건 · SPLADE 상승 '+ms.filter(function(m){return m.delta.spladeScore>0.0001;}).length+'건<br>질문 전체 Hybrid 근거 반환: 개선 '+ms.filter(function(m){return outcome(m)>0;}).length+' · 악화 '+ms.filter(function(m){return outcome(m)<0;}).length+' · 동일 '+ms.filter(function(m){return outcome(m)===0;}).length:'추가 측정 기록 없음';
+    return '<tr><td><button type="button" class="sidebtn" data-chunk-q="'+id+'">'+id.split('-').pop()+'</button></td><td>'+es.map(function(e){return esc(e.title);}).join('<br>')+'</td><td>'+description+'</td></tr>';
+  }).join('')+'</tbody></table></details>';
+}
 function cqStg(d,x){
-  var N=["SPLADE","dense","hybrid(청크 RRF 상위 5청크)"];
-  var rows=x.r.map(function(r,k){ return '<tr><td>'+N[k]+'</td><td>'+(r==null?'상위 5 밖':r+'위')+'</td></tr>'; }).join("");
-  var rt=cqRet(d);
-  return '<p class="note">카테고리 질문은 37단계에서 만들었고, 38단계에서 SPLADE를 학습했습니다. 이 화면의 순위는 BM25를 뺀 오프라인 측정 한 번의 결과라서, 질문 하나가 단계마다 어떻게 바뀌었는지는 기록하지 않았습니다.</p>'+
-  '<table><thead><tr><th>방식</th><th>첫 정답 청크 순위</th></tr></thead><tbody>'+rows+'<tr><td>컷오프 뒤 반환</td><td>'+cqReturnLabel(rt)+'</td></tr></tbody></table>'+
-  '<p class="note">묶음 전체의 지표는 결과 요약에서 볼 수 있습니다.</p>';
+  var H=window.CATEGORY_STAGE_HISTORY||{}, h=x.set==="law100"&&H[x.i];
+  if(!h) return '<div class="tl">'+['before37','before41','after45'].map(function(p){return cqChunkPhase(d,x,p);}).join('')+'</div><p class="note">'+(x.set==="law100"?'이 질문은 법령 150문서로 늘릴 때 추가되어, 45단계까지의 질문별 기록이 없습니다.':'이 카테고리는 45단계까지 같은 질문을 단계별로 다시 잰 기록이 없습니다.')+' 현재 검색 결과는 다른 탭에서 확인할 수 있습니다.</p>';
+  function rank(r){ return r==null?'<b class="no">정답 청크 미반환</b>':'<b>정답 청크 '+r+'위 반환</b>'; }
+  function change(before,after){
+    if(before==null&&after!=null) return '<span class="tl-b up">못 찾음 → 찾음</span>';
+    if(before!=null&&after==null) return '<span class="tl-b dn">찾음 → 못 찾음</span>';
+    if(before!=null&&after!=null&&before!==after) return '<span class="tl-b same">'+before+'위 → '+after+'위</span>';
+    return '<span class="tl-b same">반환 여부 변화 없음</span>';
+  }
+  function mode(name,cls,before,after){
+    return '<div class="mc '+cls+'"><span class="ml">'+name+'</span>'+(after===undefined?rank(before):rank(after))+(after===undefined?'':'<span class="dl">기준 '+(before==null?'미반환':before+'위')+' → 실험 '+(after==null?'미반환':after+'위')+'</span>')+'</div>';
+  }
+  var baseline=h.s41[2], note={
+    37:'이 질문은 37단계의 법령 21문항에 없었습니다. 이 단계의 결과를 이 질문에 옮겨 적지 않습니다.',
+    38:'38단계의 설정 비교도 앞선 법령 21문항을 사용했습니다. 현재 질문의 당시 순위 기록은 없습니다.',
+    39:'후보 수 스윕은 docs 질문으로 측정했습니다. 이 법령 질문의 단계별 결과는 없습니다.',
+    40:'RRF 방식 비교의 법령 100문항 질문별 결과는 저장되지 않았습니다.',
+    43:'메타데이터 입력 실험의 SPLADE 결과는 부분 갱신 오류로 오염됐습니다. 이 질문의 성공·실패 변화로 사용하지 않습니다.'
+  };
+  var cards=[], rib=[];
+  function addChunk(phase){var html=cqChunkPhase(d,x,phase); if(html){cards.push(html);rib.push('<button type="button" class="chunk" data-go="cq-chunk-'+phase+'"><span class="rl">청킹</span><span class="rs">'+({before37:'37단계 전',before41:'41단계 전',after45:'45단계 이후'})[phase]+'</span></button>');}}
+  addChunk('before37');
+  for(var n=37;n<=45;n++){
+    if(n===41) addChunk('before41');
+    var info=stageInfo('d'+n), lines='', cls='nd', label='기록 없음', badge='';
+    if(n===37){
+      lines='<p class="note">'+note[n]+'</p>';
+    } else if(n===41){
+      cls=baseline==null?'none':'chunk'; label=baseline==null?'정답 미반환':'정답 '+baseline+'위';
+      lines='<p class="note">법령 100문서·100문항으로 늘려 측정한 기준선입니다. 아래 순위는 컷오프 뒤 반환 목록에서 모든 근거 요건을 충족한 첫 청크의 자리입니다.</p>'+
+        '<div class="tl-modes">'+mode('SPLADE', 'kw',h.s41[0])+mode('dense','vec',h.s41[1])+mode('hybrid','hy',baseline)+'</div>';
+    } else if(n===42){
+      cls=h.s42[1]==null?'none':'chunk'; label=h.s42[1]==null?'실험: 미반환':'실험: '+h.s42[1]+'위';
+      badge=change(baseline,h.s42[1]);
+      lines='<p class="note">같은 100문서·100문항에서 SPLADE 입력에 제목 경로를 추가한 비교 실험입니다. 제목 경로 입력은 이후 채택됐지만, 이 순위는 재색인 전의 통제 실험 결과입니다.</p>'+
+        '<div class="tl-modes">'+mode('SPLADE','kw',h.s41[0],h.s42[0])+mode('hybrid','hy',baseline,h.s42[1])+'</div>'+
+        '<div class="tl-line">'+(h.s41[0]==null&&h.s42[0]!=null&&baseline!=null?'SPLADE 단독은 새로 찾았지만, hybrid는 기준선에서도 정답을 반환했습니다.':(h.s41[0]==null&&h.s42[0]!=null&&h.s42[1]==null?'SPLADE 단독은 새로 찾았지만, hybrid 컷오프 뒤에는 정답이 없습니다.':''))+'</div>';
+    } else if(n===44){
+      cls=h.s44==null?'none':'chunk'; label=h.s44==null?'실험: 미반환':'실험: '+h.s44+'위';
+      badge=change(baseline,h.s44);
+      lines='<p class="note">같은 100문서에서 판본을 지정하지 않은 질문의 대체된 문서 점수를 0.97배로 낮춘 실험입니다. 선택 기능으로 구현됐고 기본값은 1.0이라 운영 기본 결과는 기준선과 같습니다.</p>'+
+        '<div class="tl-modes">'+mode('hybrid · 선택 기능','hy',baseline,h.s44)+'</div>';
+    } else if(n===45){
+      cls=h.s45==null?'none':'chunk'; label=h.s45==null?'실험: 미반환':'실험: '+h.s45+'위';
+      badge=change(baseline,h.s45);
+      lines='<p class="note">번호로 적힌 대체 관계를 문서 ID로 풀어 새 판을 붙인 실험입니다. 전체 100문항에서 새로 찾은 정답은 없고 한 질문은 잃어 적용하지 않았습니다.</p>'+
+        '<div class="tl-modes">'+mode('hybrid · 미적용 실험','hy',baseline,h.s45)+'</div>';
+    } else lines='<p class="note">'+note[n]+'</p>';
+    rib.push('<button type="button" class="'+cls+'" data-go="cq-stage-'+n+'"><span class="rl">'+n+'단계</span><span class="rs">'+label+'</span></button>');
+    cards.push('<div class="tl-card '+cls+'" id="cq-stage-'+n+'"><div class="tl-box"><div class="tl-h"><span class="sl">'+n+'단계</span><span class="st">'+esc(info.t)+'</span>'+badge+'</div>'+lines+'</div></div>');
+  }
+  addChunk('after45');
+  var findings=[];
+  var chunkEntries=cqChunkEntries(x);
+  if(chunkEntries.length) findings.push('청킹 변경 '+chunkEntries.length+'건을 아래 청킹 카드에 기록했습니다. '+(chunkEntries.some(function(e){return e.kind==='retrieval';})?'수정 전 검색 실패와 이후 정답 반환 기록이 있습니다.':(((window.CATEGORY_CHUNKING_IMPACT||{}).measurements||{})[x.set+'-'+x.i]?'추가 통제 측정에서 dense·SPLADE 점수, 토큰 기여도, 대상 문서의 근거 반환 순위를 비교했습니다.':'근거 구조 변경은 확인됐으며 추가 검색 효과 측정은 진행 중입니다.')));
+  var measured=((window.CATEGORY_CHUNKING_IMPACT||{}).measurements||{})[x.set+'-'+x.i]||{};
+  var improvements=chunkEntries.filter(function(e){var m=measured[e.commit];return m&&m.globalAfter&&m.globalAfter.returnedRanks[2]!=null&&(m.globalBefore.returnedRanks[2]==null||m.globalAfter.returnedRanks[2]<m.globalBefore.returnedRanks[2]);});
+  if(improvements.length) findings.push('질문 전체의 근거 반환 개선: '+improvements.map(function(e){var m=measured[e.commit];return e.title+' ('+(m.globalBefore.returnedRanks[2]==null?'근거 미반환':m.globalBefore.returnedRanks[2]+'위')+' → '+m.globalAfter.returnedRanks[2]+'위)';}).join(', ')+'.');
+  if(x.i==='033') findings.push('Git의 수정 전 50문항 평가에서 SPLADE·dense·Hybrid 모두 정답 상위 5 밖이었습니다. 분리된 각주를 표 행에 연결한 뒤, 41단계 100문항 평가에서 Hybrid 정답 '+baseline+'위로 반환됐습니다. 코퍼스와 검색 설정 변화도 포함된 전후 기록입니다.');
+  if(x.i==='038') findings.push('2017 세부지침의 쪽 단위 표를 행으로 나누었습니다. 이전 2위→이후 1위 기록에는 정답 라벨 재작성도 포함됩니다.');
+  if(h.s41[0]==null&&h.s42[0]!=null) findings.push('42단계 제목 경로 실험에서 SPLADE 단독은 정답을 새로 찾았습니다'+(baseline!=null?'(hybrid는 이미 반환)':'(hybrid는 여전히 미반환)')+'.');
+  if(baseline!=null&&h.s42[1]==null) findings.push('42단계 제목 경로 실험에서는 hybrid가 기준선의 정답을 잃었습니다.');
+  if(baseline==null&&h.s44!=null) findings.push('44단계 판본 가중치 실험에서 hybrid가 정답을 '+h.s44+'위로 새로 반환했습니다. 이 기능은 기본 꺼짐입니다.');
+  if(baseline!=null&&h.s45==null) findings.push('45단계 새 판 연결 실험에서는 기준선의 정답을 잃었습니다. 이 실험은 적용하지 않았습니다.');
+  if(!findings.length) findings.push('기록된 실험에서 이 질문의 정답 반환 여부가 새로 개선된 사례는 없습니다.');
+  var labelNote=(d.positive_review||d.label_review||d.scope_note)?'<p class="warn">이 질문은 이후 정답 근거나 질문 범위를 재검토했습니다. 아래 과거 순위는 당시 라벨 기준이며, 현재 판정은 질문 상세의 근거 검토를 함께 확인해야 합니다.</p>':'';
+  return '<div class="tl-line"><b>발표용 관찰:</b> '+findings.map(esc).join(' ')+'</div>'+labelNote+
+    '<div class="tl-rib" role="group" aria-label="37~45단계 질문별 결과">'+rib.join('')+'</div>'+
+    '<p class="note">41·42·44·45단계 순위는 법령 100문서·100문항 시점의 저장된 결과입니다. 각 실험은 41단계 기준선과 따로 비교했습니다. 37·38단계는 다른 질문셋, 39·40단계는 이 질문의 기록이 없고 43단계 SPLADE 실험은 결과 오염으로 제외했습니다. 현재 다른 탭의 150문서 결과와 직접 비교하지 않습니다.</p>'+
+    '<div class="tl">'+cards.join('')+'</div>';
 }
 function cqNode(tab,cls,lb,big,sub,active){ return '<button type="button" class="node '+cls+'" data-ctab="'+tab+'" aria-pressed="'+(active?'true':'false')+'"><span class="lb">'+lb+'</span><span class="big">'+big+'</span><span class="sub">'+sub+'</span></button>'; }
 function cqFlow(d,x){
@@ -386,7 +518,7 @@ function cqSelect(id,nohash){ CQS.id=id; CQS.chunk=null; cqList(); cqDetail(); i
 function cqMove(d){ var v=cqVis(); if(!v.length) return; var i=v.findIndex(function(x){return x.id===CQS.id;}); cqSelect(v[Math.max(0,Math.min(v.length-1,i<0?0:i+d))].id); }
 function cqInit(){
   document.getElementById("list").addEventListener("click",function(e){ var fb=e.target.closest("button[data-cqflt]"); if(fb){ CQS.flt=fb.dataset.cqflt; cqList(); return; } var b=e.target.closest("button[data-cq]"); if(b) cqSelect(b.dataset.cq); });
-  document.getElementById("detail").addEventListener("click",function(e){ var ct=e.target.closest("[data-ctab]"); if(ct&&st.view==="cq"){ CQS.tab=ct.dataset.ctab; var y=this.scrollTop; cqDetail(); this.scrollTop=y; return; } var g=e.target.closest("button[data-cqgo]"); if(g){ CATSEL=Object.keys(CINFO).filter(function(o){return CINFO[o].id===g.dataset.cqgo;})[0]||"law100"; setView("c"); setTimeout(function(){ var el=document.getElementById(g.dataset.cqgo); if(el) el.scrollIntoView({block:"start"}); },0); return; } var c=e.target.closest("button[data-chunk]"); if(c&&st.view==="cq"){ CQS.chunk=+c.dataset.chunk; var y2=this.scrollTop; cqDetail(); this.scrollTop=y2; } });
+  document.getElementById("detail").addEventListener("click",function(e){ var link=e.target.closest('[data-chunk-q]'); if(link){var question=CQ.filter(function(q){return q.id===link.dataset.chunkQ;})[0]; if(question){CQS.id=question.id; CQS.set=question.set; CATSEL=question.set; CQS.tab='stg';setView('cq');}return;} var ct=e.target.closest("[data-ctab]"); if(ct&&st.view==="cq"){ CQS.tab=ct.dataset.ctab; var y=this.scrollTop; cqDetail(); this.scrollTop=y; return; } var g=e.target.closest("button[data-cqgo]"); if(g){ CATSEL=Object.keys(CINFO).filter(function(o){return CINFO[o].id===g.dataset.cqgo;})[0]||"law100"; setView("c"); setTimeout(function(){ var el=document.getElementById(g.dataset.cqgo); if(el) el.scrollIntoView({block:"start"}); },0); return; } var c=e.target.closest("button[data-chunk]"); if(c&&st.view==="cq"){ CQS.chunk=+c.dataset.chunk; var y2=this.scrollTop; cqDetail(); this.scrollTop=y2; } });
 }
 function renderCq(){ cqList(); cqDetail(); }
 

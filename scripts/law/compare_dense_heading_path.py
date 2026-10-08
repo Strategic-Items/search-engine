@@ -47,6 +47,7 @@ def main():
     ids_at = {cid: i for i, cid in enumerate(ids)}
     base_vectors = np.array([r.pop('embedding') for r in rows], dtype=np.float32)
     questions = [json.loads(line) for line in args.queries.read_text().splitlines() if line.strip()]
+    questions = [q for q in questions if q.get("positive_review", {}).get("evaluation_eligible", True)]
     for q in questions:
         if not any(set(g) & set(ids) for g in q['evidence_groups']):
             raise ValueError('Gold missing: ' + q['qid'])

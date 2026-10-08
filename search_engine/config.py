@@ -92,7 +92,7 @@ class Settings(BaseSettings):
     search_embedding_dimensions: int = Field(default=1024, ge=1)
     # 법령·행정 dense 입력에 제목 경로를 덧붙인다. 끄면 title+body로 색인한다.
     # 기존 벡터에는 소급 적용되지 않으므로 입력을 바꾸면 재색인이 필요하다.
-    search_dense_include_heading_path: bool = True
+    search_dense_include_heading_path: bool = False
     search_vector_candidates: int = Field(default=25, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
     # 반환되는 문서당 포함되는 청크 수. 랭킹은 여전히 하나의 문서를 반환한다.

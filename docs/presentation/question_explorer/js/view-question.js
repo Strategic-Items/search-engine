@@ -54,7 +54,7 @@ function flow(q){
   c.push(cell("c2 r2",node("vec","vec","② dense", vcG>=0?'<span class="pin">정답</span>'+(vcG+1)+'위':'상위 5 밖', "후보 50개 · 1위의 97% 미만은 트림", st.tab==="vec")));
   c.push(cell("c3 rs",node("rrf",gr?"":"lost","③ 문서로 묶어 합산", gr?'<span class="pin">정답</span>'+(q.gi+1)+'위':'상위 6 밖', gr?('BM25 '+(gr.b?gr.b+'위':'트림 제외')+' · dense '+(gr.v?gr.v+'위':'트림 제외')):'정답 문서가 후보에 없음', st.tab==="rrf")));
   c.push(cell("c4 rs",node("rrf",gr?(gr.k?"ok":"lost"):"lost","④ 컷오프", gr?(gr.k?'통과':'잘림'):'해당 없음', gr?(gr.k?'뒤처진 문서만 제외':'정답이 뒤처진 문서로 판정됨'):'—', false)));
-  c.push(cell("c5 rs",node("out",q.hit?"ok":"lost","⑤ 반환", q.hit?'정답 청크 실음':(q.dhit?'정답 청크 못 실음':'정답 문서 못 실음'), "문서 "+q.out.length+"건", st.tab==="out")));
+  c.push(cell("c5 rs",node("out",q.hit?"ok":"lost","⑤ 반환", q.hit?'정답 청크 반환':(q.dhit?'정답 문서 반환 · 청크 누락':'정답 라벨 문서 미반환'), "문서 "+q.out.length+"건", st.tab==="out")));
   c.push(ansNode(q));
   return c.join("");
 }

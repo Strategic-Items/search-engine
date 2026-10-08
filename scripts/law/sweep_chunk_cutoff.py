@@ -75,6 +75,7 @@ def rrf_chunks(lists: list[list[tuple[str, float]]]) -> list[tuple[str, float]]:
 def main(splade_file: str, only: list[str]) -> None:
     sp = json.loads(Path(splade_file).read_text())
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [q for q in rows if q.get("positive_review", {}).get("evaluation_eligible", True)]
     settings = get_settings()
     settings.search_chunk_filter = False
     client, embedder = create_client(settings), OllamaEmbedder(settings)

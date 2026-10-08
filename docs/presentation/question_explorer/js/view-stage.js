@@ -82,12 +82,24 @@ function figDoc(f){
   }).join("");
   return '<div class="fig"><div class="fh"><b>'+esc(f.t)+'</b></div>'+lg+body+'</div>';
 }
+function stageExample(e){
+  if(!e) return '';
+  if(e.kind==="heading_path"){
+    var crumbs=e.heading_path.map(function(part,i){return '<li><span class="hp-index">0'+(i+1)+'</span><span>'+esc(part)+'</span></li>';}).join('');
+    return '<section class="stage-example hp-example"><div class="se-head"><div><span class="se-kicker">색인 입력 예시</span><h3>'+esc(e.title)+'</h3></div><span class="se-tag">실제 청크</span></div><div class="hp-doc"><span class="se-label">문서 제목</span><b>'+esc(e.docTitle)+'</b></div><div class="hp-path"><span class="se-label">이 청크의 제목 경로</span><ol>'+crumbs+'</ol></div><div class="hp-result"><span class="se-label">검색기에 들어가는 제목</span><div><b>'+esc(e.docTitle)+'</b></div></div><div class="hp-body"><span class="se-label">같이 들어가는 본문</span><p>'+esc(e.bodyExcerpt)+'</p></div><div class="se-caption">'+esc(e.caption)+'</div></section>';
+  }
+  if(e.kind==="superseded_weight"){
+    return '<section class="stage-example sw-example"><div class="se-head"><div><span class="se-kicker">동작 예시</span><h3>'+esc(e.title)+'</h3></div><span class="se-tag">점수 순서 조정</span></div><div class="sw-condition"><span class="sw-dot"></span><div><b>판본을 지정하지 않은 질문</b><span>그리고 청크에 <code>superseded_by</code>가 있음</span></div></div><div class="sw-math"><div class="sw-value"><span>대체된 문서</span><b>'+esc(e.oldScore)+'</b><small>RRF 점수</small></div><span class="sw-op">× '+esc(e.weight)+' <i>→</i></span><div class="sw-value adjusted"><span>조정 후</span><b>'+esc(e.adjustedScore)+'</b><small>컷오프 전에 적용</small></div></div><div class="sw-outcome"><span>현행 문서 점수</span><b>'+esc(e.currentScore)+'</b><i>›</i><b>'+esc(e.adjustedScore)+'</b><strong>현행 문서가 앞설 수 있음</strong></div><div class="sw-exception"><b>판본을 지정한 질문</b><span>예: “2016년 판” → 점수 조정 생략</span></div><div class="se-caption">'+esc(e.caption)+'</div></section>';
+  }
+  return '<section class="card tbl-card"><h3 class="tbl-h">'+esc(e.title)+'</h3><pre style="white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:12px 14px;border-radius:8px;background:var(--soft);font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace">'+esc(e.lines.join('\n'))+'</pre>'+(e.caption?'<p class="note" style="margin:8px 0 0">'+esc(e.caption)+'</p>':'')+'</section>';
+}
 function panelDoc(S){
   var d=S.doc, cls=(d.status==="적용"||d.status==="일부 적용")?"ap":"un";
   var figs=flowDoc(d.num)+(DFIG[d.num]||[]).map(figDoc).join("");
+  var example=stageExample(d.example);
   var tables=d.tables||[{hd:d.hd,rows:d.rows}], tbl=tables.map(function(t){ return '<section class="card tbl-card">'+(t.title?'<h3 class="tbl-h">'+esc(t.title)+'</h3>':'')+'<div class="tbl-scroll"><table class="tbl"><thead><tr>'+t.hd.map(function(h){return '<th>'+esc(h)+'</th>';}).join("")+'</tr></thead><tbody>'+t.rows.map(function(r){ return '<tr>'+r.map(function(c){return '<td>'+esc(c)+'</td>';}).join("")+'</tr>'; }).join("")+'</tbody></table></div></section>'; }).join("");
   return figs+'<p class="note"><span class="an-s '+cls+'">'+esc(d.status)+'</span> &nbsp;'+esc(d.cond)+'</p>'+
-   tbl+
+   example+tbl+
    (d.note?'<p class="note">'+esc(d.note)+'</p>':'')+
    '<p class="note">이 단계는 질문별로 다시 돌린 자료가 없어서 단계 문서(docs/evaluation/stages)의 수치를 옮겼습니다. 단계마다 평가셋과 코퍼스가 달라 다른 단계의 수치와 바로 비교하지 않습니다.</p>';
 }

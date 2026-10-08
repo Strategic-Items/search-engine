@@ -77,10 +77,20 @@ def read_chunks() -> list[dict]:
 
 def build() -> None:
     chunks = read_chunks()
+    from reconcile_explorer_labels import RULES, matches
+    reviewed = {r["query"]: r for r in json.loads(RULES.read_text())}
+    from evidence_validation import apply_review, policies
+    positive = policies()
+    by_id = {c["id"]: c for c in chunks}
     rows, bad = [], []
     for number, (kind, query, phrases) in enumerate(_specs(), 1):
         needles = [norm(p) for p in phrases]
         gold = [c for c in chunks if all(n in norm(c["body"] + " " + " ".join(c["heading_path"])) for n in needles)]
+        original = sorted(c["id"] for c in gold)
+        rule = reviewed.get(query)
+        if rule:
+            ids = {c["id"] for c in gold}
+            gold += [c for c in chunks if c["id"] not in ids and matches(rule, c)]
         if not gold:
             bad.append(query)
             continue
@@ -89,6 +99,11 @@ def build() -> None:
             "gold": sorted({c["parent_id"] for c in gold}),
             "evidence_groups": [[c["id"] for c in gold]],
         })
+        added = sorted(set(rows[-1]["evidence_groups"][0]) - set(original))
+        if added:
+            rows[-1]["label_review"] = {"date": "2026-10-07", "scope": rule["scope"], "reason": rule["reason"],
+                                        "original_chunks": original, "added_chunks": added}
+        apply_review(rows[-1], by_id, positive)
     if bad:
         sys.exit(f"정답 청크가 없는 질문: {bad}")
     QUERIES.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
@@ -124,6 +139,7 @@ def single_window(client, embedder, alias, query: str, mode: str, ratio: float) 
 
 def evaluate() -> None:
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [r for r in rows if r.get("positive_review", {}).get("evaluation_eligible", True)]
     settings = get_settings()
     client = create_client(settings)
     embedder = OllamaEmbedder(settings)
@@ -150,12 +166,13 @@ def evaluate() -> None:
             else:
                 window = single_window(client, embedder, alias, row["query"], mode, SINGLE_RATIO[mode])
                 hits = [type("H", (), {"parent_id": d})() for d in dict.fromkeys(c.split("#")[0] for c in window)]
-            gold = set(row["evidence_groups"][0])
+            gold = {c for group in row["evidence_groups"] for c in group}
             sizes.append(len(window))
             chunk_precision.append(sum(c in gold for c in window) / len(window) if window else 0.0)
             ceiling.append(min(len(gold), len(window)) / len(window) if window else 0.0)
             doc_precision.append(sum(h.parent_id in row["gold"] for h in hits) / len(hits) if hits else 0.0)
-            rank = next((i for i, c in enumerate(window, 1) if c in gold), None)
+            group_ranks = [next((i for i, c in enumerate(window, 1) if c in group), None) for group in row["evidence_groups"]]
+            rank = max(group_ranks) if all(r is not None for r in group_ranks) else None
             found += rank is not None
             doc_hit += any(h.parent_id in row["gold"] for h in hits)
             if rank:

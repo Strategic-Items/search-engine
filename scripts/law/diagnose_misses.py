@@ -24,6 +24,7 @@ def rank_of(ranked: list[str], gold: set[str]) -> int | None:
 def main(splade_file: str) -> None:
     sp = json.loads(Path(splade_file).read_text())
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [q for q in rows if q.get("positive_review", {}).get("evaluation_eligible", True)]
     chunks = {json.loads(line)["id"]: json.loads(line) for line in
               Path(category_source(get_settings())).read_text(encoding="utf-8").splitlines() if line.strip()}
     settings = get_settings()
