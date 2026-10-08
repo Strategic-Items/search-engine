@@ -239,8 +239,9 @@ class Settings(BaseSettings):
     # 기존 title+body 입력과 제목 경로를 더한 입력을 같은 모델로 비교할 수 있게 한다.
     # 색인 입력 옵션이므로 변경 후 해당 카테고리의 SPLADE 벡터를 다시 만들어야 한다.
     search_splade_include_heading_path: bool = True
-    # 문서·질의 인코딩 길이는 38단계 측정(256)과 같다. 512로 늘려도 청크 Recall은 변하지 않았다.
-    search_splade_doc_max_length: int = Field(default=256, ge=8, le=512)
+    # 법령 150문서 평가에서 512는 256보다 근거 회수를 소폭 높였으나 차이는 불확실했고, 1024는 추가 이득이 없었다.
+    # 문서 길이 변경은 SPLADE 벡터를 다시 만들어야 반영된다. 질의 길이는 256을 유지한다.
+    search_splade_doc_max_length: int = Field(default=512, ge=8, le=512)
     search_splade_query_max_length: int = Field(default=256, ge=8, le=512)
     search_splade_top_terms: int = Field(default=256, ge=1, le=1024)
     search_splade_min_weight: float = Field(default=0.01, ge=0.0)

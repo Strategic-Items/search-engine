@@ -1,0 +1,61 @@
+{
+ "version": 2,
+ "label": "v1에서 표 칸 줄바꿈 <br>을 공백으로 잇는다",
+ "notes": "번들 마크다운의 표 칸 줄바꿈 <br>이 색인 본문에 남아 필수 구절을 끊고 SPLADE 256토큰을 먹었다(103·120·128). index_text에서 공백으로 바꾼다. 나머지 규칙은 v1과 같다.",
+ "date": "2026-10-08",
+ "search_engine_commit": "c193158",
+ "dirty": true,
+ "parser_commit": "",
+ "policy": {
+  "chunk_size": 800,
+  "chunk_overlap": 100,
+  "min_chunk_chars": 30,
+  "question_min": 3,
+  "question_max_chars": 300,
+  "question_path_chars": 80,
+  "row_key_max_chars": 40,
+  "long_cell_ratio": 0.5,
+  "pair_oversize_ratio": 1.5,
+  "carry_max_chars": 40,
+  "heading_max_chars": 60
+ },
+ "parity": "",
+ "corpus": {
+  "law": {
+   "documents": 150,
+   "chunks": 6503,
+   "chars_mean": 289.0,
+   "chars_median": 192,
+   "chars_max": 4337,
+   "under_30_chars": 170,
+   "text_over_1200": 0,
+   "table_chunks": 3908,
+   "row_chunks": 3766,
+   "text_without_heading_path": 39
+  }
+ },
+ "search": {
+  "law": {
+   "alias": "exp-chk-law-v2",
+   "questions": 149,
+   "gold_lost": 1,
+   "cutoffs": {
+    "service": {
+     "evidence": 142,
+     "doc_hit": 147,
+     "phrase": 139,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 7.87
+    },
+    "0.95": {
+     "evidence": 138,
+     "doc_hit": 146,
+     "phrase": 135,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 3.39
+    }
+   },
+   "service_cutoff": 0.7
+  }
+ }
+}
