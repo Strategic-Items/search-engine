@@ -207,7 +207,7 @@ heading 60자 자르기) → `SearchDocument` → 기존 `indexer.py`. `indexer.
 
 ## 버전 기록과 실험 방법
 
-청킹은 계속 바꾸고 재므로 버전마다 남긴다: [chunking_versions.md](../evaluation/chunking_versions.md)(표)와 `docs/evaluation/chunking_versions/v<N>.json`(정책값,
+청킹은 계속 바꾸고 재므로 단계와 버전으로 남긴다. 한 번의 변경과 측정은 `docs/evaluation/chunking-stages/`의 **청킹 단계**(검색엔진 단계 1~45와 번호를 따로 센다, 이 작업이 [청킹 1단계](../evaluation/chunking-stages/stage-01-move-chunking-to-search-engine.md))이고, 코드 버전별 숫자는 아래에 둔다: [chunking_versions.md](../evaluation/chunking_versions.md)(표)와 `docs/evaluation/chunking_versions/v<N>.json`(정책값,
 코퍼스 통계, 검색 결과). v0은 파서의 기존 `docs.jsonl`(규칙 74개, 비교 기준), v1은 이 저장소의 이식 청커다.
 
 - 바꾼 뒤: `params.py`의 `CHUNKER_VERSION`을 올리고 `scripts/chunking/run_version.sh <버전> "<요약>" "<무엇을 왜>"`. 번들에서 코퍼스를 만들고

@@ -1,5 +1,8 @@
 # 청킹 버전 기록
 
+청킹 **단계**(한 번의 변경과 측정)는 [성능 이력의 청킹 단계](performance_history.md#청킹-단계)에, 이 문서는 그 안의 코드 **버전**별 숫자를 둔다.
+v0 -> v1이 [청킹 1단계](chunking-stages/stage-01-move-chunking-to-search-engine.md)다.
+
 청커나 정책을 바꿀 때마다 한 줄씩 남긴다. 각 버전의 JSON은 `chunking_versions/v<N>.json`, 만드는 법은
 `scripts/chunking/record_chunking_version.py`. 정답 청크 반환은 서비스 인덱스의 공식 라벨(청크 ID)을 각 청킹의 청크로 옮기고 필수 구절을 담은 청크를 더하는 규칙을 모든 버전에 똑같이 적용해 센 값이고
 (`scripts/chunking/eval_category_chunking.py --reference`; 글이 80% 이상 겹치는 같은 문서의 청크를 같은 근거로 본다; 기준 인덱스에도 같은 규칙), **서비스 컷오프**는 기록 시점의 서비스 설정, 0.95는 이전 기준이다.
