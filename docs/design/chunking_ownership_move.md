@@ -127,8 +127,7 @@ heading 60자 자르기) → `SearchDocument` → 기존 `indexer.py`. `indexer.
 2. `structured.py`, `table_rows.py`, `tables.py`, 후처리(`postprocess.py`) 이식 -- 완료(삭제 20개 뒤 코드, 위 검증 1 통과).
 3. **`structure.json` 읽기**: 계약이 확정되면 원소·논리 표를 `chunk_elements`에 바로 넣는 입구를 만든다. 계약의 `tables[]`는 이미
    논리 표(`logical_tables()` 결과)라서 `chunk_elements`가 표 자료(`tabledata` 모양)뿐 아니라 논리 표도 받게 고쳐야 한다.
-4. "옮김" 22개를 이쪽 정책으로 정리한다(청크 크기·겹침·최소 크기, 표를 통째로 둘지 행으로 나눌지, 제목만 남는 청크, 문답 묶기,
-   행·칸·조문 쌍의 본문 표현, 청크 제목). 지금은 파서 코드를 그대로 가져온 상태다.
+4. "옮김" 22개를 이쪽 정책으로 정리한다 -- 완료(아래 "옮김 22개 정책": 위치와 조절 값을 `ChunkPolicy`로 모음, 값은 그대로).
 5. 색인 연결(`SearchDocument` 생성, 제목 정리, `chunk_index` 번호)과 `Settings`로 파라미터 이동, core 통합.
 6. 일치와 성능이 확인되면 파서가 청킹 경로를 걷어낸다(계약의 구현 순서 6).
 
@@ -143,6 +142,44 @@ heading 60자 자르기) → `SearchDocument` → 기존 `indexer.py`. `indexer.
 6. **문서 메타데이터** -- `documents.jsonl` 한 곳. 청크마다 붙이는 일은 이쪽이 한다.
 7. **전환 기간** -- 이전 전달물(`docs.jsonl`)은 그대로 둔다. 새 경로의 성능을 컷오프 0.95로 재서 같음을 보인 뒤에 바꾼다.
 8. **그림 설명** -- 이쪽에서 생성할 계획이 없으면 파서 출력에서 뺀다. 결정이 필요하다.
+
+## 옮김 22개 정책
+
+파서 규칙 목록(`CHUNKING_RULES.md`)에서 "옮김"으로 분류된 22개는 이제 이 저장소의 정책이다. 코드는 파서 것을 그대로 가져왔고, **정한 것은 소유와
+위치와 조절 방법**이다. 값은 바꾸지 않았다 -- 청크 길이·경계는 검색 품질에 걸리므로 측정 없이 고치지 않는다(컷오프 0.95 기준 비교가 먼저).
+숫자로 정해지는 것은 `ChunkPolicy`(`params.py`)에 모았고 기본값은 파서가 쓰던 값이다. 기본값은 `tests/chunking/test_policy.py`가 고정한다.
+
+| 규칙 | 정책 | 위치 | 조절 값 |
+|---|---|---|---|
+| A1 | 크기를 넘으면 청크를 닫는다. 문단·목록 항목 경계에서만 자른다 | `structured.chunk_elements` | `chunk_size`=800 |
+| A3 | 원소 하나가 크기를 넘으면 글자 수 분할기로 나눈다. 짧은 꼬리는 앞 조각에 | `structured`, `splitter` | `chunk_size`, `chunk_overlap`=100, `min_chunk_chars`=30 |
+| A4 | 크기 이하 표는 표 하나 = 청크 하나, 앞 제목과 같은 청크 | `structured` 표 분기 | `chunk_size` |
+| B1 | 쌓인 것이 제목뿐이면 닫지 않는다 | `structured` | (구조 규칙, 값 없음) |
+| B2 | 본문이 아주 짧으면 다음 청크 앞에 붙인다 | `structured` | `min_chunk_chars` |
+| B3 | 긴 문단을 나눌 때 앞의 제목은 첫 조각 앞에 | `structured` | -- |
+| B4 | 글자 없는 그림·빈 표는 본문이 아니다 | `structured.has_body` | -- |
+| D1 | 물음표로 끝나는 짧은 줄이 3개 이상이면 문답 문서: 질문마다 청크 | `structured._faq_questions` | `question_min`=3, `question_max_chars`=300, `question_path_chars`=80 |
+| E1 | 표 크기는 HTML 태그를 뺀 글자 수로 재고, 크기를 넘고 나눌 수 있을 때만 행으로 | `structured` 표 분기 | `chunk_size` |
+| E3 | 행으로 나누는 표는 앞 제목을 본문에 넣지 않고 `heading_path`로 | `structured` | -- |
+| E7 | 같은 표 안의 나눌 수 없는 조각은 한 청크로 다시 합친다 | `structured` | -- |
+| E10 | 대비표는 크기와 상관없이 조문 쌍 청크로 | `structured` -> `table_rows.comparison_chunks` | -- |
+| E11, H1 | (파서에서 이미 삭제된 목록형 표 묶기) | -- | -- |
+| G1 | 행 하나 = 청크 하나, 본문은 `열이름: 값` 줄, 첫 줄에 `표:`·`단위:` | `table_rows.row_chunks` | -- |
+| G6 | 행이 크기를 넘으면 칸 단위로: 짧은 칸은 머리 줄, 중간 칸은 한 청크, 긴 칸은 글자 수 분할 | `table_rows._cell_pieces` | `row_key_max_chars`=40, `long_cell_ratio`=0.5 |
+| I6 | 조문 없는 짧은 쌍은 다음 쌍 앞에 붙인다 | `table_rows.comparison_chunks` | `carry_max_chars`=40 |
+| I7 | 청크 글 형식: 키 머리 줄 + `현행:` / `개정안:` + 사유 | `table_rows.comparison_chunks` | -- |
+| I8 | 쌍이 크기의 1.5배를 넘으면 현행·개정안을 각각 조각으로 | `table_rows.comparison_chunks` | `pair_oversize_ratio`=1.5 |
+| K4 | 청크 제목 = `문서 제목 — 절 표시` | `postprocess.chunk_title` / `section_label` | `heading_max_chars`=60 |
+| L1 | 분할기 구분자 우선순위(제목 -> `제N조` -> `1.` -> `가.` -> 빈 줄 -> 줄바꿈 -> `. ` -> 공백) | `splitter._KOREAN_LEGAL_SEPARATORS` | -- |
+| L2 | 짧은 조각은 다음 조각과 합친다 | `splitter._merge_tiny_pieces` | `min_chunk_chars` |
+
+- K4는 색인 단계의 규칙이라 파서의 `chunks_to_documents`에서 가져와 `postprocess`에 두었다. 번들 189개의 청크 제목 6,612개 중 6,549개가 파서가 낸
+  제목과 같고, 나머지 63개는 문서 제목에 `(산업통상자원부 공고 제…호)`가 덧붙은 것이다 -- 같은 제목의 문서를 가르는 코퍼스 수준 작업(`pipeline.disambiguate_titles`)이라
+  청킹 규칙이 아니다.
+- **측정 후보**(값을 바꾸려면 컷오프 0.95로 먼저 잴 것): `chunk_size`/`chunk_overlap`, `min_chunk_chars`, `long_cell_ratio`와 `pair_oversize_ratio`(표 청크 길이),
+  `question_min`(문답 문서 판정). 나머지는 값이 아니라 구조 규칙이라 측정으로 정할 대상이 아니다.
+- 파서 #129가 지적한 증상(서식이 행 조각으로 나뉨, 머리글 없이 끊긴 표가 `열1/열2`, 첫 행 일반기준 본문이 머리글 탐지를 막음)은 삭제된 규칙이 막던
+  것이다. 이 저장소가 청킹을 가져가면 이쪽 정책으로 다룰 일이다 -- 지금은 다루지 않았다.
 
 ## 동작 일치 비교 (2026-10-08, 삭제 20개 뒤 파서 코드 기준)
 
@@ -170,4 +207,9 @@ heading 60자 자르기) → `SearchDocument` → 기존 `indexer.py`. `indexer.
 
 ## 이 저장소에서 아직 안 한 것
 
-`structure.json` 읽기(파서가 아직 내지 않는다), "옮김" 22개 정책 정리, 색인 연결, 파라미터 `Settings` 이동, core 통합.
+`structure.json` 읽기(파서가 아직 내지 않는다), 색인 연결(`SearchDocument` 생성, `chunk_index` 번호), 파라미터의 `Settings` 이동, core 통합.
+파서의 통과 판정(`category_gate.py`)이 보던 청킹 결과 검사(30자 미만·제목만 있는 청크, 1,200자 초과, `heading_path` 비율)는 이쪽에서 다시 세워야 한다.
+
+옮긴 테스트: 파서의 청킹 테스트 6개 파일(`test_heading_chunks`, `test_table_cells`, `test_table_rows`, `test_table_feedback`, `test_chunking_structured`,
+`test_amendment_notice`)을 `tests/chunking/`으로 가져왔다. 파서의 직렬화(`table_markdown`)·`legal_structure`·`docs.jsonl` 행 만들기를 검사하던 테스트는
+이 저장소 소관이 아니라 뺐다.

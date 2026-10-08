@@ -61,6 +61,9 @@ from __future__ import annotations
 
 import re
 
+from dataclasses import replace
+
+from search_engine.chunking.params import DEFAULT_POLICY, ChunkPolicy
 from search_engine.chunking.splitter import chunk_markdown
 from search_engine.chunking import patterns
 from search_engine.chunking.table_rows import comparison_chunks, comparison_columns, logical_tables, row_chunks, table_fields
@@ -71,8 +74,8 @@ _PAGE_NUMBER_ONLY = re.compile(r"^\s*(?:[-–—]\s*\d{1,4}\s*[-–—]|\d{1,4}\
 
 
 def chunk_elements(
-    elements: list[dict], *, document_id: str, chunk_size: int = 800, chunk_overlap: int = 100,
-    tables: list[list[dict]] | None = None, min_chunk_chars: int = 30,
+    elements: list[dict], *, document_id: str, chunk_size: int | None = None, chunk_overlap: int | None = None,
+    tables: list[list[dict]] | None = None, min_chunk_chars: int | None = None, policy: ChunkPolicy = DEFAULT_POLICY,
 ) -> list[dict]:
     """Chunk at heading/paragraph/list boundaries while keeping tables atomic.
 
@@ -80,7 +83,12 @@ def chunk_elements(
     Without ``tables`` a table can exceed ``chunk_size``; preserving the whole table takes precedence.
     With ``tables`` (one entry per table element, see ``normalize.element_tables``) an oversized
     table is split into one chunk per data row (module docstring).
+
+    크기·겹침·최소 크기는 ``policy``가 정하고, 개별 인자를 주면 그 값이 정책의 값을 덮어쓴다(기존 호출을 위해).
     """
+    policy = replace(policy, **{name: value for name, value in (
+        ("chunk_size", chunk_size), ("chunk_overlap", chunk_overlap), ("min_chunk_chars", min_chunk_chars)) if value is not None})
+    chunk_size, chunk_overlap, min_chunk_chars = policy.chunk_size, policy.chunk_overlap, policy.min_chunk_chars
     chunks: list[dict] = []
     heading_stack: list[tuple[int, str]] = []
     pending: list[dict] = []
@@ -144,7 +152,7 @@ def chunk_elements(
         return sum(len(render(item)) for item in items) + max(0, len(items) - 1) * 2
 
     last_page = None  # 직전 글자 원소의 쪽(그림 제외) -- 쪽 머리 반복 제목 판단용
-    questions = _faq_questions(elements)
+    questions = _faq_questions(elements, policy)
     for element in elements:
         kind = element["type"]
         new_page = last_page is not None and element.get("page") != last_page
@@ -156,7 +164,7 @@ def chunk_elements(
                 flush()
             while heading_stack and heading_stack[-1][0] >= _QUESTION_LEVEL:
                 heading_stack.pop()
-            heading_stack.append((_QUESTION_LEVEL, " ".join(element["text"].split())[:_QUESTION_PATH_CHARS]))
+            heading_stack.append((_QUESTION_LEVEL, " ".join(element["text"].split())[:policy.question_path_chars]))
             pending.append(element)
             continue
         boundary = (_part_boundary(element) if kind in ("heading", "paragraph")
@@ -240,8 +248,8 @@ def chunk_elements(
                     lead_body = [text for text in lead_texts if text not in table_path]
                     lead_texts = []  # 첫 논리 표에만
                     comparison = not lt.degraded and comparison_columns(lt.columns) is not None
-                    rows = (comparison_chunks(lt, table_id, chunk_size=chunk_size) if comparison  # 대비표: 조문 쌍 청크
-                            else row_chunks(lt, table_id, chunk_size=chunk_size))
+                    rows = (comparison_chunks(lt, table_id, chunk_size=chunk_size, policy=policy) if comparison  # 대비표: 조문 쌍 청크
+                            else row_chunks(lt, table_id, chunk_size=chunk_size, policy=policy))
                     # 같은 표 노드 안의 작은 조각(데이터 한 행 등)은 행을 나누지 않고 한 청크로 둔다.
                     if not comparison and not lt.splittable and rows and not lt.has_oversized_row(chunk_size):
                         rows = [{**rows[0], "text": "\n\n".join(r["text"] for r in rows),
@@ -298,15 +306,12 @@ def chunk_elements(
     return _drop_repeated_headers(chunks, document_id)
 
 
-# FAQ 질문 줄: 물음표로 끝나는 짧은 문단·목록 항목. 문서에 `_QUESTION_MIN`개 이상 있으면 문답 문서로 보고 질문마다 청크를 연다
+# FAQ 질문 줄: 물음표로 끝나는 짧은 문단·목록 항목. 문서에 `policy.question_min`개 이상 있으면 문답 문서로 보고 질문마다 청크를 연다
 # (실측: CP 설명회 주요 질의응답 -- `☐ (포괄허가) …?` 다음 답 `- …`가 청크 경계에서 질문과 갈렸다).
 _QUESTION = re.compile(r"[?？]\s*$")
-_QUESTION_MIN = 3
 _SENTENCE_DONE = re.compile(r"[.?!？。]\s*$|다\s*$")
 _ITEM_START = re.compile(r"^\s*(?:[☐□ㅇ○●◦•·※\-–—*]|Q\s*\d|\d+[.)]|[가-힣][.)]|[(（][^)）]{1,12}[)）])")
-_QUESTION_MAX_CHARS = 300
 _QUESTION_LEVEL = 99            # 질문은 열린 제목들 아래 가장 깊은 단계
-_QUESTION_PATH_CHARS = 80
 
 
 # 부속 경계(본칙 뒤에 붙는 부분의 표지). 이 줄이 나오면 그때까지 열린 장·조 경로를 닫는다 -- 닫지 않으면 마지막 부칙
@@ -354,19 +359,19 @@ def _part_boundary(element: dict) -> str | None:
     return None
 
 
-def _faq_questions(elements: list[dict]) -> set[int]:
+def _faq_questions(elements: list[dict], policy: ChunkPolicy) -> set[int]:
     """질문이 시작하는 원소들. 질문이 두 줄로 갈려 물음표 줄이 이어짐이면(앞 원소가 문장으로 끝나지 않았고 물음표 줄이 기호로
     시작하지 않음) 앞 원소가 질문의 시작이다 -- 물음표 줄에서 청크를 열면 질문 앞부분이 앞 청크에 남는다."""
     openers = []
     for i, e in enumerate(elements):
         text = e.get("text", "")
-        if not (e["type"] in ("paragraph", "list_item") and len(text) <= _QUESTION_MAX_CHARS and _QUESTION.search(text)):
+        if not (e["type"] in ("paragraph", "list_item") and len(text) <= policy.question_max_chars and _QUESTION.search(text)):
             continue
         prev = elements[i - 1] if i else None
         continued = (prev is not None and prev["type"] in ("paragraph", "list_item")
                      and not _SENTENCE_DONE.search(prev.get("text", "")) and not _ITEM_START.match(text))
         openers.append(prev if continued else e)
-    return {id(e) for e in openers} if len(openers) >= _QUESTION_MIN else set()
+    return {id(e) for e in openers} if len(openers) >= policy.question_min else set()
 
 
 def _drop_repeated_headers(chunks: list[dict], document_id: str) -> list[dict]:

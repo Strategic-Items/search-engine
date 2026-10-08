@@ -22,6 +22,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from search_engine.chunking.params import DEFAULT_POLICY, ChunkPolicy
+
 _HEADER_CELL_MAX_CHARS = 20
 _CAPTION_MAX_CHARS = 100
 # 번호·항목 표지로 시작하는 글(`1.`, `가.`, `1)`, `가)`, `(1)`, `예)`, `(예외)`, `*`, `※`) -- 표 제목·본문 행이 아니라 데이터 행
@@ -208,7 +210,8 @@ def _named_lines(pairs: list[tuple[str, str]]) -> list[str]:
     return [f"{name}: {' > '.join(values)}" for name, values in merged]
 
 
-def row_chunks(table: LogicalTable, table_id: str, *, chunk_size: int | None = None) -> list[dict]:
+def row_chunks(table: LogicalTable, table_id: str, *, chunk_size: int | None = None,
+               policy: ChunkPolicy = DEFAULT_POLICY) -> list[dict]:
     """데이터 행마다 `열이름: 값` 본문 + 행 메타데이터. 값이 하나도 없는 행은 건너뛴다.
 
     `chunk_size`를 주면 그보다 긴 행은 칸 단위로 나눈다(`_cell_pieces`): 칸 안의 글이 문서 한 편이면(대비표의 현행·개정안
@@ -229,7 +232,7 @@ def row_chunks(table: LogicalTable, table_id: str, *, chunk_size: int | None = N
         if not lines:
             continue
         if chunk_size and not table.degraded and len("\n".join(prefix + lines)) > chunk_size:
-            out.extend(_cell_pieces(table, index, values, prefix, base, table_id, chunk_size))
+            out.extend(_cell_pieces(table, index, values, prefix, base, table_id, chunk_size, policy))
             continue
         # 행 칸이 조문으로 시작하면(대비표의 한 행 = 조문 한 쌍) 그 조문 표제를 경로로 -- 칸 조각과 같은 규칙(`_cell_sections`)
         own = [] if table.degraded else [v for c, v in enumerate(values) if c not in spill and v.strip()]
@@ -249,14 +252,13 @@ def row_chunks(table: LogicalTable, table_id: str, *, chunk_size: int | None = N
 
 # 행의 식별자로 볼 짧은 칸(통제번호·조문 번호·구분 등). 긴 칸을 나눈 조각마다 머리 줄로 붙여, 조각 하나만 검색돼도 어느
 # 행인지 알게 한다. 이보다 긴 짧은 칸(비고 등)은 조각에 반복하지 않고 따로 한 청크로 둔다.
-_ROW_KEY_MAX_CHARS = 40
 
 
 def _cell_pieces(table: LogicalTable, index: int, values: list[str], prefix: list[str], base: dict, table_id: str,
-                 chunk_size: int) -> list[dict]:
+                 chunk_size: int, policy: ChunkPolicy) -> list[dict]:
     """청크 크기를 넘는 행: 긴 칸은 칸 안의 글을 문서처럼 그 구조(조문 -> 번호 -> 문단)로 나눈다.
 
-    - 행의 식별자 칸(`_ROW_KEY_MAX_CHARS` 이하, 통제번호 `ML1` 등)은 조각마다 머리 줄로 붙는다 -- 따로 두면 `통제번호: ML1`만
+    - 행의 식별자 칸(`policy.row_key_max_chars` 이하, 통제번호 `ML1` 등)은 조각마다 머리 줄로 붙는다 -- 따로 두면 `통제번호: ML1`만
       든 몇 글자짜리 청크가 생기고, 조각은 어느 행인지 모른다.
     - 그 밖의 짧은 칸(비고 등)은 한 청크로 모은다.
     조각마다 어느 표의 어느 행·열인지(`row_id`, `column`)와 칸 안 순서(`piece_index`/`piece_count`)를 남긴다. 행 전체 값
@@ -270,9 +272,9 @@ def _cell_pieces(table: LogicalTable, index: int, values: list[str], prefix: lis
     spill = table.spill[index] if index < len(table.spill) else set()
     cells = [(name, value.strip()) for c, (name, value) in enumerate(zip(table.columns, values))
              if value.strip() and c not in spill]
-    long_limit = chunk_size // 2  # 한 칸이 청크 절반을 넘으면 그 칸을 따로 나눈다
-    keys = [f"{n}: {' '.join(v.split())}" for n, v in cells if len(v) <= _ROW_KEY_MAX_CHARS]
-    others = [f"{n}: {' '.join(v.split())}" for n, v in cells if _ROW_KEY_MAX_CHARS < len(v) <= long_limit]
+    long_limit = int(chunk_size * policy.long_cell_ratio)  # 한 칸이 청크 절반을 넘으면 그 칸을 따로 나눈다
+    keys = [f"{n}: {' '.join(v.split())}" for n, v in cells if len(v) <= policy.row_key_max_chars]
+    others = [f"{n}: {' '.join(v.split())}" for n, v in cells if policy.row_key_max_chars < len(v) <= long_limit]
     row = {"page_start": table.row_pages[index], "page_end": table.row_pages[index], **base,
            "row_id": f"{table_id}#row{index}", "row_index": index}
     out = []
@@ -282,8 +284,8 @@ def _cell_pieces(table: LogicalTable, index: int, values: list[str], prefix: lis
         if len(value) <= long_limit:
             continue
         head = prefix + keys + [f"{name}:"]
-        budget = max(chunk_size - len("\n".join(head)) - 1, chunk_size // 2)
-        pieces = [piece.text for piece in chunk_markdown(value, budget, 0, min_chunk_chars=30)]
+        budget = max(chunk_size - len("\n".join(head)) - 1, long_limit)
+        pieces = [piece.text for piece in chunk_markdown(value, budget, 0, min_chunk_chars=policy.min_chunk_chars)]
         for k, (piece, section) in enumerate(zip(pieces, _cell_sections(pieces))):
             extra = {"section_path": section} if section else {}
             out.append({**row, "text": "\n".join(head + [piece]), "column": name,
@@ -365,7 +367,6 @@ _REASON_COLUMN = re.compile(r"사\s*유|비\s*고")
 _REVISED_COLUMN = re.compile(r"개\s*정")
 # 개정안 칸의 "현행과 같음" 표시: 바뀌지 않은 글자 자리를 줄표로 채운다(`① -------- 제21조에 따른 …`). 내용이 아니라 표시라
 # 줄표 덩어리를 말줄임 하나로 줄인다(원문의 "같음" 뜻은 남는다). 쪽 번호(`- 1 -`)처럼 줄표가 두 개 이하인 것은 건드리지 않는다.
-_CARRY_MAX_CHARS = 40  # 이보다 짧은 조문 없는 쌍은 단독 청크로 두지 않는다(`comparison_chunks`)
 _SAME_AS_CURRENT = re.compile(r"[-‐－–—](?:\s*[-‐－–—]){2,}")
 
 
@@ -469,7 +470,8 @@ def _continued_rows(table: LogicalTable, cur_col: int, rev_col: int):
     return [tuple(m) for m in merged]
 
 
-def comparison_chunks(table: LogicalTable, table_id: str, *, chunk_size: int) -> list[dict]:
+def comparison_chunks(table: LogicalTable, table_id: str, *, chunk_size: int,
+                      policy: ChunkPolicy = DEFAULT_POLICY) -> list[dict]:
     """대비표 -> 조문 쌍 청크. 청크 글은 `현행 열 이름:` / `개정안 열 이름:` 두 단락(+ 조문 쌍이 하나뿐인 행은 사유). 줄표 표시는
     `…`로 줄인다. 쌍 하나가 청크 크기의 1.5배를 넘으면 현행·개정안을 각각 조각으로 나누되 조문 경로는 유지한다.
     조문 쌍이 여럿인 행의 사유·비고 칸은 조문에 맞출 수 없어 따로 한 청크로 둔다."""
@@ -488,7 +490,7 @@ def comparison_chunks(table: LogicalTable, table_id: str, *, chunk_size: int) ->
         # 행 식별 칸(통제번호 등)이 있는 행은 짧아도 다음 쌍에 붙이지 않는다 -- 붙이면 그 행의 키가 사라진다
         row_keyed = any(cell(i) for i in range(len(table.columns)) if i not in (cur_col, rev_col, reason_col))
         for key, cur, rev in pairs:
-            if key is None and not row_keyed and len(cur) + len(rev) < _CARRY_MAX_CHARS:
+            if key is None and not row_keyed and len(cur) + len(rev) < policy.carry_max_chars:
                 carry = (f"{carry[0]}\n{cur}".strip(), f"{carry[1]}\n{rev}".strip())
                 continue
             if any(carry):
@@ -511,15 +513,15 @@ def comparison_chunks(table: LogicalTable, table_id: str, *, chunk_size: int) ->
             section = _cell_sections([cur or rev])[0] if key else []
             extra = {"article": key, **({"section_path": section} if section else {})}
             text = "\n".join(texts)
-            if len(text) <= chunk_size * 1.5:
+            if len(text) <= chunk_size * policy.pair_oversize_ratio:
                 out.append({**row, "text": text, "column": f"{cur_name}+{rev_name}", **extra})
                 continue
             for name, side in ((cur_name, cur), (rev_name, rev)):
                 if not side.strip():
                     continue
                 head = prefix + heads + [f"{name}:"]  # 조각에도 행 식별 칸(통제번호 등)을 -- 없으면 어느 품목인지 모른다
-                budget = max(chunk_size - len("\n".join(head)) - 1, chunk_size // 2)
-                pieces = [p.text for p in chunk_markdown(side, budget, 0, min_chunk_chars=30)]
+                budget = max(chunk_size - len("\n".join(head)) - 1, policy.long_cell_chars)
+                pieces = [p.text for p in chunk_markdown(side, budget, 0, min_chunk_chars=policy.min_chunk_chars)]
                 for k, piece in enumerate(pieces):
                     out.append({**row, "text": "\n".join(head + [piece]), "column": name,
                                 "piece_index": k, "piece_count": len(pieces), **extra})

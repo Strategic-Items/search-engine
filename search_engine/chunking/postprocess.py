@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import re
 
+from search_engine.chunking.params import DEFAULT_POLICY, ChunkPolicy
+
 _PAGE_MARKER_LINE = re.compile(r"^\s*<!--\s*page:\s*\d+\s*-->\s*$", re.MULTILINE)
 _IMAGE_PLACEHOLDER_LINE = re.compile(r"^\s*!\[page \d+ image\]\(#page-\d+\)\s*$", re.MULTILINE)
 # `chunk_elements()`가 셀 텍스트 없는 표 자리에 넣는 대체 문구. 색인할 내용이 아니다.
@@ -79,3 +81,28 @@ def merge_table_scaffolds(chunks: list[dict]) -> list[dict]:
         merged.append({**_absorb_structure(chunk, before=list(leading)), "text": text})
         leading.clear()
     return merged
+
+
+# K4 청크 제목 = `문서 제목 — 절 표시`. 제목은 검색에서 본문의 3배로 가중되고 임베딩 입력에도 들어가므로, 청크마다 다른 제목이 필요하되
+# 조문 본문이 통째로 딸려오면 안 된다: 조 번호와 괄호 표제까지만 남긴다.
+_CLAUSE_LABEL = re.compile(r"^제\d+조(?:의\d+)?\s*(?:\([^)]{0,60}\))?")
+TITLE_SEPARATOR = " — "
+
+
+def section_label(heading: str, policy: ChunkPolicy = DEFAULT_POLICY) -> str:
+    """청크 제목에 덧붙일 만한 길이의 절 표시로 줄인다."""
+    heading = heading.strip("#* \t")
+    clause = _CLAUSE_LABEL.match(heading)
+    if clause and clause.group(0).strip():
+        return clause.group(0).strip()
+    if len(heading) <= policy.heading_max_chars:
+        return heading
+    return heading[:policy.heading_max_chars].rsplit(" ", 1)[0].rstrip(" ,.·") + "…"
+
+
+def chunk_title(document_title: str, heading: str, policy: ChunkPolicy = DEFAULT_POLICY) -> str:
+    """청크 제목. 문서 제목에 이미 든 표제는 다시 붙이지 않는다(`[별표 4] 통제번호의 … — 통제번호의 …`)."""
+    label = section_label(heading, policy)
+    if label and "".join(label.split()) in "".join(document_title.split()):
+        label = ""
+    return f"{document_title}{TITLE_SEPARATOR}{label}" if label else document_title
