@@ -1,0 +1,84 @@
+{
+ "version": 0,
+ "label": "파서 청킹 규칙 74개 (#129 이전) — 기존 docs.jsonl",
+ "notes": "비교 기준. 파서(unstructured-doc-parser_ver2)가 원소·표 자료에서 만든 기존 `docs.jsonl`(법령 150문서, 행정 20문서). 이 저장소의 코드가 아니라서 정책은 파서 상수값이다. 코퍼스는 파서 저장소 `data/category_chunks`의 당시 파일이고 인덱스는 같은 인덱서·모델(dense: bge-m3-ko + 제목 경로, SPLADE 설정 C)로 따로 만들었다. 서비스 `search-law`/`search-admin`은 이 파일로 만든 것이 아니다(청크 수가 다르다).",
+ "date": "2026-10-08",
+ "search_engine_commit": "ee1d8cd",
+ "dirty": false,
+ "parser_commit": "9224772",
+ "policy": {
+  "chunk_size": 800,
+  "chunk_overlap": 100,
+  "min_chunk_chars": 30,
+  "note": "파서 규칙 74개 전부 적용"
+ },
+ "parity": "",
+ "corpus": {
+  "law": {
+   "documents": 150,
+   "chunks": 6272,
+   "chars_mean": 300.2,
+   "chars_median": 206.0,
+   "chars_max": 4358,
+   "under_30_chars": 117,
+   "text_over_1200": 0,
+   "table_chunks": 3682,
+   "row_chunks": 3503,
+   "text_without_heading_path": 21
+  },
+  "admin": {
+   "documents": 20,
+   "chunks": 152,
+   "chars_mean": 554.4,
+   "chars_median": 268.0,
+   "chars_max": 5196,
+   "under_30_chars": 3,
+   "text_over_1200": 0,
+   "table_chunks": 79,
+   "row_chunks": 25,
+   "text_without_heading_path": 1
+  }
+ },
+ "search": {
+  "law": {
+   "alias": "exp-chk-law-old",
+   "questions": 149,
+   "gold_lost": 2,
+   "cutoffs": {
+    "service": {
+     "evidence": 138,
+     "doc_hit": 147,
+     "phrase": 138,
+     "avg_returned": 8.0
+    },
+    "0.95": {
+     "evidence": 135,
+     "doc_hit": 145,
+     "phrase": 136,
+     "avg_returned": 3.56
+    }
+   },
+   "service_cutoff": 0.7
+  },
+  "admin": {
+   "alias": "exp-chk-admin-old",
+   "questions": 30,
+   "gold_lost": 0,
+   "cutoffs": {
+    "service": {
+     "evidence": 30,
+     "doc_hit": 30,
+     "phrase": 30,
+     "avg_returned": 9.33
+    },
+    "0.95": {
+     "evidence": 27,
+     "doc_hit": 30,
+     "phrase": 27,
+     "avg_returned": 3.53
+    }
+   },
+   "service_cutoff": 0.7
+  }
+ }
+}

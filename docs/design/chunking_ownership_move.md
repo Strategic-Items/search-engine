@@ -205,6 +205,18 @@ heading 60자 자르기) → `SearchDocument` → 기존 `indexer.py`. `indexer.
 - 이 네 가지는 계약의 `structure.json`(원소 `type`/`skip`, 논리 표 `rows`/`header_detected`)이 싣는 정보와 겹친다. 그래서 번들 마크다운을
   다시 만드는 대신 구조 파일을 받는 쪽으로 간다.
 
+## 버전 기록과 실험 방법
+
+청킹은 계속 바꾸고 재므로 버전마다 남긴다: [chunking_versions.md](../evaluation/chunking_versions.md)(표)와 `docs/evaluation/chunking_versions/v<N>.json`(정책값,
+코퍼스 통계, 검색 결과). v0은 파서의 기존 `docs.jsonl`(규칙 74개, 비교 기준), v1은 이 저장소의 이식 청커다.
+
+- 바꾼 뒤: `params.py`의 `CHUNKER_VERSION`을 올리고 `scripts/chunking/run_version.sh <버전> "<요약>" "<무엇을 왜>"`. 번들에서 코퍼스를 만들고
+  (`build_corpus_from_bundles.py`), 서비스 별칭과 따로 `exp-chk-{law,admin}-v<N>` 인덱스에 색인하고, v0 인덱스(`exp-chk-*-old`)와 같은 질문으로
+  비교하고(`eval_category_chunking.py`), 기록(`record_chunking_version.py`)까지 한다.
+- 평가는 서비스 검색 경로(hybrid, 청크 RRF)와 서비스 컷오프를 쓰고 0.95도 함께 낸다. 정답 청크는 청킹이 바뀌면 ID가 달라지므로 필수 구절로 인덱스마다
+  다시 정한다 -- 라벨이 청크에서 사라진 질문 수를 같이 본다. 이 재정의는 공식 라벨과 완전히 같지 않다(법령 150문항 중 124문항이 같고, 나머지는 대부분
+  구절 기준이 더 엄격하다). 그래서 **버전끼리 같은 규칙으로 잰 상대 비교**로만 읽는다. 라벨과 무관한 "필수 구절 반환"을 같이 낸다.
+
 ## 이 저장소에서 아직 안 한 것
 
 `structure.json` 읽기(파서가 아직 내지 않는다), 색인 연결(`SearchDocument` 생성, `chunk_index` 번호), 파라미터의 `Settings` 이동, core 통합.

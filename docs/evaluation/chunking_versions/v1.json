@@ -1,0 +1,91 @@
+{
+ "version": 1,
+ "label": "검색엔진 이식 청커 — 파서 #129 규칙 20개 삭제 뒤, 번들 마크다운 입력",
+ "notes": "파서 청커를 `search_engine/chunking`으로 이식(삭제 20개 반영, `ChunkPolicy` 기본값 = 파서 값). 입력은 번들 `text.markdown`에서 되살린 원소·표다. 같은 코드를 파서의 원래 원소·표 자료에 쓰면 파서 슬림판 청크와 189문서 모두 같고(slim 팔), 마크다운 입력은 PDF 13문서가 어긋난다. 검색 결과는 slim 팔과 합계가 같다(법령 135/149, 행정 30/30; 6개 질문은 세부가 다르다). v0 대비 법령은 놓친 질문이 늘었다: 033·125·130·142·143(별표·표 서식 질문 — 파서 #129가 예고한 증상: 과태료 별표 행 조각, 서식 행 조각화). 반대로 058·145가 새로 반환됐다. 142·143은 필수 구절이 한 청크에 더는 모이지 않아 정답 라벨이 청크에서 사라졌다.",
+ "date": "2026-10-08",
+ "search_engine_commit": "ee1d8cd",
+ "dirty": false,
+ "parser_commit": "def6caf",
+ "policy": {
+  "chunk_size": 800,
+  "chunk_overlap": 100,
+  "min_chunk_chars": 30,
+  "question_min": 3,
+  "question_max_chars": 300,
+  "question_path_chars": 80,
+  "row_key_max_chars": 40,
+  "long_cell_ratio": 0.5,
+  "pair_oversize_ratio": 1.5,
+  "carry_max_chars": 40,
+  "heading_max_chars": 60
+ },
+ "parity": "원래 원소·표 자료 -> 189/189 일치, 번들 마크다운 -> 176/189 (PDF 28 중 13 어긋남)",
+ "corpus": {
+  "law": {
+   "documents": 150,
+   "chunks": 6503,
+   "chars_mean": 289.4,
+   "chars_median": 192,
+   "chars_max": 4358,
+   "under_30_chars": 170,
+   "text_over_1200": 0,
+   "table_chunks": 3908,
+   "row_chunks": 3766,
+   "text_without_heading_path": 39
+  },
+  "admin": {
+   "documents": 20,
+   "chunks": 183,
+   "chars_mean": 464.5,
+   "chars_median": 154,
+   "chars_max": 5196,
+   "under_30_chars": 12,
+   "text_over_1200": 0,
+   "table_chunks": 108,
+   "row_chunks": 56,
+   "text_without_heading_path": 2
+  }
+ },
+ "search": {
+  "law": {
+   "alias": "exp-chk-law-port",
+   "questions": 149,
+   "gold_lost": 4,
+   "cutoffs": {
+    "service": {
+     "evidence": 135,
+     "doc_hit": 146,
+     "phrase": 136,
+     "avg_returned": 7.86
+    },
+    "0.95": {
+     "evidence": 132,
+     "doc_hit": 145,
+     "phrase": 134,
+     "avg_returned": 3.5
+    }
+   },
+   "service_cutoff": 0.7
+  },
+  "admin": {
+   "alias": "exp-chk-admin-port",
+   "questions": 30,
+   "gold_lost": 0,
+   "cutoffs": {
+    "service": {
+     "evidence": 30,
+     "doc_hit": 30,
+     "phrase": 30,
+     "avg_returned": 9.27
+    },
+    "0.95": {
+     "evidence": 27,
+     "doc_hit": 30,
+     "phrase": 27,
+     "avg_returned": 3.5
+    }
+   },
+   "service_cutoff": 0.7
+  }
+ }
+}
