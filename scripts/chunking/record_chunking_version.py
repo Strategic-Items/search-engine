@@ -71,8 +71,8 @@ def eval_metrics(path: Path, arm: str) -> dict:
 def render(records: list[dict]) -> str:
     lines = ["# 청킹 버전 기록", "",
              "청커나 정책을 바꿀 때마다 한 줄씩 남긴다. 각 버전의 JSON은 `chunking_versions/v<N>.json`, 만드는 법은",
-             "`scripts/chunking/record_chunking_version.py`. 정답 청크 반환은 서비스 인덱스의 공식 라벨(청크 ID)을 각 청킹의 청크로 옮겨 센 값이고",
-             "(`scripts/chunking/eval_category_chunking.py --reference`; 글이 80% 이상 겹치는 같은 문서의 청크를 같은 근거로 본다), **서비스 컷오프**는 기록 시점의 서비스 설정, 0.95는 이전 기준이다.",
+             "`scripts/chunking/record_chunking_version.py`. 정답 청크 반환은 서비스 인덱스의 공식 라벨(청크 ID)을 각 청킹의 청크로 옮기고 필수 구절을 담은 청크를 더하는 규칙을 모든 버전에 똑같이 적용해 센 값이고",
+             "(`scripts/chunking/eval_category_chunking.py --reference`; 글이 80% 이상 겹치는 같은 문서의 청크를 같은 근거로 본다; 기준 인덱스에도 같은 규칙), **서비스 컷오프**는 기록 시점의 서비스 설정, 0.95는 이전 기준이다.",
              "법령 150문항 중 평가 대상 149문항(정답 근거가 불완전한 053 제외) 기준이고 149는 질문 수다.", "",
              "| 버전 | 날짜 | 요약 | 법령 청크 | 법령 정답 청크 반환 (서비스 / 0.95) |",
              "|---|---|---|---:|---|"]

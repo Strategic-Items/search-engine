@@ -88,6 +88,19 @@ def transfer_gold(question: dict, reference: dict[str, dict], chunks: list[dict]
     return groups
 
 
+def label_groups(question: dict, reference: dict[str, dict], chunks: list[dict], rules: dict) -> list[list[str]]:
+    """모든 청킹에 같은 규칙으로 정답 청크를 정한다(기준 인덱스에도 똑같이 적용해 버전 사이에 라벨 방식 차이가 없게 한다).
+
+    그룹마다 (1) 공식 정답 청크와 글이 겹치는 같은 문서의 청크(`transfer_gold`) 또는 (2) 정답 문서의 청크 중 그 그룹의 필수 구절을
+    모두 담고 검토된 범위 제약을 통과한 청크(`derive_gold`)를 정답으로 센다. 어느 청킹에서도 그룹이 비면 라벨을 잃은 질문이다.
+    """
+    moved = transfer_gold(question, reference, chunks)
+    derived = derive_gold(question, chunks, rules)
+    if len(derived) != len(moved):  # 구절 정보로 그룹을 맞출 수 없으면 옮긴 것만
+        return moved
+    return [sorted(set(a) | set(b)) for a, b in zip(moved, derived)]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--queries", type=Path, required=True)
@@ -125,12 +138,7 @@ def main() -> int:
         body_norm = {c["id"]: norm(c["body"]) for c in chunks}
         per_question = {}
         for q in questions:
-            if reference is None:
-                groups = derive_gold(q, chunks, rules)
-            elif alias == ref_alias:
-                groups = [list(g) for g in q["evidence_groups"]]  # 공식 라벨 그대로
-            else:
-                groups = transfer_gold(q, reference, chunks)
+            groups = derive_gold(q, chunks, rules) if reference is None else label_groups(q, reference, chunks, rules)
             entry = {"gold_groups": [len(g) for g in groups], "gold_lost": any(not g for g in groups) or not groups}
             for label, ratio in ratios.items():
                 hits = retrieval.retrieve(client, alias, q["query"], as_of, 5, Frozen(), mode="hybrid", lexical="splade",
