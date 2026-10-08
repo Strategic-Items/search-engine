@@ -1,15 +1,16 @@
-# 이식 원본: unstructured-doc-parser_ver2 src/docparser/chunking/table_rows.py -- 동작 일치를 확인하는 동안 본문은 그대로 두고 import만 바꿨다.
+# 이식 원본: unstructured-doc-parser_ver2 src/docparser/chunking/table_rows.py (def6caf, 규칙 20개 삭제 뒤) -- 본문은 그대로 두고 import만 바꿨다.
 """표 자료(`tabledata`) -> 행 청크용 논리 표.
 
-`tabledata`의 격자는 PDF에 그려진 선을 따른 것이라 그대로 행 청크를 만들면 세 가지가 어긋난다(2026-09-29 코퍼스 실측,
+`tabledata`의 격자는 PDF에 그려진 선을 따른 것이라 그대로 행 청크를 만들면 두 가지가 어긋난다(2026-09-29 코퍼스 실측,
 행으로 나눈 표 164개 중 열 이름이 하나도 없던 표 45개를 원인별로 나눴다):
 
 1. **표 제목이 격자 첫 행에 들어간다** -- `<표 2> 수출지역의 ...`이 가로 병합으로 여러 칸을 채운 행. 머리글로도 데이터로도
    쓰면 안 된다. 떼어서 `caption`으로 둔다.
 2. **가로 병합된 머리글이 머리글로 인식되지 않는다** -- `tabledata`는 병합 칸의 글자를 칸마다 채워 주므로(`fill_merged`)
    `특례 | 특례 | 특례 | 등급 | 등급`처럼 같은 값이 이어진다. 머리글 판정에서 이어진 같은 값은 한 칸으로 본다.
-3. **표 여러 개가 격자 하나로 붙는다** -- 같은 모양 표를 위아래로 붙여 그린 페이지(`【불화수소】` 표, `【레지스트】` 표 ...)에서
-   두 번째 표의 머리글이 데이터 행처럼 나온다. 머리글이 다시 나오는 곳에서 표를 나눈다.
+
+표 종류를 가르던 판정(빈 서식·목록 같은 표·목록형 표), 표 첫 행 본문 분리, 붙은 표 나누기, 앞 행 키 물려받기는 특정 문서에서
+나온 규칙이라 2026-10-08에 걷어냈다(`CHUNKING_RULES.md`). 여기 남은 것은 표 구조(제목·머리글·열 이름·단위·병합)를 읽는 일이다.
 
 머리글은 배경색 감지(`tabledata.header_rows`)가 있으면 그걸 쓰고, 없으면 생김새로 짐작한다(`_header_like`). 숫자 칸·긴 칸이
 있는 행은 데이터로 본다. 짐작이 틀려 데이터 행을 머리글로 쓰면 그 행 청크 하나가 빠지고 열 이름이 이상해진다 -- 대신 값과
@@ -22,15 +23,9 @@ import re
 from dataclasses import dataclass, field
 
 _HEADER_CELL_MAX_CHARS = 20
-_BLANK_FORM_ROW_RATIO = 0.6
-_BLANK_FORM_LABEL_MAX_CHARS = 60
-_FORM_GRID_MIN_COLS = 8     # 서식 격자로 볼 최소 열 수(머리글 없는 넓은 격자)
-_FORM_ROW_MAX_VALUES = 3    # 서식 행의 서로 다른 값 수 상한(구역·칸 이름·안내)
 _CAPTION_MAX_CHARS = 100
-_LISTLIKE_ROW_RATIO = 0.8  # 값이 하나뿐인 행이 이 비율 이상이면 목록 같은 표(`LogicalTable.listlike`)
 # 번호·항목 표지로 시작하는 글(`1.`, `가.`, `1)`, `가)`, `(1)`, `예)`, `(예외)`, `*`, `※`) -- 표 제목·본문 행이 아니라 데이터 행
 _LIST_MARKER = re.compile(r"^\s*(?:\d{1,2}\s*[.)]|[가-하]\s*[.)]|\(\d{1,2}\)|\([가-하]\)|예\)|\(예외\)|[*※])")
-_OUTLINE_MIN_SINGLE = 0.3   # 목록형 표: 값이 하나뿐인 행(구역·항목 줄)이 이 비율 이상
 _NUMERIC_CELL = re.compile(r"^[\d\s.,:/\-~%()]+$")
 
 
@@ -41,69 +36,13 @@ class LogicalTable:
     row_pages: list[int]
     spill: list[set[int]] = field(default_factory=list)  # 행마다 가로 병합으로 채워진 칸(본문에 한 번만 쓴다)
     caption: str = ""
-    preamble: str = ""                  # 표 첫 행 전체를 차지한 긴 글(별표의 일반기준 등) -- 행 청크 앞에 따로 둔다
     degraded: bool = False
     unit: str = ""                      # 표 위 글의 `(단위: 만원)` -- 행 청크마다 싣는다(숫자만 든 행이 무슨 단위인지 알 수 있게)
-    hard_breaks: bool = False           # 칸 안 줄바꿈이 문단 경계인 표(HWP) -- 행 청크에서 줄을 구분해 남긴다
 
     @property
     def splittable(self) -> bool:
-        """행으로 나눌 수 있는 표: 격자가 있고 데이터 행이 둘 이상이며 빈 서식이 아님."""
-        return not self.degraded and len(self.rows) >= 2 and not self.blank_form
-
-    @property
-    def blank_form(self) -> bool:
-        """빈 서식(입력란 표): 행 대부분이 칸 이름 하나만 있고 값 칸은 비어 있다(`NAME OF FIRM | `, `ADDRESS | `).
-
-        행으로 나누면 `① END-USER: ADDRESS` 같은 내용 없는 조각이 행마다 생긴다(2026-10-02, 일부개정고시안 붙임 최종사용자
-        서약서 18행 x 2). 서식은 통째로 읽는 단위라 한 청크로 둔다. 판정: 가로 병합으로 채워진 칸을 빼고 서로 다른 값이 하나뿐이고
-        그 값이 짧은 행이 `_BLANK_FORM_ROW_RATIO` 이상.
-        """
-        if self.degraded or len(self.rows) < 3 or len(self.columns) < 2:
-            return False
-        if any(sum(len(v) for v in row) > 800 for row in self._own_cells()):
-            return False  # 칸에 문서 한 편이 든 표(대비표)는 서식이 아니다
-        filled = label_only = 0
-        for index, row in enumerate(self.rows):
-            spill = self.spill[index] if index < len(self.spill) else set()
-            values = {" ".join(v.split()) for c, v in enumerate(row) if v.strip() and c not in spill}
-            if not values:
-                continue  # 빈 행은 세지 않는다
-            filled += 1
-            label_only += len(values) == 1 and len(next(iter(values))) <= _BLANK_FORM_LABEL_MAX_CHARS
-        if filled >= 3 and label_only >= _BLANK_FORM_ROW_RATIO * filled:
-            return True
-        # 칸이 많은 신청서: 행마다 "구역 이름 | 칸 이름 | (빈 입력칸) …"이라 값이 여럿이다. 입력칸은 병합 칸이라 빈칸 수로는 안 보인다.
-        # 머리글이 없고(열 이름이 기본값) 격자가 넓은데(`_FORM_GRID_MIN_COLS` 열 이상) 행마다 서로 다른 짧은 값이 몇 개뿐이면 서식이다
-        # (실측: 반출승인 신청서 30열 격자, 행마다 값 2~3개. 넓은 데이터 표는 행마다 값이 열 수만큼 있다).
-        if not all(re.fullmatch(r"열\d+", c) for c in self.columns) or len(self.columns) < _FORM_GRID_MIN_COLS:
-            return False
-        sparse = 0
-        for row in self._own_cells():
-            values = {" ".join(v.split()) for v in row if v.strip()}
-            sparse += bool(values) and len(values) <= _FORM_ROW_MAX_VALUES and all(len(v) <= _BLANK_FORM_LABEL_MAX_CHARS for v in values)
-        return filled >= 3 and sparse >= _BLANK_FORM_ROW_RATIO * filled
-
-    @property
-    def listlike(self) -> bool:
-        """행마다 값이 하나뿐인 표(한 열 표, 서식의 체크 항목 a~e): 데이터 표가 아니라 목록이다. 행마다 청크로 나누면 항목 하나씩
-        떨어져 맥락을 잃는다(실측: 별지 제2호 최종사용자 서약서 a~e가 청크 5개 -- 검색 076). 열 이름이 기본값(`열N`)일 때만."""
-        if self.degraded or len(self.rows) < 3 or not all(re.fullmatch(r"열\d+", c) for c in self.columns):
-            return False
-        # 서식 격자는 가로 병합 칸이 대부분이고 몇 행만 칸이 둘(`① Ultimate Consignee | ② Exporter`) -- 행 대부분이 값 하나면 목록
-        filled = [{" ".join(v.split()) for v in row if v.strip()} for row in self._own_cells()]
-        filled = [values for values in filled if values]
-        return len(filled) >= 3 and sum(len(values) == 1 for values in filled) >= _LISTLIKE_ROW_RATIO * len(filled)
-
-    @property
-    def outline(self) -> bool:
-        """목록형 표: 열 머리글이 없고(`열N`) 행마다 값이 한두 개뿐이며 한 개인 행(구역·항목 줄)이 꽤 된다 -- 번호 목록(구역 -> 항목 ->
-        이름 | 번호)을 표에 담은 별표(특정화학물질). `열1:` 행 청크 대신 행 글자를 잇고 구역을 따라간다(`structured._list_chunks`)."""
-        if self.degraded or len(self.rows) < 3 or not all(re.fullmatch(r"열\d+", c) for c in self.columns):
-            return False
-        counts = [len({" ".join(v.split()) for v in row if v.strip()}) for row in self._own_cells()]
-        counts = [n for n in counts if n]
-        return bool(counts) and max(counts) <= 2 and sum(n == 1 for n in counts) >= _OUTLINE_MIN_SINGLE * len(counts)
+        """행으로 나눌 수 있는 표: 격자가 있고 데이터 행이 둘 이상."""
+        return not self.degraded and len(self.rows) >= 2
 
     def has_oversized_row(self, chunk_size: int) -> bool:
         """행 하나가 청크 크기를 넘는가 -- 칸 안에 문서 한 편이 든 표(신·구조문 대비표의 현행·개정안 칸)."""
@@ -131,101 +70,36 @@ def logical_tables(table: dict) -> list[LogicalTable]:
                 continued[r].update(range(m["col"], m["col"] + m["colspan"]))
 
     captions: list[str] = []
-    preambles: list[str] = []
-    # 표 맨 위의 제목 행과 가로 전체를 합친 본문 행을 순서와 상관없이 걷어낸다 -- 법령 머리 줄 -> 표 제목 -> 일반기준 본문 -> 2단 머리글
-    # 순서인 별표(방위산업기술 보호법 시행령 [별표] 과태료)는 제목만 걷다가 본문 행에서 멈춰 머리글을 못 찾고 `열1~열5`가 됐다.
+    # 표 맨 위의 제목 행을 걷어낸다. 번호·항목 표지로 시작하는 행(`가. 독성화학물질`, `예) 사린 …`)은 제목이 아니라 데이터다.
     while len(rows) > 2:
         top = _top_value(rows[0]) if any(c.strip() for c in rows[0]) else ""
-        # 본문 행(일반기준)은 번호로 시작해도(`1. 일반기준`) 바로 아래가 머리글이면 걷어낸다. 그 밖의 번호·항목 표지로 시작하는 행
-        # (`가. 독성화학물질`, `예) 사린 …`)은 제목·본문이 아니라 데이터다.
-        preamble_row = len(rows) > 3 and _preamble_like(rows[0]) and (
-            _header_like(rows[1], allow_blanks=True) or (not (captions or preambles) and not _LIST_MARKER.match(top)))
-        if not preamble_row and _LIST_MARKER.match(top):
+        if _LIST_MARKER.match(top) or not _caption_like(rows[0]):
             break
-        if preamble_row:
-            # 가로 전체를 합친 칸에 표 제목과 긴 본문이 함께 든 별표(`과태료의 부과기준(제94조 관련)` + `1. 일반기준 가.~라.`):
-            # 첫 칸이고 첫 줄이 짧으면 표 제목, 나머지는 표 앞 본문. 그대로 두면 본문이 `열1:` 값 하나로 뭉치고 아래 머리글도 못 찾는다.
-            lines = _top_value(rows[0]).splitlines()
-            if not captions and not preambles and len(lines[0]) <= _CAPTION_MAX_CHARS:
-                captions.append(lines[0].strip())
-                lines = lines[1:]
-            preambles.append("\n".join(lines).strip())
-        elif _caption_like(rows[0]):
-            lines = top.splitlines()
-            cut = next((i for i, line in enumerate(lines) if i and _LIST_MARKER.match(line)), None)
-            if cut is not None:
-                # 제목 칸에 첫 구역 줄이 붙어 있다(`특정화학물질(제2조제5호 관련)` + `1. 1종화학물질`): 제목 줄만 제목으로 쓰고 나머지는
-                # 데이터로 돌려 둔다 -- 통째로 제목이 되면 첫 구역 이름이 모든 행 청크에 붙었다
-                captions.append("\n".join(lines[:cut]).strip())
-                rest = "\n".join(lines[cut:]).strip()
-                rows = [[rest if c.strip() == top.strip() else c for c in rows[0]], *rows[1:]]
-                break
-            # 값이 두 개인 제목 행은 둘 다 남긴다 -- 한 값만 남기면 다른 칸 글자(화학물질 CAS 번호)가 통째로 사라졌다
-            captions.append(" ".join(dict.fromkeys(c.strip() for c in rows[0] if c.strip())))
-        else:
+        lines = top.splitlines()
+        cut = next((i for i, line in enumerate(lines) if i and _LIST_MARKER.match(line)), None)
+        if cut is not None:
+            # 제목 칸에 첫 구역 줄이 붙어 있다(`특정화학물질(제2조제5호 관련)` + `1. 1종화학물질`): 제목 줄만 제목으로 쓰고 나머지는
+            # 데이터로 돌려 둔다 -- 통째로 제목이 되면 첫 구역 이름이 모든 행 청크에 붙었다
+            captions.append("\n".join(lines[:cut]).strip())
+            rest = "\n".join(lines[cut:]).strip()
+            rows = [[rest if c.strip() == top.strip() else c for c in rows[0]], *rows[1:]]
             break
+        # 값이 두 개인 제목 행은 둘 다 남긴다 -- 한 값만 남기면 다른 칸 글자(화학물질 CAS 번호)가 통째로 사라졌다
+        captions.append(" ".join(dict.fromkeys(c.strip() for c in rows[0] if c.strip())))
         rows, row_pages, spill, continued = rows[1:], row_pages[1:], spill[1:], continued[1:]
     caption = " ".join(captions)
-    preamble = "\n\n".join(p for p in preambles if p)
-    unit = _unit(caption + "\n" + preamble)
+    unit = _unit(caption)
 
     header_count = _header_count(rows, table.get("header_rows", 0) if not captions else 0,
                                  continued=continued if merges else None)
-    header = rows[:header_count]
-    columns = _column_names(header, len(rows[0]) if rows else 0)
-
-    out: list[LogicalTable] = []
-    start = header_count
-    r = start
-    while r <= len(rows):
-        # 머리글이 다시 나오는 곳(같은 모양의 표가 붙은 것)에서 끊는다.
-        repeats = header_count and r < len(rows) and r > start and rows[r:r + header_count] == header
-        if r == len(rows) or repeats:
-            if r > start:
-                out.append(LogicalTable(columns, rows[start:r], row_pages[start:r], spill[start:r], caption,
-                                        preamble=preamble if not out else "", unit=unit,
-                                        hard_breaks=bool(table.get("hard_breaks"))))
-            if r == len(rows):
-                break
-            start = r = r + header_count
-            continue
-        r += 1
-    return out or [LogicalTable(columns, [], [], [], caption, preamble=preamble, unit=unit)]
+    columns = _column_names(rows[:header_count], len(rows[0]) if rows else 0)
+    return [LogicalTable(columns, rows[header_count:], row_pages[header_count:], spill[header_count:], caption, unit=unit)]
 
 
 def _unit(text: str) -> str:
     """표 위 글의 마지막 `단위: …`(`(단위: 만원)`, `[단위 : 원]`, `<단위: 밀리시버트>`)."""
     found = re.findall(r"단\s*위\s*[:：]\s*([^)）\]>〉\n]{1,20}?)\s*[)）\]>〉]?\s*(?:$|\n)", text)
     return " ".join(found[-1].split()) if found else ""
-
-
-def form_lines(table: LogicalTable) -> list[tuple[int, str]]:
-    """서식 표를 읽는 순서의 글 줄로: 행마다 칸 글자를 ` | `로 잇는다. (쪽, 줄) 목록.
-
-    서식(별지)은 데이터 표가 아니라 칸 이름과 안내문을 배치한 양식이라 `열이름: 값` 행 청크로 나누면 서식 칸 하나가 표 제목·열 이름이
-    되어 모든 청크에 복제됐다(전략물자수출입고시 일부개정고시 PDF 별지 제2호: `표: ② Exporter Name Address / City:`가 청크 20개에).
-    가로 병합으로 채운 칸과 바로 윗행에서 세로 병합으로 이어진 같은 글자는 한 번만 쓴다."""
-    out: list[tuple[int, str]] = []
-    if table.caption:
-        out.append((table.row_pages[0] if table.row_pages else 0, table.caption))
-    if table.preamble:
-        out.append((table.row_pages[0] if table.row_pages else 0, table.preamble))
-    header = [c for c in table.columns if c and not re.fullmatch(r"열\d+", c)]
-    if header:
-        out.append((table.row_pages[0] if table.row_pages else 0, " | ".join(dict.fromkeys(header))))
-    previous: list[str] = []
-    for index, row in enumerate(table.rows):
-        spill = table.spill[index] if index < len(table.spill) else set()
-        values = []
-        for c, value in enumerate(row):
-            text = " ".join(value.split())
-            if not text or c in spill or (c < len(previous) and previous[c] == text):
-                continue
-            values.append(text)
-        previous = [" ".join(v.split()) for v in row]
-        if values:
-            out.append((table.row_pages[index] if index < len(table.row_pages) else 0, " | ".join(dict.fromkeys(values))))
-    return out
 
 
 def _caption_like(row: list[str]) -> bool:
@@ -241,13 +115,6 @@ def _caption_like(row: list[str]) -> bool:
     if len(filled) == 1:  # 칸 하나에만 글자가 있는 첫 행(병합을 못 읽은 제목 조각)
         return True
     return filled.count(top) * 2 >= len(cells) and len(set(filled)) <= 2
-
-
-def _preamble_like(row: list[str]) -> bool:
-    """표 앞 본문 행: 모든 칸이 같은 글(가로 전체 병합)이고, 제목보다 길며 여러 줄."""
-    cells = [c.strip() for c in row]
-    return (len(cells) >= 2 and all(cells) and len(set(cells)) == 1
-            and len(cells[0]) > _CAPTION_MAX_CHARS and "\n" in cells[0])
 
 
 def _top_value(row: list[str]) -> str:
@@ -328,14 +195,12 @@ def table_fields(table: LogicalTable, table_id: str) -> dict:
     return fields
 
 
-def _named_lines(pairs: list[tuple[str, str]], *, keep_breaks: bool = False) -> list[str]:
+def _named_lines(pairs: list[tuple[str, str]]) -> list[str]:
     """`열이름: 값` 줄. 이웃한 열이 이름이 같으면(머리글 칸 하나가 하위 단계 열 여럿에 걸친 것: `특례 | 특례 | 특례`) 한 줄로 잇는다
     -- `특례:`가 세 번 되풀이되면 어느 값이 상위 구분인지 안 보인다. 값은 왼쪽(상위)부터 ` > `로 잇는다."""
     merged: list[tuple[str, list[str]]] = []
     for name, value in pairs:
-        # 칸 안 줄바꿈이 문단 경계면(HWP) ` / `로 구분한다 -- 공백으로 이으면 목록 항목이 붙었다(`한국의 집 관광식당`)
-        value = (" / ".join(" ".join(line.split()) for line in value.splitlines() if line.strip()) if keep_breaks
-                 else " ".join(value.split()))
+        value = " ".join(value.split())
         if merged and merged[-1][0] == name:
             merged[-1][1].append(value)
         else:
@@ -353,37 +218,14 @@ def row_chunks(table: LogicalTable, table_id: str, *, chunk_size: int | None = N
     # 표 제목은 행 청크 하나만 검색돼도 무슨 표인지 알 수 있게 본문 첫 줄에 둔다.
     prefix = ([f"표: {table.caption}"] if table.caption else []) + ([f"단위: {table.unit}"] if table.unit else [])
     out = []
-    last_key = ""
-    previous: list[str] = []  # 바로 앞 행(물려받은 값 포함)
     for index, values in enumerate(table.rows):
-        if not table.degraded and values:
-            # 앞 행의 계속인 행은 앞 행의 값(열쇠)을 물려받는다. 셋 중 하나일 때만:
-            # - 쪽이 바뀌며 이어지는 행: 새 쪽 첫 행이 첫 칸만 비었다(군용물자목록: 2쪽 "a. 소총 …"이 ML1의 계속)
-            # - 첫 칸만 비었고 둘째 칸이 앞 행 둘째 칸의 번호를 잇는다(면허 시험표: `가. 필기시험` 다음 행 `나. 실기시험` -- 칸을 병합하지
-            #   않고 테두리 없이 비워 둔 표)
-            # - 마지막 칸 말고 앞 칸이 다 비었다(앞 행의 마지막 칸 글이 다음 행으로 넘어간 것)
-            key = values[0].strip()
-            page_turn = index > 0 and index < len(table.row_pages) and table.row_pages[index] != table.row_pages[index - 1]
-            rest = any(v.strip() for v in values[1:])
-            if not key and last_key and rest and (page_turn or _continues_marker(previous, values)):
-                values = [last_key, *values[1:]]
-            elif (not key and previous and len(values) >= 3 and values[-1].strip()
-                  and not any(v.strip() for v in values[:-1]) and any(v.strip() for v in previous[:-1])):
-                values = [*previous[:-1], values[-1]]
-            elif key and len(key) <= _ROW_KEY_MAX_CHARS:
-                last_key = key
-            elif key:
-                last_key = ""
-            previous = list(values)
         if table.degraded:  # 격자가 없는 표: 열 이름을 붙일 수 없어 글자 그대로
             lines = [values[0].strip()] if values and values[0].strip() else []
         else:
             spill = table.spill[index] if index < len(table.spill) else set()
             pairs = [(name, value) for c, (name, value) in enumerate(zip(table.columns, values))
                      if value.strip() and c not in spill]
-            # 여러 칸이 같은 줄 수로 나열돼도 줄끼리 짝짓지 않는다 -- 원본이 줄을 눈으로만 맞춘 표가 있다(관광업소 표: 업소명 12줄,
-            # 주소 13줄, 셋째 줄부터 어긋남). 짝을 지으면 틀린 대응을 만든다. 줄바꿈만 남긴다.
-            lines = _named_lines(pairs, keep_breaks=table.hard_breaks)
+            lines = _named_lines(pairs)
         if not lines:
             continue
         if chunk_size and not table.degraded and len("\n".join(prefix + lines)) > chunk_size:
@@ -599,22 +441,11 @@ def _continued_rows(table: LogicalTable, cur_col: int, rev_col: int):
     # 이어 붙이기는 조문으로 된 대비표에서만(행마다 통제번호·항목이 다른 표는 행이 곧 단위다)
     articles = any(_section_line(line) for row in table.rows for i in (cur_col, rev_col) if i < len(row)
                    for line in (row[i] or "").splitlines())
-    # 행마다 키(통제번호 등)가 있는 표에서 키가 빈 행은 앞 행의 이어짐이다 -- 한 품목이 쪽을 넘거나 하위 항목(b., 기술해설)이 다음
-    # 행으로 갈려 키 없이 `개정 전: b. 탄소 …`만 남았다(실측: '10년 별표 2 대비표 PDF, 행 131개 중 키 없는 행이 43개).
     keyed_rows = [any(i < len(row) and (row[i] or "").strip() for i in keys) for row in table.rows]
-    keyed_table = bool(keys) and sum(keyed_rows) * 2 >= len(table.rows)
     for index, values in enumerate(table.rows):
         page = table.row_pages[index]
         cells = [v or "" for v in values]
         keyed = keyed_rows[index]
-        if merged and keyed_table and not keyed and not articles:
-            prev = merged[-1]
-            for i, value in enumerate(cells):
-                # 세로 병합 칸은 행마다 같은 글이 채워져 있다(`fill_merged`) -- 이미 든 글은 다시 붙이지 않는다
-                if value.strip() and i < len(prev[1]) and value.strip() not in prev[1][i]:
-                    prev[1][i] = f"{prev[1][i]}\n{value}".strip()
-            prev[3] = page
-            continue
         if merged and articles and not keyed:
             # 열마다 따로: 첫 조문·장 줄 앞의 글은 앞 행 같은 열의 이어짐이다(현행 열은 앞 조문이 이어지고 개정안 열은 새 조문으로
             # 시작하는 쪽도 있다)
@@ -705,23 +536,3 @@ def comparison_chunks(table: LogicalTable, table_id: str, *, chunk_size: int) ->
             out.append({**base, "page_start": table.row_pages[0] if table.row_pages else 1,
                         "page_end": table.row_pages[-1] if table.row_pages else 1, "text": "\n".join(prefix + [tail])})
     return out
-
-
-_ITEM_MARKER = re.compile(r"^\s*(?:(\d{1,2})\s*[.)]|([가-하])\s*[.)])")
-
-
-def _continues_marker(previous: list[str], values: list[str]) -> bool:
-    """둘째 칸이 앞 행 둘째 칸의 번호를 잇는가(`가.` -> `나.`, `1)` -> `2)`). 앞 행 둘째 칸이 여러 줄이면 마지막 번호를 본다."""
-    if len(previous) < 2 or len(values) < 2:
-        return False
-    before = [m for m in (_ITEM_MARKER.match(line) for line in previous[1].splitlines()) if m]
-    now = _ITEM_MARKER.match(values[1])
-    if not before or not now:
-        return False
-    a, b = before[-1], now
-    if a.group(1) and b.group(1):
-        return int(b.group(1)) == int(a.group(1)) + 1
-    if a.group(2) and b.group(2):
-        order = "가나다라마바사아자차카타파하"  # 유니코드 간격이 일정하지 않다(가->나 1176, 나->다 588)
-        return order.find(b.group(2)) == order.find(a.group(2)) + 1 > 0
-    return False
