@@ -1,0 +1,61 @@
+{
+ "version": 1,
+ "label": "검색엔진 이식 청커 — 파서 #129 규칙 20개 삭제 뒤, 번들 마크다운 입력",
+ "notes": "파서 청커를 `search_engine/chunking`으로 이식(삭제 20개 반영, `ChunkPolicy` 기본값 = 파서 값). 입력은 번들 `text.markdown`에서 되살린 원소·표다. 같은 코드를 파서의 원래 원소·표 자료에 쓰면 파서 슬림판 청크와 189문서 모두 같고, 검색 결과도 슬림판(원소 입력)과 합계가 같다. 정답 청크는 v0과 같은 규칙으로 정했다. 서비스 컷오프 0.7에서 v0 대비 -6(145 -> 139), v1만 반환한 질문은 없다. 놓친 6개: 검색이 놓친 것 033·120·130, 필수 구절이 한 청크에 더는 모이지 않아 정답 라벨이 사라진 것 103·128·143. 103·128은 디스크의 옛 docs.jsonl 코퍼스에서도 사라지므로 청커가 아니라 서비스 인덱스와 번들의 코퍼스 내용 차이에서 온다. 청커 규칙 삭제 탓으로 보이는 것은 033·120·130·143이며 별표·표 서식 질문 중심이고 파서 #129가 예고한 증상이다. 컷오프 0.95에서는 v0 대비 -3(140 -> 137), 058이 새로 반환된다.",
+ "date": "2026-10-08",
+ "search_engine_commit": "1096f19",
+ "dirty": false,
+ "parser_commit": "def6caf",
+ "policy": {
+  "chunk_size": 800,
+  "chunk_overlap": 100,
+  "min_chunk_chars": 30,
+  "question_min": 3,
+  "question_max_chars": 300,
+  "question_path_chars": 80,
+  "row_key_max_chars": 40,
+  "long_cell_ratio": 0.5,
+  "pair_oversize_ratio": 1.5,
+  "carry_max_chars": 40,
+  "heading_max_chars": 60
+ },
+ "parity": "원래 원소·표 자료 -> 189/189 일치, 번들 마크다운 -> 176/189 (PDF 28 중 13 어긋남)",
+ "corpus": {
+  "law": {
+   "documents": 150,
+   "chunks": 6503,
+   "chars_mean": 289.4,
+   "chars_median": 192,
+   "chars_max": 4358,
+   "under_30_chars": 170,
+   "text_over_1200": 0,
+   "table_chunks": 3908,
+   "row_chunks": 3766,
+   "text_without_heading_path": 39
+  }
+ },
+ "search": {
+  "law": {
+   "alias": "exp-chk-law-port",
+   "questions": 149,
+   "gold_lost": 3,
+   "cutoffs": {
+    "service": {
+     "evidence": 139,
+     "doc_hit": 147,
+     "phrase": 136,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 7.84
+    },
+    "0.95": {
+     "evidence": 137,
+     "doc_hit": 146,
+     "phrase": 134,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 3.41
+    }
+   },
+   "service_cutoff": 0.7
+  }
+ }
+}

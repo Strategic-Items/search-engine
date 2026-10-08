@@ -7,6 +7,7 @@ from collections.abc import Iterable
 import httpx
 from opensearchpy import OpenSearch, OpenSearchException
 
+from search_engine.codes import extract_control_numbers
 from search_engine.config import Settings, get_settings
 from search_engine.embeddings import OllamaEmbedder
 from search_engine.search.hsk import extract_hsk_code, retrieve_hsk
@@ -192,6 +193,23 @@ def build_splade_query(terms: dict[str, float], as_of: date, query: str = "") ->
         "must": [{"neural_sparse": {"splade": {"query_tokens": terms}}}],
         "filter": _validity_filters(as_of) + _docket_filter(query),
     }}
+
+
+def _identifier_hits(client: OpenSearch, alias: str, query: str, as_of: date, size: int = 5) -> list[dict]:
+    """질문의 통제번호를 본문에 그대로 담은 청크. 번호가 없으면 빈 목록이다.
+
+    표 행 한 줄짜리 청크는 SPLADE·dense 어느 쪽에서도 번호 하나로는 점수가 낮아, 같은 표의 다른 행에 묻힌다.
+    번호가 흔하면(ML8은 79청크) 구절 일치 점수가 모두 같아 앞 몇 개가 정답이라는 보장이 없다. 그래서 상위 5개만 쓰고
+    가중치도 낮춘다(0.5): 25개·가중치 1.0이면 최고 RRF 점수가 올라 컷오프가 정답을 자른다.
+    """
+    codes = extract_control_numbers(query)
+    if not codes:
+        return []
+    body = {"query": {"bool": {
+        "should": [{"match_phrase": {"body": code}} for code in codes], "minimum_should_match": 1,
+        "filter": _validity_filters(as_of) + _docket_filter(query),
+    }}}
+    return client.search(index=alias, body=body, size=size)["hits"]["hits"]
 
 
 def _validity_filters(as_of: date) -> list[dict]:
@@ -610,9 +628,13 @@ def retrieve(
         chunk_first = settings.search_chunk_first
     if mode == "hybrid" and len(ranked_lists) > 1 and chunk_first:
         # 원시 점수 트림: 각 검색기 목록의 끝을 자기 1위 점수 대비 비율로 먼저 자른다.
+        identifier = (_identifier_hits(client, alias, query, as_of)
+                      if settings.search_chunk_first_identifier_weight else [])
         chunk_lists = ranked_lists if not settings.search_chunk_first_trim else [
             (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
             for hits, weight, retriever in ranked_lists]
+        if identifier:
+            chunk_lists = [*chunk_lists, (identifier, settings.search_chunk_first_identifier_weight, "identifier")]
         groups = _chunk_first(
             chunk_lists, query, rrf_k=settings.search_hybrid_rrf_k,
             max_chunks=settings.search_chunk_first_max_chunks,

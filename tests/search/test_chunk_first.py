@@ -96,3 +96,10 @@ def test_a_retired_edition_is_scored_down_when_the_question_names_no_edition():
 def test_a_question_that_names_an_edition_keeps_the_retired_edition_first():
     assert pick("2015년 개정안의 처리기간은", 0.5) == [["r1"], ["n1"]]
     assert pick("17차 개정에서 정의는", 0.5) == [["r1"], ["n1"]]
+
+
+def test_extract_control_numbers_keeps_only_control_codes():
+    from search_engine.codes import extract_control_numbers
+
+    assert extract_control_numbers("별표 2 통제번호 3A002.d.1의 개정반영, 제21조 ML8과 2B352") == ["3A002.d.1", "ML8", "2B352"]
+    assert extract_control_numbers("자율준수무역거래자 지정 요건은 제21조의7인가요?") == []

@@ -92,7 +92,7 @@ class Settings(BaseSettings):
     search_embedding_dimensions: int = Field(default=1024, ge=1)
     # 법령·행정 dense 입력에 제목 경로를 덧붙인다. 끄면 title+body로 색인한다.
     # 기존 벡터에는 소급 적용되지 않으므로 입력을 바꾸면 재색인이 필요하다.
-    search_dense_include_heading_path: bool = False
+    search_dense_include_heading_path: bool = True
     search_vector_candidates: int = Field(default=25, ge=1, le=1_000)
     search_hybrid_rrf_k: int = Field(default=60, ge=1)
     # 반환되는 문서당 포함되는 청크 수. 랭킹은 여전히 하나의 문서를 반환한다.
@@ -221,25 +221,31 @@ class Settings(BaseSettings):
     # 문서 정밀도가 떨어진다.
     search_chunk_first_max_documents: int = Field(default=5, ge=1, le=5)
     # 판본을 지정하지 않은 질문에서 `superseded_by`가 있는 문서의 청크 점수에 곱한다. 1이면 끈다(43단계).
-    search_chunk_first_superseded_weight: float = Field(default=1.0, ge=0.0, le=1.0)
+    # 2026-10-08: 0.97로 켰다. 최신 판이 앞에 와야 한다는 기준이고, law150 컷오프 0.7에서 048 하나를 얻고 잃은 질문이 없었다.
+    search_chunk_first_superseded_weight: float = Field(default=0.97, ge=0.0, le=1.0)
     # 청크 점수에 더하는 문서 합의의 배수(0이면 청크 RRF만).
     search_chunk_first_agreement: float = Field(default=0.0, ge=0.0)
     # 청크 RRF 앞에서 검색기별 원시 점수 트림(fusion_trim)을 적용할지.
     search_chunk_first_trim: bool = False
+    # 질문에 통제번호(3A002.d.1, ML8)가 있으면 본문에 그 번호가 그대로 든 청크의 목록을 청크 RRF에 세 번째로 더한다.
+    # 값은 그 목록의 RRF 가중치이고 0이면 끈다. 번호가 없는 질문은 영향이 없다.
+    # law150, 컷오프 0.7, 통제번호가 있는 10문항: 후보 상위 5개·가중치 0.5에서 9→10문항(075 구제), 잃은 질문 없음.
+    # 가중치 1.0은 078(ML8)을 잃고 평균 청크가 8.4→5.1개로 줄었다.
+    search_chunk_first_identifier_weight: float = Field(default=0.5, ge=0.0)
 
     # 카테고리 검색(법령·행정·민원FAQ)의 어휘 검색기: 38단계에서 파인튜닝한 SPLADE(설정 C).
     # 비워 두면 카테고리 검색도 BM25를 쓴다. 가중치(약 570MB)는 저장소 밖에 두고 경로를 지정한다.
     search_splade_model: str = ""
     # 기존 title+body 입력과 제목 경로를 더한 입력을 같은 모델로 비교할 수 있게 한다.
     # 색인 입력 옵션이므로 변경 후 해당 카테고리의 SPLADE 벡터를 다시 만들어야 한다.
-    search_splade_include_heading_path: bool = False
+    search_splade_include_heading_path: bool = True
     # 문서·질의 인코딩 길이는 38단계 측정(256)과 같다. 512로 늘려도 청크 Recall은 변하지 않았다.
     search_splade_doc_max_length: int = Field(default=256, ge=8, le=512)
     search_splade_query_max_length: int = Field(default=256, ge=8, le=512)
     search_splade_top_terms: int = Field(default=256, ge=1, le=1024)
     search_splade_min_weight: float = Field(default=0.01, ge=0.0)
-    # 카테고리 hybrid는 청크 단위 RRF 뒤 1위 청크 점수의 이 비율로 자른다(40단계 측정 기준 0.95).
-    search_category_cutoff_ratio: float = Field(default=0.95, ge=0.0, le=1.0)
+    # 카테고리 hybrid는 청크 단위 RRF 뒤 1위 청크 점수의 이 비율로 자른다. 40단계 측정 기준은 0.95였고 2026-10-08 사용자 지시로 0.7로 통일했다.
+    search_category_cutoff_ratio: float = Field(default=0.7, ge=0.0, le=1.0)
     rag_top_k: int = Field(default=5, ge=1)
 
     # 각 리트리버 목록의 얼마나 들어가서 융합되는가. 위의 컷오프 비율과는 별도로, 다른 질문에 답한다: "아니오"가 아니라
