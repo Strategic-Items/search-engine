@@ -1,9 +1,10 @@
 var VIEWS={d:[["q","질문별"],["s","단계별"],["a","구조도"],["e","메타데이터"]], c:[["cq","질문별"],["c","결과 요약"],["cm","메타데이터"]]};
 var BRAND={d:["질문별 검색 경로 탐색기","docs 정답형 135문항과 무응답 대상 38문항을 지금 운영 설정(문서 우선, 판정 LLM 끔)으로 다시 돌린 결과입니다."],c:["카테고리별 검색 탐색기","법령·고시, 행정·업무, 민원FAQ를 각자 인덱스에서 따로 찾는 경로(37단계부터)를 점검한 결과입니다."]};
-function modeOf(v){ return v==="cq"||v==="cs"||v==="ca"||v==="c"||v==="cm"||v==="cmc"?"c":"d"; }
+function modeOf(v){ return v==="ck"||v==="cq"||v==="cs"||v==="ca"||v==="c"||v==="cm"||v==="cmc"?"c":"d"; }
 function categoryStageExists(k){ return STG.some(function(x){return x.k===k&&!!x.doc&&x.num>=37;}); }
-function categoryViews(){ return CATSEL==="common"?[["cs","단계별"],["ca","구조도"],["cmc","메타데이터"]]:VIEWS.c; }
+function categoryViews(){ return CATSEL==="common"?[["cs","단계별"],["ca","구조도"],["cmc","메타데이터"]]:(CATSEL==="law100"?[["cq","질문별"],["ck","청킹 결과"],["c","결과 요약"],["cm","메타데이터"]]:VIEWS.c); }
 function setView(v,nohash){
+  if(v==="ck"&&CATSEL!=="law100") v="cq";
   var m=modeOf(v), prev=st.mode||"d";
   if(m==="c"){
     if(v==="cs"||v==="ca"||v==="cmc") CATSEL="common";
@@ -28,11 +29,11 @@ function setView(v,nohash){
   document.getElementById("modesw").querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.mode===m?"true":"false"); });
   document.getElementById("viewsw").querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.view===v?"true":"false"); });
   if(m==="c") renderCategorySelector();
-  var q=v==="q", cq=v==="cq", lst=q||cq;
+  var q=v==="q", cq=v==="cq", lst=q||cq||v==="ck";
   document.getElementById("tools").hidden=!q; document.getElementById("list").hidden=!lst; document.getElementById("stnav").hidden=lst; document.getElementById("catsw").hidden=(m!=="c");
   document.getElementById("side").classList.toggle("sv",!lst);
-  if(q){ renderList(); renderDetail(); } else if(cq) renderCq(); else if(v==="s"||v==="cs") renderStage(); else if(v==="e") renderMeta(); else if(v==="c") renderCat(); else if(v==="cm") renderCategoryMeta(); else if(v==="cmc") renderCategoryCommonMeta(); else if(v==="ca") renderCategoryArch(); else renderArch();
-  if(!nohash){ if(v==="s") location.hash="stage-"+st.stage; else if(v==="cs") location.hash="cat-stage-"+st.stage; else if(v==="ca") location.hash="cat-arch"; else if(v==="a") location.hash="arch"; else if(v==="e") location.hash="meta"; else if(v==="c") location.hash="cat"; else if(v==="cm") location.hash="cat-meta"; else if(v==="cmc") location.hash="cat-common-meta"; else if(v==="cq") location.hash="cat-q-"+CQS.id; else if(st.id) location.hash=st.id; }
+  if(q){ renderList(); renderDetail(); } else if(cq) renderCq(); else if(v==="ck") renderChunking(); else if(v==="s"||v==="cs") renderStage(); else if(v==="e") renderMeta(); else if(v==="c") renderCat(); else if(v==="cm") renderCategoryMeta(); else if(v==="cmc") renderCategoryCommonMeta(); else if(v==="ca") renderCategoryArch(); else renderArch();
+  if(!nohash){ if(v==="ck") ckSetHash(); else if(v==="s") location.hash="stage-"+st.stage; else if(v==="cs") location.hash="cat-stage-"+st.stage; else if(v==="ca") location.hash="cat-arch"; else if(v==="a") location.hash="arch"; else if(v==="e") location.hash="meta"; else if(v==="c") location.hash="cat"; else if(v==="cm") location.hash="cat-meta"; else if(v==="cmc") location.hash="cat-common-meta"; else if(v==="cq") location.hash="cat-q-"+CQS.id; else if(st.id) location.hash=st.id; }
 }
 (function(){
   var seg=document.getElementById("seg");
@@ -51,6 +52,7 @@ function setView(v,nohash){
   document.getElementById("viewsw").addEventListener("click",function(e){ var b=e.target.closest("button[data-view]"); if(b) setView(b.dataset.view); });
   document.getElementById("modesw").addEventListener("click",function(e){ var b=e.target.closest("button[data-mode]"); if(b&&b.dataset.mode!==st.mode) setView(b.dataset.mode==="c"?"cq":"q"); });
   cqInit();
+  ckInit();
   (function(){ var app=document.querySelector(".app");
     function set(c){ app.classList.toggle("side-closed",c); try{ localStorage.setItem("qeSideClosed",c?"1":"0"); }catch(e){} }
     try{ if(localStorage.getItem("qeSideClosed")==="1") app.classList.add("side-closed"); }catch(e){}
@@ -269,6 +271,8 @@ function setView(v,nohash){
     var mv=st.view==="cq"?cqMove:st.view==="q"?move:null; if(!mv) return;
     if(e.key==="ArrowDown"||e.key==="j"){ e.preventDefault(); mv(1); } else if(e.key==="ArrowUp"||e.key==="k"){ e.preventDefault(); mv(-1); } });
   window.addEventListener("hashchange",function(){ var id=location.hash.slice(1);
+    var oldChunkSelection=CK.group+"|"+CK.qid;
+    if(ckReadHash(id)){if(st.view==="ck"&&CATSEL==="law100"&&oldChunkSelection===CK.group+"|"+CK.qid)return;CATSEL="law100";setView("ck",true);return;}
     if(id==="arch"){ if(st.view!=="a") setView("a",true); return; }
     if(id==="meta"){ if(st.view!=="e") setView("e",true); return; }
     if(id==="cat-arch"){ setView("ca",true); return; }
@@ -281,5 +285,5 @@ function setView(v,nohash){
     if(Q.some(function(q){return q.id===id;})) select(id,true); });
   var start=location.hash.slice(1); if(!Q.some(function(q){return q.id===start;})) start="docs-v2-001";
   select(start,true);
-  var h0=location.hash.slice(1); if(h0==="arch") setView("a",true); else if(h0==="meta") setView("e",true); else if(h0==="cat-arch") setView("ca",true); else if(h0==="cat") setView("c",true); else if(h0==="cat-meta") setView("cm",true); else if(h0==="cat-common-meta") setView("cmc",true); else if(h0.indexOf("cat-q-")===0){ var initialCq=CQ.filter(function(x){return x.id===h0.slice(6);})[0]; if(initialCq){ CQS.id=initialCq.id; CQS.set=initialCq.set; CATSEL=initialCq.set; setView("cq",true); } } else if(h0.indexOf("cat-stage-")===0&&categoryStageExists(h0.slice(10))){ st.stage=h0.slice(10); setView("cs",true); } else if(h0.indexOf("stage-")===0 && STG.some(function(x){return x.k===h0.slice(6);})){ st.stage=h0.slice(6); setView("s",true); }
+  var h0=location.hash.slice(1); if(ckReadHash(h0)){CATSEL="law100";setView("ck",true);} else if(h0==="arch") setView("a",true); else if(h0==="meta") setView("e",true); else if(h0==="cat-arch") setView("ca",true); else if(h0==="cat") setView("c",true); else if(h0==="cat-meta") setView("cm",true); else if(h0==="cat-common-meta") setView("cmc",true); else if(h0.indexOf("cat-q-")===0){ var initialCq=CQ.filter(function(x){return x.id===h0.slice(6);})[0]; if(initialCq){ CQS.id=initialCq.id; CQS.set=initialCq.set; CATSEL=initialCq.set; setView("cq",true); } } else if(h0.indexOf("cat-stage-")===0&&categoryStageExists(h0.slice(10))){ st.stage=h0.slice(10); setView("cs",true); } else if(h0.indexOf("stage-")===0 && STG.some(function(x){return x.k===h0.slice(6);})){ st.stage=h0.slice(6); setView("s",true); }
 })();
