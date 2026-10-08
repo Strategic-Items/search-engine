@@ -1,9 +1,9 @@
 {
  "version": 0,
- "label": "파서 청킹 규칙 74개 (#129 이전) — 기존 docs.jsonl",
- "notes": "비교 기준. 파서(unstructured-doc-parser_ver2)가 원소·표 자료에서 만든 기존 `docs.jsonl`(법령 150문서, 행정 20문서). 이 저장소의 코드가 아니라서 정책은 파서 상수값이다. 코퍼스는 파서 저장소 `data/category_chunks`의 당시 파일이고 인덱스는 같은 인덱서·모델(dense: bge-m3-ko + 제목 경로, SPLADE 설정 C)로 따로 만들었다. 서비스 `search-law`/`search-admin`은 이 파일로 만든 것이 아니다(청크 수가 다르다).",
+ "label": "서비스 인덱스 search-law — 파서 규칙 74개 시기의 청킹(기준)",
+ "notes": "비교 기준. 서비스 `search-law`(150문서·6,288청크, 인덱스 `search-law-v20261008061513-3ba81c`)이고 공식 라벨(`data/queries_law150_v1.jsonl`의 evidence_groups)을 그대로 쓴다. 청킹은 파서(unstructured-doc-parser_ver2)가 원소·표 자료에서 만든 것이라 이 저장소의 코드가 아니고 정책은 파서 상수값이다. 같은 하네스로 잰 값: 서비스 컷오프 0.7에서 149문항 중 145, 못 찾은 질문은 037·043·076·125다. 별도 확인에서 146(125 포함)이 나왔는데, 125의 둘째 근거(과태료 금액의 단위 헤더 청크)를 이 하네스는 반환하지 못한다 -- 탐색기 쪽 라벨 검토 반영 여부의 차이로 보이며 확인이 필요하다. 참고: 파서 저장소 디스크의 옛 `docs.jsonl`(6,272청크)로 만든 인덱스는 같은 라벨을 옮겨 쟀을 때 139다.",
  "date": "2026-10-08",
- "search_engine_commit": "ee1d8cd",
+ "search_engine_commit": "c0dd2e4",
  "dirty": false,
  "parser_commit": "9224772",
  "policy": {
@@ -16,66 +16,36 @@
  "corpus": {
   "law": {
    "documents": 150,
-   "chunks": 6272,
-   "chars_mean": 300.2,
-   "chars_median": 206.0,
+   "chunks": 6288,
+   "chars_mean": 298.9,
+   "chars_median": 205.0,
    "chars_max": 4358,
    "under_30_chars": 117,
    "text_over_1200": 0,
-   "table_chunks": 3682,
-   "row_chunks": 3503,
-   "text_without_heading_path": 21
-  },
-  "admin": {
-   "documents": 20,
-   "chunks": 152,
-   "chars_mean": 554.4,
-   "chars_median": 268.0,
-   "chars_max": 5196,
-   "under_30_chars": 3,
-   "text_over_1200": 0,
-   "table_chunks": 79,
-   "row_chunks": 25,
-   "text_without_heading_path": 1
+   "table_chunks": 3692,
+   "row_chunks": 3523,
+   "text_without_heading_path": 22
   }
  },
  "search": {
   "law": {
-   "alias": "exp-chk-law-old",
+   "alias": "search-law",
    "questions": 149,
-   "gold_lost": 2,
-   "cutoffs": {
-    "service": {
-     "evidence": 138,
-     "doc_hit": 147,
-     "phrase": 138,
-     "avg_returned": 8.0
-    },
-    "0.95": {
-     "evidence": 135,
-     "doc_hit": 145,
-     "phrase": 136,
-     "avg_returned": 3.56
-    }
-   },
-   "service_cutoff": 0.7
-  },
-  "admin": {
-   "alias": "exp-chk-admin-old",
-   "questions": 30,
    "gold_lost": 0,
    "cutoffs": {
     "service": {
-     "evidence": 30,
-     "doc_hit": 30,
-     "phrase": 30,
-     "avg_returned": 9.33
+     "evidence": 145,
+     "doc_hit": 148,
+     "phrase": 143,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 7.91
     },
     "0.95": {
-     "evidence": 27,
-     "doc_hit": 30,
-     "phrase": 27,
-     "avg_returned": 3.53
+     "evidence": 139,
+     "doc_hit": 146,
+     "phrase": 139,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 3.39
     }
    },
    "service_cutoff": 0.7

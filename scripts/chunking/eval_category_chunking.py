@@ -48,10 +48,51 @@ def derive_gold(question: dict, chunks: list[dict], rules: dict) -> list[list[st
     return groups
 
 
+_SHINGLE = 10
+_EQUIVALENT = 0.8
+
+
+def shingles(text: str) -> set[str]:
+    t = norm(text)
+    return {t[i:i + _SHINGLE] for i in range(max(len(t) - _SHINGLE + 1, 1))}
+
+
+def transfer_gold(question: dict, reference: dict[str, dict], chunks: list[dict]) -> list[list[str]]:
+    """공식 라벨(기준 인덱스의 정답 청크)을 다른 청킹의 청크로 옮긴다.
+
+    같은 부모 문서의 청크 중 정답 청크의 글이 거의 다(80%) 들어 있거나(정답이 통째로 든 청크), 청크의 글이 거의 다 정답 청크 안에
+    있으면(정답 청크를 쪼갠 조각) 같은 근거로 본다. 옮길 청크가 하나도 없는 그룹은 비어 이 청킹에서 라벨을 잃은 질문이 된다.
+    """
+    by_parent: dict[str, list[dict]] = {}
+    for c in chunks:
+        by_parent.setdefault(c["parent_id"], []).append(c)
+    cache: dict[str, set[str]] = {}
+
+    def sh(chunk: dict) -> set[str]:
+        return cache.setdefault(chunk["id"], shingles(chunk["body"]))
+
+    groups = []
+    for group in question["evidence_groups"]:
+        found: set[str] = set()
+        for gid in group:
+            gold = reference.get(gid)
+            if gold is None:
+                continue
+            g = shingles(gold["body"])
+            for c in by_parent.get(gold["parent_id"], []):
+                cs = sh(c)
+                inter = len(g & cs)
+                if inter / len(g) >= _EQUIVALENT or inter / len(cs) >= _EQUIVALENT:
+                    found.add(c["id"])
+        groups.append(sorted(found))
+    return groups
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--queries", type=Path, required=True)
     parser.add_argument("--arm", action="append", required=True, help="이름=별칭")
+    parser.add_argument("--reference", help="공식 라벨의 청크 ID가 살아 있는 인덱스(서비스 인덱스). 주면 라벨을 그 청크에서 각 팔로 옮긴다")
     parser.add_argument("--as-of", default="2026-10-07")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
@@ -73,6 +114,8 @@ def main() -> int:
             return vectors[q.strip()]
 
     rules = policies()
+    reference = {c["id"]: c for c in load_chunks(client, args.reference)} if args.reference else None
+    ref_alias = args.reference
     ratios = {"service": settings.search_category_cutoff_ratio, "0.95": 0.95}
     result = {"questions": len(questions), "service_cutoff": settings.search_category_cutoff_ratio, "arms": {}}
     for spec in args.arm:
@@ -82,7 +125,12 @@ def main() -> int:
         body_norm = {c["id"]: norm(c["body"]) for c in chunks}
         per_question = {}
         for q in questions:
-            groups = derive_gold(q, chunks, rules)
+            if reference is None:
+                groups = derive_gold(q, chunks, rules)
+            elif alias == ref_alias:
+                groups = [list(g) for g in q["evidence_groups"]]  # 공식 라벨 그대로
+            else:
+                groups = transfer_gold(q, reference, chunks)
             entry = {"gold_groups": [len(g) for g in groups], "gold_lost": any(not g for g in groups) or not groups}
             for label, ratio in ratios.items():
                 hits = retrieval.retrieve(client, alias, q["query"], as_of, 5, Frozen(), mode="hybrid", lexical="splade",

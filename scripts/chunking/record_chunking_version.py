@@ -60,6 +60,8 @@ def eval_metrics(path: Path, arm: str) -> dict:
         values = list(per_question.values())
         out["cutoffs"][label] = {
             **{field: sum(e[label][field] for e in values) for field in EVAL_FIELDS},
+            # 공식 라벨을 이 청킹의 청크로 옮기지 못했지만(gold_lost) 필수 구절은 반환된 질문 -- 라벨 탓이지 검색 탓이 아니다
+            "evidence_label_unmapped_phrase_returned": sum(1 for e in values if e["gold_lost"] and e[label]["phrase"] and not e[label]["evidence"]),
             "avg_returned": round(sum(e[label]["returned"] for e in values) / questions, 2),
         }
     out["service_cutoff"] = result["service_cutoff"]
@@ -69,10 +71,11 @@ def eval_metrics(path: Path, arm: str) -> dict:
 def render(records: list[dict]) -> str:
     lines = ["# 청킹 버전 기록", "",
              "청커나 정책을 바꿀 때마다 한 줄씩 남긴다. 각 버전의 JSON은 `chunking_versions/v<N>.json`, 만드는 법은",
-             "`scripts/chunking/record_chunking_version.py`. 정답 청크 반환은 필수 구절로 각 인덱스에서 다시 정한 정답 청크 기준이고",
-             "(`scripts/chunking/eval_category_chunking.py`), **서비스 컷오프**는 기록 시점의 서비스 설정, 0.95는 이전 기준이다.", "",
-             "| 버전 | 날짜 | 요약 | 법령 청크 | 법령 정답 청크 반환 (서비스 / 0.95) | 행정 청크 | 행정 정답 청크 반환 (서비스 / 0.95) |",
-             "|---|---|---|---:|---|---:|---|"]
+             "`scripts/chunking/record_chunking_version.py`. 정답 청크 반환은 서비스 인덱스의 공식 라벨(청크 ID)을 각 청킹의 청크로 옮겨 센 값이고",
+             "(`scripts/chunking/eval_category_chunking.py --reference`; 글이 80% 이상 겹치는 같은 문서의 청크를 같은 근거로 본다), **서비스 컷오프**는 기록 시점의 서비스 설정, 0.95는 이전 기준이다.",
+             "법령 150문항 중 평가 대상 149문항(정답 근거가 불완전한 053 제외) 기준이고 149는 질문 수다.", "",
+             "| 버전 | 날짜 | 요약 | 법령 청크 | 법령 정답 청크 반환 (서비스 / 0.95) |",
+             "|---|---|---|---:|---|"]
 
     def cell(record: dict, name: str) -> tuple[str, str]:
         stats = record.get("corpus", {}).get(name)
@@ -84,8 +87,8 @@ def render(records: list[dict]) -> str:
         return chunks, f"{c['service']['evidence']} / {c['0.95']['evidence']} (/{found['questions']})"
 
     for r in records:
-        law, admin = cell(r, "law"), cell(r, "admin")
-        lines.append(f"| v{r['version']} | {r['date']} | {r['label']} | {law[0]} | {law[1]} | {admin[0]} | {admin[1]} |")
+        law = cell(r, "law")
+        lines.append(f"| v{r['version']} | {r['date']} | {r['label']} | {law[0]} | {law[1]} |")
     for r in records:
         lines += ["", f"## v{r['version']} — {r['label']} ({r['date']})", "", r.get("notes", "").strip(), ""]
         lines.append(f"- 검색엔진 커밋 `{r['search_engine_commit']}`{' (작업 트리에 미커밋 변경 있음)' if r.get('dirty') else ''}"
@@ -99,9 +102,9 @@ def render(records: list[dict]) -> str:
                          f"표 청크 {stats['table_chunks']}(행 청크 {stats['row_chunks']}), 표 아닌 청크 중 제목 경로 없음 {stats['text_without_heading_path']}")
         for name, found in r.get("search", {}).items():
             lines += ["", f"### {name} 검색 ({found['questions']}문항, 서비스 컷오프 {found['service_cutoff']}, 정답 라벨이 청크에서 사라진 질문 {found['gold_lost']})", "",
-                      "| 컷오프 | 정답 청크 반환 | 정답 문서 적중 | 필수 구절 반환 | 평균 반환 청크 |", "|---|---:|---:|---:|---:|"]
+                      "| 컷오프 | 정답 청크 반환 | 라벨을 못 옮겼지만 필수 구절은 반환 | 정답 문서 적중 | 필수 구절 반환 | 평균 반환 청크 |", "|---|---:|---:|---:|---:|---:|"]
             for label, c in found["cutoffs"].items():
-                lines.append(f"| {label} | {c['evidence']} | {c['doc_hit']} | {c['phrase']} | {c['avg_returned']} |")
+                lines.append(f"| {label} | {c['evidence']} | {c.get('evidence_label_unmapped_phrase_returned', '-')} | {c['doc_hit']} | {c['phrase']} | {c['avg_returned']} |")
             lines.append(f"\n색인 별칭: `{found['alias']}`")
     return "\n".join(lines) + "\n"
 
