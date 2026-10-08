@@ -70,6 +70,7 @@ def main():
             client.update_by_query(index=clone, body={'query': {'term': {'parent_id': parent_id}}, 'script': {'source': 'ctx._source.superseded_by = params.v', 'params': {'v': target}}}, refresh=True)
         client.indices.refresh(index=clone)
         questions = [json.loads(line) for line in args.queries.read_text().splitlines() if line.strip()]
+        questions = [q for q in questions if q.get("positive_review", {}).get("evaluation_eligible", True)]
         texts = [q['query'].strip() for q in questions]
         vectors = dict(zip(texts, OllamaEmbedder(settings).embed(texts)))
         sparse = dict(zip(texts, SparseEncoder(settings).encode(texts, settings.search_splade_query_max_length)))

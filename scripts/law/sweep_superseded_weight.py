@@ -46,6 +46,7 @@ def main():
     client = create_client(settings)
     index = list(client.indices.get_alias(name=args.alias))[0]
     questions = [json.loads(line) for line in args.queries.read_text().splitlines() if line.strip()]
+    questions = [q for q in questions if q.get("positive_review", {}).get("evaluation_eligible", True)]
     texts = [q['query'].strip() for q in questions]
     vectors = dict(zip(texts, OllamaEmbedder(settings).embed(texts)))
     sparse = dict(zip(texts, SparseEncoder(settings).encode(texts, settings.search_splade_query_max_length)))

@@ -57,6 +57,7 @@ def main():
     baseline = physical[0]
     rows = sorted((h['_source'] for h in scan(client, index=baseline, query={'query': {'match_all': {}}, '_source': {'excludes': ['embedding', 'splade']}})), key=lambda r: r['id'])
     questions = [json.loads(line) for line in args.queries.read_text().splitlines() if line.strip()]
+    questions = [q for q in questions if q.get("positive_review", {}).get("evaluation_eligible", True)]
     if not rows or not questions:
         raise ValueError('Empty corpus or questions')
     ids = {r['id'] for r in rows}
@@ -124,7 +125,7 @@ def main():
         for offset in range(0, len(rows), 64):
             batch = rows[offset:offset + 64]
             vectors = encoder.encode_documents(new_texts[offset:offset + 64])
-            actions = ({'_op_type': 'update', '_index': experiment, '_id': r['id'], 'doc': {'splade': v}} for r, v in zip(batch, vectors))
+            actions = ({'_op_type': 'update', '_index': experiment, '_id': r['id'], 'script': {'source': 'ctx._source.splade = params.v', 'params': {'v': v}}} for r, v in zip(batch, vectors))
             for ok, item in streaming_bulk(client, actions, chunk_size=64, raise_on_error=True):
                 if not ok:
                     raise RuntimeError(str(item))

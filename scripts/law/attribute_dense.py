@@ -68,13 +68,18 @@ def main() -> None:
             dn = qd.get("dn")
             if not dn:
                 continue
+            old = qd.get("occ") or {}
+            pending = [i for i,h in enumerate(dn) if i >= len(old.get("base", [])) or old["base"][i] is None or not h.get("cs")]
+            if not pending:
+                continue
+            selected = [dn[i] for i in pending]
             query = qtext[(setk, qid)]
             words = query.split()
 
             texts = [query] + [" ".join(words[:i] + words[i + 1 :]) for i in range(len(words))]
             chunk_at = []
             chunk_segs = []
-            for hit in dn:
+            for hit in selected:
                 title, body = catb[hit["c"]]
                 body_t = tidy(body)
                 cwords = body_t.split()
@@ -94,14 +99,15 @@ def main() -> None:
             qv = embs[0]
             word_vs = embs[1 : 1 + len(words)]
 
-            base = []
-            d_rows = [[] for _ in words]
-            for hi, hit in enumerate(dn):
+            base = list(old.get("base", [])) if len(old.get("base", [])) == len(dn) else [None] * len(dn)
+            d_rows = [list(r) for r in old["d"]] if old.get("w") == words and all(len(r) == len(dn) for r in old.get("d", [])) else [[None] * len(dn) for _ in words]
+            for hi, hit in enumerate(selected):
+                column = pending[hi]
                 cv = embs[chunk_at[hi]]
                 b = cosine(qv, cv)
-                base.append(round(b, 3))
+                base[column] = round(b, 3)
                 for wi, wv in enumerate(word_vs):
-                    d_rows[wi].append(round(b - cosine(wv, cv), 4))
+                    d_rows[wi][column] = round(b - cosine(wv, cv), 4)
                 segs, seg_at = chunk_segs[hi]
                 cs = []
                 for seg, at in zip(segs, seg_at):
@@ -110,7 +116,10 @@ def main() -> None:
                 hit["cs"] = cs
 
             qd["occ"] = {"w": words, "base": base, "d": d_rows}
-            print(f"[{done}/{total}] {setk}-{qid} 완료", flush=True)
+            # Save each completed question so a service failure can be resumed.
+            new_cath = json.dumps(cath, ensure_ascii=False, separators=(",", ":"))
+            DETAIL.write_text(detail_txt[:cath_span[0]] + new_cath + detail_txt[cath_span[1]:], encoding="utf-8")
+            print(f"[{done}/{total}] {setk}-{qid} 완료 (+{len(pending)}청크)", flush=True)
 
     new_cath = json.dumps(cath, ensure_ascii=False, separators=(",", ":"))
     new_txt = detail_txt[: cath_span[0]] + new_cath + detail_txt[cath_span[1] :]

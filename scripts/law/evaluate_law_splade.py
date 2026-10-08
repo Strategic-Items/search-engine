@@ -49,6 +49,7 @@ def window(lists: dict[str, list[tuple[str, float]]], parent: dict[str, str]) ->
 def main(splade_file: str) -> None:
     sp = json.loads(Path(splade_file).read_text())
     rows = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [r for r in rows if r.get("positive_review", {}).get("evaluation_eligible", True)]
     settings = get_settings()
     settings.search_chunk_filter = False
     client, embedder = create_client(settings), OllamaEmbedder(settings)
@@ -88,8 +89,9 @@ def main(splade_file: str) -> None:
         for row in rows:
             groups = run(row)
             flat = [c for g in groups for c in g]
-            gold = set(row["evidence_groups"][0])
-            found += bool(gold & set(flat))
+            gold = {c for group in row["evidence_groups"] for c in group}
+            complete = all(bool(set(g) & set(flat)) for g in row["evidence_groups"])
+            found += complete
             docs = [g[0].split("#")[0] for g in groups if g]
             doc_hit += bool(set(docs) & set(row["gold"]))
             n = len(flat)
@@ -97,7 +99,7 @@ def main(splade_file: str) -> None:
             cp.append(sum(c in gold for c in flat) / n if n else 0.0)
             ceil.append(min(len(gold), n) / n if n else 0.0)
             dp.append(sum(d in row["gold"] for d in docs) / len(docs) if docs else 0.0)
-            if not gold & set(flat):
+            if not complete:
                 misses.setdefault(name, []).append(f"{row['qid']} {row['query']}")
         n = len(rows)
         print(f"| {name} | {found}/{n} = {found / n:.3f} | {sum(cp) / n:.3f} | {sum(ceil) / n:.3f} | {sum(dp) / n:.3f} | {doc_hit}/{n} | {sum(sizes) / n:.1f} |")

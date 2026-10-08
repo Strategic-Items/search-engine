@@ -92,6 +92,7 @@ def main():
     ids = [r['id'] for r in rows]
     base_dense = np.array([r.pop('embedding') for r in rows], dtype=np.float32)
     questions = [json.loads(line) for line in args.queries.read_text().splitlines() if line.strip()]
+    questions = [q for q in questions if q.get("positive_review", {}).get("evaluation_eligible", True)]
     for q in questions:
         if not any(set(g) & set(ids) for g in q['evidence_groups']):
             raise ValueError('Gold missing: ' + q['qid'])
@@ -247,7 +248,7 @@ def main():
         for off in range(0, len(changed), 64):
             pos = changed[off:off + 64]
             vectors = encoder.encode_documents([new_texts[i] for i in pos])
-            actions = ({'_op_type': 'update', '_index': index, '_id': rows[i]['id'], 'doc': {'splade': v}} for i, v in zip(pos, vectors))
+            actions = ({'_op_type': 'update', '_index': index, '_id': rows[i]['id'], 'script': {'source': 'ctx._source.splade = params.v', 'params': {'v': v}}} for i, v in zip(pos, vectors))
             for ok, item in streaming_bulk(client, actions, chunk_size=64, raise_on_error=True):
                 if not ok:
                     raise RuntimeError(str(item))

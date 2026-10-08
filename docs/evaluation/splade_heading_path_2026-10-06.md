@@ -101,7 +101,7 @@
 
 ## 구현과 적용 상태
 
-`SEARCH_SPLADE_INCLUDE_HEADING_PATH=true`를 설정하면 법령·행정의 SPLADE 색인 입력에 dense와 같은 방식으로 제목 경로를 붙일 수 있다. 기본값은 false이며 현재 운영 인덱스·별칭은 이 실험으로 바꾸지 않았다. 이 옵션은 색인할 때만 사용하므로 켜는 것만으로 기존 벡터가 바뀌지는 않는다. 재색인이 필요하다.
+`SEARCH_SPLADE_INCLUDE_HEADING_PATH=true`를 설정하면 법령·행정의 SPLADE 색인 입력에 dense와 같은 방식으로 제목 경로를 붙일 수 있다. 2026-10-07부터 기본값은 true이며(확정). 실험 당시 기본값은 false였고 현재 운영 인덱스·별칭은 이 실험으로 바꾸지 않았다. 이 옵션은 색인할 때만 사용하므로 켜는 것만으로 기존 벡터가 바뀌지는 않는다. 재색인이 필요하다.
 
 ```bash
 .venv/bin/python scripts/law/compare_splade_heading_path.py
