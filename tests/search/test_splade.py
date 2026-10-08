@@ -101,7 +101,7 @@ def test_category_search_uses_splade_and_chunk_rrf_when_the_model_is_set(monkeyp
     assert seen["modes"] == CATEGORY_MODES
     assert seen["options"]["lexical"] == "splade"
     assert seen["options"]["chunk_first"] is True
-    assert seen["options"]["chunk_first_cutoff_ratio"] == 0.95
+    assert seen["options"]["chunk_first_cutoff_ratio"] == 0.7
 
 
 def test_category_search_falls_back_to_bm25_without_a_model(monkeypatch):
