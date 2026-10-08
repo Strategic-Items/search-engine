@@ -213,3 +213,6 @@ __marimo__/
 # macOS 워크스페이스 파일
 .DS_Store
 data/generated/
+
+# 청킹 버전별 색인 산출물(임베딩 포함, 큼) -- scripts/chunking/version_artifacts.py
+data/chunking_artifacts/

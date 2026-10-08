@@ -4,6 +4,7 @@
 #
 #   scripts/chunking/run_version.sh <버전> "<요약>" "<무엇을 왜 바꿨나>"
 #
+# 색인한 인덱스는 임베딩까지 data/chunking_artifacts/v<N>/에 보관한다(version_artifacts.py). 나중에 되살려 다시 잴 수 있다.
 # 먼저 search_engine/chunking/params.py의 CHUNKER_VERSION을 <버전>으로 올려 둔다(다르면 기록 때 경고).
 set -e
 cd "$(dirname "$0")/../.."
@@ -13,6 +14,7 @@ OUT=data/generated/chunking-v$V
 mkdir -p $OUT
 .venv/bin/python scripts/chunking/build_corpus_from_bundles.py $PARSER/data/category_chunks/01_법령고시 --out $OUT/law.jsonl
 env SEARCH_LAW_ALIAS=exp-chk-law-v$V SEARCH_LAW_PREFIX=exp-chk-law-v$V- .venv/bin/search-index $OUT/law.jsonl --dataset law 2>&1 | tail -1
+.venv/bin/python scripts/chunking/version_artifacts.py save --version $V --index exp-chk-law-v$V --corpus $OUT/law.jsonl
 .venv/bin/python scripts/chunking/eval_category_chunking.py --queries data/queries_law150_v1.jsonl --reference search-law \
   --arm live=search-law --arm new=exp-chk-law-v$V --out $OUT/eval_law.json 2>&1 | grep -v "^INFO\|Warning\|warn\|Loading weights"
 .venv/bin/python scripts/chunking/record_chunking_version.py --version $V --label "$LABEL" --notes "$NOTES" \
