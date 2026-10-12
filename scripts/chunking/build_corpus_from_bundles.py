@@ -20,9 +20,13 @@ from search_engine.chunking.postprocess import TITLE_SEPARATOR, section_label
 # 청크마다 달라지는 필드 -- 문서 단위 행에서 가져오지 않고 새로 채운다
 _CHUNK_FIELDS = {"id", "title", "body", "content_hash", "chunk_index", "chunk_count", "heading_path", "element_types",
                  "page_start", "page_end", "table_id", "caption", "unit", "columns", "row_count", "row_id", "row_index", "values",
-                 "column", "piece_index", "piece_count", "article", "images"}
+                 "column", "piece_index", "piece_count", "article", "images", "table_context_before", "table_context_after",
+                 "table_segment_index", "table_segment_count", "table_continued", "table_page_start", "table_page_end",
+                 "table_row_offset", "table_segment_row_index"}
 _STRUCTURE_KEYS = ("page_start", "page_end", "heading_path", "element_types", "table_id", "caption", "unit", "columns", "row_count",
-                   "row_id", "row_index", "values", "column", "piece_index", "piece_count", "article")
+                   "row_id", "row_index", "values", "column", "piece_index", "piece_count", "article", "table_context_before",
+                   "table_context_after", "table_segment_index", "table_segment_count", "table_continued", "table_page_start",
+                   "table_page_end", "table_row_offset", "table_segment_row_index")
 
 
 def document_title(first_row: dict) -> str:

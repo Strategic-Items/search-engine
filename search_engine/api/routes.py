@@ -197,10 +197,15 @@ def search_category_compare(category: str, request: SearchRequest) -> ModeCompar
     alias = _category_alias(category)
     settings = get_settings()
     # SPLADE 모델이 설정돼 있으면 SPLADE가 BM25 자리를 맡고 hybrid는 청크 단위 RRF로 합친다(38·40단계 측정 기준).
-    # 설정이 없으면 예전대로 BM25다.
+    # 법령에는 BM25 대체 경로를 허용하지 않는다.
     splade = sparse_enabled(settings)
+    if category == "law" and not splade:
+        raise HTTPException(status_code=503, detail="law search requires a configured SPLADE model")
     options = {"lexical": "splade", "chunk_first": True,
                "chunk_first_cutoff_ratio": settings.search_category_cutoff_ratio} if splade else {}
+    if splade and category == "law":
+        options.update(hybrid_candidates=settings.search_law_candidates,
+                       law_ranking=True)
     try:
         return search_modes(
             create_client(), alias, request.query, date.today(), 5,

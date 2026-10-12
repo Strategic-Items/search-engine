@@ -10,7 +10,7 @@
 
 from dataclasses import dataclass
 
-CHUNKER_VERSION = 2
+CHUNKER_VERSION = 9
 
 DEFAULT_CHUNK_SIZE = 800
 DEFAULT_CHUNK_OVERLAP = 100

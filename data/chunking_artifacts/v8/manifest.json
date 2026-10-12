@@ -1,0 +1,72 @@
+{
+  "version": 8,
+  "saved_at": "2026-10-12T06:49:39+00:00",
+  "source_index": "exp-table-headers-final-law-20261012064449-120749",
+  "documents": 150,
+  "chunks": 6493,
+  "has_splade": true,
+  "embedding_dimensions": 1024,
+  "embedding_model": "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16",
+  "splade_model": "/Users/jeongbin/models/splade-c",
+  "dense_include_heading_path": true,
+  "splade_include_heading_path": true,
+  "chunker_version_in_code": 8,
+  "search_engine_commit": "9e61bac",
+  "dirty": true,
+  "files": {
+    "index.jsonl.gz": {
+      "sha256": "16b7a9154628389c15f4fe5b0994c07baa6bda9ecf18a423902f61dc72246072",
+      "bytes": 44632406
+    },
+    "corpus.jsonl.gz": {
+      "sha256": "fc4e083d73070f500e89938f9ea7559b6e5d7c62cbcd45bd068aec0bd05624b4",
+      "bytes": 1617415
+    },
+    "audit.json": {
+      "sha256": "c21685143f0a01127de482d2bd146a8aca8412a44f9494920eb08ae79a9dbe1c",
+      "bytes": 770293
+    },
+    "structure_law.json": {
+      "sha256": "ef1de8878f1a06641080dccdb3174cdf16e8d88a479c45f889b9e777df9cf513",
+      "bytes": 40316
+    },
+    "eval_law.json": {
+      "sha256": "cca6d0ea5b2229fc0868db6e1e8e5586dd66ab115de6eb62d609b4f5e8b1ab84",
+      "bytes": 92110
+    },
+    "gain_case.json": {
+      "sha256": "5112972b36b008991e4d777face216e950fb9974591a4dc39ccc2420507c35a5",
+      "bytes": 2418
+    },
+    "example.json": {
+      "sha256": "43b4fdbd1f34297765a384a31fd744a60c904a5acf5c0cbd01741fd6d38f0bac",
+      "bytes": 6689
+    },
+    "chunking.patch.gz": {
+      "sha256": "579ad116ba396aaedf4a2bed99301abef2f8859dd7fb5993f7212f8cc0d0f42c",
+      "bytes": 6087
+    }
+  },
+  "baseline": {
+    "index": "exp-table-ctx-after-law",
+    "corpus": "../table-context-2026-10-12/after/corpus.jsonl.gz",
+    "index_snapshot": "../table-context-2026-10-12/after/index.jsonl.gz"
+  },
+  "evaluation": {
+    "questions": 149,
+    "cutoff": {
+      "name": "service",
+      "ratio": 0.7
+    },
+    "llm": false,
+    "artifact": "eval_law.json",
+    "caveat": "Evidence 143→144 includes header-based label recovery; the improved question returned the same correct row before and after."
+  },
+  "column_names": {
+    "before_generic_chunks": 1251,
+    "after_generic_chunks": 382,
+    "before_generic_tables": 187,
+    "after_generic_tables": 89,
+    "inferred_sequence_name": "순번; only 1..N with at least 3 values"
+  }
+}

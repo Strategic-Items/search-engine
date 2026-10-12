@@ -79,3 +79,22 @@ def test_long_front_matter_stays_its_own_chunk():
     chunks = chunk_elements([_p(long_intro), _h("1. 배경"), _p("가상 배경 문장이 여기에 들어간다. 일관성 있는 작성을 유도한다.")],
                             document_id="d")
     assert len(chunks) == 2 and chunks[0]["heading_path"] == []
+
+
+def test_short_intro_can_still_join_a_child_heading():
+    chunks = chunk_elements([_h("첫 장"), _p("소개."), _h("하위 절", 2), _p("하위 절의 본문.")], document_id="d")
+    assert len(chunks) == 1
+    assert chunks[0]["heading_path"] == ["첫 장", "하위 절"]
+    assert "소개." in chunks[0]["text"]
+
+
+def test_heading_pages_and_types_follow_the_first_long_body_piece():
+    heading = {**_h("첫 장"), "page": 1}
+    child = {**_h("첫 절", 2), "page": 2}
+    body = {**_p("가나다라마바사아자차카타파하 문장이다. " * 80), "page": 3}
+    chunks = chunk_elements([heading, child, body], document_id="d", chunk_size=300, chunk_overlap=0)
+    assert len(chunks) > 1
+    assert (chunks[0]["page_start"], chunks[0]["page_end"]) == (1, 3)
+    assert chunks[0]["element_types"] == ["heading", "paragraph"]
+    assert all((c["page_start"], c["page_end"]) == (3, 3) and c["element_types"] == ["paragraph"]
+               for c in chunks[1:])

@@ -28,7 +28,8 @@ class _HtmlGrid(HTMLParser):
             self.rows.append([])
         elif tag in ("td", "th"):
             attrs = dict(attrs)
-            self._cell = {"rs": int(attrs.get("rowspan") or 1), "cs": int(attrs.get("colspan") or 1), "text": ""}
+            self._cell = {"rs": int(attrs.get("rowspan") or 1), "cs": int(attrs.get("colspan") or 1),
+                          "text": "", "header": tag == "th"}
         elif tag == "br" and self._cell is not None:
             self._cell["text"] += "\n"
 
@@ -52,7 +53,8 @@ def _html_cells(html: str) -> list[dict]:
         for cell in row:
             while (r, c) in taken:
                 c += 1
-            cells.append({"r": r, "c": c, "rs": cell["rs"], "cs": cell["cs"], "text": cell["text"]})
+            cells.append({"r": r, "c": c, "rs": cell["rs"], "cs": cell["cs"],
+                          "text": cell["text"], "header": cell["header"]})
             for rr in range(r, r + cell["rs"]):
                 for cc in range(c, c + cell["cs"]):
                     taken.add((rr, cc))
@@ -171,6 +173,14 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
         if not cells:
             continue
         matrix, merges = _matrix(cells, hard_breaks=hard_breaks)
+        header_rows = 0
+        for row_index in range(len(matrix)):
+            row_cells = [cell for cell in cells if cell["r"] == row_index]
+            if (row_cells and any(cell.get("header") for cell in row_cells)
+                    and all(cell.get("header") or not cell["text"].strip() for cell in row_cells)):
+                header_rows += 1
+            else:
+                break
         if tables and len(tables[-1]["rows"][0]) == len(matrix[0]):
             table = tables[-1]
             base = len(table["rows"])
@@ -180,7 +190,7 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
             if part_page not in table["pages"]:
                 table["pages"].append(part_page)
             continue
-        tables.append({"type": "table", "rows": matrix, "header_rows": 0, "header_cols": 0, "merges": merges,
+        tables.append({"type": "table", "rows": matrix, "header_rows": header_rows, "header_cols": 0, "merges": merges,
                        "pages": [part_page], "_row_pages": [part_page] * len(matrix),
                        **({"hard_breaks": True} if hard_breaks else {})})
     for table in tables:
@@ -196,6 +206,110 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
 
 
 def element_tables(elements: list[dict], *, hard_breaks: bool) -> list[list[dict]]:
-    """`chunk_elements(tables=...)`가 받는 값: 표 원소마다 그 표의 논리 표 자료 목록(같은 순서)."""
-    return [table_objects(e["text"], e.get("page", 1), hard_breaks=hard_breaks) if e["text"].strip() else []
-            for e in elements if e["type"] == "table"]
+    """`chunk_elements(tables=...)`용 표 자료. 인접 페이지에서 이어지는 표 조각에는 앞 구간의 열 이름을 물려준다."""
+    from search_engine.chunking.table_rows import comparison_columns, logical_tables
+
+    table_elements = [(i, element) for i, element in enumerate(elements) if element["type"] == "table"]
+    result: list[list[dict]] = []
+    previous: dict | None = None
+    for table_index, (element_position, element) in enumerate(table_elements):
+        objects = table_objects(element["text"], element.get("page", 1), hard_breaks=hard_breaks) if element["text"].strip() else []
+        result.append(objects)
+        if not objects:
+            continue
+
+        first_page = min(page for obj in objects for page in obj["pages"])
+        last_page = max(page for obj in objects for page in obj["pages"])
+        logical = [table for obj in objects for table in logical_tables(obj)]
+        named_comparison = next((table.columns for table in logical
+                                 if comparison_columns(table.columns)
+                                 and not all(name == f"열{i + 1}" for i, name in enumerate(table.columns))), None)
+        continuation = False
+        if previous is not None:
+            previous_position = table_elements[previous["last_index"]][0]
+            bridge = elements[previous_position + 1:element_position]
+            generic_columns = all(name == f"열{i + 1}" for i, name in enumerate(logical[0].columns))
+            schema_matches = logical[0].columns == previous["columns"] or generic_columns
+            connected = (first_page == previous["last_page"] + 1
+                         and len(previous["columns"]) == len(logical[0].columns)
+                         and all(item["type"] == "paragraph" and len(" ".join(item.get("text", "").split())) <= 12
+                                 for item in bridge))
+            first_values = [row[0].strip() for row in logical[0].rows if row and row[0].strip()]
+            identifiers = sum(bool(re.fullmatch(r"[0-9A-Za-z][0-9A-Za-z .,/_-]{0,35}", value))
+                              and bool(re.search(r"\d", value)) for value in first_values)
+            continuation = (connected and schema_matches and len(first_values) >= 3
+                            and identifiers / len(first_values) >= 0.6)
+
+        if continuation:
+            columns = previous["columns"]
+            for obj in objects:
+                obj["column_names"] = columns
+            segment_index = len(previous["segments"])
+            row_offset = previous["row_count"]
+            segment_rows = sum(len(table.rows) for table in logical)
+            previous["segments"].append(objects)
+            previous["row_count"] += segment_rows
+            previous["last_page"] = last_page
+            previous["last_index"] = table_index
+            for index, segment in enumerate(previous["segments"]):
+                segment_offset = sum(previous["segment_rows"][:index])
+                for obj in segment:
+                    obj["table_continuation"] = {
+                        "group": previous["group"], "segment": index,
+                        "segment_count": len(previous["segments"]),
+                        "page_start": previous["page_start"], "page_end": previous["last_page"],
+                        "row_offset": segment_offset, "row_count": previous["row_count"],
+                    }
+            previous["segment_rows"].append(segment_rows)
+            continue
+
+        if named_comparison:
+            previous = {"group": table_index, "last_index": table_index, "last_page": last_page,
+                        "page_start": first_page, "columns": named_comparison, "segments": [objects],
+                        "segment_rows": [sum(len(table.rows) for table in logical)],
+                        "row_count": sum(len(table.rows) for table in logical)}
+        else:
+            previous = None
+    if not hard_breaks:
+        _inherit_column_names(elements, table_elements, result)
+    return result
+
+
+def _inherit_column_names(elements: list[dict], table_elements: list[tuple[int, dict]],
+                          tables: list[list[dict]]) -> None:
+    """페이지 경계에서 빠진 머리글만 복구한다. 표 ID·행 경계는 변경하지 않는다.
+
+    같은 문서의 연속 페이지와 같은 열 수가 필요하다. 새 제목·별표·서식에서 끊고,
+    열 수가 깨진 구간에는 이름을 붙이지 않는다. 번호 목록을 제목으로 파싱한 PDF는 이어진 본문이다.
+    """
+    from search_engine.chunking.table_rows import logical_tables
+
+    anchor: dict | None = None
+    for (position, element), objects in zip(table_elements, tables):
+        if not objects:
+            anchor = None
+            continue
+        logical = [lt for obj in objects for lt in logical_tables(obj)]
+        first_page = min(page for obj in objects for page in obj["pages"])
+        last_page = max(page for obj in objects for page in obj["pages"])
+        if anchor:
+            bridge = elements[anchor["position"] + 1:position]
+            boundary = any(
+                (item["type"] == "heading" and not re.match(r"^\d+[.)]\s", item["text"]))
+                or re.match(r"^\s*(?:[\[【〔〈<■]\s*)?(?:별표|별지|붙임|부록)\s*\d", item["text"])
+                for item in bridge
+            )
+            if boundary or first_page != anchor["last_page"] + 1:
+                anchor = None
+        columns = logical[0].columns
+        generic = bool(columns) and all(name == f"열{i + 1}" for i, name in enumerate(columns))
+        if anchor and generic:
+            if len(columns) == len(anchor["columns"]):
+                for obj, lt in zip(objects, logical):
+                    if all(name == f"열{i + 1}" for i, name in enumerate(lt.columns)):
+                        obj["column_names"] = list(anchor["columns"])
+            anchor.update(position=position, last_page=last_page)
+        elif columns and not any(re.fullmatch(r"열\d+", name) for name in columns):
+            anchor = {"columns": list(columns), "position": position, "last_page": last_page}
+        else:
+            anchor = None

@@ -1,0 +1,26 @@
+{
+ "version": 5,
+ "saved_at": "2026-10-12T03:11:33+00:00",
+ "source_index": "exp-chk-common-v3-law-after-20261012030647-2732dc",
+ "documents": 150,
+ "chunks": 6517,
+ "has_splade": true,
+ "embedding_dimensions": 1024,
+ "embedding_model": "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16",
+ "splade_model": "/Users/jeongbin/models/splade-c",
+ "dense_include_heading_path": true,
+ "splade_include_heading_path": true,
+ "chunker_version_in_code": 5,
+ "search_engine_commit": "bc90f3a",
+ "dirty": true,
+ "files": {
+  "index.jsonl.gz": {
+   "sha256": "796d2440a6da14d1fdb9c67a5af239ddb91edc1bfc8923136ec9dc1a1d5a4427",
+   "bytes": 45323074
+  },
+  "corpus.jsonl.gz": {
+   "sha256": "caba2d54d9e2aa66b3123c4dd21ec84cf0f6be46d97ae13d4c5b5357e2c88569",
+   "bytes": 1620066
+  }
+ }
+}

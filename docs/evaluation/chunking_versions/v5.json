@@ -1,0 +1,95 @@
+{
+ "version": 5,
+ "label": "실험: 제목 메타데이터 보정 + 짧은 절 경계 (현재 경계 규칙 제거됨)",
+ "notes": "긴 문단 첫 조각 메타데이터 보정과 짧은 절 강제 경계를 함께 실험했다. 짧은 절 강제 경계는 목차에서 작은 청크를 만든 사례가 있어 현재 v6에서 제거했다. 이 v5 코퍼스·측정치는 과거 실험 결과로 보관한다.",
+ "date": "2026-10-12",
+ "search_engine_commit": "bc90f3a",
+ "dirty": true,
+ "parser_commit": "",
+ "policy": {
+  "chunk_size": 800,
+  "chunk_overlap": 100,
+  "min_chunk_chars": 30,
+  "question_min": 3,
+  "question_max_chars": 300,
+  "question_path_chars": 80,
+  "row_key_max_chars": 40,
+  "long_cell_ratio": 0.5,
+  "pair_oversize_ratio": 1.5,
+  "carry_max_chars": 40,
+  "heading_max_chars": 60
+ },
+ "parity": "",
+ "corpus": {
+  "law": {
+   "documents": 150,
+   "chunks": 6517,
+   "chars_mean": 288.4,
+   "chars_median": 191,
+   "chars_max": 4337,
+   "under_30_chars": 188,
+   "text_over_1200": 0,
+   "table_chunks": 3908,
+   "row_chunks": 3766,
+   "text_without_heading_path": 39
+  },
+  "admin": {
+   "documents": 20,
+   "chunks": 183,
+   "chars_mean": 460.3,
+   "chars_median": 154,
+   "chars_max": 5196,
+   "under_30_chars": 12,
+   "text_over_1200": 0,
+   "table_chunks": 108,
+   "row_chunks": 56,
+   "text_without_heading_path": 2
+  }
+ },
+ "search": {
+  "law": {
+   "alias": "exp-chk-common-v5-law-after",
+   "questions": 149,
+   "gold_lost": 1,
+   "cutoffs": {
+    "service": {
+     "evidence": 143,
+     "doc_hit": 146,
+     "phrase": 140,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 7.97
+    },
+    "0.95": {
+     "evidence": 141,
+     "doc_hit": 146,
+     "phrase": 137,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 3.42
+    }
+   },
+   "service_cutoff": 0.7
+  },
+  "admin": {
+   "alias": "exp-chk-common-v5-admin-after",
+   "questions": 30,
+   "gold_lost": 0,
+   "cutoffs": {
+    "service": {
+     "evidence": 30,
+     "doc_hit": 30,
+     "phrase": 30,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 9.3
+    },
+    "0.95": {
+     "evidence": 28,
+     "doc_hit": 30,
+     "phrase": 27,
+     "evidence_label_unmapped_phrase_returned": 0,
+     "avg_returned": 3.5
+    }
+   },
+   "service_cutoff": 0.7
+  }
+ }
+}

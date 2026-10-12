@@ -2,7 +2,7 @@ var VIEWS={d:[["q","질문별"],["s","단계별"],["a","구조도"],["e","메타
 var BRAND={d:["질문별 검색 경로 탐색기","docs 정답형 135문항과 무응답 대상 38문항을 지금 운영 설정(문서 우선, 판정 LLM 끔)으로 다시 돌린 결과입니다."],c:["카테고리별 검색 탐색기","법령·고시, 행정·업무, 민원FAQ를 각자 인덱스에서 따로 찾는 경로(37단계부터)를 점검한 결과입니다."]};
 function modeOf(v){ return v==="ck"||v==="cq"||v==="cs"||v==="ca"||v==="c"||v==="cm"||v==="cmc"?"c":"d"; }
 function categoryStageExists(k){ return STG.some(function(x){return x.k===k&&!!x.doc&&x.num>=37;}); }
-function categoryViews(){ return CATSEL==="common"?[["cs","단계별"],["ca","구조도"],["cmc","메타데이터"]]:(CATSEL==="law100"?[["cq","질문별"],["ck","청킹 결과"],["c","결과 요약"],["cm","메타데이터"]]:VIEWS.c); }
+function categoryViews(){ return CATSEL==="common"?[["cs","단계별"],["ca","구조도"],["cmc","메타데이터"]]:(CATSEL==="law100"?[["cq","질문별"],["ck","청킹 단계"],["c","결과 요약"],["cm","메타데이터"]]:VIEWS.c); }
 function setView(v,nohash){
   if(v==="ck"&&CATSEL!=="law100") v="cq";
   var m=modeOf(v), prev=st.mode||"d";
@@ -271,8 +271,8 @@ function setView(v,nohash){
     var mv=st.view==="cq"?cqMove:st.view==="q"?move:null; if(!mv) return;
     if(e.key==="ArrowDown"||e.key==="j"){ e.preventDefault(); mv(1); } else if(e.key==="ArrowUp"||e.key==="k"){ e.preventDefault(); mv(-1); } });
   window.addEventListener("hashchange",function(){ var id=location.hash.slice(1);
-    var oldChunkSelection=CK.group+"|"+CK.qid;
-    if(ckReadHash(id)){if(st.view==="ck"&&CATSEL==="law100"&&oldChunkSelection===CK.group+"|"+CK.qid)return;CATSEL="law100";setView("ck",true);return;}
+    var oldChunkSelection=CK.stageId;
+    if(ckReadHash(id)){if(st.view==="ck"&&CATSEL==="law100"&&oldChunkSelection===CK.stageId)return;CATSEL="law100";setView("ck",true);return;}
     if(id==="arch"){ if(st.view!=="a") setView("a",true); return; }
     if(id==="meta"){ if(st.view!=="e") setView("e",true); return; }
     if(id==="cat-arch"){ setView("ca",true); return; }

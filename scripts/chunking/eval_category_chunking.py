@@ -2,7 +2,7 @@
 
 정답 청크는 청킹이 달라지면 ID도 달라지므로, 질문의 필수 구절(`phrases`)로 *각 인덱스에서 다시 정한다*: 정답 문서(`gold`)의 청크 중
 필수 구절을 모두 담은 청크(검토된 범위 제약 `evidence_validation` 적용). 질문 라벨이 청크를 따라오는 방식은 `evaluate_law.py`와 같다.
-서비스 경로(`retrieve`, chunk_first)를 그대로 쓰고 컷오프는 서비스 설정과 이전 기준(0.95)을 함께 낸다.
+서비스 경로(`retrieve`, chunk_first)를 그대로 쓰고 서비스 설정의 컷오프만 평가한다.
 
     .venv/bin/python scripts/chunking/eval_category_chunking.py --queries data/queries_law150_v1.jsonl \\
         --arm old=exp-chk-law-old --arm port=exp-chk-law-port --arm slim=exp-chk-law-slim --out result.json
@@ -129,7 +129,7 @@ def main() -> int:
     rules = policies()
     reference = {c["id"]: c for c in load_chunks(client, args.reference)} if args.reference else None
     ref_alias = args.reference
-    ratios = {"service": settings.search_category_cutoff_ratio, "0.95": 0.95}
+    ratios = {"service": settings.search_category_cutoff_ratio}
     result = {"questions": len(questions), "service_cutoff": settings.search_category_cutoff_ratio, "arms": {}}
     for spec in args.arm:
         name, alias = spec.split("=", 1)

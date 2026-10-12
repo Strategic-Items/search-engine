@@ -16,8 +16,9 @@
 벡터 공간 중심 근처에 놓여 아무 질의에나 딸려 나온다, CLAUDE.md "색인 계약에서 주의할 것").
 
 메타데이터: 표 청크(쪼갠 것·안 쪼갠 것 모두, 논리 표가 하나로 대응될 때)에 `table_id`, `columns`, `row_count`(머리글
-제외 데이터 행 수)를 붙이고, 행 청크에는 `row_id`, `row_index`(0부터, 데이터 행 기준), `values`(열 순서대로의 값)를 더
-붙인다. 쪽 범위는 다른 청크와 같이 `page_start`/`page_end`다.
+제외 데이터 행 수)를 붙이고, 행 청크에는 `row_id`, `row_index`, `values`(열 순서대로의 값)를 더한다. 페이지를 넘어 이어진
+표 구간은 같은 `table_id`와 전역 행 번호를 쓰고 `table_segment_index`, `table_segment_count`, `table_page_start`/
+`table_page_end`, `table_row_offset`으로 구간을 식별한다. `page_start`/`page_end`는 행의 원본 페이지다.
 
 ## 제목만 남는 청크를 만들지 않는다 (2026-10-01)
 
@@ -30,8 +31,7 @@
 - 본문으로 치지 않는 원소: 글자 없는 그림(OCR 없음)·빈 표 -- 색인 단계(`convert.index_text`)에서 자리표시가 지워지므로
   이것만 붙은 제목도 제목만 남는다.
 - 행으로 나누는 큰 표 앞의 제목은 지금처럼 본문에 넣지 않고 `heading_path`(행 청크마다)로 남긴다.
-- 제목 아래 본문이 아주 짧으면(`min_chunk_chars`=30자 미만: 문서 첫머리 행사명 한 줄, 제목+괄호 부제) 따로 청크로 내보내지
-  않고 다음 청크(다음 제목 또는 표) 앞에 붙인다 -- 혼자서는 검색 단위가 못 된다.
+- 제목 아래 본문이 아주 짧으면(`min_chunk_chars`=30자 미만) 다음 제목 또는 표 앞에 붙여, 짧은 본문만 든 청크를 만들지 않는다.
 
 ## 쪽마다 되풀이되는 같은 제목 (2026-10-01)
 
@@ -71,6 +71,31 @@ from search_engine.chunking.table_rows import comparison_chunks, comparison_colu
 _PAGE_MARKER = re.compile(r"<!--\s*page:\s*(\d+)\s*-->")
 _HTML_TAG = re.compile(r"<[^>]+>")
 _PAGE_NUMBER_ONLY = re.compile(r"^\s*(?:[-–—]\s*\d{1,4}\s*[-–—]|\d{1,4}\s*/\s*\d{1,4}|-\s*\d{1,4}\s*/\s*\d{1,4}\s*-)\s*$")
+_TABLE_REFERENCE = re.compile(r"(?:다음|아래)\s*(?:의\s*)?표|표\s*(?:제\s*)?\d+\s*(?:은|는|과|와|에|에서|을|를|참고|참조|같이)")
+_TABLE_NOTE = re.compile(r"^\s*(?:※|\*|주(?:\s*\d+)?\s*[:：.)]|비고\s*[:：])")
+_TABLE_CONTEXT_MAX = 240
+
+
+def _table_contexts(elements: list[dict]) -> list[dict[str, str]]:
+    """바로 붙은 문장 중 표를 명시적으로 가리키는 설명·주석만 표에 연결한다."""
+    table_positions = [i for i, element in enumerate(elements) if element["type"] == "table"]
+    contexts = []
+    for position in table_positions:
+        context = {}
+        for key, neighbor, pattern in (
+            ("table_context_before", position - 1, _TABLE_REFERENCE),
+            ("table_context_after", position + 1, _TABLE_NOTE),
+        ):
+            if not 0 <= neighbor < len(elements) or elements[neighbor]["type"] != "paragraph":
+                continue
+            text = " ".join(elements[neighbor].get("text", "").split())
+            if not pattern.search(text):
+                continue
+            if len(text) > _TABLE_CONTEXT_MAX:
+                text = text[:_TABLE_CONTEXT_MAX].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
+            context[key] = text
+        contexts.append(context)
+    return contexts
 
 
 def chunk_elements(
@@ -94,6 +119,8 @@ def chunk_elements(
     pending: list[dict] = []
     table_elements_seen = 0
     table_ids = 0
+    continuation_ids: dict[int, str] = {}
+    table_contexts = _table_contexts(elements)
 
     def next_table_id() -> str:
         nonlocal table_ids
@@ -189,7 +216,7 @@ def chunk_elements(
             level = max(1, element.get("level") or 1)
             if new_page and (level, element.get("text", "")) in heading_stack:
                 continue  # 쪽 머리에 되풀이된, 이미 열린 제목 -- 이어지는 절(모듈 docstring)
-            # 제목만 쌓여 있거나 본문이 아주 짧으면(`min_chunk_chars` 미만) 닫지 않는다 -- 다음 제목의 청크 앞에 이어 붙는다(모듈 docstring).
+            # 본문이 충분히 쌓였으면 새 제목에서 닫는다. 짧은 본문은 다음 제목과 함께 둔다.
             if has_body(pending) and size(pending) >= min_chunk_chars:
                 flush()
             while heading_stack and heading_stack[-1][0] >= level:
@@ -199,6 +226,7 @@ def chunk_elements(
             continue
         if kind == "table":
             objects = tables[table_elements_seen] if tables is not None and table_elements_seen < len(tables) else []
+            context = table_contexts[table_elements_seen] if table_elements_seen < len(table_contexts) else {}
             table_elements_seen += 1
             if not element.get("text", "").strip():
                 # 글자 없는 표는 색인 본문에 남지 않으므로 청크 경계가 되지 않는다(앞 제목만 남는 청크가 생긴다).
@@ -220,7 +248,8 @@ def chunk_elements(
                 lead_unit = lead_unit or _UNIT_LINE.match(pending[-1]["text"]).group(1).strip()
                 trailing_headings.insert(0, pending.pop())
             flush()
-            logical = [lt for obj in objects for lt in logical_tables(obj)]
+            logical_entries = [(obj, lt) for obj in objects for lt in logical_tables(obj)]
+            logical = [lt for _, lt in logical_entries]
             for lt in logical:
                 if lead_unit and not lt.unit:
                     lt.unit = lead_unit
@@ -235,8 +264,15 @@ def chunk_elements(
             if any_comparison or (table_chars > chunk_size and any(lt.splittable or lt.has_oversized_row(chunk_size) for lt in logical)):
                 # 머리 제목은 heading_path(-> 색인 제목)로 행 청크마다 남으므로 본문에 따로 두지 않는다.
                 path = [title for _, title in heading_stack]
-                for lt in logical:
-                    table_id = next_table_id()
+                for obj, lt in logical_entries:
+                    continuation = obj.get("table_continuation")
+                    if continuation:
+                        group = continuation["group"]
+                        if group not in continuation_ids:
+                            continuation_ids[group] = next_table_id()
+                        table_id = continuation_ids[group]
+                    else:
+                        table_id = next_table_id()
                     # 열린 제목이 없으면 표 제목 행(caption)이 경로가 된다 -- 문서 전체가 표 하나이고 표지가 표 첫 행에 든 별표
                     # (`[별표 2호의3] 상황허가 면제대상(제54조 관련)`)는 제목 원소가 없어 경로가 비었다.
                     caption_path = [" ".join(lt.caption.split())] if lt.caption else []  # 칸 줄바꿈(<br>)은 경로에 넣지 않는다
@@ -261,16 +297,46 @@ def chunk_elements(
                     if lead_body and rows:
                         rows[0] = {**rows[0], "text": "\n".join(lead_body + [rows[0]["text"]])}
                     for row in rows:
+                        context_lines = [f"표 설명: {context['table_context_before']}"] if context.get("table_context_before") else []
+                        if context.get("table_context_after"):
+                            context_lines.append(f"표 주석: {context['table_context_after']}")
+                        if context_lines:
+                            row["text"] = "\n".join([*context_lines, row["text"]])
+                            row.update(context)
+                        if continuation:
+                            local_index = row.get("row_index")
+                            row.update({
+                                "table_segment_index": continuation["segment"],
+                                "table_segment_count": continuation["segment_count"],
+                                "table_continued": continuation["segment_count"] > 1,
+                                "table_page_start": continuation["page_start"],
+                                "table_page_end": continuation["page_end"],
+                                "table_row_offset": continuation["row_offset"],
+                                "row_count": continuation["row_count"],
+                            })
+                            if local_index is not None:
+                                global_index = continuation["row_offset"] + local_index
+                                row["table_segment_row_index"] = local_index
+                                row["row_index"] = global_index
+                                row["row_id"] = f"{table_id}#row{global_index}"
                         section = row.pop("section_path", [])  # 칸 안 조문 표제(`table_rows._cell_sections`)
                         chunks.append({"chunk_id": f"{document_id}#{len(chunks)}", "document_id": document_id,
                                        "element_types": ["table"], **row, "heading_path": table_path + section})
                 continue
-            pending = [*trailing_headings, element]
+            context_before = context.get("table_context_before")
+            context_after = context.get("table_context_after")
+            context_blocks = ([{"type": "paragraph", "text": f"표 설명: {context_before}", "page": element.get("page", 1)}]
+                              if context_before else [])
+            after_blocks = ([{"type": "paragraph", "text": f"표 주석: {context_after}", "page": element.get("page", 1)}]
+                            if context_after else [])
+            pending = [*trailing_headings, *context_blocks, element, *after_blocks]
             flush()
             if len(logical) == 1 and chunks and "table" in chunks[-1]["element_types"]:
                 chunks[-1].update(table_fields(logical[0], next_table_id()))
             else:
                 table_ids += len(logical)
+            if context and chunks and "table" in chunks[-1]["element_types"]:
+                chunks[-1].update(context)
             continue
         if kind in ("paragraph", "list_item") and _PAGE_NUMBER_ONLY.match(element.get("text", "")):
             continue  # 쪽 번호만 있는 줄(`- 1 -`, `3 / 12`)은 내용이 아니다 -- 혼자 청크가 되면 조각 청크다
@@ -292,11 +358,12 @@ def chunk_elements(
                 pieces[-1] = f"{pieces[-1]} {tail}"
             for index, piece in enumerate(pieces):
                 text = f"{prefix}\n\n{piece}" if prefix and index == 0 else piece
+                included = [*leading, element] if index == 0 else [element]
                 chunks.append({
                     "chunk_id": f"{document_id}#{len(chunks)}", "text": text,
-                    "document_id": document_id, "page_start": element["page"],
-                    "page_end": element["page"], "heading_path": current_path(),
-                    "element_types": [kind],
+                    "document_id": document_id, "page_start": min(item["page"] for item in included),
+                    "page_end": max(item["page"] for item in included), "heading_path": current_path(),
+                    "element_types": list(dict.fromkeys(item["type"] for item in included)),
                 })
             continue
         if pending and has_body(pending) and size(pending + [element]) > chunk_size:

@@ -315,6 +315,33 @@ class _CountingEmbedder:
         return [[float(len(text)), text] for text in texts]
 
 
+class _CountingSparse:
+    def __init__(self):
+        self.calls = []
+
+    def encode_documents(self, texts):
+        self.calls.append(list(texts))
+        return [{} for _ in texts]
+
+
+def test_law_embedding_removes_path_headings_but_keeps_the_source_body(tmp_path: Path):
+    body = "# 제1조(목적)\n\n목적 본문.\n\n## 제1항\n\n항 본문."
+    path = write(tmp_path, {
+        "id": "law#0", "parent_id": "law", "title": "시행령 — 제1항", "body": body,
+        "heading_path": ["제1조(목적)", "제1항"], "source_type": "법령", "chunk_index": 0,
+    })
+    embedder = _CountingEmbedder()
+    sparse = _CountingSparse()
+
+    actions = list(document_actions(path, "law-index", embedder, law=True,
+                                    sparse=sparse, dense_heading_path=True, sparse_heading_path=True))
+
+    expected = embedding_text("시행령 — 제1조(목적) > 제1항", "목적 본문.\n\n항 본문.")
+    assert embedder.calls == [[expected]]
+    assert sparse.calls == [[expected]]
+    assert actions[0]["_source"]["body"] == body
+
+
 def test_batched_embeddings_stay_with_their_own_document(tmp_path: Path):
     """묶어 보내도 벡터가 제 문서에 붙어야 한다. 짝이 어긋나면 조용히 오답이 된다."""
     path = tmp_path / "corpus.jsonl"

@@ -748,3 +748,86 @@ tr.hl td { background: var(--gc); color: var(--gc-ink); font-weight: 700; }
 .sw-outcome>span {color:var(--muted)}.sw-outcome>b {font:700 13px var(--font-mono)}.sw-outcome>i {color:var(--vec);font-style:normal;font-size:17px}.sw-outcome>strong {padding:3px 8px;border-radius:999px;background:var(--gc);color:var(--gc-ink);font-size:11px}
 .sw-exception {display:flex;justify-content:space-between;gap:10px;margin-top:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:9px;font-size:12px}.sw-exception span {color:var(--muted);text-align:right}
 @media(max-width:650px){.stage-example{padding:14px}.sw-math{gap:7px}.sw-value{min-width:100px;padding:10px}.sw-value>b{font-size:19px}.sw-op{gap:3px;font-size:12px}.sw-exception{flex-direction:column}.sw-exception span{text-align:left}}
+.ck-stage-item[aria-current=true] { box-shadow:inset 0 0 0 1px var(--vec); }
+.ck-stage-examples { margin:12px 0 20px; }
+.ck-stage-examples article { min-width:0; border:1px solid var(--line); border-radius:10px; padding:14px; background:var(--tint); }
+.ck-stage-examples article:last-child { background:var(--vec-soft); border-color:#8cbead; }
+.ck-stage-examples h3 { margin:0 0 9px; }
+.ck-stage-examples pre { white-space:pre-wrap; overflow-wrap:anywhere; font:13px/1.7 var(--font-body); margin:0; }
+.ck-example-summary { margin:12px 0 0; padding:10px 13px; border-left:4px solid var(--vec); border-radius:7px; background:var(--vec-soft); font-size:13px; font-weight:700; }
+.ck-stage-examples .ck-table-example { padding:15px; background:var(--paper); }
+.ck-stage-examples .ck-table-example:last-child { background:var(--paper); border-color:#8cbead; }
+.ck-example-title { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ck-example-title h3 { margin:0; font-size:16px; }
+.ck-example-title>span { flex:none; padding:3px 8px; border-radius:999px; background:var(--tint); color:var(--muted); font-size:11px; font-weight:700; }
+.ck-example-path { margin:9px 0 12px; color:var(--muted); font-size:12px; line-height:1.55; overflow-wrap:anywhere; }
+.ck-table-meta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:5px 10px; margin-bottom:9px; font-size:12px; }
+.ck-table-meta>span { color:var(--muted); }
+.ck-context-note { margin:8px 0; padding:9px 11px; border:1px solid #a8c9bc; border-left:4px solid var(--vec); border-radius:7px; background:var(--vec-soft); }
+.ck-context-note>span,.ck-context-note>b { display:block; }
+.ck-context-note>span { margin-bottom:3px; color:var(--muted); font-size:11px; font-weight:700; }
+.ck-context-note>b { font-size:13px; line-height:1.55; overflow-wrap:anywhere; }
+.ck-context-empty { margin:8px 0; padding:9px 11px; border:1px dashed var(--line); border-radius:7px; color:var(--muted); font-size:12px; }
+.ck-row-caption { margin:11px 0 5px; color:var(--muted); font-size:11px; font-weight:700; }
+.ck-plain-row { padding:10px; border:1px dashed var(--line); border-radius:7px; background:var(--tint); }
+.ck-plain-row>span { display:block; margin-bottom:6px; color:var(--muted); font-size:11px; font-weight:700; }
+.ck-plain-row pre { white-space:pre-wrap; overflow-wrap:anywhere; font:13px/1.7 var(--font-body); }
+.ck-row-table { width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; overflow:hidden; border:1px solid var(--line); border-radius:7px; background:var(--paper); }
+.ck-row-table td { width:50%; padding:9px 10px; vertical-align:top; overflow-wrap:anywhere; }
+.ck-row-table td+td { border-left:1px solid var(--line); }
+.ck-row-table td>span,.ck-row-table td>b { display:block; }
+.ck-row-table td>span { margin-bottom:4px; color:var(--muted); font-size:11px; }
+.ck-row-table td>b { font-size:14px; }
+.ck-context-meta { margin:8px 0 0; color:var(--muted); font-size:11px; }
+.ck-raw-chunk { margin-top:8px; border-top:1px solid var(--line); padding-top:7px; }
+.ck-raw-chunk summary { color:var(--muted); cursor:pointer; font-size:11px; font-weight:650; }
+.ck-raw-chunk pre { margin-top:7px; padding:8px; border-radius:6px; background:var(--tint); font:11px/1.5 var(--font-mono); }
+.ck-stage-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:12px 0 18px; }
+.ck-stage-metric { min-width:0; padding:14px; border:1px solid var(--line); border-radius:9px; background:var(--tint); }
+.ck-stage-metric>span { display:block; font-size:12px; color:var(--muted); }
+.ck-stage-metric>b { display:block; margin-top:6px; font-size:17px; }
+.ck-stage-metric>p { margin:6px 0 0; font-size:12px; color:var(--muted); }
+.ck-source-md { margin-top:18px; border-top:1px solid var(--line); padding-top:12px; }
+.ck-source-md summary { cursor:pointer; font-weight:650; }
+.ck-source-md>p { font-size:13px; }
+.ck-source-md pre { max-height:620px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:14px; border-radius:8px; background:var(--tint); font:12px/1.7 var(--font-mono); }
+
+/* 원본 표와 실제 청크 비교: 열 머리글과 값의 경계를 명시한다. */
+.ck-original-table { margin:18px 0 24px; padding:20px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+.ck-original-table h3 { margin:0 0 12px; }
+.ck-source-title { margin:0 0 7px; font-size:14px; font-weight:700; line-height:1.6; }
+.ck-source-hint { margin:0 0 12px; font-size:12px; color:var(--muted); }
+.ck .ck-visible-table { width:100%; margin:0; border-collapse:collapse; table-layout:fixed; background:#fff; color:#172332; font-size:14px; }
+.ck .ck-visible-table th,.ck .ck-visible-table td { border:1px solid #bcc9d6; padding:12px 15px; text-align:left; overflow-wrap:anywhere; }
+.ck .ck-visible-table th { background:#e9eff5; color:#24364b; font-size:13px; font-weight:700; }
+.ck .ck-visible-table td { background:#fff; font-weight:500; }
+.ck .ck-visible-table .ck-selected-row td { background:#edf4ff; color:#184a89; font-weight:700; }
+.ck-source-note { margin:0; padding:12px 15px; border:1px solid #bcc9d6; border-top:0; background:#f7f9fb; font-size:13px; line-height:1.7; }
+.ck-full-table { margin-top:12px; }
+.ck-full-table summary { padding:8px 0; cursor:pointer; color:var(--muted); font-size:12px; }
+.ck-compare-heading { margin:24px 0 10px; }
+.ck .ck-stage-examples { gap:18px; }
+.ck .ck-stage-examples .ck-table-example { background:#fff; padding:20px; }
+.ck .ck-example-title { padding-bottom:12px; border-bottom:1px solid var(--line); }
+.ck .ck-row-caption { margin:14px 0 10px; font-size:12px; line-height:1.6; }
+.ck-added-note,.ck-missing-note { margin-top:16px; padding:16px; border-radius:8px; min-height:100px; box-sizing:border-box; }
+.ck-added-note { background:#e4f5eb; border:2px solid #4b9670; }
+.ck-added-label { display:block; font-size:12px; font-weight:700; color:#206342; }
+.ck-added-note p { margin:9px 0 0; font-size:14px; font-weight:700; line-height:1.8; color:#164a31; }
+.ck-missing-note { background:#f5f7fa; border:1px dashed #bdc8d5; }
+.ck-missing-note b { display:block; font-size:13px; color:#526276; }
+.ck-missing-note p { margin:9px 0 0; font-size:12px; color:#65758a; line-height:1.8; }
+.ck .ck-raw-chunk { margin-top:16px; padding-top:12px; }
+.ck .ck-raw-chunk p { font-size:12px; line-height:1.8; color:var(--muted); }
+@media(max-width:700px) { .ck-original-table { padding:14px; } .ck .ck-stage-examples { grid-template-columns:1fr; } .ck .ck-visible-table th,.ck .ck-visible-table td { padding:10px 12px; } }
+.ck .ck-visible-table th.ck-recovered-header { background:#e4f5eb; color:#206342; border-color:#75aa8e; }
+.ck-table-example > .ck-source-hint { margin:10px 0 0; line-height:1.6; }
+.ck-example-section-title { margin:30px 0 12px; padding-bottom:10px; border-bottom:2px solid var(--line); font-size:17px; }
+.ck-source-intro { margin-bottom:12px; padding:12px 15px; border:1px solid #bcc9d6; border-radius:7px; background:#f7f9fb; }
+.ck-source-intro span { display:block; color:var(--muted); font-size:11px; font-weight:700; }
+.ck-source-intro p { margin:7px 0 0; font-size:14px; line-height:1.7; }
+.ck-long-cell summary { cursor:pointer; font-size:13px; line-height:1.7; font-weight:500; }
+.ck-long-cell summary span { display:block; margin-top:6px; color:#526276; font-size:11px; }
+.ck-long-cell div { padding-top:10px; white-space:pre-wrap; font-size:13px; line-height:1.7; font-weight:400; }
+.ck-intro-example .ck-visible-table th:first-child,.ck-intro-source .ck-visible-table td:first-child { width:24%; }
+.ck-intro-example .ck-visible-table { margin-top:16px; }

@@ -92,9 +92,36 @@ def logical_tables(table: dict) -> list[LogicalTable]:
     caption = " ".join(captions)
     unit = _unit(caption)
 
+    # 빈 장식 행은 머리글 판정의 근거가 아니다. 글자는 버리지 않는다.
+    while len(rows) > 1 and not any(c.strip() for c in rows[0]):
+        rows, row_pages, spill, continued = rows[1:], row_pages[1:], spill[1:], continued[1:]
+    # 두 열짜리 표도 병합 제목 다음에 실제 머리글이 올 수 있다.
+    if (len(rows) > 2 and len(set(c.strip() for c in rows[0])) == 1
+            and spill[0]
+            and rows[0][0].strip() and len(rows[0][0]) <= _CAPTION_MAX_CHARS
+            and _header_like(rows[1], allow_blanks=True)
+            and len(set(c.strip() for c in rows[1] if c.strip())) >= 2):
+        caption = " ".join(filter(None, [caption, rows[0][0].strip()]))
+        rows, row_pages, spill, continued = rows[1:], row_pages[1:], spill[1:], continued[1:]
+
     header_count = _header_count(rows, table.get("header_rows", 0) if not captions else 0,
                                  continued=continued if merges else None)
-    columns = _column_names(rows[:header_count], len(rows[0]) if rows else 0)
+    columns = list(table.get("column_names") or _column_names(rows[:header_count], len(rows[0]) if rows else 0))
+    if not header_count and not table.get("column_names"):
+        # 표 앞의 긴 설명은 보존하면서, 그 뒤에 있는 짧은 실제 머리글로 이름만 복구한다.
+        for index in range(1, min(4, len(rows) - 1)):
+            prefix = rows[:index]
+            if not all(not any(c.strip() for c in row)
+                       or (len(set(c.strip() for c in row)) == 1
+                           and len(spill[row_index]) == len(row) - 1)
+                       for row_index, row in enumerate(prefix)):
+                break
+            candidate = rows[index]
+            if (_partial_header_like(candidate)
+                    and len(set(c.strip() for c in candidate if c.strip())) >= 2
+                    and not _header_like(rows[index + 1], allow_blanks=True)):
+                columns = _column_names([candidate], len(candidate))
+                break
     return [LogicalTable(columns, rows[header_count:], row_pages[header_count:], spill[header_count:], caption, unit=unit)]
 
 
@@ -130,6 +157,11 @@ def _header_count(rows: list[list[str]], detected: int, *, continued: list[set[i
     두 줄짜리 표(머리글 + 데이터 한 행)는 첫 줄이 머리글처럼 생기고 둘째 줄은 아닐 때만 머리글로 본다 -- 둘 다 짧은
     값이면 어느 쪽이 머리글인지 알 수 없다.
     """
+    if not rows:
+        return 0
+    if len(rows[0]) == 1 and not detected:
+        return int(len(rows) >= 2 and _header_like(rows[0])
+                   and (not _header_like(rows[1]) or "\n" in rows[1][0]))
     if len(rows) == 2 and len(rows[0]) >= 2 and not detected:
         return 1 if _header_like(rows[0]) and not _header_like(rows[1]) else 0
     if len(rows) < 3 or len(rows[0]) < 2:
@@ -137,15 +169,31 @@ def _header_count(rows: list[list[str]], detected: int, *, continued: list[set[i
     header = detected
     if not header and _header_like(rows[0]):
         header = 1
+    if (not header and _partial_header_like(rows[0])
+            and len(set(c.strip() for c in rows[0] if c.strip())) >= 2
+            and not _header_like(rows[1], allow_blanks=True, distinct=False)):
+        header = 1
     # 두 줄 머리글: 윗줄이 가로 병합된 상위 머리글이라 빈 칸이 있어도(`한국 | | 세계`), 아랫줄이 온전한 머리글이면 둘 다 머리글.
     # 아랫줄은 그룹마다 같은 하위 머리글이 되풀이되므로(`수량 | 금액 | 수량 | 금액`) 서로 달라야 한다는 조건을 뺀다.
-    if not header and _header_like(rows[0], allow_blanks=True) and _header_like(rows[1], distinct=False):
+    if not header and _partial_header_like(rows[0], allow_internal_blanks=True) and _header_like(rows[1], distinct=False):
         header = 2
     # 세로 병합된 머리글(`구분`/`직위명`) 옆에 하위 머리글(`경력`)이 붙은 줄: 병합으로 채워진 칸이 윗줄과 같고
     # 나머지도 머리글처럼 생겼으면 머리글에 넣는다. 데이터가 최소 두 줄은 남게 한다.
     while 0 < header < len(rows) - 2 and _header_like(rows[header]) and _continues_header(rows, header, continued):
         header += 1
     return header
+
+
+def _partial_header_like(row: list[str], *, allow_internal_blanks: bool = False) -> bool:
+    """빈 칸이 있는 머리글. 짧은 대비표 본문·자리표시자를 머리글로 삼지 않는다."""
+    filled_positions = [i for i, cell in enumerate(row) if cell.strip()]
+    if (filled_positions and not allow_internal_blanks
+            and len(filled_positions) != filled_positions[-1] - filled_positions[0] + 1):
+        return False
+    return _header_like(row, allow_blanks=True) and not any(
+        re.match(r"^\s*\d", cell) or re.search(r"[-—]{2,}|[.!?]", cell.strip())
+        for cell in row if cell.strip()
+    )
 
 
 def _continues_header(rows: list[list[str]], r: int, continued: list[set[int]] | None) -> bool:
@@ -179,7 +227,10 @@ def _header_like(row: list[str], *, allow_blanks: bool = False, distinct: bool =
 
 
 def _column_names(header: list[list[str]], width: int) -> list[str]:
-    """열 이름. 머리글이 여러 줄이면(상위 머리글 + 하위 머리글) 위에서부터 잇는다."""
+    """원문 열 이름만 사용한다. 빈 제목은 위치 표시인 `열N`으로 유지한다.
+
+    숫자 패턴으로 `순번` 같은 의미를 추측하지 않는다. 여러 줄 머리글은 위에서부터 잇는다.
+    """
     names = []
     for col in range(width):
         parts = [row[col].strip() for row in header if col < len(row) and row[col].strip()]

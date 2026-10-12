@@ -1,0 +1,3900 @@
+{
+ "questions": 149,
+ "service_cutoff": 0.7,
+ "arms": {
+  "before": {
+   "alias": "exp-table-ctx-before-law",
+   "chunks": 6502,
+   "documents": 150,
+   "per_question": {
+    "law150-v1-001": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-226-2392303-전략물자사전판정운영요령-최종-f2812b36",
+      "returned": 10
+     }
+    },
+    "law150-v1-002": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7059-2394627-전략물자_판정업무_운영규칙_-2016.3.7-_개정전문-4939f230",
+      "returned": 8
+     }
+    },
+    "law150-v1-003": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7059-2394627-전략물자_판정업무_운영규칙_-2016.3.7-_개정전문-4939f230",
+      "returned": 10
+     }
+    },
+    "law150-v1-004": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2392328-입법예고용_대외무역법시행령개정_예고_문안_06.11.10-8dfac5d4",
+      "returned": 9
+     }
+    },
+    "law150-v1-005": {
+     "gold_groups": [
+      12
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2391792-11_공지용_대외무역법시행령-문안-4c0fac36",
+      "returned": 8
+     }
+    },
+    "law150-v1-006": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2391792-11_공지용_대외무역법시행령-문안-4c0fac36",
+      "returned": 7
+     }
+    },
+    "law150-v1-007": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2391792-11_공지용_대외무역법시행령-문안-4c0fac36",
+      "returned": 10
+     }
+    },
+    "law150-v1-008": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393341-대외무역법_시행령_본문-2395506a",
+      "returned": 6
+     }
+    },
+    "law150-v1-009": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393341-대외무역법_시행령_본문-2395506a",
+      "returned": 10
+     }
+    },
+    "law150-v1-010": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-t0000-00-4597a54e",
+      "returned": 7
+     }
+    },
+    "law150-v1-011": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393341-대외무역법_시행령_본문-2395506a",
+      "returned": 5
+     }
+    },
+    "law150-v1-012": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11371-2393907-제29차_전략물자_수출입고시_전문-dfc0a74c",
+      "returned": 9
+     }
+    },
+    "law150-v1-013": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2392082-첨부1-고시개정안_전문_01-da916108",
+      "returned": 6
+     }
+    },
+    "law150-v1-014": {
+     "gold_groups": [
+      9
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 8
+     }
+    },
+    "law150-v1-015": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11299-2393886-전략물자수출입고시_일부개정_및_신구대비표-6921e931",
+      "returned": 5
+     }
+    },
+    "law150-v1-016": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2392082-첨부1-고시개정안_전문_01-da916108",
+      "returned": 9
+     }
+    },
+    "law150-v1-017": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 8
+     }
+    },
+    "law150-v1-018": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 10
+     }
+    },
+    "law150-v1-019": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 6
+     }
+    },
+    "law150-v1-020": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": false,
+      "phrase": false,
+      "top_parent": "01_법령고시-728-2392463-admin22013053110003443개정_고시_전문-17차-47ec63b5",
+      "returned": 6
+     }
+    },
+    "law150-v1-021": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-998-2392728-붙임1._개정_본문-국제평화_및_안전유지_등_의무이행을_위한_무역에_관한_특별조치_고시_일부개정고시안-d1dda230",
+      "returned": 10
+     }
+    },
+    "law150-v1-022": {
+     "gold_groups": [
+      24
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-023": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 6
+     }
+    },
+    "law150-v1-024": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-025": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-658-2391843-admin22011122309004807신구대비표-90d14148",
+      "returned": 5
+     }
+    },
+    "law150-v1-026": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0015-00-c165899d",
+      "returned": 10
+     }
+    },
+    "law150-v1-027": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0015-00-c165899d",
+      "returned": 10
+     }
+    },
+    "law150-v1-028": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0013-02-2ff97763",
+      "returned": 8
+     }
+    },
+    "law150-v1-029": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0017-00-c17236f6",
+      "returned": 7
+     }
+    },
+    "law150-v1-030": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0021-00-c9971bc5",
+      "returned": 10
+     }
+    },
+    "law150-v1-031": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2394253-첨부5-별표_4-별표_18_01-15dea616",
+      "returned": 5
+     }
+    },
+    "law150-v1-032": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11937-2392828-개정별표-별표6_-_별표19-fe53ccc1",
+      "returned": 10
+     }
+    },
+    "law150-v1-033": {
+     "gold_groups": [
+      23
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": false,
+      "phrase": false,
+      "top_parent": "01_법령고시-전략물자수출입고시-산업통상부고시-제2026-101호-20260901-ce992162",
+      "returned": 10
+     }
+    },
+    "law150-v1-034": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2394253-첨부5-별표_4-별표_18_01-15dea616",
+      "returned": 10
+     }
+    },
+    "law150-v1-035": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-4530-2392788-1._국제평화및안전유지등의무이행을위한무역에관한_특별조치고시_개정안-산업통상자원부_고시_제2019-57호-72408078",
+      "returned": 6
+     }
+    },
+    "law150-v1-036": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 5
+     }
+    },
+    "law150-v1-037": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 9
+     }
+    },
+    "law150-v1-038": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393762-붙임1._신구조문_대비표-412381f5",
+      "returned": 10
+     }
+    },
+    "law150-v1-039": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 10
+     }
+    },
+    "law150-v1-040": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11937-2392829-전략물자_수출입고시_개정문_및_신구대조표-8292fe22",
+      "returned": 10
+     }
+    },
+    "law150-v1-041": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0001-00-fc6772d0",
+      "returned": 10
+     }
+    },
+    "law150-v1-042": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0013-02-2ff97763",
+      "returned": 10
+     }
+    },
+    "law150-v1-043": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": false,
+      "phrase": false,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 5
+     }
+    },
+    "law150-v1-044": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0014-00-423069fa",
+      "returned": 10
+     }
+    },
+    "law150-v1-045": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0012-00-e6360b80",
+      "returned": 10
+     }
+    },
+    "law150-v1-046": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0015-00-c165899d",
+      "returned": 10
+     }
+    },
+    "law150-v1-047": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-998-2392728-붙임1._개정_본문-국제평화_및_안전유지_등_의무이행을_위한_무역에_관한_특별조치_고시_일부개정고시안-d1dda230",
+      "returned": 10
+     }
+    },
+    "law150-v1-048": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-11299-2393886-전략물자수출입고시_일부개정_및_신구대비표-6921e931",
+      "returned": 5
+     }
+    },
+    "law150-v1-049": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-257-2391886-붙임4-통합고시개정신구대비표_01-ff3b551f",
+      "returned": 10
+     }
+    },
+    "law150-v1-050": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-257-2391886-붙임4-통합고시개정신구대비표_01-ff3b551f",
+      "returned": 8
+     }
+    },
+    "law150-v1-051": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-052": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11008-2393869-전략물자_판정기준_해석_세부지침-21.12.24-6c49e92b",
+      "returned": 10
+     }
+    },
+    "law150-v1-054": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11299-2393886-전략물자수출입고시_일부개정_및_신구대비표-6921e931",
+      "returned": 7
+     }
+    },
+    "law150-v1-055": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393762-붙임1._신구조문_대비표-412381f5",
+      "returned": 10
+     }
+    },
+    "law150-v1-056": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11352-2393803-기획재정부고시_제2021-31호-관세통계통합품목분류표_일부_개정-37643ec5",
+      "returned": 6
+     }
+    },
+    "law150-v1-057": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11371-2393906-별표2의2-_상황허가_대상품목_개정_-_최종-4516c372",
+      "returned": 6
+     }
+    },
+    "law150-v1-058": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11937-2392828-개정별표-별표6_-_별표19-fe53ccc1",
+      "returned": 10
+     }
+    },
+    "law150-v1-059": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11960-2393726-대외무역법_제17072호_제개정문-c0f2c4b2",
+      "returned": 6
+     }
+    },
+    "law150-v1-060": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11960-2393727-대외무역법-17072-89429219",
+      "returned": 10
+     }
+    },
+    "law150-v1-061": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393342-대외무역법_시행령_개정문-0e751500",
+      "returned": 7
+     }
+    },
+    "law150-v1-062": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393344-별표4-_과태료의_부과기준-8ee23709",
+      "returned": 10
+     }
+    },
+    "law150-v1-063": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-12046-2393441-전략물자_수출입고시_개정-안-b1caa198",
+      "returned": 10
+     }
+    },
+    "law150-v1-064": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 10
+     }
+    },
+    "law150-v1-065": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394137-붙임2_전략물자_수출입고시_24차_개정_신구대비표-2e93375c",
+      "returned": 9
+     }
+    },
+    "law150-v1-066": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 6
+     }
+    },
+    "law150-v1-067": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-16295-2395723-행정예고-_공고문-192e53e6",
+      "returned": 7
+     }
+    },
+    "law150-v1-068": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 6
+     }
+    },
+    "law150-v1-069": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-16585-2391491-전략물자_판정기준_해석_세부지침-24.2.24-3e184892",
+      "returned": 7
+     }
+    },
+    "law150-v1-070": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-138-2392664-대외무역법시행령_신구대비표-9a2711e9",
+      "returned": 9
+     }
+    },
+    "law150-v1-071": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2392328-입법예고용_대외무역법시행령개정_예고_문안_06.11.10-8dfac5d4",
+      "returned": 9
+     }
+    },
+    "law150-v1-072": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-18678-2395467-전략물자_등_수출통관에_관한_고시-제2025_18호-549f109b",
+      "returned": 10
+     }
+    },
+    "law150-v1-073": {
+     "gold_groups": [
+      17
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-728-2392463-admin22013053110003443개정_고시_전문-17차-47ec63b5",
+      "returned": 10
+     }
+    },
+    "law150-v1-074": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-189-2392433-admin220120503140018241.전략물자수출입고시_개정_고시-e1e54d7b",
+      "returned": 10
+     }
+    },
+    "law150-v1-075": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11197-2393810-붙임-별표2-이중용도품목-신구대비표-국문-a1517456",
+      "returned": 5
+     }
+    },
+    "law150-v1-076": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-23257-3167281-전략물자수출입고시_일부개정고시_최종-07269dc8",
+      "returned": 6
+     }
+    },
+    "law150-v1-077": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-23257-3167282-전략물자수출입고시_최종-a99c1b8b",
+      "returned": 1
+     }
+    },
+    "law150-v1-078": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-23303-3171936-별표_3-_군용물자목록-전략물자수출입고시-1842d53c",
+      "returned": 6
+     }
+    },
+    "law150-v1-079": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-577-2391984-대외무역법개정안_공지_0606211-48e0e01f",
+      "returned": 6
+     }
+    },
+    "law150-v1-080": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-138-2392664-대외무역법시행령_신구대비표-9a2711e9",
+      "returned": 5
+     }
+    },
+    "law150-v1-081": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5237-2393935-붙임2_산업통상자원부_고시개정안-제2017-28호-7c91cc00",
+      "returned": 4
+     }
+    },
+    "law150-v1-082": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5670-2393694-붙임1-_전략물자_판정기준_해석_세부지침-a9c245ed",
+      "returned": 6
+     }
+    },
+    "law150-v1-083": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 6
+     }
+    },
+    "law150-v1-084": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-658-2392482-admin22011122309004807개정고시-4d8cbd07",
+      "returned": 5
+     }
+    },
+    "law150-v1-085": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7059-2394628-전략물자_판정업무_운영규칙_신구조문대비표-8297e6c6",
+      "returned": 10
+     }
+    },
+    "law150-v1-086": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7269-2393154-민원_처리에_관한_법률-13459-b9a9b6a1",
+      "returned": 6
+     }
+    },
+    "law150-v1-087": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-728-2391837-admin22013053110003549신구대비표-17차-5937b48f",
+      "returned": 10
+     }
+    },
+    "law150-v1-088": {
+     "gold_groups": [
+      12
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2392082-첨부1-고시개정안_전문_01-da916108",
+      "returned": 9
+     }
+    },
+    "law150-v1-089": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5670-2393694-붙임1-_전략물자_판정기준_해석_세부지침-a9c245ed",
+      "returned": 5
+     }
+    },
+    "law150-v1-090": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7960-2393201-붙임._공작기계_고시_개정_신구대비표_최종-1f656185",
+      "returned": 10
+     }
+    },
+    "law150-v1-091": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11371-2393907-제29차_전략물자_수출입고시_전문-dfc0a74c",
+      "returned": 10
+     }
+    },
+    "law150-v1-092": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-827-2392412-admin22010111116001006신구대비표-국문-98219fb3",
+      "returned": 7
+     }
+    },
+    "law150-v1-093": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-16585-2391491-전략물자_판정기준_해석_세부지침-24.2.24-3e184892",
+      "returned": 5
+     }
+    },
+    "law150-v1-094": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 8
+     }
+    },
+    "law150-v1-095": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8612-2393958-붙임1_산업통상자원부-고시개정안-제2017-169호-fcc997bd",
+      "returned": 4
+     }
+    },
+    "law150-v1-096": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-866-2391815-신구대비표-국문-09._7._1개정-_01-4f6ee8e4",
+      "returned": 7
+     }
+    },
+    "law150-v1-097": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394184-201510230549133_산업통상자원부-고시-제2015-223호-관보게재안-26424ed9",
+      "returned": 6
+     }
+    },
+    "law150-v1-098": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-998-2392728-붙임1._개정_본문-국제평화_및_안전유지_등_의무이행을_위한_무역에_관한_특별조치_고시_일부개정고시안-d1dda230",
+      "returned": 6
+     }
+    },
+    "law150-v1-099": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-100": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0024-00-ff9891b2",
+      "returned": 7
+     }
+    },
+    "law150-v1-101": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0002-01-72c233a4",
+      "returned": 9
+     }
+    },
+    "law150-v1-102": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0006-00-77e7b4f9",
+      "returned": 10
+     }
+    },
+    "law150-v1-103": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0007-00-37e0d8f5",
+      "returned": 5
+     }
+    },
+    "law150-v1-104": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-t0000-00-4597a54e",
+      "returned": 4
+     }
+    },
+    "law150-v1-105": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0009-00-a94d8911",
+      "returned": 2
+     }
+    },
+    "law150-v1-106": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-278483-b0002-00-d6de90c5",
+      "returned": 2
+     }
+    },
+    "law150-v1-107": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 5
+     }
+    },
+    "law150-v1-108": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-b0008-00-faa6f87e",
+      "returned": 10
+     }
+    },
+    "law150-v1-109": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 9
+     }
+    },
+    "law150-v1-110": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000283458-t0000-00-0bd73220",
+      "returned": 8
+     }
+    },
+    "law150-v1-111": {
+     "gold_groups": [
+      1,
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0001-00-479808ed",
+      "returned": 10
+     }
+    },
+    "law150-v1-112": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0009-00-3fa40f6a",
+      "returned": 7
+     }
+    },
+    "law150-v1-113": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-290379-b0002-00-b893a49a",
+      "returned": 10
+     }
+    },
+    "law150-v1-114": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0003-01-45ae9f7d",
+      "returned": 10
+     }
+    },
+    "law150-v1-115": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-t0000-00-317a189a",
+      "returned": 6
+     }
+    },
+    "law150-v1-116": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0008-00-a084b64c",
+      "returned": 6
+     }
+    },
+    "law150-v1-117": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0001-00-fc6772d0",
+      "returned": 10
+     }
+    },
+    "law150-v1-118": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000257522-t0000-00-3773f2ff",
+      "returned": 6
+     }
+    },
+    "law150-v1-119": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-278483-b0003-00-914812dc",
+      "returned": 9
+     }
+    },
+    "law150-v1-120": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-121": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-122": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000283458-t0000-00-0bd73220",
+      "returned": 8
+     }
+    },
+    "law150-v1-123": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0002-00-303b496b",
+      "returned": 8
+     }
+    },
+    "law150-v1-124": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0010-03-37d5af7a",
+      "returned": 10
+     }
+    },
+    "law150-v1-125": {
+     "gold_groups": [
+      1,
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-290401-b0000-00-fd12575a",
+      "returned": 10
+     }
+    },
+    "law150-v1-126": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0004-01-dcfbed39",
+      "returned": 10
+     }
+    },
+    "law150-v1-127": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0003-00-6a8fe2af",
+      "returned": 10
+     }
+    },
+    "law150-v1-128": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0009-00-199da818",
+      "returned": 5
+     }
+    },
+    "law150-v1-129": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0004-00-6aae9961",
+      "returned": 5
+     }
+    },
+    "law150-v1-130": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-276643-b0000-00-009c74ea",
+      "returned": 6
+     }
+    },
+    "law150-v1-131": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-278483-b0004-00-57c0f102",
+      "returned": 6
+     }
+    },
+    "law150-v1-132": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-b0005-00-da39dec8",
+      "returned": 6
+     }
+    },
+    "law150-v1-133": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 8
+     }
+    },
+    "law150-v1-134": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-281125-b0001-00-bab074ae",
+      "returned": 9
+     }
+    },
+    "law150-v1-135": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000283458-t0000-00-0bd73220",
+      "returned": 6
+     }
+    },
+    "law150-v1-136": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0006-00-74764c6e",
+      "returned": 10
+     }
+    },
+    "law150-v1-137": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0010-03-37d5af7a",
+      "returned": 10
+     }
+    },
+    "law150-v1-138": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-t0000-00-317a189a",
+      "returned": 10
+     }
+    },
+    "law150-v1-139": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0004-00-2097c10f",
+      "returned": 10
+     }
+    },
+    "law150-v1-140": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0011-00-c8110b95",
+      "returned": 8
+     }
+    },
+    "law150-v1-141": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0006-00-cb1ff0c0",
+      "returned": 6
+     }
+    },
+    "law150-v1-142": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-law-278483-b0001-00-e48c7bda",
+      "returned": 9
+     }
+    },
+    "law150-v1-143": {
+     "gold_groups": [
+      0,
+      1
+     ],
+     "gold_lost": true,
+     "service": {
+      "evidence": false,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-law-278483-b0005-00-c9907040",
+      "returned": 10
+     }
+    },
+    "law150-v1-144": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-145": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-146": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-281125-b0002-00-f619925e",
+      "returned": 10
+     }
+    },
+    "law150-v1-147": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284142-b0001-00-474038ae",
+      "returned": 6
+     }
+    },
+    "law150-v1-148": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0006-00-74764c6e",
+      "returned": 10
+     }
+    },
+    "law150-v1-149": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289785-b0000-00-1748a460",
+      "returned": 10
+     }
+    },
+    "law150-v1-150": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-3543-2392630-전략물자_수출입고시-a1a5f319",
+      "returned": 7
+     }
+    }
+   }
+  },
+  "after": {
+   "alias": "exp-table-ctx-after-law",
+   "chunks": 6502,
+   "documents": 150,
+   "per_question": {
+    "law150-v1-001": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-226-2392303-전략물자사전판정운영요령-최종-f2812b36",
+      "returned": 10
+     }
+    },
+    "law150-v1-002": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7059-2394627-전략물자_판정업무_운영규칙_-2016.3.7-_개정전문-4939f230",
+      "returned": 8
+     }
+    },
+    "law150-v1-003": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7059-2394627-전략물자_판정업무_운영규칙_-2016.3.7-_개정전문-4939f230",
+      "returned": 10
+     }
+    },
+    "law150-v1-004": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2392328-입법예고용_대외무역법시행령개정_예고_문안_06.11.10-8dfac5d4",
+      "returned": 9
+     }
+    },
+    "law150-v1-005": {
+     "gold_groups": [
+      12
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2391792-11_공지용_대외무역법시행령-문안-4c0fac36",
+      "returned": 8
+     }
+    },
+    "law150-v1-006": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2391792-11_공지용_대외무역법시행령-문안-4c0fac36",
+      "returned": 7
+     }
+    },
+    "law150-v1-007": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2391792-11_공지용_대외무역법시행령-문안-4c0fac36",
+      "returned": 10
+     }
+    },
+    "law150-v1-008": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393341-대외무역법_시행령_본문-2395506a",
+      "returned": 6
+     }
+    },
+    "law150-v1-009": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393341-대외무역법_시행령_본문-2395506a",
+      "returned": 10
+     }
+    },
+    "law150-v1-010": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-t0000-00-4597a54e",
+      "returned": 7
+     }
+    },
+    "law150-v1-011": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393341-대외무역법_시행령_본문-2395506a",
+      "returned": 5
+     }
+    },
+    "law150-v1-012": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11371-2393907-제29차_전략물자_수출입고시_전문-dfc0a74c",
+      "returned": 8
+     }
+    },
+    "law150-v1-013": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2392082-첨부1-고시개정안_전문_01-da916108",
+      "returned": 6
+     }
+    },
+    "law150-v1-014": {
+     "gold_groups": [
+      9
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 8
+     }
+    },
+    "law150-v1-015": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11299-2393886-전략물자수출입고시_일부개정_및_신구대비표-6921e931",
+      "returned": 5
+     }
+    },
+    "law150-v1-016": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2392082-첨부1-고시개정안_전문_01-da916108",
+      "returned": 9
+     }
+    },
+    "law150-v1-017": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 8
+     }
+    },
+    "law150-v1-018": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 10
+     }
+    },
+    "law150-v1-019": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 6
+     }
+    },
+    "law150-v1-020": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": false,
+      "phrase": false,
+      "top_parent": "01_법령고시-728-2392463-admin22013053110003443개정_고시_전문-17차-47ec63b5",
+      "returned": 6
+     }
+    },
+    "law150-v1-021": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-998-2392728-붙임1._개정_본문-국제평화_및_안전유지_등_의무이행을_위한_무역에_관한_특별조치_고시_일부개정고시안-d1dda230",
+      "returned": 10
+     }
+    },
+    "law150-v1-022": {
+     "gold_groups": [
+      24
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-023": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 6
+     }
+    },
+    "law150-v1-024": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-025": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-658-2391843-admin22011122309004807신구대비표-90d14148",
+      "returned": 4
+     }
+    },
+    "law150-v1-026": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0015-00-c165899d",
+      "returned": 10
+     }
+    },
+    "law150-v1-027": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0015-00-c165899d",
+      "returned": 10
+     }
+    },
+    "law150-v1-028": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0013-02-2ff97763",
+      "returned": 8
+     }
+    },
+    "law150-v1-029": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0017-00-c17236f6",
+      "returned": 7
+     }
+    },
+    "law150-v1-030": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0021-00-c9971bc5",
+      "returned": 10
+     }
+    },
+    "law150-v1-031": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0008-00-bbcbb9b5",
+      "returned": 10
+     }
+    },
+    "law150-v1-032": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0019-00-0d1767c3",
+      "returned": 10
+     }
+    },
+    "law150-v1-033": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": false,
+      "phrase": false,
+      "top_parent": "01_법령고시-전략물자수출입고시-산업통상부고시-제2026-101호-20260901-ce992162",
+      "returned": 10
+     }
+    },
+    "law150-v1-034": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2394253-첨부5-별표_4-별표_18_01-15dea616",
+      "returned": 10
+     }
+    },
+    "law150-v1-035": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-4530-2392788-1._국제평화및안전유지등의무이행을위한무역에관한_특별조치고시_개정안-산업통상자원부_고시_제2019-57호-72408078",
+      "returned": 6
+     }
+    },
+    "law150-v1-036": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 5
+     }
+    },
+    "law150-v1-037": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 9
+     }
+    },
+    "law150-v1-038": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393762-붙임1._신구조문_대비표-412381f5",
+      "returned": 10
+     }
+    },
+    "law150-v1-039": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 10
+     }
+    },
+    "law150-v1-040": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11937-2392829-전략물자_수출입고시_개정문_및_신구대조표-8292fe22",
+      "returned": 10
+     }
+    },
+    "law150-v1-041": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0001-00-fc6772d0",
+      "returned": 10
+     }
+    },
+    "law150-v1-042": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0013-02-2ff97763",
+      "returned": 10
+     }
+    },
+    "law150-v1-043": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": false,
+      "phrase": false,
+      "top_parent": "01_법령고시-8924-2394373-전략물자_수출입고시-산업통상자원부고시_2015-145호-_2015.7.20-f90a2a9e",
+      "returned": 5
+     }
+    },
+    "law150-v1-044": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0014-00-423069fa",
+      "returned": 10
+     }
+    },
+    "law150-v1-045": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0012-00-e6360b80",
+      "returned": 10
+     }
+    },
+    "law150-v1-046": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0015-00-c165899d",
+      "returned": 10
+     }
+    },
+    "law150-v1-047": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-998-2392728-붙임1._개정_본문-국제평화_및_안전유지_등_의무이행을_위한_무역에_관한_특별조치_고시_일부개정고시안-d1dda230",
+      "returned": 10
+     }
+    },
+    "law150-v1-048": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-11299-2393886-전략물자수출입고시_일부개정_및_신구대비표-6921e931",
+      "returned": 5
+     }
+    },
+    "law150-v1-049": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-257-2391886-붙임4-통합고시개정신구대비표_01-ff3b551f",
+      "returned": 10
+     }
+    },
+    "law150-v1-050": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-257-2391886-붙임4-통합고시개정신구대비표_01-ff3b551f",
+      "returned": 8
+     }
+    },
+    "law150-v1-051": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-052": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11008-2393869-전략물자_판정기준_해석_세부지침-21.12.24-6c49e92b",
+      "returned": 10
+     }
+    },
+    "law150-v1-054": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11299-2393886-전략물자수출입고시_일부개정_및_신구대비표-6921e931",
+      "returned": 7
+     }
+    },
+    "law150-v1-055": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393762-붙임1._신구조문_대비표-412381f5",
+      "returned": 10
+     }
+    },
+    "law150-v1-056": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11352-2393803-기획재정부고시_제2021-31호-관세통계통합품목분류표_일부_개정-37643ec5",
+      "returned": 6
+     }
+    },
+    "law150-v1-057": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11371-2393906-별표2의2-_상황허가_대상품목_개정_-_최종-4516c372",
+      "returned": 6
+     }
+    },
+    "law150-v1-058": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11937-2392828-개정별표-별표6_-_별표19-fe53ccc1",
+      "returned": 10
+     }
+    },
+    "law150-v1-059": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11960-2393726-대외무역법_제17072호_제개정문-c0f2c4b2",
+      "returned": 6
+     }
+    },
+    "law150-v1-060": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11960-2393727-대외무역법-17072-89429219",
+      "returned": 10
+     }
+    },
+    "law150-v1-061": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393342-대외무역법_시행령_개정문-0e751500",
+      "returned": 7
+     }
+    },
+    "law150-v1-062": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11971-2393344-별표4-_과태료의_부과기준-8ee23709",
+      "returned": 10
+     }
+    },
+    "law150-v1-063": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-12046-2393441-전략물자_수출입고시_개정-안-b1caa198",
+      "returned": 10
+     }
+    },
+    "law150-v1-064": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 10
+     }
+    },
+    "law150-v1-065": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394137-붙임2_전략물자_수출입고시_24차_개정_신구대비표-2e93375c",
+      "returned": 9
+     }
+    },
+    "law150-v1-066": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 6
+     }
+    },
+    "law150-v1-067": {
+     "gold_groups": [
+      6
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-16295-2395723-행정예고-_공고문-192e53e6",
+      "returned": 7
+     }
+    },
+    "law150-v1-068": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 6
+     }
+    },
+    "law150-v1-069": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-16585-2391491-전략물자_판정기준_해석_세부지침-24.2.24-3e184892",
+      "returned": 7
+     }
+    },
+    "law150-v1-070": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-138-2392664-대외무역법시행령_신구대비표-9a2711e9",
+      "returned": 9
+     }
+    },
+    "law150-v1-071": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-170-2392328-입법예고용_대외무역법시행령개정_예고_문안_06.11.10-8dfac5d4",
+      "returned": 9
+     }
+    },
+    "law150-v1-072": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-18678-2395467-전략물자_등_수출통관에_관한_고시-제2025_18호-549f109b",
+      "returned": 10
+     }
+    },
+    "law150-v1-073": {
+     "gold_groups": [
+      17
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-728-2392463-admin22013053110003443개정_고시_전문-17차-47ec63b5",
+      "returned": 10
+     }
+    },
+    "law150-v1-074": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-189-2392433-admin220120503140018241.전략물자수출입고시_개정_고시-e1e54d7b",
+      "returned": 10
+     }
+    },
+    "law150-v1-075": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11197-2393810-붙임-별표2-이중용도품목-신구대비표-국문-a1517456",
+      "returned": 5
+     }
+    },
+    "law150-v1-076": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-23257-3167281-전략물자수출입고시_일부개정고시_최종-07269dc8",
+      "returned": 10
+     }
+    },
+    "law150-v1-077": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-23257-3167282-전략물자수출입고시_최종-a99c1b8b",
+      "returned": 1
+     }
+    },
+    "law150-v1-078": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-23303-3171936-별표_3-_군용물자목록-전략물자수출입고시-1842d53c",
+      "returned": 6
+     }
+    },
+    "law150-v1-079": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-577-2391984-대외무역법개정안_공지_0606211-48e0e01f",
+      "returned": 6
+     }
+    },
+    "law150-v1-080": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-138-2392664-대외무역법시행령_신구대비표-9a2711e9",
+      "returned": 5
+     }
+    },
+    "law150-v1-081": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5237-2393935-붙임2_산업통상자원부_고시개정안-제2017-28호-7c91cc00",
+      "returned": 4
+     }
+    },
+    "law150-v1-082": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5670-2393694-붙임1-_전략물자_판정기준_해석_세부지침-a9c245ed",
+      "returned": 6
+     }
+    },
+    "law150-v1-083": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5915-2394136-붙임1_전략물자_수출입고시_24차_개정_본문-07f4e4ce",
+      "returned": 6
+     }
+    },
+    "law150-v1-084": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-658-2392482-admin22011122309004807개정고시-4d8cbd07",
+      "returned": 5
+     }
+    },
+    "law150-v1-085": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7059-2394628-전략물자_판정업무_운영규칙_신구조문대비표-8297e6c6",
+      "returned": 10
+     }
+    },
+    "law150-v1-086": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7269-2393154-민원_처리에_관한_법률-13459-b9a9b6a1",
+      "returned": 6
+     }
+    },
+    "law150-v1-087": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-728-2391837-admin22013053110003549신구대비표-17차-5937b48f",
+      "returned": 10
+     }
+    },
+    "law150-v1-088": {
+     "gold_groups": [
+      12
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-1406-2392082-첨부1-고시개정안_전문_01-da916108",
+      "returned": 8
+     }
+    },
+    "law150-v1-089": {
+     "gold_groups": [
+      7
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-5670-2393694-붙임1-_전략물자_판정기준_해석_세부지침-a9c245ed",
+      "returned": 5
+     }
+    },
+    "law150-v1-090": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-7960-2393201-붙임._공작기계_고시_개정_신구대비표_최종-1f656185",
+      "returned": 10
+     }
+    },
+    "law150-v1-091": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11371-2393907-제29차_전략물자_수출입고시_전문-dfc0a74c",
+      "returned": 10
+     }
+    },
+    "law150-v1-092": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-827-2392412-admin22010111116001006신구대비표-국문-98219fb3",
+      "returned": 7
+     }
+    },
+    "law150-v1-093": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-16585-2391491-전략물자_판정기준_해석_세부지침-24.2.24-3e184892",
+      "returned": 5
+     }
+    },
+    "law150-v1-094": {
+     "gold_groups": [
+      5
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-11321-2393763-붙임2._전략물자_판정기준_해석_세부지침-20.9.17-d620322f",
+      "returned": 8
+     }
+    },
+    "law150-v1-095": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8612-2393958-붙임1_산업통상자원부-고시개정안-제2017-169호-fcc997bd",
+      "returned": 4
+     }
+    },
+    "law150-v1-096": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-866-2391815-신구대비표-국문-09._7._1개정-_01-4f6ee8e4",
+      "returned": 7
+     }
+    },
+    "law150-v1-097": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394184-201510230549133_산업통상자원부-고시-제2015-223호-관보게재안-26424ed9",
+      "returned": 6
+     }
+    },
+    "law150-v1-098": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-998-2392728-붙임1._개정_본문-국제평화_및_안전유지_등_의무이행을_위한_무역에_관한_특별조치_고시_일부개정고시안-d1dda230",
+      "returned": 6
+     }
+    },
+    "law150-v1-099": {
+     "gold_groups": [
+      3
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-8756-2394185-국제평화-및-안전유지-등-의무이행을-위한-무역에-관한-특별조치-고시-b88b770d",
+      "returned": 10
+     }
+    },
+    "law150-v1-100": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284150-b0024-00-ff9891b2",
+      "returned": 7
+     }
+    },
+    "law150-v1-101": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0002-01-72c233a4",
+      "returned": 9
+     }
+    },
+    "law150-v1-102": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0006-00-77e7b4f9",
+      "returned": 10
+     }
+    },
+    "law150-v1-103": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0007-00-37e0d8f5",
+      "returned": 4
+     }
+    },
+    "law150-v1-104": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-t0000-00-4597a54e",
+      "returned": 4
+     }
+    },
+    "law150-v1-105": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0009-00-a94d8911",
+      "returned": 2
+     }
+    },
+    "law150-v1-106": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-278483-b0002-00-d6de90c5",
+      "returned": 2
+     }
+    },
+    "law150-v1-107": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 5
+     }
+    },
+    "law150-v1-108": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-b0008-00-faa6f87e",
+      "returned": 10
+     }
+    },
+    "law150-v1-109": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 9
+     }
+    },
+    "law150-v1-110": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000283458-t0000-00-0bd73220",
+      "returned": 7
+     }
+    },
+    "law150-v1-111": {
+     "gold_groups": [
+      1,
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0001-00-479808ed",
+      "returned": 10
+     }
+    },
+    "law150-v1-112": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0009-00-3fa40f6a",
+      "returned": 7
+     }
+    },
+    "law150-v1-113": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-290379-b0002-00-b893a49a",
+      "returned": 10
+     }
+    },
+    "law150-v1-114": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0003-01-45ae9f7d",
+      "returned": 10
+     }
+    },
+    "law150-v1-115": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-t0000-00-317a189a",
+      "returned": 6
+     }
+    },
+    "law150-v1-116": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0008-00-a084b64c",
+      "returned": 6
+     }
+    },
+    "law150-v1-117": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0001-00-fc6772d0",
+      "returned": 10
+     }
+    },
+    "law150-v1-118": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000257522-t0000-00-3773f2ff",
+      "returned": 6
+     }
+    },
+    "law150-v1-119": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-278483-b0003-00-914812dc",
+      "returned": 9
+     }
+    },
+    "law150-v1-120": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-121": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-122": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000283458-t0000-00-0bd73220",
+      "returned": 8
+     }
+    },
+    "law150-v1-123": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0002-00-303b496b",
+      "returned": 8
+     }
+    },
+    "law150-v1-124": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0010-03-37d5af7a",
+      "returned": 10
+     }
+    },
+    "law150-v1-125": {
+     "gold_groups": [
+      1,
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": false,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-290401-b0000-00-fd12575a",
+      "returned": 10
+     }
+    },
+    "law150-v1-126": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-b0004-01-dcfbed39",
+      "returned": 10
+     }
+    },
+    "law150-v1-127": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0003-00-6a8fe2af",
+      "returned": 10
+     }
+    },
+    "law150-v1-128": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0009-00-199da818",
+      "returned": 5
+     }
+    },
+    "law150-v1-129": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0004-00-6aae9961",
+      "returned": 5
+     }
+    },
+    "law150-v1-130": {
+     "gold_groups": [
+      4
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-276643-b0000-00-009c74ea",
+      "returned": 6
+     }
+    },
+    "law150-v1-131": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-278483-b0004-00-57c0f102",
+      "returned": 6
+     }
+    },
+    "law150-v1-132": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-b0005-00-da39dec8",
+      "returned": 6
+     }
+    },
+    "law150-v1-133": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-b0012-00-3630d941",
+      "returned": 8
+     }
+    },
+    "law150-v1-134": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-281125-b0001-00-bab074ae",
+      "returned": 9
+     }
+    },
+    "law150-v1-135": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000283458-t0000-00-0bd73220",
+      "returned": 6
+     }
+    },
+    "law150-v1-136": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0006-00-74764c6e",
+      "returned": 10
+     }
+    },
+    "law150-v1-137": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0010-03-37d5af7a",
+      "returned": 10
+     }
+    },
+    "law150-v1-138": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000189358-t0000-00-317a189a",
+      "returned": 10
+     }
+    },
+    "law150-v1-139": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0004-00-2097c10f",
+      "returned": 10
+     }
+    },
+    "law150-v1-140": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000237604-b0011-00-c8110b95",
+      "returned": 8
+     }
+    },
+    "law150-v1-141": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000251134-b0006-00-cb1ff0c0",
+      "returned": 6
+     }
+    },
+    "law150-v1-142": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-law-278483-b0001-00-e48c7bda",
+      "returned": 9
+     }
+    },
+    "law150-v1-143": {
+     "gold_groups": [
+      0,
+      1
+     ],
+     "gold_lost": true,
+     "service": {
+      "evidence": false,
+      "doc_hit": true,
+      "phrase": false,
+      "top_parent": "01_법령고시-law-278483-b0005-00-c9907040",
+      "returned": 10
+     }
+    },
+    "law150-v1-144": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-145": {
+     "gold_groups": [
+      8
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000268600-t0000-00-2c9093af",
+      "returned": 10
+     }
+    },
+    "law150-v1-146": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-281125-b0002-00-f619925e",
+      "returned": 10
+     }
+    },
+    "law150-v1-147": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-admrul-2100000284142-b0001-00-474038ae",
+      "returned": 6
+     }
+    },
+    "law150-v1-148": {
+     "gold_groups": [
+      2
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289453-b0006-00-74764c6e",
+      "returned": 10
+     }
+    },
+    "law150-v1-149": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-law-289785-b0000-00-1748a460",
+      "returned": 10
+     }
+    },
+    "law150-v1-150": {
+     "gold_groups": [
+      1
+     ],
+     "gold_lost": false,
+     "service": {
+      "evidence": true,
+      "doc_hit": true,
+      "phrase": true,
+      "top_parent": "01_법령고시-3543-2392630-전략물자_수출입고시-a1a5f319",
+      "returned": 7
+     }
+    }
+   }
+  }
+ }
+}
