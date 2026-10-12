@@ -42,13 +42,13 @@ window.CATEGORY_CHUNKING_STAGES = [
 
 window.CATEGORY_CHUNKING_EXAMPLES = {
   "table-note-row": {
-    summary: "같은 표 행과 열 이름은 유지하고, 표 바로 뒤의 주석만 이 행 청크에 연결했습니다.",
+    summary: "수정 전에는 표 행이 평문으로만 보였습니다. 수정 후에는 열 이름과 값의 짝, 표 안의 행 위치를 구조적으로 확인할 수 있고 표 주석도 연결됩니다.",
     before: {
       id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#0035",
       heading_path: ["[별표3]", "전략물자 확인의무 제외대상 목록(영 제40조의2)"],
       body: "HS번호: 1류\n품 명: 산동물",
       table_id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#table0",
-      table_number: 1, columns: ["HS번호", "품 명"], row_values: ["1류", "산동물"], row_index: 0, row_count: 24,
+      table_example: true, table_number: null, columns: [], row_index: null, row_count: null,
       table_context_after: null
     },
     after: [{
@@ -56,7 +56,7 @@ window.CATEGORY_CHUNKING_EXAMPLES = {
       heading_path: ["[별표3]", "전략물자 확인의무 제외대상 목록(영 제40조의2)"],
       body: "표 주석: ※ 상기 품목의 규격은 불문한다.\nHS번호: 1류\n품 명: 산동물",
       table_id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#table0",
-      table_number: 1, columns: ["HS번호", "품 명"], row_values: ["1류", "산동물"], row_index: 0, row_count: 24,
+      table_example: true, table_number: 1, columns: ["HS번호", "품 명"], row_values: ["1류", "산동물"], row_index: 0, row_count: 24,
       table_context_after: "※ 상기 품목의 규격은 불문한다."
     }]
   }

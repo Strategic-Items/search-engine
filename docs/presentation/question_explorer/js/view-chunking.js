@@ -22,13 +22,13 @@ function ckDetail(){
   if(!s){el.innerHTML='<div class="wrap ck"><h1>청킹 단계</h1><p>기록된 단계가 없습니다.</p></div>';return;}
   var example=((window.CATEGORY_CHUNKING_EXAMPLES||{})[s.exampleKey]||null);
   function chunkBlock(c,label){
-    if(c.row_values){
+    if(c.table_example){
       var note=c.table_context_after?'<div class="ck-context-note"><span>표에 연결된 주석</span><b>'+esc(c.table_context_after)+'</b></div>':'<div class="ck-context-empty">이 청크에는 연결된 표 주석이 없습니다</div>';
-      var cells=c.columns.map(function(name,i){return '<td><span>'+esc(name)+'</span><b>'+esc(c.row_values[i]||"")+'</b></td>';}).join("");
-      var meta='<div class="ck-table-meta"><b>표 '+c.table_number+' · 행 '+(c.row_index+1)+' / '+c.row_count+'</b><span>열과 행 데이터는 수정 전후 동일</span></div>';
-      var table='<table class="ck-row-table"><tbody><tr>'+cells+'</tr></tbody></table>';
+      var cells=(c.columns||[]).map(function(name,i){return '<td><span>'+esc(name)+'</span><b>'+esc(c.row_values[i]||"")+'</b></td>';}).join("");
+      var meta='<div class="ck-table-meta"><b>'+(c.row_values?'표 '+c.table_number+' · 행 '+(c.row_index+1)+' / '+c.row_count:'표 구조 정보 없음')+'</b><span>'+(c.row_values?'열 이름과 값 연결':'열 이름·행 위치 메타데이터 없음')+'</span></div>';
+      var table=c.row_values?'<table class="ck-row-table"><tbody><tr>'+cells+'</tr></tbody></table>':'<div class="ck-plain-row"><span>청크 본문 · 열과 값의 대응이 표 셀로 보이지 않음</span><pre>'+esc(c.body)+'</pre></div>';
       var stored='<p class="ck-context-meta">문맥 메타데이터: '+(c.table_context_after?'표 뒤 주석 저장':'없음')+'</p>';
-      var raw='<details class="ck-raw-chunk"><summary>실제 청크 본문 보기</summary><pre>'+esc(c.body)+'</pre></details>';
+      var raw=c.row_values?'<details class="ck-raw-chunk"><summary>실제 청크 본문 보기</summary><pre>'+esc(c.body)+'</pre></details>':'';
       return '<article class="ck-table-example"><div class="ck-example-title"><h3>'+label+'</h3><span>청크 #'+esc(c.id.split("#").pop())+'</span></div><p class="ck-example-path">'+esc((c.heading_path||[]).join(" › "))+'</p>'+meta+note+'<div class="ck-row-caption">청크에 포함된 표 행</div>'+table+stored+raw+'</article>';
     }
     return '<article><h3>'+label+' · '+esc(c.id.split("#").pop())+'</h3><p class="cap">경로: '+esc((c.heading_path||[]).join(" → ")||"제목 경로 없음")+'</p><pre>'+esc(c.body)+'</pre></article>';

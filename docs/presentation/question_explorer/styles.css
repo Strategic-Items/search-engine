@@ -769,6 +769,9 @@ tr.hl td { background: var(--gc); color: var(--gc-ink); font-weight: 700; }
 .ck-context-note>b { font-size:13px; line-height:1.55; overflow-wrap:anywhere; }
 .ck-context-empty { margin:8px 0; padding:9px 11px; border:1px dashed var(--line); border-radius:7px; color:var(--muted); font-size:12px; }
 .ck-row-caption { margin:11px 0 5px; color:var(--muted); font-size:11px; font-weight:700; }
+.ck-plain-row { padding:10px; border:1px dashed var(--line); border-radius:7px; background:var(--tint); }
+.ck-plain-row>span { display:block; margin-bottom:6px; color:var(--muted); font-size:11px; font-weight:700; }
+.ck-plain-row pre { white-space:pre-wrap; overflow-wrap:anywhere; font:13px/1.7 var(--font-body); }
 .ck-row-table { width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; overflow:hidden; border:1px solid var(--line); border-radius:7px; background:var(--paper); }
 .ck-row-table td { width:50%; padding:9px 10px; vertical-align:top; overflow-wrap:anywhere; }
 .ck-row-table td+td { border-left:1px solid var(--line); }
