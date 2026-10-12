@@ -23,7 +23,7 @@ function catMissed(k){
     return '<tr><td>'+x.i+'</td><td>'+esc(x.c)+'</td><td class="qq">'+esc(x.q)+'</td><td>'+x.n+'</td><td>SPLADE '+(g[0]||'밖')+' · dense '+(g[1]||'밖')+' · 합산 '+(g[2]||'밖')+'</td><td class="qq">'+esc((CATH[k][x.i].positive_review||{}).reason||CATH[k][x.i].diagnosis||CATH[k][x.i].scope_note||CWHY[x.i]||'원인을 확인하지 않았습니다.')+'</td></tr>'; }).join(""); }
   function tbl(t,a,note){ return '<h3>'+t+' ('+a.length+'개)</h3><p class="cap">'+note+'</p><table class="catq"><thead><tr><th>번호</th><th>유형</th><th>질문</th><th>정답<br>청크</th><th>정답 청크의 순위</th><th>왜 틀렸나</th></tr></thead><tbody>'+rows(a)+'</tbody></table>'; }
   return '<h3 style="margin-top:16px">최종 반환에서 정답 라벨을 충족하지 못한 질문 '+(docM.length+chM.length)+'개 / '+D.length+'개</h3>'+
-    '<p class="cap">hybrid가 컷오프(1위 점수의 95%)를 거쳐 최종 반환한 청크에 정답 청크가 없는 질문만 적었습니다. 순위는 SPLADE 상위 100, dense 상위 50, 합산 후보(각 25개) 안에서 정답 근거 요건을 모두 충족한 자리입니다. 원인 설명은 저장된 후보 순위와 최종 반환 청크를 비교한 진단입니다.</p>'+
+    '<p class="cap">hybrid가 컷오프(1위 점수의 70%)를 거쳐 최종 반환한 청크에 정답 청크가 없는 질문만 적었습니다. 순위는 SPLADE 상위 100, dense 상위 50, 합산 후보(각 25개) 안에서 정답 근거 요건을 모두 충족한 자리입니다. 원인 설명은 저장된 후보 순위와 최종 반환 청크를 비교한 진단입니다.</p>'+
     tbl('정답 라벨 문서 미반환',docM.filter(function(x){return !CATH[k][x.i].scope_note&&x.eligible!==false;}),'반환된 원본 문서 ID가 정답 라벨의 원본 문서 ID와 일치하지 않습니다. 비슷한 제목의 다른 판도 별개 문서로 셉니다.')+
     tbl('정답 청크 미반환',chM.filter(function(x){return !CATH[k][x.i].scope_note&&x.eligible!==false;}),'정답 문서는 반환됐지만 정답 청크가 반환 청크에 없습니다.')+
     tbl('질문 범위 확인 필요',docM.concat(chM).filter(function(x){return CATH[k][x.i].scope_note&&x.eligible!==false;}),'일부 답의 근거 또는 다른 판의 답이 있어 라벨 미적중을 검색 오답으로 단정하지 않습니다.')+tbl('평가 제외',D.filter(function(x){return x.eligible===false;}),'질문의 통제번호 또는 원본 근거가 불완전해 성능 지표에 포함하지 않습니다.');
@@ -82,7 +82,7 @@ function catTbl(st){
   return '<table><thead><tr><th>방식</th><th>청크 Recall</th><th>1위 청크 적중</th><th>청크 MRR</th><th>Precision</th></tr></thead><tbody>'+
     [1,0,2].map(function(m){ var o=st.m[m]; var nm=["SPLADE","dense","hybrid (SPLADE + dense)"][m];
       return '<tr><td>'+nm+'</td><td>'+(o.rec===best?'<b>'+f3(o.rec)+'</b>':f3(o.rec))+'</td><td>'+o.top+'/'+st.n+'</td><td>'+(o.mrr===bm?'<b>'+f3(o.mrr)+'</b>':f3(o.mrr))+'</td><td>'+f3(o.prec)+'</td></tr>'; }).join("")+'</tbody></table>'+catDocTbl(st)+
-    (law?'<p class="cap">Precision은 반환한 청크 중 <b>정답 청크</b>의 비율(질문 평균)입니다. 라벨 밖에 있는 관련 청크도 오답으로 셉니다. 법령 150문항은 Sonnet 판정을 하지 않았습니다. 세 방식 모두 청크 순위를 1위 점수 대비 비율로 자른 기준입니다(청크 최대 10개, 문서 최대 5개, 문서당 최대 6개): hybrid 95%(서비스와 같이 SPLADE 25 + dense 25 후보), SPLADE 80%, dense 93%.</p>':'<p class="cap">Precision은 반환한 청크 중 질문과 관련 있는 청크의 비율(질문 평균)입니다. 관련 여부는 정답 청크가 아니라 Sonnet이 청크마다 질문과 본문만 보고 매긴 판정(2 답을 담음, 1 일부 담음, 0 무관)의 1 이상입니다. 세 방식 모두 청크 단위 RRF 또는 청크 순위를 1위 점수 대비 비율로 자른 기준입니다(청크 최대 10개, 문서 최대 5개, 문서당 최대 6개): hybrid 95%, SPLADE 80%, dense 93%. 비율은 이 질문 110개에서 Recall을 지키며 Precision이 오르는 지점을 찾은 값이라 과적합 위험이 있습니다.</p>');
+    (law?'<p class="cap">Precision은 반환한 청크 중 <b>정답 청크</b>의 비율(질문 평균)입니다. 라벨 밖의 관련 청크도 분자에 포함되지 않으므로 실제 관련도 Precision의 하한입니다. 법령 150문항은 Sonnet 판정을 하지 않았습니다. 세 방식 모두 청크 순위를 1위 점수 대비 비율로 자른 기준입니다(청크 최대 10개, 문서 최대 5개, 문서당 최대 6개): hybrid 70%(46단계 · SPLADE 25 + dense 25 후보), SPLADE 80%, dense 93%.</p>':'<p class="cap">Precision은 반환한 청크 중 질문과 관련 있는 청크의 비율(질문 평균)입니다. 관련 여부는 정답 청크가 아니라 Sonnet이 청크마다 질문과 본문만 보고 매긴 판정(2 답을 담음, 1 일부 담음, 0 무관)의 1 이상입니다. 세 방식 모두 청크 단위 RRF 또는 청크 순위를 1위 점수 대비 비율로 자른 기준입니다(청크 최대 10개, 문서 최대 5개, 문서당 최대 6개): hybrid 95%, SPLADE 80%, dense 93%. 비율은 이 질문 110개에서 Recall을 지키며 Precision이 오르는 지점을 찾은 값이라 과적합 위험이 있습니다.</p>');
 }
 function catSummary(k){
   var st=catStats(k), M=st.m, info=CINFO[k], allFound=M.every(function(o){return o.hit===st.n;});
@@ -98,7 +98,7 @@ function catSummary(k){
   li.push('<li>정답 청크를 1위에 올린 질문은 SPLADE '+M[0].top+'개, dense '+M[1].top+'개, hybrid '+M[2].top+'개이고, 청크 MRR은 '+f3(M[0].mrr)+' / '+f3(M[1].mrr)+' / '+f3(M[2].mrr)+'입니다.'+(M[2].mrr<Math.max(M[0].mrr,M[1].mrr)?' 이 묶음에서는 합쳤을 때 순위가 오히려 낮아졌습니다.':(M[2].mrr>Math.max(M[0].mrr,M[1].mrr)?' 합쳤을 때 순위가 가장 높습니다.':''))+'</li>');
   if(st.excluded) li.push('<li>질문·근거 오류로 '+st.excluded+'문항을 지표에서 제외했습니다. 질문별 화면에서 사유를 확인할 수 있습니다.</li>');
   li.push('<li>컷오프를 거친 최종 반환에 정답 청크가 실린 질문은 '+st.fin+'/'+st.n+'개입니다.</li>');
-  return '<div class="card"><h2 class="ch">'+info.full+'</h2>'+catTbl(st)+'<ul class="cl">'+li.join("")+'</ul></div>';
+  return '<div class="card"><h2 class="ch">'+info.full+'</h2>'+catTbl(st)+(k==='law100'?cqStage46Overview():'')+'<ul class="cl">'+li.join("")+'</ul></div>';
 }
 function catDetail(k){
   var st=catStats(k), M=st.m, info=CINFO[k];
@@ -114,7 +114,7 @@ function catRead(){
     '<li>질문 수가 30~150개라 한 문항이 약 <b>0.7~3.3%p</b>입니다. 방식 간 차이가 2~3문항 안쪽이면 순서를 단정하지 않습니다.</li>'+
     '<li>질문은 본문을 본 사람이 쓴 것이라 실제 이용자의 말투보다 본문과 가깝습니다. 사람 검수를 거치지 않았고, 필수 구절이 본문에 있는지만 코드가 확인했습니다.</li>'+
     (big.length?'<li>정답 청크가 10개 이상인 질문은 청크 Recall이 느슨하게 나옵니다: '+big.join(", ")+'.</li>':'')+
-    '<li>모두 오프라인 측정이라 카테고리 경로의 운영 컷오프와 필터를 거치지 않았고, 순위는 상위 5청크 기준입니다. 서비스가 실제로 돌려주는 창과 다릅니다.</li>'+
+    '<li>법령은 46단계의 실제 retrieve 경로(각 25후보·70% 컷오프)에서 LLM 필터·판정을 끄고 기록했습니다. 상위 5청크 지표와 최종 반환 근거 충족은 별도로 셉니다. 행정·FAQ는 이전 오프라인 결과입니다.</li>'+
     '<li>BM25는 이 탭에서 더 이상 재지 않습니다. 이전 BM25·dense·hybrid 측정과 직접 비교하지 마세요.</li>'+
     '<li>법령·고시는 2026-10-07의 150문서·6,288청크 색인에서 150문항을 다시 쟀으며, 근거 불완전 1문항을 제외한 149문항으로 집계합니다. 코퍼스·청킹·질문 수가 달라 과거 100문항 수치와 직접 비교하지 않습니다. 행정·민원FAQ는 2026-10-06 색인 그대로입니다.</li>'+
   '</ul>';
@@ -122,7 +122,7 @@ function catRead(){
 function panelCat(){
   var k=CATSEL;
   return '<div class="em">'+
-  '<p class="note">카테고리 검색은 법령·고시, 행정·업무, 민원FAQ를 각자 인덱스에서 따로 찾는 경로입니다. 질문마다 <b>필수 구절</b>을 적고 그 구절을 모두 담은 청크를 정답 청크로 코드가 찾아 붙였습니다. <b>질문은 본문을 보고 작성한 점검용이며 새 질문에 대한 일반화 성능을 뜻하지 않습니다.</b> 아래 수치는 모두 같은 오프라인 조건입니다: <b>SPLADE는 38단계에서 합성 질의 2,702개로 파인튜닝한 모델</b>, dense는 BGE-m3-ko, hybrid는 SPLADE와 dense를 <b>청크 단위 RRF(k=60)</b>로 합친 뒤 1위 점수의 95% 컷오프로 자른 것이고, 청크 Recall은 <b>상위 5청크</b> 안에서 정답 청크를 찾았는지로 셉니다. LLM 필터·답변 가능성 판정·리랭커 없음, 기준일은 법령 2026-10-07, 나머지 자료 2026-10-06입니다.</p>'+
+  '<p class="note">카테고리 검색은 법령·고시, 행정·업무, 민원FAQ를 각자 인덱스에서 따로 찾는 경로입니다. 질문마다 <b>필수 구절</b>을 적고 그 구절을 모두 담은 청크를 정답 청크로 코드가 찾아 붙였습니다. <b>질문은 본문을 보고 작성한 점검용이며 새 질문에 대한 일반화 성능을 뜻하지 않습니다.</b> 법령은 2026-10-12에 46단계로 갱신했고, 행정·FAQ는 이전 결과를 유지합니다: <b>SPLADE는 38단계에서 합성 질의 2,702개로 파인튜닝한 모델</b>, dense는 BGE-m3-ko, hybrid는 SPLADE와 dense를 <b>청크 단위 RRF(k=60)</b>로 합친 뒤 법령은 70%, 행정·FAQ는 95% 컷오프로 자른 것이고, 청크 Recall은 <b>상위 5청크</b> 안에서 정답 청크를 찾았는지로 셉니다. LLM 필터·답변 가능성 판정·리랭커 없음, 기준일은 법령 2026-10-07, 나머지 자료 2026-10-06입니다.</p>'+
   '<h2 id="cat-sum">결론부터</h2>'+catSummary(k)+
   '<p class="cap">질문이 30~150개라 한 문항이 0.007~0.033입니다. 방식 간 차이가 1~2문항이면 순서를 단정하지 않습니다. 질문별 결과는 아래에 있습니다.</p>'+
   catDetail(k)+catRead()+
@@ -236,7 +236,7 @@ function cqHits(list,kind,terms,d){
     var tm=(h.t||[]).map(function(x){return '<span class="tm"><b>'+esc(x[0])+'</b> '+x[1]+'</span>';}).join("");
     var from=kind==="hy"?'<span class="sc" style="flex:none">SPLADE '+(h.a?h.a+'위':'—')+' · dense '+(h.b?h.b+'위':'—')+'</span>':'';
     return '<details class="hit'+(h.g?' gold':'')+'"'+(h.g?' open':'')+'><summary class="hd"><span class="rk">'+(h.comparison?(h.rank?h.rank+'위 · 비교':'정답 비교'):(i+1)+'위')+'</span><span class="ti">'+esc(cqTitle(h.c))+'</span>'+(h.g?'<span class="pin big">근거 요건 청크</span>':'')+cqExtraLabel(d,h.c)+from+'<span class="sc">'+h.s+'</span><span class="more">본문 보기</span></summary>'+
-      '<div class="sn">'+body+'</div>'+(tm?'<div class="tms"><span>단어별 기여</span>'+tm+'</div>':'')+'</details>'; }).join("");
+      '<div class="sn">'+body+'</div>'+(tm?'<div class="tms"><span>단어별 기여</span>'+tm+(h.boost>0?'<span class="tm"><b>명시 근거 가산</b> +'+h.boost+'</span>':'')+'</div>':'')+'</details>'; }).join("");
 }
 function cqPanelDn(d,x){
   var hits=d.dn.concat(d.dn_gold||[]);
@@ -244,7 +244,7 @@ function cqPanelDn(d,x){
   if(idx<0||idx>=hits.length) idx=0;
   var pick=hits.map(function(h,i){ return '<button type="button" data-chunk="'+i+'" aria-pressed="'+(i===idx?'true':'false')+'"><span class="r">'+(h.comparison?'비교':(i+1)+'위')+'</span><span class="t">'+esc(cqTitle(h.c))+(h.g?' <span class="pin">정답'+(h.comparison?' · '+(h.rank?h.rank+'위':'상위 5 밖'):'')+'</span>':'')+'</span><span class="s">'+h.s+'</span></button>'; }).join("");
   var selected=hits[idx], o=selected.attr?{w:selected.attr.w,base:hits.map(function(h,i){return h.attr?h.attr.base:(d.occ?d.occ.base[i]:null);}),d:selected.attr.d.map(function(v){var row=[];row[idx]=v;return row;})}:d.occ;
-  if(!o) return cqBar2(d)+'<p class="note">dense 검색은 청크마다 미리 만들어 둔 임베딩과 질문 임베딩의 코사인 유사도로 순위를 냅니다. 청크를 통째로 임베딩했고 질문도 통째로 한 번 임베딩합니다.</p><h2>dense 검색 상위 5 · 코사인 유사도</h2>'+cqHits(d.dn,"dn",null,d);
+  if(!o) return cqBar2(d)+'<p class="note">dense 검색은 청크마다 미리 만들어 둔 임베딩과 질문 임베딩의 코사인 유사도로 순위를 냅니다. 청크를 통째로 임베딩했고 질문도 통째로 한 번 임베딩합니다.</p><h2>dense 검색 상위 5 · 점수 (1+코사인)/2</h2>'+cqHits(hits,"dn",null,d);
   var col=o.d.map(function(r){return r[idx];}), mx=Math.max.apply(null,col.concat([0.001]));
   var words=o.w.map(function(w,i){ var dd=col[i], a=dd>0.005?Math.min(0.9,0.12+0.78*dd/mx):0; return '<span style="--a:'+a.toFixed(2)+'" title="'+esc(w)+': 빼면 유사도 '+(dd>=0?'−':'+')+Math.abs(dd).toFixed(3)+'">'+esc(w)+'</span>'; }).join("");
   var top=col.map(function(dd,i){return [o.w[i],dd];}).filter(function(z){return z[1]>0.01;}).sort(function(a,b){return b[1]-a[1];}).slice(0,4);
@@ -274,7 +274,7 @@ function cqPanel(d,x){
   var mx=Math.max.apply(null,qt.map(function(t){return t[1];}).concat([0.001]));
   var chips=qt.map(function(t){ var al=Math.min(0.75,0.08+0.67*t[1]/mx); return '<span class="spchip" style="--a:'+al.toFixed(2)+'" title="질문 가중치 '+t[1]+'">'+esc(t[0])+'</span>'; }).join("");
   var terms=[]; d.sp.concat(d.sp_gold||[]).forEach(function(h){ (h.t||[]).forEach(function(x2){ if(terms.indexOf(x2[0])<0) terms.push(x2[0]); }); });
-  return cqBar2(d)+'<div><h2>질문을 이렇게 바꿔서 찾았습니다 (SPLADE)</h2><div class="chips" style="margin-top:8px">'+chips+'</div></div><h2>SPLADE 검색 상위 5 · 점수</h2>'+cqHits(d.sp,"sp",terms,d)+(d.sp_gold&&d.sp_gold.length?'<h2>상위 5 밖 정답 청크 · 단어별 기여 비교</h2><p class="note">비교용 정답 청크입니다. 실제 검색 순위·합산·반환 결과에는 포함하지 않습니다. 점수는 SPLADE 벡터와 질문 벡터의 내적입니다(현재 색인에 없는 청크는 저장 본문을 다시 인코딩한 근사값).</p>'+cqHits(d.sp_gold,"sp",terms,d):'');
+  return cqBar2(d)+(x.set==='law100'?'<p class="note"><b>46단계.</b> SPLADE 내적에 명시 조문·별표·별지의 제목 경로 일치 +6, 통제번호의 본문 일치 +6, 근거 범위와 대상 항목의 본문 일치 +6을 더한 뒤 상위 25개를 고릅니다. 각 조건은 한 번만 더합니다. BM25·추가 후보 조회는 없습니다. 아래 단어별 기여는 내적 성분이며 가산점은 별도로 표시합니다.</p>':'')+'<div><h2>질문을 이렇게 바꿔서 찾았습니다 (SPLADE)</h2><div class="chips" style="margin-top:8px">'+chips+'</div></div><h2>SPLADE 검색 상위 5 · 점수</h2>'+cqHits(d.sp,"sp",terms,d)+(d.sp_gold&&d.sp_gold.length?'<h2>상위 5 밖 정답 청크 · 단어별 기여 비교</h2><p class="note">비교용 정답 청크입니다. 실제 검색 순위·합산·반환 결과에는 포함하지 않습니다. 법령 점수는 현재 색인의 SPLADE 내적과 46단계 명시 근거 가산점의 합입니다. 비교 청크는 진단용 조회에서 기록했으며 실제 hybrid는 각 25개만 합산합니다.</p>'+cqHits(d.sp_gold,"sp",terms,d):'');
 }
 function cqDocId(c){ return c.split("#")[0]; }
 function cqDocGold(d,r){ var gold=new Set(d.gc.map(cqDocId)); return r.ch.some(function(c){return gold.has(cqDocId(c[0]));}); }
@@ -298,7 +298,8 @@ function cqExtraLabel(d,c){
   return '';
 }
 function cqReviewNote(d){
-  var note=d.scope_note?'<p class="warn"><b>질문 범위 확인 필요:</b> '+esc(d.scope_note)+'</p>':'';
+  var note=d.diagnosis?'<p class="note"><b>현재 실패 원인:</b> '+esc(d.diagnosis)+'</p>':'';
+  note+=d.scope_note?'<p class="warn"><b>질문 범위 확인 필요:</b> '+esc(d.scope_note)+'</p>':'';
   if(d.label_review) note+='<p class="note"><b>동등한 정답 근거 반영:</b> '+esc(d.label_review.reason)+' (추가 '+d.label_review.added_chunks.length+'청크 · '+d.label_review.date+')</p>';
   if(d.supporting_chunks&&d.supporting_chunks.length) note+='<p class="note">같은 답의 내용을 담지만 질문이 지정한 출처를 충족하지 않는 '+d.supporting_chunks.length+'청크는 보조 근거로 구분했습니다.</p>';
   if(d.positive_review){
@@ -327,17 +328,17 @@ function cqSingleCut(name,cls,fx,unit){
 }
 function cqLab(l,law){ if(law) return '<span class="tag '+(l===2?'t-ok':'t-mut')+'" title="정답 청크 라벨">'+(l===2?'정답 청크':'라벨 밖')+'</span>'; return '<span class="tag '+(l===2?'t-ok':(l===1?'t-mut':'t-bad'))+'" title="Sonnet 관련도 판정">판정 '+l+'</span>'; }
 function cqFx(d,x){
-  var f=d.fx, K=60, ST={keep:'<span class="tag t-ok">반환</span>',cut:'<span class="tag t-bad">컷오프</span>',docs:'<span class="tag t-mut">문서 수 한도</span>',perdoc:'<span class="tag t-mut">문서당 한도</span>',budget:'<span class="tag t-mut">청크 예산 끝</span>'};
+  var f=d.fx, K=60, ST={keep:'<span class="tag t-ok">반환</span>',cut:'<span class="tag t-bad">컷오프</span>',docs:'<span class="tag t-mut">문서 수 한도</span>',perdoc:'<span class="tag t-mut">문서당 한도</span>',budget:'<span class="tag t-mut">청크 예산 끝</span>',duplicate:'<span class="tag t-mut">같은 문서 사본</span>',edition_limit:'<span class="tag t-mut">새 판 연결 뒤 문서 한도</span>'};
   function term(r){ return r?'1/('+K+'+'+r+') = '+(1/(K+r)).toFixed(4):'—'; }
   var drawn=false;
   var frows=f.cr.map(function(r,i){
     var line="";
-    if(!drawn&&r[5]){ drawn=true; line='<div class="cutline wide">─ 컷오프 선: 1위 RRF 점수 × 95% = '+f.floor+' · 이 아래는 각 목록의 1위 청크만 살아남음 ─</div>'; }
+    if(!drawn&&r[5]){ drawn=true; line='<div class="cutline wide">─ 컷오프 선: 1위 RRF 점수 × '+cqRatio(d)+'% = '+f.floor+' · 이 아래는 각 목록의 1위 청크만 살아남음 ─</div>'; }
     var res=(r[6]==="keep"&&r[5])?'<span class="tag t-mut">선 아래·1위라 유지</span>':ST[r[6]];
-    return line+'<div class="frow'+(r[7]?' g':'')+'"><span class="n">'+(i+1)+'</span><span class="dc">'+esc(cqTitle(r[0]))+(r[7]?' <span class="pin">정답 청크</span>':'')+'</span><span class="calc"><span class="'+(r[1]?'sp':'no')+'">SPLADE '+(r[1]?r[1]+'위 ':'없음 ')+term(r[1])+'</span> + <span class="'+(r[2]?'v':'no')+'">dense '+(r[2]?r[2]+'위 ':'없음 ')+term(r[2])+'</span></span><span class="tot">'+r[3].toFixed(4)+'</span><span class="bar"><i style="width:'+(f.top?(r[3]/f.top*100).toFixed(0):0)+'%"></i></span>'+res+'</div>';
+    return line+'<div class="frow'+(r[7]?' g':'')+'"><span class="n">'+(i+1)+'</span><span class="dc">'+esc(cqTitle(r[0]))+(r[7]?' <span class="pin">정답 청크</span>':'')+'</span><span class="calc"><span class="'+(r[1]?'sp':'no')+'">SPLADE '+(r[1]?r[1]+'위 ':'없음 ')+term(r[1])+'</span> + <span class="'+(r[2]?'v':'no')+'">dense '+(r[2]?r[2]+'위 ':'없음 ')+term(r[2])+'</span>'+(r[8]&&r[8]!==1?' · 대체된 판 ×'+r[8]:'')+'</span><span class="tot">'+r[3].toFixed(4)+'</span><span class="bar"><i style="width:'+(f.top?(r[3]/f.top*100).toFixed(0):0)+'%"></i></span>'+res+'</div>';
   }).join("");
   var step1='<h2>① SPLADE·dense를 <b>단독으로</b> 쓸 때의 청크 컷오프 <small style="font-weight:400;color:var(--muted)">hybrid는 이 컷을 쓰지 않습니다</small></h2><p class="note">각 검색기의 청크 순위(SPLADE 상위 100, dense 상위 50)를 1위 점수 대비 비율로 자릅니다. 두 방식의 Precision이 너무 낮게 나와서(관련 없는 청크를 너무 많이 실어서) 결과 요약 수치를 이 컷오프로 다시 쟀습니다. 비율은 질문 110개에서 Recall을 지키면서 Precision이 오르는 지점을 찾은 값(SPLADE 80%, dense 93%)이라 이 질문셋에 맞춰져 있습니다. 1위 청크는 비율과 무관하게 항상 남고, 그 뒤로 청크 최대 10개·문서 최대 5개·문서당 최대 6개까지 싣습니다. 결과 요약의 SPLADE·dense Precision은 이 컷을 쓴 기준입니다. dense 점수는 코사인을 0~1로 옮긴 값 (1+코사인)/2입니다.</p><div class="lists">'+cqSingleCut("SPLADE","spl",f.sp,2)+cqSingleCut("dense","vec",f.dn,3)+'</div>';
-  var step2='<h2 style="margin-top:22px">② 청크 단위 RRF와 컷오프 <small style="font-weight:400;color:var(--muted)">합산 대상 '+f.nf+'개 청크 · 위에서 '+f.cr.length+'개만 표시</small></h2><p class="note">문서로 묶지 않고 청크마다 <b>1/(60+자리)</b>를 더합니다. 두 목록 모두 1위이면 2/61 = 0.0328이 최고점입니다. 1위 점수의 <b>95%</b> 미만은 버리되 어느 목록의 1위 청크는 남깁니다. 남은 청크를 위에서부터 싣는데, 청크는 최대 10개, 문서는 최대 5개, 한 문서의 청크는 최대 6개입니다. 점수가 같으면 dense에서 자리가 앞선 쪽, 그래도 같으면 청크 ID 순입니다. 결과 요약의 hybrid 청크 Recall·MRR은 이 순서의 상위 5청크로 셉니다.'+(x.set==="law100"?' 법령 150문항은 서비스 경로와 같게 SPLADE 상위 25개와 dense 상위 25개만 합산합니다(위 단독 순위는 100·50까지 봅니다).':'')+'</p>'+'<div class="card frows">'+frows+'</div>'+(f.gd?'':'<p class="warn">정답 근거 요건을 모두 충족하는 청크가 합산 후보에 들어오지 못했습니다.</p>');
+  var step2='<h2 style="margin-top:22px">② 청크 단위 RRF와 컷오프 <small style="font-weight:400;color:var(--muted)">합산 대상 '+f.nf+'개 청크 · 위에서 '+f.cr.length+'개만 표시</small></h2><p class="note">문서로 묶지 않고 청크마다 <b>1/(60+자리)</b>를 더합니다. 두 목록 모두 1위이면 2/61 = 0.0328이 최고점입니다. 1위 점수의 <b>'+cqRatio(d)+'%</b> 미만은 버리되 어느 목록의 1위 청크는 남깁니다. 남은 청크를 위에서부터 싣는데, 청크는 최대 10개, 문서는 최대 5개, 한 문서의 청크는 최대 6개입니다. 점수가 같으면 dense에서 자리가 앞선 쪽, 그래도 같으면 청크 ID 순입니다. 결과 요약의 hybrid 청크 Recall·MRR은 이 순서의 상위 5청크로 셉니다.'+(x.set==="law100"?' 법령 150문항은 서비스 경로와 같게 SPLADE 상위 25개와 dense 상위 25개만 합산합니다(위 단독 순위는 100·50까지 봅니다). 합산 순위는 별도의 실제 size=25 조회 결과이며 dense ANN은 조회 크기에 따라 순위가 달라질 수 있습니다.':'')+'</p>'+'<div class="card frows">'+frows+'</div>'+(f.gd?'':'<p class="warn">정답 근거 요건을 모두 충족하는 청크가 합산 후보에 들어오지 못했습니다.</p>');
   return cqBar2(d)+step1+step2;
 }
 function cqOutP(d,x){
@@ -346,11 +347,11 @@ function cqOutP(d,x){
     var rows=doc.ch.map(function(c,j){ var b=tidy(CATB[c[0]][1]);
       return '<details class="cdet cq-outchunk'+(c[3]?' g':'')+'"'+(c[3]?' open':'')+'><summary><span class="cq-chunk-id"><span class="ord">'+(j+1)+'번째</span><span class="cid">#'+c[0].split("#")[1]+'</span></span><span class="cq-ranks">'+r(c[1],"SPLADE",100)+r(c[2],"dense",50)+'</span><span class="prev">'+esc(b.slice(0,90))+'…</span><span class="cq-markers">'+(c[3]?'<span class="pin">근거 요건 청크</span>':'')+cqExtraLabel(d,c[0])+cqLab(c[4],x.set==="law100")+'</span></summary><div class="cbody2">'+esc(b)+'</div></details>'; }).join("");
     return '<div class="dbox cq-outdoc'+(cqDocGold(d,doc)?' g':'')+'"><div class="dhead cq-outhead"><span class="dn">'+(i+1)+'위</span><span class="dt">'+esc(doc.t)+'</span>'+(cqDocGold(d,doc)?'<span class="pin">정답 라벨 문서</span>':'<span class="tag t-mut">정답 문서 라벨 밖</span>')+'<span class="dm">'+doc.ch.length+'개 청크</span></div><div class="cq-docid"><span>원본 문서 ID</span><code>'+esc(cqDocId(doc.ch[0][0]))+'</code></div><div class="crows">'+rows+'</div></div>'; }).join("");
-  return '<p class="note">청크 단위 RRF에서 컷오프(1위 점수의 95%)를 통과한 청크를 문서별로 묶었습니다(청크 최대 10개, 문서 최대 5개, 문서당 최대 6개). 순서는 합산 탭 ②의 순서입니다. '+(x.set==="law100"?'오른쪽 표시는 그 청크가 정답 청크 라벨에 있는지입니다(Sonnet 판정은 하지 않았습니다). 오른쪽 순위는':'오른쪽 "판정"은 Sonnet이 질문과 청크 본문만 보고 매긴 관련도(2 답을 담음, 1 일부 담음, 0 무관)이고, Precision은 판정 1 이상을 관련으로 셉니다. 오른쪽 순위는')+' 그 청크가 SPLADE(상위 100)·dense(상위 50) 목록에서 몇 위였는지이고, "밖"은 그 목록에 없었다는 뜻입니다. <b>이 창은 결과 요약의 청크 Recall(상위 5청크)과 다릅니다.</b> 각 줄을 누르면 청크 본문이 열립니다.</p>'+cqBar2(d)+cqDocEvidence(d)+'<div class="dboxes">'+(out||'<p class="note" style="margin:0">반환된 문서가 없습니다.</p>')+'</div>';
+  return '<p class="note">청크 단위 RRF에서 컷오프(1위 점수의 '+cqRatio(d)+'%)를 통과한 청크를 문서별로 묶었습니다(청크 최대 10개, 문서 최대 5개, 문서당 최대 6개). 합산 탭 ②에서 고른 청크를 문서별로 묶고, 문서 ID로 연결된 새 판을 추가하는 기존 반환 단계를 거칩니다. 새 판이 추가되면 5문서 상한에서 뒤 문서가 빠질 수 있습니다. '+(x.set==="law100"?'오른쪽 표시는 그 청크가 정답 청크 라벨에 있는지입니다(Sonnet 판정은 하지 않았습니다). 오른쪽 순위는':'오른쪽 "판정"은 Sonnet이 질문과 청크 본문만 보고 매긴 관련도(2 답을 담음, 1 일부 담음, 0 무관)이고, Precision은 판정 1 이상을 관련으로 셉니다. 오른쪽 순위는')+' 그 청크가 SPLADE(상위 100)·dense(상위 50) 목록에서 몇 위였는지이고, "밖"은 그 목록에 없었다는 뜻입니다. <b>이 창은 결과 요약의 청크 Recall(상위 5청크)과 다릅니다.</b> 각 줄을 누르면 청크 본문이 열립니다.</p>'+cqBar2(d)+cqDocEvidence(d)+'<div class="dboxes">'+(out||'<p class="note" style="margin:0">반환된 문서가 없습니다.</p>')+'</div>';
 }
 function cqAns(d,x){
   var n=d.fx.ret.length, m=d.fx.ret.reduce(function(a,doc){return a+doc.ch.length;},0);
-  return cqBar2(d)+'<div class="verdict"><b>이 질문의 판정·답변은 측정하지 않았습니다</b><p>이 탭의 수치는 검색 단계(SPLADE, dense, 합산, 컷오프)만 오프라인으로 잰 것입니다. 판정 LLM과 답변 LLM은 돌리지 않았고, SPLADE는 서비스 검색에 붙어 있지 않습니다. 그래서 판정 결과와 답변 예시는 없습니다.</p></div>'+
+  return cqBar2(d)+'<div class="verdict"><b>이 질문의 판정·답변은 측정하지 않았습니다</b><p>이 탭의 수치는 검색 단계(SPLADE, dense, 합산, 컷오프)만 오프라인으로 잰 것입니다. 카테고리 검색의 SPLADE와 dense 조회 결과를 기록했으며 판정 LLM과 답변 LLM은 돌리지 않았습니다. 그래서 판정 결과와 답변 예시는 없습니다.</p></div>'+
   '<p class="note" style="margin-top:12px">서비스 구조대로라면 최종 반환의 <b>문서 '+n+'건·청크 '+m+'개</b>가 답변 LLM에 근거로 넘어갑니다. 판정 LLM은 기본값이 꺼짐이고, 켜면 앞 문서 3개를 읽고 질문이 요구하는 사실이 적혀 있는지 예/아니오로 답해 아니오이면 결과를 비웁니다. 카테고리 검색 경로는 판정을 끈 상태로 둡니다.</p>';
 }
 function cqChunkImpact(x,e){
@@ -419,7 +420,7 @@ function cqChunkCatalog(k){
     return '<tr><td><button type="button" class="sidebtn" data-chunk-q="'+id+'">'+id.split('-').pop()+'</button></td><td>'+es.map(function(e){return esc(e.title);}).join('<br>')+'</td><td>'+description+'</td></tr>';
   }).join('')+'</tbody></table></details>';
 }
-function cqStg(d,x){
+function cqHistoricStg(d,x){
   var H=window.CATEGORY_STAGE_HISTORY||{}, h=x.set==="law100"&&H[x.i];
   if(!h) return '<div class="tl">'+['before37','before41','after45'].map(function(p){return cqChunkPhase(d,x,p);}).join('')+'</div><p class="note">'+(x.set==="law100"?'이 질문은 법령 150문서로 늘릴 때 추가되어, 45단계까지의 질문별 기록이 없습니다.':'이 카테고리는 45단계까지 같은 질문을 단계별로 다시 잰 기록이 없습니다.')+' 현재 검색 결과는 다른 탭에서 확인할 수 있습니다.</p>';
   function rank(r){ return r==null?'<b class="no">정답 청크 미반환</b>':'<b>정답 청크 '+r+'위 반환</b>'; }
@@ -497,10 +498,10 @@ function cqFlow(d,x){
   var gdoc=f.gd?'<span class="pin">정답</span>'+f.gd+'위':'후보 밖', kept=rt.chunk, nret=f.ret.reduce(function(a,o){return a+o.ch.length;},0);
   return cell("c1 r1",cqNode("sp","spl","질문 → SPLADE용","토큰 "+d.nq+"개","어휘 가중치로 바꿈 · 확장 포함",false))+
     cell("c1 r2",cqNode("dn","vec","질문 → dense용","문장 통째로 1번","임베딩 1024차원 · 쪼개지 않음",false))+
-    cell("c2 r1",cqNode("sp","spl","① SPLADE",h(gr[0]),"청크 상위 100 · hybrid는 트림 없이 합산",CQS.tab==="sp"))+
-    cell("c2 r2",cqNode("dn","vec","② dense",h(gr[1]),"청크 상위 50 · hybrid는 트림 없이 합산",CQS.tab==="dn"))+
+    cell("c2 r1",cqNode("sp","spl","① SPLADE",h(gr[0]),"단독·진단 상위 100 · hybrid는 25개",CQS.tab==="sp"))+
+    cell("c2 r2",cqNode("dn","vec","② dense",h(gr[1]),"단독·진단 상위 50 · hybrid는 25개",CQS.tab==="dn"))+
     cell("c3 rs",cqNode("fx",f.gd?"":"lost","③ 청크 단위 RRF",gdoc,"합산 대상 청크 "+f.nf+"개",CQS.tab==="fx"))+
-    cell("c4 rs",cqNode("fx",kept?"ok":"lost","④ 컷오프 95%",kept?'정답 청크 유지':(f.gd?'정답 청크 제외':'정답 청크 후보 없음'),"청크 "+nret+"개 남음",false))+
+    cell("c4 rs",cqNode("fx",kept?"ok":"lost","④ 컷오프 "+cqRatio(d)+"%",kept?'정답 청크 유지':(f.gd?'정답 청크 제외':'정답 청크 후보 없음'),"청크 "+nret+"개 남음",false))+
     cell("c5 rs",cqNode("out",rt.chunk?"ok":"lost","⑤ 반환",cqReturnLabel(rt),"문서 "+f.ret.length+"건 · 청크 "+nret+"개",CQS.tab==="out"))+
     cell("c6 rs",cqNode("ans","","⑥ 판정·답변",'측정 안 함',"오프라인 측정에 없음",CQS.tab==="ans"));
 }
@@ -511,7 +512,7 @@ function cqDetail(){
   '<section aria-label="단계별 경로"><div class="flow">'+cqFlow(d,x)+'</div></section>'+
   '<div><div class="tabs" role="tablist">'+CTABS.map(function(t){return '<button type="button" role="tab" data-ctab="'+t[0]+'" aria-selected="'+(CQS.tab===t[0]?'true':'false')+'">'+t[1]+'</button>';}).join("")+'</div><div class="panel" role="tabpanel">'+cqPanel(d,x)+'</div></div>'+
   '<p class="note"><button type="button" class="sidebtn" data-cqgo="'+CINFO[x.set].id+'">결과 요약에서 보기</button></p>'+
-  '<p class="cap">질문은 정답을 아는 사람이 본문을 보고 쓴 점검용이라 성능 판단에는 쓰지 않습니다. 오프라인 측정이라 LLM 필터·판정을 거치지 않았습니다. "정답 근거 충족"은 청크 단위 RRF와 95% 컷오프 뒤 반환한 청크가 모든 근거 요건을 충족하는지이고, 위 청크 Recall은 상위 5청크 기준입니다.</p></div>';
+  '<p class="cap">질문은 정답을 아는 사람이 본문을 보고 쓴 점검용이라 성능 판단에는 쓰지 않습니다. 오프라인 측정이라 LLM 필터·판정을 거치지 않았습니다. "정답 근거 충족"은 청크 단위 RRF와 '+cqRatio(d)+'% 컷오프 뒤 반환한 청크가 모든 근거 요건을 충족하는지이고, 위 청크 Recall은 상위 5청크 기준입니다.</p></div>';
   el.scrollTop=0;
 }
 function cqSelect(id,nohash){ CQS.id=id; CQS.chunk=null; cqList(); cqDetail(); if(!nohash) location.hash="cat-q-"+id; var c=document.querySelector('#list [aria-current="true"]'); if(c&&c.scrollIntoView) c.scrollIntoView({block:"nearest"}); }
@@ -540,4 +541,17 @@ function panelC38(){
   '<div class="card"><h2 class="ch">법령·고시 (21문항, 청크 673)</h2>'+c38Table(C38.hd,C38.law)+'</div>'+
   '<div class="card"><h2 class="ch">행정·업무 (30문항, 청크 183)</h2>'+c38Table(C38.hd,C38.adm)+'</div>'+
   '<p class="cap">SPLADE 단독은 상위 5문서 전부를 반환한 값이고, hybrid는 BGE-m3-ko와 RRF(k=60, 사전 컷 0.97, 최종 컷 0.97)로 합쳤습니다. 질문은 정답을 아는 사람이 본문을 보고 쓴 점검용이고, 평가는 오프라인이라 카테고리 경로의 운영 컷오프와 필터를 거치지 않았습니다. dense와 합치면 법령에서 C 단독(0.952)보다 낮아지고(0.905), 행정·업무의 문서 Hit@5는 모든 hybrid가 0.900으로 SPLADE 단독(1.000)보다 낮습니다.</p>';
+}
+
+function cqRatio(d){ return Math.round((d.fx.ratio==null?0.95:d.fx.ratio)*100); }
+function cqStage46Overview(){
+  var m=window.LAW_STAGE46;
+  if(!m) return '';
+  return '<p class="note"><b>46단계 · 명시 근거 일치 가산점.</b> BM25 없이 SPLADE 25 + dense 25, 추가 후보 조회 0. 같은 색인·라벨·70% 컷오프에서 가산점 0 → 6을 비교했습니다. 최종 근거 충족 <b>'+m.before.found+'/'+m.before.n+' → '+m.after.found+'/'+m.after.n+'</b>, 첫 문서 적중 '+m.before.top1+' → '+m.after.top1+', 청크 Precision 하한 '+m.before.precision_lower_bound.toFixed(4)+' → '+m.after.precision_lower_bound.toFixed(4)+'. 037·075·076을 새로 찾았고 기존 성공의 회귀는 없습니다. <b>추가 튜닝을 멈추고 이 설정을 고정합니다.</b> 이 질문셋으로 선택한 규칙이므로 새 질문·법령에서 일반화 성능을 따로 확인해야 합니다.</p>';
+}
+function cqStg(d,x){
+  var old=cqHistoricStg(d,x), m=window.LAW_STAGE46, q=m&&m.questions[x.i];
+  if(x.set!=='law100'||!q) return old;
+  function rank(r){return r==null?'근거 요건 미충족':r+'번째 청크에서 근거 요건 충족';}
+  return old+'<div class="tl"><div class="tl-card '+(q.after==null?'none':'chunk')+'" id="cq-stage-46"><div class="tl-box"><div class="tl-h"><span class="sl">46단계 · 적용</span><span class="st">법령 명시 근거 일치 가산점</span></div><p class="note">150문서·6,288청크, 평가 대상 149문항에서 가산점 0과 6을 비교했습니다. 두 조건 모두 BM25 제외, 각 25후보, 추가 조회 없음, 컷오프 70%, 최대 10청크·5문서·문서당 6청크입니다. 과거 100문항 실험과 직접 비교하지 않습니다.</p><div class="tl-modes"><div class="mc hy"><span class="ml">가산점 0</span><b>'+rank(q.before)+'</b></div><div class="mc hy"><span class="ml">가산점 6</span><b>'+rank(q.after)+'</b></div></div><p>'+esc(d.diagnosis||'명시 근거 가산점 적용 후의 후보와 반환 결과는 검색·합산 탭에서 확인할 수 있습니다.')+'</p><p class="cap">추가 튜닝은 중단했습니다. 새 법령·새 질문에 대한 검증 전에는 일반화 성능 향상을 단정하지 않습니다.</p></div></div></div>';
 }
