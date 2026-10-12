@@ -21,9 +21,20 @@ function ckDetail(){
   var s=ckSelected(),el=document.getElementById("detail");
   if(!s){el.innerHTML='<div class="wrap ck"><h1>청킹 단계</h1><p>기록된 단계가 없습니다.</p></div>';return;}
   var example=((window.CATEGORY_CHUNKING_EXAMPLES||{})[s.exampleKey]||null);
-  function chunkBlock(c,label){var table=c.table_id?'<p class="cap">표 ID: '+esc(c.table_id)+' · 열: '+esc((c.columns||[]).join(" | "))+' · 행: '+(c.row_index==null?"-":c.row_index+1)+'/'+(c.row_count||"-")+'<br>table_context_after: '+esc(c.table_context_after||"없음")+'</p>':'';return '<article><h3>'+label+' · '+esc(c.id.split("#").pop())+'</h3><p class="cap">경로: '+esc((c.heading_path||[]).join(" → ")||"제목 경로 없음")+'</p>'+table+'<pre>'+esc(c.body)+'</pre></article>';}
+  function chunkBlock(c,label){
+    if(c.row_values){
+      var note=c.table_context_after?'<div class="ck-context-note"><span>표에 연결된 주석</span><b>'+esc(c.table_context_after)+'</b></div>':'<div class="ck-context-empty">이 청크에는 연결된 표 주석이 없습니다</div>';
+      var cells=c.columns.map(function(name,i){return '<td><span>'+esc(name)+'</span><b>'+esc(c.row_values[i]||"")+'</b></td>';}).join("");
+      var meta='<div class="ck-table-meta"><b>표 '+c.table_number+' · 행 '+(c.row_index+1)+' / '+c.row_count+'</b><span>열과 행 데이터는 수정 전후 동일</span></div>';
+      var table='<table class="ck-row-table"><tbody><tr>'+cells+'</tr></tbody></table>';
+      var stored='<p class="ck-context-meta">문맥 메타데이터: '+(c.table_context_after?'표 뒤 주석 저장':'없음')+'</p>';
+      var raw='<details class="ck-raw-chunk"><summary>실제 청크 본문 보기</summary><pre>'+esc(c.body)+'</pre></details>';
+      return '<article class="ck-table-example"><div class="ck-example-title"><h3>'+label+'</h3><span>청크 #'+esc(c.id.split("#").pop())+'</span></div><p class="ck-example-path">'+esc((c.heading_path||[]).join(" › "))+'</p>'+meta+note+'<div class="ck-row-caption">청크에 포함된 표 행</div>'+table+stored+raw+'</article>';
+    }
+    return '<article><h3>'+label+' · '+esc(c.id.split("#").pop())+'</h3><p class="cap">경로: '+esc((c.heading_path||[]).join(" → ")||"제목 경로 없음")+'</p><pre>'+esc(c.body)+'</pre></article>';
+  }
   var originalMd=example&&example.sourceMarkdownPath?'<details class="ck-source-md" data-md-path="'+esc(example.sourceMarkdownPath)+'" open><summary>청킹 입력 원문 Markdown 전문 · '+esc(example.sourceMarkdownName||"원문.md")+'</summary><p><a href="'+esc(example.sourceMarkdownPath)+'" target="_blank" rel="noopener">원문 Markdown 파일 열기</a> · TextBundle <code>'+esc(example.sourceBundle||"")+'</code></p><pre data-md-content>원문 Markdown을 불러오는 중…</pre></details>':'';
-  var exampleMarkup=example?'<div class="ck-two ck-stage-examples">'+chunkBlock(example.before,"수정 전")+example.after.map(function(c,i){return chunkBlock(c,"수정 후 청크 "+i);}).join("")+'</div>':'<div class="ck-two ck-stage-examples"><article><h3>변경 전</h3><pre>'+esc(s.before)+'</pre></article><article><h3>변경 후</h3><pre>'+esc(s.after)+'</pre></article></div>';
+  var exampleMarkup=example?(example.summary?'<p class="ck-example-summary">'+esc(example.summary)+'</p>':'')+'<div class="ck-two ck-stage-examples">'+chunkBlock(example.before,"수정 전")+example.after.map(function(c,i){return chunkBlock(c,example.after.length===1?"수정 후":"수정 후 청크 "+i);}).join("")+'</div>':'<div class="ck-two ck-stage-examples"><article><h3>변경 전</h3><pre>'+esc(s.before)+'</pre></article><article><h3>변경 후</h3><pre>'+esc(s.after)+'</pre></article></div>';
   var metrics=s.metrics.map(function(m){return '<article class="ck-stage-metric"><span>'+esc(m.label)+'</span><b>'+esc(m.value)+'</b><p>'+esc(m.note)+'</p></article>';}).join("");
   el.innerHTML='<div class="wrap ck"><div class="kicker">법령·고시 · 행정·업무 · 청킹 단계 '+s.number+'</div><h1>청킹 변경 단계</h1><section class="ck-group-detail"><div class="kicker">'+esc(s.date)+' · '+esc(s.status)+'</div><h2>'+esc(s.title)+'</h2><div class="ck-process"><div><b>이전 문제</b><p>'+esc(s.problem)+'</p></div><div><b>청킹 수정</b><p>'+esc(s.change)+'</p></div><div><b>확인 결과</b><p>'+esc(s.result)+'</p></div></div><h3>'+(example?(example.sourceMarkdownPath?'원문 Markdown과 실제 전후 청크 전체':'실제 전후 청크 전체'):'전후 구조')+'</h3>'+originalMd+exampleMarkup+'<h3>평가 결과</h3><div class="ck-stage-metrics">'+metrics+'</div><p class="note">'+esc(s.note)+'</p><details class="ck-source-md" data-md-path="'+esc(s.mdPath)+'"><summary>단계 평가 기록 Markdown 보기 · '+esc(s.mdPath.split("/").pop())+'</summary><p><a href="'+esc(s.mdPath)+'" target="_blank" rel="noopener">Markdown 파일을 새 탭에서 열기</a></p><pre data-md-content>원문을 불러오는 중…</pre></details></section></div>';
 }
