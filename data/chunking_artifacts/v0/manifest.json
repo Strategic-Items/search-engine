@@ -1,0 +1,26 @@
+{
+ "version": 0,
+ "saved_at": "2026-10-08T07:47:31+00:00",
+ "source_index": "search-law-v20261008061513-3ba81c",
+ "documents": 150,
+ "chunks": 6288,
+ "has_splade": true,
+ "embedding_dimensions": 1024,
+ "embedding_model": "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16",
+ "splade_model": "/Users/jeongbin/models/splade-c",
+ "dense_include_heading_path": true,
+ "splade_include_heading_path": true,
+ "chunker_version_in_code": 1,
+ "search_engine_commit": "8564ee4",
+ "dirty": false,
+ "files": {
+  "index.jsonl.gz": {
+   "sha256": "dba767ba87045d4f1a8ae35d584001779a2d924ab36cd4c48f9bf636f0722223",
+   "bytes": 43842521
+  },
+  "corpus.jsonl.gz": {
+   "sha256": "32a64f6a5009eaa996d94d1a2dbc64376ec3b013ed76f3a6580071e69a86a66a",
+   "bytes": 1580394
+  }
+ }
+}

@@ -12,6 +12,9 @@ from search_engine.chunking.structured import chunk_elements
 from search_engine.chunking.tables import element_tables
 
 _TABLE_KEYS = ("table_id", "caption", "unit", "columns", "row_count", "row_id", "row_index", "values",
+               "table_segment_index", "table_segment_count", "table_continued", "table_page_start",
+               "table_page_end", "table_row_offset", "table_segment_row_index",
+               "table_context_before", "table_context_after",
                "column", "piece_index", "piece_count", "article", "image_ids")
 
 

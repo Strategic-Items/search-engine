@@ -196,6 +196,68 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
 
 
 def element_tables(elements: list[dict], *, hard_breaks: bool) -> list[list[dict]]:
-    """`chunk_elements(tables=...)`가 받는 값: 표 원소마다 그 표의 논리 표 자료 목록(같은 순서)."""
-    return [table_objects(e["text"], e.get("page", 1), hard_breaks=hard_breaks) if e["text"].strip() else []
-            for e in elements if e["type"] == "table"]
+    """`chunk_elements(tables=...)`용 표 자료. 인접 페이지에서 이어지는 표 조각에는 앞 구간의 열 이름을 물려준다."""
+    from search_engine.chunking.table_rows import comparison_columns, logical_tables
+
+    table_elements = [(i, element) for i, element in enumerate(elements) if element["type"] == "table"]
+    result: list[list[dict]] = []
+    previous: dict | None = None
+    for table_index, (element_position, element) in enumerate(table_elements):
+        objects = table_objects(element["text"], element.get("page", 1), hard_breaks=hard_breaks) if element["text"].strip() else []
+        result.append(objects)
+        if not objects:
+            continue
+
+        first_page = min(page for obj in objects for page in obj["pages"])
+        last_page = max(page for obj in objects for page in obj["pages"])
+        logical = [table for obj in objects for table in logical_tables(obj)]
+        named_comparison = next((table.columns for table in logical
+                                 if comparison_columns(table.columns)
+                                 and not all(name == f"열{i + 1}" for i, name in enumerate(table.columns))), None)
+        continuation = False
+        if previous is not None:
+            previous_position = table_elements[previous["last_index"]][0]
+            bridge = elements[previous_position + 1:element_position]
+            generic_columns = all(name == f"열{i + 1}" for i, name in enumerate(logical[0].columns))
+            schema_matches = logical[0].columns == previous["columns"] or generic_columns
+            connected = (first_page == previous["last_page"] + 1
+                         and len(previous["columns"]) == len(logical[0].columns)
+                         and all(item["type"] == "paragraph" and len(" ".join(item.get("text", "").split())) <= 12
+                                 for item in bridge))
+            first_values = [row[0].strip() for row in logical[0].rows if row and row[0].strip()]
+            identifiers = sum(bool(re.fullmatch(r"[0-9A-Za-z][0-9A-Za-z .,/_-]{0,35}", value))
+                              and bool(re.search(r"\d", value)) for value in first_values)
+            continuation = (connected and schema_matches and len(first_values) >= 3
+                            and identifiers / len(first_values) >= 0.6)
+
+        if continuation:
+            columns = previous["columns"]
+            for obj in objects:
+                obj["column_names"] = columns
+            segment_index = len(previous["segments"])
+            row_offset = previous["row_count"]
+            segment_rows = sum(len(table.rows) for table in logical)
+            previous["segments"].append(objects)
+            previous["row_count"] += segment_rows
+            previous["last_page"] = last_page
+            previous["last_index"] = table_index
+            for index, segment in enumerate(previous["segments"]):
+                segment_offset = sum(previous["segment_rows"][:index])
+                for obj in segment:
+                    obj["table_continuation"] = {
+                        "group": previous["group"], "segment": index,
+                        "segment_count": len(previous["segments"]),
+                        "page_start": previous["page_start"], "page_end": previous["last_page"],
+                        "row_offset": segment_offset, "row_count": previous["row_count"],
+                    }
+            previous["segment_rows"].append(segment_rows)
+            continue
+
+        if named_comparison:
+            previous = {"group": table_index, "last_index": table_index, "last_page": last_page,
+                        "page_start": first_page, "columns": named_comparison, "segments": [objects],
+                        "segment_rows": [sum(len(table.rows) for table in logical)],
+                        "row_count": sum(len(table.rows) for table in logical)}
+        else:
+            previous = None
+    return result

@@ -1,0 +1,43 @@
+{
+  "experiment": "table-context-2026-10-12",
+  "saved_at": "2026-10-12T06:10:22.728517+00:00",
+  "queries": "data/queries_law150_v1.jsonl",
+  "question_count": 149,
+  "embedding_model": "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16",
+  "embedding_dimensions": 1024,
+  "dense_include_heading_path": true,
+  "splade_model": "/Users/jeongbin/models/splade-c",
+  "splade_include_heading_path": true,
+  "arms": {
+    "before": {
+      "alias": "exp-table-ctx-before-law",
+      "index": "exp-table-ctx-before-law-20261012060624-0105de",
+      "chunks": 6502,
+      "corpus": {
+        "path": "before/corpus.jsonl.gz",
+        "bytes": 1633292,
+        "sha256": "df650e3bbb57366b54182eb99e598cded16f812a1091178e0332e604da3fe1bd"
+      },
+      "index_snapshot": {
+        "path": "before/index.jsonl.gz",
+        "bytes": 44601560,
+        "sha256": "3f1a8c71966f43d64ea4acb2fbd94c92c48ebcf8e20bd9b629784206ae64faa9"
+      }
+    },
+    "after": {
+      "alias": "exp-table-ctx-after-law",
+      "index": "exp-table-ctx-after-law-20261012060712-c408c9",
+      "chunks": 6502,
+      "corpus": {
+        "path": "after/corpus.jsonl.gz",
+        "bytes": 1634841,
+        "sha256": "c1c3344b2810fb587f3ac52f8f0c26825ea6fd239bb4aebec799c75212282fcb"
+      },
+      "index_snapshot": {
+        "path": "after/index.jsonl.gz",
+        "bytes": 44603224,
+        "sha256": "c77739f874db2ea86c3bb544ff24f62a561e092a13035d26bd90a239f3fa4a37"
+      }
+    }
+  }
+}

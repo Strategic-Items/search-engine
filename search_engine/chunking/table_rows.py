@@ -94,7 +94,7 @@ def logical_tables(table: dict) -> list[LogicalTable]:
 
     header_count = _header_count(rows, table.get("header_rows", 0) if not captions else 0,
                                  continued=continued if merges else None)
-    columns = _column_names(rows[:header_count], len(rows[0]) if rows else 0)
+    columns = list(table.get("column_names") or _column_names(rows[:header_count], len(rows[0]) if rows else 0))
     return [LogicalTable(columns, rows[header_count:], row_pages[header_count:], spill[header_count:], caption, unit=unit)]
 
 
