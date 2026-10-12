@@ -71,7 +71,7 @@ from search_engine.chunking.table_rows import comparison_chunks, comparison_colu
 _PAGE_MARKER = re.compile(r"<!--\s*page:\s*(\d+)\s*-->")
 _HTML_TAG = re.compile(r"<[^>]+>")
 _PAGE_NUMBER_ONLY = re.compile(r"^\s*(?:[-–—]\s*\d{1,4}\s*[-–—]|\d{1,4}\s*/\s*\d{1,4}|-\s*\d{1,4}\s*/\s*\d{1,4}\s*-)\s*$")
-_TABLE_REFERENCE = re.compile(r"(?:다음|아래|위|상기)\s*(?:의\s*)?표|표\s*(?:제\s*)?\d+\s*(?:은|는|과|와|에|에서|을|를|참고|참조|같이)")
+_TABLE_REFERENCE = re.compile(r"(?:다음|아래)\s*(?:의\s*)?표|표\s*(?:제\s*)?\d+\s*(?:은|는|과|와|에|에서|을|를|참고|참조|같이)")
 _TABLE_NOTE = re.compile(r"^\s*(?:※|\*|주(?:\s*\d+)?\s*[:：.)]|비고\s*[:：])")
 _TABLE_CONTEXT_MAX = 240
 

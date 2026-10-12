@@ -22,6 +22,32 @@ def _elements(table_text, *, before=()):
 ITEMS = [["순번", "품목명", "HS코드"]] + [[str(i), f"품목{i}", f"{130000 + i}"] for i in range(1, 41)]
 
 
+def test_table_context_is_copied_to_every_split_row():
+    before = "품목별 분류 기준은 아래 표와 같이 정하며 각 품목에 동일하게 적용한다."
+    after = "※ 모든 품목에 공통으로 적용하는 주석이다."
+    elements = _elements("x" * 2000, before=[{"type": "paragraph", "text": before, "page": 1}])
+    elements.append({"type": "paragraph", "text": after, "page": 2})
+    chunks = chunk_elements(elements, document_id="doc", tables=[[_table(ITEMS)]])
+    rows = [c for c in chunks if "row_id" in c]
+    assert len(rows) == 40
+    for row in rows:
+        assert row["table_context_before"] == before
+        assert row["table_context_after"] == after
+        assert row["text"].startswith(f"표 설명: {before}\n표 주석: {after}\n")
+
+
+def test_backward_table_reference_is_not_attached_to_next_table():
+    for reference in ("위 표", "상기 표", "위의 표", "상기의 표"):
+        elements = _elements("x" * 2000, before=[{
+            "type": "paragraph", "text": f"{reference}의 내용을 설명하는 문장으로 이전 표에만 해당한다.", "page": 1,
+        }])
+        chunks = chunk_elements(elements, document_id="doc", tables=[[_table(ITEMS)]])
+        rows = [c for c in chunks if "row_id" in c]
+        assert rows
+        assert all("table_context_before" not in row for row in rows)
+        assert all("표 설명:" not in row["text"] for row in rows)
+
+
 def test_large_table_becomes_one_chunk_per_row_with_shared_table_id():
     table = _table(ITEMS, pages=[1, 2], row_pages=[1] * 21 + [2] * 20)
     chunks = chunk_elements(_elements("x" * 2000, before=[{"type": "heading", "text": "품목 목록", "level": 1, "page": 1}]),
