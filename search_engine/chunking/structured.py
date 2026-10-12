@@ -30,8 +30,8 @@
 - 본문으로 치지 않는 원소: 글자 없는 그림(OCR 없음)·빈 표 -- 색인 단계(`convert.index_text`)에서 자리표시가 지워지므로
   이것만 붙은 제목도 제목만 남는다.
 - 행으로 나누는 큰 표 앞의 제목은 지금처럼 본문에 넣지 않고 `heading_path`(행 청크마다)로 남긴다.
-- 제목 아래 본문이 아주 짧으면(`min_chunk_chars`=30자 미만: 문서 첫머리 행사명 한 줄, 제목+괄호 부제) 따로 청크로 내보내지
-  않고 다음 청크(다음 제목 또는 표) 앞에 붙인다 -- 혼자서는 검색 단위가 못 된다.
+- 제목 아래 본문이 아주 짧으면(`min_chunk_chars`=30자 미만) 하위 제목과 함께 둘 수 있다. 같은 수준이나 상위 제목으로
+  넘어가면 짧아도 현재 절을 닫아, 본문이 다음 절의 경로를 물려받지 않게 한다.
 
 ## 쪽마다 되풀이되는 같은 제목 (2026-10-01)
 
@@ -174,7 +174,7 @@ def chunk_elements(
                     if kind == "list_item" else None)
         if boundary is not None:
             # 부칙·붙임·별표·대비표 표지: 본칙의 장·조 경로를 닫고 이 표지 하나를 경로 뿌리로 둔다(모듈 docstring "부속 경계")
-            if has_body(pending) and size(pending) >= min_chunk_chars:
+            if has_body(pending):
                 flush()
             heading_stack[:] = [(0, boundary)]
             text = (element.get("text") or "").strip()
@@ -189,8 +189,9 @@ def chunk_elements(
             level = max(1, element.get("level") or 1)
             if new_page and (level, element.get("text", "")) in heading_stack:
                 continue  # 쪽 머리에 되풀이된, 이미 열린 제목 -- 이어지는 절(모듈 docstring)
-            # 제목만 쌓여 있거나 본문이 아주 짧으면(`min_chunk_chars` 미만) 닫지 않는다 -- 다음 제목의 청크 앞에 이어 붙는다(모듈 docstring).
-            if has_body(pending) and size(pending) >= min_chunk_chars:
+            # 짧은 본문도 같은 수준/상위 절로 넘어가면 닫는다. 하위 제목은 기존처럼 함께 둘 수 있다.
+            closes_section = bool(heading_stack and level <= heading_stack[-1][0])
+            if has_body(pending) and (size(pending) >= min_chunk_chars or closes_section):
                 flush()
             while heading_stack and heading_stack[-1][0] >= level:
                 heading_stack.pop()
@@ -292,11 +293,12 @@ def chunk_elements(
                 pieces[-1] = f"{pieces[-1]} {tail}"
             for index, piece in enumerate(pieces):
                 text = f"{prefix}\n\n{piece}" if prefix and index == 0 else piece
+                included = [*leading, element] if index == 0 else [element]
                 chunks.append({
                     "chunk_id": f"{document_id}#{len(chunks)}", "text": text,
-                    "document_id": document_id, "page_start": element["page"],
-                    "page_end": element["page"], "heading_path": current_path(),
-                    "element_types": [kind],
+                    "document_id": document_id, "page_start": min(item["page"] for item in included),
+                    "page_end": max(item["page"] for item in included), "heading_path": current_path(),
+                    "element_types": list(dict.fromkeys(item["type"] for item in included)),
                 })
             continue
         if pending and has_body(pending) and size(pending + [element]) > chunk_size:
