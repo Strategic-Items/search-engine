@@ -195,6 +195,33 @@ def build_splade_query(terms: dict[str, float], as_of: date, query: str = "") ->
     }}
 
 
+def build_law_splade_query(terms: dict[str, float], as_of: date, query: str,
+                           *, reference_boost: float) -> dict:
+    """법령의 SPLADE 순위를 보완한다. 후보를 더 읽거나 별도 후보 목록을 합치지 않는다."""
+    base = build_splade_query(terms, as_of, query)
+    filters = [{"match_phrase": {"heading_path": article}}
+               for article in dict.fromkeys(ARTICLE_NUMBER.findall(query))]
+    for kind, number in re.findall(r"(별표|별지)\s*제?\s*(\d+)\s*호?", query):
+        filters.append({"match_phrase": {"heading_path": f"{kind} 제{number}호" if kind == "별지" else f"{kind} {number}"}})
+    codes = [{"match_phrase": {"body": code}} for code in extract_control_numbers(query)]
+    if not (filters or codes) or not reference_boost:
+        return base
+    functions = [{"filter": {"bool": {"should": group, "minimum_should_match": 1}},
+                  "weight": reference_boost} for group in (filters, codes) if group]
+    # 명시한 별표/서식 안에서 질문의 대상 항목도 맞는 본문을 우대한다.
+    # 예: "별지 제4호 ... 주의사항에는 무엇"에서 서식 제목보다 주의사항 본문을 올린다.
+    focus = re.search(r"\b([가-힣]{3,}?)(?:에는|에서는|은|는|이|가|을|를|에)\s*(?:무엇|어떤|어떻게|얼마|몇)", query)
+    if focus:
+        functions.append({"filter": {"bool": {"must": [
+            {"bool": {"should": filters + codes, "minimum_should_match": 1}},
+            {"match_phrase": {"body": focus.group(1)}},
+        ]}}, "weight": reference_boost})
+    return {"function_score": {
+        "query": base, "functions": functions,
+        "score_mode": "sum", "boost_mode": "sum",
+    }}
+
+
 def _identifier_hits(client: OpenSearch, alias: str, query: str, as_of: date, size: int = 5) -> list[dict]:
     """질문의 통제번호를 본문에 그대로 담은 청크. 번호가 없으면 빈 목록이다.
 
@@ -210,6 +237,9 @@ def _identifier_hits(client: OpenSearch, alias: str, query: str, as_of: date, si
         "filter": _validity_filters(as_of) + _docket_filter(query),
     }}}
     return client.search(index=alias, body=body, size=size)["hits"]["hits"]
+
+
+ARTICLE_NUMBER = re.compile(r"제\s*\d+\s*조(?:\s*의\s*\d+)?")
 
 
 def _validity_filters(as_of: date) -> list[dict]:
@@ -528,6 +558,8 @@ def retrieve(
     rerank_chunks: bool | None = None,
     lexical: str = "bm25", chunk_first: bool | None = None,
     chunk_first_cutoff_ratio: float | None = None,
+    hybrid_candidates: int | None = None,
+    law_ranking: bool = False,
 ) -> list[SearchHit]:
     """`alias`에서 검색한다. 이는 여러 인덱스를 쉼표로 구분하여 명명할 수 있다.
 
@@ -541,8 +573,12 @@ def retrieve(
         raise ValueError(f"unknown lexical retriever: {lexical}")
     if mode == "splade":
         lexical = "splade"
+    if law_ranking and lexical != "splade":
+        raise ValueError("law ranking requires SPLADE as the primary lexical retriever")
     if k < 1:
         raise ValueError("k must be positive")
+    if hybrid_candidates is not None and not 1 <= hybrid_candidates <= 100:
+        raise ValueError("hybrid_candidates must be between 1 and 100")
     # (hits, weight, retriever): 검색기 정보는 유지되어야 하므로, 검색에서
     # 한 개의 리스트만 남아 있으면 해당 리트리버의 캘리브레이션에서 잘릴 수 있다.
     ranked_lists: list[tuple[list[dict], float, str]] = []
@@ -578,11 +614,18 @@ def retrieve(
 
     lexical_candidates = min(k * 5, 100)
     vector_candidates = min(max(k * 5, settings.search_vector_candidates), 1000)
+    if mode == "hybrid" and hybrid_candidates is not None:
+        lexical_candidates = vector_candidates = hybrid_candidates
+    if law_ranking:
+        lexical_candidates = vector_candidates = 25
     if mode in ("bm25", "splade", "hybrid") and lexical == "splade":
         # 질의 인코딩이 실패하면(모델 미설정·torch 없음) 조용히 BM25로 돌아가지 않고 그대로 알린다.
         terms = encode_sparse_query(query.strip())
+        sparse_query = (build_law_splade_query(terms, as_of, query,
+                                             reference_boost=settings.search_law_reference_boost)
+                        if law_ranking else build_splade_query(terms, as_of, query))
         add_response(client.search(
-            index=alias, body={"query": build_splade_query(terms, as_of, query)},
+            index=alias, body={"query": sparse_query},
             size=lexical_candidates, ignore_unavailable=not strict,
         ), "splade", "splade")
     elif mode in ("bm25", "hybrid"):
@@ -629,7 +672,7 @@ def retrieve(
     if mode == "hybrid" and len(ranked_lists) > 1 and chunk_first:
         # 원시 점수 트림: 각 검색기 목록의 끝을 자기 1위 점수 대비 비율로 먼저 자른다.
         identifier = (_identifier_hits(client, alias, query, as_of)
-                      if settings.search_chunk_first_identifier_weight else [])
+                      if settings.search_chunk_first_identifier_weight and not law_ranking else [])
         chunk_lists = ranked_lists if not settings.search_chunk_first_trim else [
             (_ratio_cut(hits, settings.fusion_trim_ratio(retriever)), weight, retriever)
             for hits, weight, retriever in ranked_lists]

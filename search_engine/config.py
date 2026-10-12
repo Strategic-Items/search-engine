@@ -247,6 +247,10 @@ class Settings(BaseSettings):
     search_splade_min_weight: float = Field(default=0.01, ge=0.0)
     # 카테고리 hybrid는 청크 단위 RRF 뒤 1위 청크 점수의 이 비율로 자른다. 40단계 측정 기준은 0.95였고 2026-10-08 사용자 지시로 0.7로 통일했다.
     search_category_cutoff_ratio: float = Field(default=0.7, ge=0.0, le=1.0)
+    # 법령 검색은 각 25개 후보 안에서 순위를 개선한다. 후보 확장은 사용하지 않는다.
+    search_law_candidates: int = Field(default=25, ge=25, le=25)
+    # 질문의 조문·별표·통제번호와 대상 항목을 맞춘 청크를 후보 조회 전에 우대한다.
+    search_law_reference_boost: float = Field(default=6.0, ge=0.0, le=20.0)
     rag_top_k: int = Field(default=5, ge=1)
 
     # 각 리트리버 목록의 얼마나 들어가서 융합되는가. 위의 컷오프 비율과는 별도로, 다른 질문에 답한다: "아니오"가 아니라
