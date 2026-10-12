@@ -1,0 +1,75 @@
+{
+  "version": 9,
+  "saved_at": "2026-10-12T07:06:28+00:00",
+  "source_index": "exp-table-headers-no-inference-law-20261012070326-706b0a",
+  "documents": 150,
+  "chunks": 6493,
+  "has_splade": true,
+  "embedding_dimensions": 1024,
+  "embedding_model": "hf.co/Neuwhufbox/BGE-m3-ko-gguf:F16",
+  "splade_model": "/Users/jeongbin/models/splade-c",
+  "dense_include_heading_path": true,
+  "splade_include_heading_path": true,
+  "chunker_version_in_code": 9,
+  "search_engine_commit": "6b302ff",
+  "dirty": true,
+  "files": {
+    "index.jsonl.gz": {
+      "sha256": "8912b23bceca12fe93f5ba6e685bef8595ddc8ebbb33e64ae7220190e0658648",
+      "bytes": 44618785
+    },
+    "corpus.jsonl.gz": {
+      "sha256": "3deb112498d4791c744556c8741f1a862a66c04747042cd24b5b15b03e04d981",
+      "bytes": 1617387
+    },
+    "audit.json": {
+      "sha256": "bb54f20bc3d17b3e8268964e6488ee1a590f5e27e25f48aa651d47de0226a67d",
+      "bytes": 911680
+    },
+    "structure_law.json": {
+      "sha256": "ff3714f06f017d5bae5f5980b6ed5da103432c78d009b02a17ad700e5aa88279",
+      "bytes": 40306
+    },
+    "eval_law.json": {
+      "sha256": "add78180a733f39961a066d9fa2d4ad0306c8a81aee54643e2070e43f8d420f3",
+      "bytes": 92117
+    },
+    "gain_case.json": {
+      "sha256": "5112972b36b008991e4d777face216e950fb9974591a4dc39ccc2420507c35a5",
+      "bytes": 2418
+    },
+    "example.json": {
+      "sha256": "3508903d63090d51848d836e1ad05958a4a1ef5b705ce0edaf3fd290157423bf",
+      "bytes": 6638
+    },
+    "chunking.patch.gz": {
+      "sha256": "1e5c8f5fc46859d6ba8338d4bb8a259258210dd63370824d843d537069395d0f",
+      "bytes": 1817
+    }
+  },
+  "baseline": {
+    "index": "exp-table-ctx-after-law",
+    "corpus": "../table-context-2026-10-12/after/corpus.jsonl.gz",
+    "index_snapshot": "../table-context-2026-10-12/after/index.jsonl.gz"
+  },
+  "column_name_policy": "Only source header text. Empty headers retain positional names (열N). Never infer 순번 from numeric values.",
+  "column_names": {
+    "before_generic_chunks": 1251,
+    "after_generic_chunks": 650,
+    "all_generic_chunks": 319,
+    "partially_recovered_chunks": 331,
+    "before_generic_tables": 187,
+    "after_generic_tables": 94
+  },
+  "evaluation": {
+    "questions": 149,
+    "cutoff": {
+      "name": "service",
+      "ratio": 0.7
+    },
+    "llm": false,
+    "artifact": "eval_law.json",
+    "caveat": "Evidence 143→144 includes header-based label recovery; the same correct row was returned before and after."
+  },
+  "source_patch_base_commit": "6b302ffa032790f4889ce1714c5c7d492a08552c"
+}

@@ -122,16 +122,6 @@ def logical_tables(table: dict) -> list[LogicalTable]:
                     and not _header_like(rows[index + 1], allow_blanks=True)):
                 columns = _column_names([candidate], len(candidate))
                 break
-    if header_count:
-        # 빈 모서리 칸 아래가 1, 2, 3…인 경우에만 순번으로 명명한다.
-        for col, name in enumerate(columns):
-            if name != f"열{col + 1}":
-                continue
-            values = [row[col].strip() for row in rows[header_count:] if col < len(row)]
-            if len(values) >= 3 and all(v.isdecimal() for v in values):
-                numbers = [int(v) for v in values]
-                if numbers == list(range(1, len(numbers) + 1)):
-                    columns[col] = "순번"
     return [LogicalTable(columns, rows[header_count:], row_pages[header_count:], spill[header_count:], caption, unit=unit)]
 
 
@@ -237,7 +227,10 @@ def _header_like(row: list[str], *, allow_blanks: bool = False, distinct: bool =
 
 
 def _column_names(header: list[list[str]], width: int) -> list[str]:
-    """열 이름. 머리글이 여러 줄이면(상위 머리글 + 하위 머리글) 위에서부터 잇는다."""
+    """원문 열 이름만 사용한다. 빈 제목은 위치 표시인 `열N`으로 유지한다.
+
+    숫자 패턴으로 `순번` 같은 의미를 추측하지 않는다. 여러 줄 머리글은 위에서부터 잇는다.
+    """
     names = []
     for col in range(width):
         parts = [row[col].strip() for row in header if col < len(row) and row[col].strip()]

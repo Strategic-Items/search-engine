@@ -35,6 +35,10 @@ def corpus_summary(rows):
     return {
         "documents": len({row["parent_id"] for row in rows}), "chunks": len(rows),
         "generic_name_chunks": len(unresolved),
+        "all_generic_name_chunks": sum(all(re.fullmatch(r"열\d+", name) for name in row["columns"])
+                                       for row in unresolved),
+        "partially_recovered_chunks": sum(not all(re.fullmatch(r"열\d+", name) for name in row["columns"])
+                                          for row in unresolved),
         "generic_name_tables": len({row["table_id"] for row in unresolved}),
         "generic_chunks_by_document": dict(Counter(row["parent_id"] for row in unresolved)),
     }

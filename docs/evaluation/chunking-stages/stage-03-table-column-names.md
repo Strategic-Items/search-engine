@@ -1,6 +1,6 @@
 # 청킹 3단계: 표의 실제 열 이름 복구 (2026-10-12)
 
-`열1·열2`라는 임시 이름이 남던 표에서 원문 머리글을 복구한다. 청커 v8이며 LLM은 사용하지 않는다. 법령·고시 150문서만 새 코퍼스와 실험 인덱스로 생성했다.
+`열1·열2`라는 임시 이름이 남던 표에서 원문 머리글을 복구한다. 청커 v9이며 LLM은 사용하지 않는다. 법령·고시 150문서만 새 코퍼스와 실험 인덱스로 생성했다.
 
 ## 실제 전후 예시
 
@@ -22,13 +22,13 @@
 columns: [열1, 열2, 열3]
 
 수정 후 — #0001 / 저장된 행 위치 1/89
-순번: 1
+열1: 1
 국문: 아세트산
 영문: Acetic acid
-columns: [순번, 국문, 영문]
+columns: [열1, 국문, 영문]
 ```
 
-`국문·영문`은 원문 머리글이다. `순번`은 원문에 없는 이름이며, 해당 열의 값이 **3개 이상이고 1, 2, 3…으로 연속**하는 것을 확인해 추론했다. 그 조건을 만족하지 않는 빈 머리글은 이름을 추측하지 않는다. 행 수 90→89는 머리글을 데이터에서 분리한 결과이고, 89개 품목은 보존된다.
+`국문·영문`은 원문 머리글이다. 첫 열은 원문에서도 제목이 없으므로 `열1`로 유지한다. 값이 1, 2, 3…으로 연속해도 `순번` 같은 의미를 추측하지 않는다. v8의 순번 추론은 제거했으며, 현재 적용은 v9다. 행 수 90→89는 머리글을 데이터에서 분리한 결과이고 89개 품목은 보존된다.
 
 ## 적용 규칙과 과적합 점검
 
@@ -38,7 +38,7 @@ columns: [순번, 국문, 영문]
 - PDF에서 연속된 페이지의 표가 같은 열 수를 유지하면 앞 구간의 실제 열 이름을 전달한다. 새 제목·별표·서식·페이지 간격에서 전달을 끊는다. 열 수가 손상된 구간에는 이름을 붙이지 않는다.
 - 문서 ID·파일명·품목명·평가 질문을 비교하는 예외 분기를 추가하지 않았다. 기존 머리글 길이 기준 20자를 평가 수치에 맞춰 조정하지 않았다.
 
-테스트는 한국어·영어·그리스 문자 열 이름, 명시적 긴 HTML 머리글, 순번이 아닌 코드, 짧은 신구대비 본문, 흐름도, 다른 제목·페이지 간격·열 수 등의 반례를 확인한다. `tests/chunking` **133개 통과**.
+테스트는 한국어·영어·그리스 문자 열 이름, 명시적 긴 HTML 머리글, 숫자 순서로 열 이름을 추측하지 않는 경우, 짧은 신구대비 본문, 흐름도, 다른 제목·페이지 간격·열 수 등의 반례를 확인한다. `tests/chunking` **133개 통과**.
 
 원문 셀 보존 검사는 법령 150문서 / 논리 표 323개와 행정 20문서 / 논리 표 54개에서 **누락된 셀 0개**였다. 이는 머리글·표 제목·행 값에 원문 셀 글자가 남는지를 검사하며, 모든 열 이름의 의미가 맞음을 보장하는 검사는 아니다.
 
@@ -50,14 +50,18 @@ columns: [순번, 국문, 영문]
 |---|---:|---:|
 | 법령 문서 | 150 | 150 |
 | 전체 청크 | 6,502 | 6,493 |
-| 임시 열 이름이 하나라도 있는 청크 | 1,251 | 382 |
-| 임시 열 이름이 하나라도 있는 표 ID | 187 | 89 |
+| 임시 열 이름이 하나라도 있는 청크 | 1,251 | 650 |
+| 모든 열 이름이 임시 이름인 청크 | 1,251 | 319 |
+| 실제 이름을 일부 복구하고 빈 제목만 임시 표시인 청크 | 0 | 331 |
+| 임시 열 이름이 하나라도 있는 표 ID | 187 | 94 |
 
-382개가 모두 해결됐다고 표현하지 않는다. 공통 열 머리글이 없는 신청서·서식, 일부 머리글이 빈 표, PDF 격자의 열 수가 달라져 대응을 확정할 수 없는 표 등이 남았다. 실제 이름을 임의로 붙이지 않고 `audit.json`에 청크 ID·본문·열 이름을 기록했다.
+임시 이름이 하나라도 남은 청크는 650개다. 이 가운데 331개는 `열1 / 국문 / 영문`처럼 실제 이름을 일부 복구했고, 원문에서 비어 있는 제목만 위치 표시로 남겼다. 모든 열이 임시 이름인 청크는 319개다. 공통 머리글 없는 신청서·서식이나 PDF 격자가 손상된 표도 포함된다. 실제 이름을 임의로 붙이지 않고 `audit.json`에 청크 ID·본문·열 이름을 기록했다.
+
+v8의 382개는 빈 첫 열을 순번으로 추측해 채운 결과였다. 추측을 제거한 현재 결과와 섞어 보고하지 않는다.
 
 ## 법령 검색 결과
 
-같은 기존 법령 149문항, 기준일 2026-10-07, hybrid(SPLADE+dense), 청크 우선 검색, **서비스 컷오프 0.7만** 사용했다. LLM 필터·답변 가능성 판정·리랭커·질문 재작성은 사용하지 않았다. 기준선은 표 주석 연결까지 적용한 `exp-table-ctx-after-law`, 변경안은 `exp-table-headers-final-law`다. 질문·정답 라벨·검색 설정은 이 수정에 맞춰 변경하지 않았다.
+같은 기존 법령 149문항, 기준일 2026-10-07, hybrid(SPLADE+dense), 청크 우선 검색, **서비스 컷오프 0.7만** 사용했다. LLM 필터·답변 가능성 판정·리랭커·질문 재작성은 사용하지 않았다. 기준선은 표 주석 연결까지 적용한 `exp-table-ctx-after-law`, 변경안은 `exp-table-headers-no-inference-law`다. 질문·정답 라벨·검색 설정은 이 수정에 맞춰 변경하지 않았다.
 
 | 지표 | 수정 전 | 수정 후 |
 |---|---:|---:|
@@ -73,27 +77,27 @@ columns: [순번, 국문, 영문]
 
 ## 산출물과 재현
 
-- `data/chunking_artifacts/v8/`: 새 코퍼스, dense·SPLADE 포함 인덱스, 평가, 구조 감사, 미해결 청크, 코드 패치.
+- `data/chunking_artifacts/v9/`: 새 코퍼스, dense·SPLADE 포함 인덱스, 평가, 구조 감사, 미해결 청크, 코드 패치.
 - 기준선은 `data/chunking_artifacts/table-context-2026-10-12/after/`의 코퍼스·인덱스다.
-- `data/generated/table-headers-2026-10-12/`: 비압축 작업 코퍼스와 측정 로그.
+- `data/generated/table-headers-no-inference-2026-10-12/`: 비압축 작업 코퍼스와 측정 로그.
 - 화면: Question Explorer의 `#cat-chunking-stage-03`.
 
 ```bash
 .venv/bin/python -m pytest tests/chunking -q
 .venv/bin/python scripts/chunking/build_corpus_from_bundles.py \
   ../unstructured-doc-parser_ver2/data/category_chunks/01_법령고시 \
-  --out data/generated/table-headers-2026-10-12/final.jsonl
+  --out data/generated/table-headers-no-inference-2026-10-12/law.jsonl
 .venv/bin/python scripts/chunking/index_cached_law_corpus.py \
-  data/generated/table-headers-2026-10-12/final.jsonl \
-  --cache exp-table-ctx-after-law --alias exp-table-headers-final-law \
-  --prefix exp-table-headers-final-law-
+  data/generated/table-headers-no-inference-2026-10-12/law.jsonl \
+  --cache exp-table-ctx-after-law --alias exp-table-headers-no-inference-law \
+  --prefix exp-table-headers-no-inference-law-
 .venv/bin/python scripts/chunking/eval_category_chunking.py \
   --queries data/queries_law150_v1.jsonl --reference search-law \
-  --arm before=exp-table-ctx-after-law --arm after=exp-table-headers-final-law \
-  --out data/generated/table-headers-2026-10-12/eval_law.json
+  --arm before=exp-table-ctx-after-law --arm after=exp-table-headers-no-inference-law \
+  --out data/generated/table-headers-no-inference-2026-10-12/eval_law.json
 .venv/bin/python scripts/chunking/audit_table_headers.py \
   --before data/chunking_artifacts/table-context-2026-10-12/after/corpus.jsonl.gz \
-  --after data/chunking_artifacts/v8/corpus.jsonl.gz \
+  --after data/chunking_artifacts/v9/corpus.jsonl.gz \
   --review-category ../unstructured-doc-parser_ver2/data/category_chunks/02_행정업무 \
-  --out data/generated/table-headers-2026-10-12/audit.json
+  --out data/generated/table-headers-no-inference-2026-10-12/audit.json
 ```

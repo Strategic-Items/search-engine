@@ -181,13 +181,13 @@ def test_long_single_cell_first_row_is_not_a_caption():
     assert _logical(rows)[0].caption == ""
 
 
-def test_blank_corner_header_recovers_names_and_sequence_without_losing_items():
+def test_blank_corner_header_is_not_named_from_sequential_values():
     rows = [["", "국문", "영문"], ["1", "아세트산", "Acetic acid"],
             ["2", "알루미늄", "Aluminium"], ["3", "아르곤", "Argon"]]
     [lt] = _logical(rows)
-    assert lt.columns == ["순번", "국문", "영문"]
+    assert lt.columns == ["열1", "국문", "영문"]
     assert lt.rows == rows[1:]
-    assert row_chunks(lt, "doc#table0")[0]["text"] == "순번: 1\n국문: 아세트산\n영문: Acetic acid"
+    assert row_chunks(lt, "doc#table0")[0]["text"] == "열1: 1\n국문: 아세트산\n영문: Acetic acid"
 
 
 def test_blank_header_is_not_called_sequence_for_nonsequential_codes():
@@ -242,5 +242,5 @@ def test_corner_header_recovery_does_not_depend_on_korean_or_domain_words():
     for labels in [["Name", "Description"], ["α", "β"], ["이름", "설명"]]:
         rows = [["", *labels], ["1", "A", "100"], ["2", "B", "200"], ["3", "C", "300"]]
         [lt] = _logical(rows)
-        assert lt.columns == ["순번", *labels]
+        assert lt.columns == ["열1", *labels]
         assert lt.rows == rows[1:]
