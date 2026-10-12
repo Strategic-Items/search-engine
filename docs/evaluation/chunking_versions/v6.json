@@ -1,0 +1,50 @@
+{
+ "version": 6,
+ "label": "짧은 절 강제 경계 제거, 제목 메타데이터 보정 유지",
+ "notes": "v5 실험에서 같은 수준·상위 제목과 독립 부속 경계에서 30자 미만 본문을 강제로 닫던 동작을 제거했다. 첫 긴 본문 조각의 제목 페이지·원소 종류 메타데이터 보정은 유지한다. 평가 코퍼스의 본문·제목·경로는 v2와 일치하며 v6 전용 재색인·검색 평가는 아직 하지 않았다.",
+ "date": "2026-10-12",
+ "search_engine_commit": "22a0744",
+ "dirty": true,
+ "parser_commit": "",
+ "policy": {
+  "chunk_size": 800,
+  "chunk_overlap": 100,
+  "min_chunk_chars": 30,
+  "question_min": 3,
+  "question_max_chars": 300,
+  "question_path_chars": 80,
+  "row_key_max_chars": 40,
+  "long_cell_ratio": 0.5,
+  "pair_oversize_ratio": 1.5,
+  "carry_max_chars": 40,
+  "heading_max_chars": 60
+ },
+ "parity": "",
+ "corpus": {
+  "law": {
+   "documents": 150,
+   "chunks": 6503,
+   "chars_mean": 289.0,
+   "chars_median": 192,
+   "chars_max": 4337,
+   "under_30_chars": 170,
+   "text_over_1200": 0,
+   "table_chunks": 3908,
+   "row_chunks": 3766,
+   "text_without_heading_path": 39
+  },
+  "admin": {
+   "documents": 20,
+   "chunks": 183,
+   "chars_mean": 460.3,
+   "chars_median": 154,
+   "chars_max": 5196,
+   "under_30_chars": 12,
+   "text_over_1200": 0,
+   "table_chunks": 108,
+   "row_chunks": 56,
+   "text_without_heading_path": 2
+  }
+ },
+ "search": {}
+}

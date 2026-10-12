@@ -81,25 +81,6 @@ def test_long_front_matter_stays_its_own_chunk():
     assert len(chunks) == 2 and chunks[0]["heading_path"] == []
 
 
-def test_short_body_stays_in_its_section_when_a_sibling_heading_opens():
-    chunks = chunk_elements([_h("첫 절"), _p("짧은 본문."), _h("다음 절"), _p("다음 절의 본문.")], document_id="d")
-    assert [c["heading_path"] for c in chunks] == [["첫 절"], ["다음 절"]]
-    assert chunks[0]["text"] == "# 첫 절\n\n짧은 본문."
-    assert "짧은 본문." not in chunks[1]["text"]
-
-
-def test_short_body_closes_when_an_ancestor_section_opens():
-    chunks = chunk_elements([_h("첫 장"), _h("첫 절", 2), _p("짧은 본문."),
-                             _h("다음 장"), _p("다음 장의 본문.")], document_id="d")
-    assert [c["heading_path"] for c in chunks] == [["첫 장", "첫 절"], ["다음 장"]]
-
-
-def test_short_body_closes_before_an_independent_attachment():
-    chunks = chunk_elements([_h("첫 절"), _p("짧은 본문."), _h("[붙임 1]"), _p("붙임의 본문.")], document_id="d")
-    assert [c["heading_path"] for c in chunks] == [["첫 절"], ["[붙임 1]"]]
-    assert "짧은 본문." not in chunks[1]["text"]
-
-
 def test_short_intro_can_still_join_a_child_heading():
     chunks = chunk_elements([_h("첫 장"), _p("소개."), _h("하위 절", 2), _p("하위 절의 본문.")], document_id="d")
     assert len(chunks) == 1
