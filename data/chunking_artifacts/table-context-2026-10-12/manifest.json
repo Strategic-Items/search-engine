@@ -39,5 +39,9 @@
         "sha256": "c77739f874db2ea86c3bb544ff24f62a561e092a13035d26bd90a239f3fa4a37"
       }
     }
+  },
+  "cutoff": {
+    "name": "service",
+    "ratio": 0.7
   }
 }
