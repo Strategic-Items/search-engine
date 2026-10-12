@@ -36,6 +36,28 @@ window.CATEGORY_CHUNKING_STAGES = [
       {label: "법령 · 컷오프 0.95", value: "정답 청크 141 → 140/149", note: "문서 146/149 유지, 필수 구절 136 → 135/149; qid law150-v1-058에서 1건 손실"},
       {label: "표 주석 확인 질의", value: "수정 후 해당 표 행 노출", note: "‘상기 품목의 규격은 불문한다’ 질의에서 주석이 붙은 청크가 상위 결과에 포함"}
     ],
+    exampleKey: "table-note-row",
     note: "149문항 비교는 LLM 판정·리랭커·질문 재작성 없이 동일 hybrid(SPLADE+dense) 경로로 실행했습니다. 일반 질문셋에서는 뚜렷한 개선이 없고 엄격 컷오프에서 소폭 하락했으므로, 표 문맥이 실제로 필요한 질의에서의 이득과 함께 판단해야 합니다. 기존 긴 본문 메타데이터 및 짧은 경계 실험 기록은 아래 Markdown에 보존합니다."
   }
 ];
+
+window.CATEGORY_CHUNKING_EXAMPLES = {
+  "table-note-row": {
+    before: {
+      id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#0035",
+      heading_path: ["[별표3]", "전략물자 확인의무 제외대상 목록(영 제40조의2)"],
+      body: "HS번호: 1류\n품 명: 산동물",
+      table_id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#table0",
+      columns: ["HS번호", "품 명"], row_index: 0, row_count: 24,
+      table_context_after: null
+    },
+    after: [{
+      id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#0035",
+      heading_path: ["[별표3]", "전략물자 확인의무 제외대상 목록(영 제40조의2)"],
+      body: "표 주석: ※ 상기 품목의 규격은 불문한다.\nHS번호: 1류\n품 명: 산동물",
+      table_id: "01_법령고시-138-2392283-대외무역법시행령_부처협의안-05ba7156#table0",
+      columns: ["HS번호", "품 명"], row_index: 0, row_count: 24,
+      table_context_after: "※ 상기 품목의 규격은 불문한다."
+    }]
+  }
+};
