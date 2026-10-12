@@ -1,10 +1,10 @@
 /* 검증된 청킹 작업을 단계별로 보여준다. */
-var CK={stageId:"stage-02"};
+var CK={stageId:"stage-03"};
 function ckStages(){return window.CATEGORY_CHUNKING_STAGES||[];}
 function ckSelected(){return ckStages().find(function(s){return s.id===CK.stageId;})||ckStages()[ckStages().length-1]||null;}
 function ckSetHash(){var s=ckSelected();if(s)location.hash="cat-chunking-"+s.id;}
 function ckReadHash(hash){
-  if(hash==="cat-chunking"){CK.stageId="stage-02";return true;}
+  if(hash==="cat-chunking"){CK.stageId="stage-03";return true;}
   if(hash.indexOf("cat-chunking-")!==0)return false;
   var id=hash.slice("cat-chunking-".length);
   /* 이전 질문별 변경 링크도 청킹 단계 화면으로 열리게 한다. */
@@ -21,19 +21,23 @@ function ckDetail(){
   var s=ckSelected(),el=document.getElementById("detail");
   if(!s){el.innerHTML='<div class="wrap ck"><h1>청킹 단계</h1><p>기록된 단계가 없습니다.</p></div>';return;}
   var example=((window.CATEGORY_CHUNKING_EXAMPLES||{})[s.exampleKey]||null);
-  function tableHtml(columns,rows,highlight){
-    return '<table class="ck-visible-table"><thead><tr>'+columns.map(function(c){return '<th scope="col">'+esc(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(row,i){return '<tr'+(highlight&&i===0?' class="ck-selected-row"':'')+'>'+row.map(function(v){return '<td>'+esc(v)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
+  function tableHtml(columns,rows,highlight,changedHeaders){
+    return '<table class="ck-visible-table"><thead><tr>'+columns.map(function(c){return '<th scope="col"'+(changedHeaders?' class="ck-recovered-header"':'')+'>'+esc(c||'(원문 빈칸)')+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(row,i){return '<tr'+(highlight&&i===0?' class="ck-selected-row"':'')+'>'+row.map(function(v){return '<td>'+esc(v)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
   }
   function chunkBlock(c,label){
     if(c.table_example){
       var changed=!!c.table_context_after;
       var note=changed?'<div class="ck-added-note"><span class="ck-added-label">＋ 새로 추가된 표 주석</span><p>'+esc(c.table_context_after)+'</p></div>':'<div class="ck-missing-note"><b>표 주석이 청크에 없음</b><p>행의 값만 검색에 사용됩니다.</p></div>';
-      return '<article class="ck-table-example"><div class="ck-example-title"><h3>'+label+'</h3><span>청크 #'+esc(c.id.split('#').pop())+'</span></div><p class="ck-row-caption">같은 표의 첫 번째 행 · 24행 중 1행</p>'+tableHtml(c.columns,[c.row_values],false)+note+'<details class="ck-raw-chunk"><summary>저장된 본문·메타데이터 확인</summary><pre>'+esc(c.body)+'</pre><p>열 이름: '+esc(c.columns.join(' / '))+'<br>행 위치: '+(c.row_index+1)+' / '+c.row_count+'<br>표 뒤 주석: '+esc(c.table_context_after||'없음')+'</p></details></article>';
+      var headersChanged=example.headerChange&&label!=="수정 전";
+      if(example.headerChange){
+        note=headersChanged?'<div class="ck-added-note"><span class="ck-added-label">복구된 열 이름</span><p>'+c.columns.map(function(name,i){return esc(example.before.columns[i])+' → '+esc(name);}).join('<br>')+'</p></div>':'<div class="ck-missing-note"><b>실제 열 제목을 인식하지 못함</b><p>국문·영문 머리글도 데이터 행으로 취급했습니다.</p></div>';
+      }
+      return '<article class="ck-table-example"><div class="ck-example-title"><h3>'+label+'</h3><span>청크 #'+esc(c.id.split('#').pop())+'</span></div><p class="ck-row-caption">저장된 행 위치 '+(c.row_index+1)+' / '+c.row_count+' · 같은 데이터 행 비교</p>'+tableHtml(c.columns,[c.row_values],false,headersChanged)+note+'<details class="ck-raw-chunk"><summary>저장된 본문·메타데이터 확인</summary><pre>'+esc(c.body)+'</pre><p>열 이름: '+esc(c.columns.join(' / '))+'<br>행 위치: '+(c.row_index+1)+' / '+c.row_count+'<br>표 뒤 주석: '+esc(c.table_context_after||'없음')+'</p></details></article>';
     }
     return '<article><h3>'+label+' · '+esc(c.id.split('#').pop())+'</h3><p class="cap">경로: '+esc((c.heading_path||[]).join(' → ')||'제목 경로 없음')+'</p><pre>'+esc(c.body)+'</pre></article>';
   }
   var source=example&&example.sourceTable;
-  var sourceMarkup=source?'<section class="ck-original-table"><h3>① 원본 표</h3><p class="ck-source-title">'+esc(source.title)+'</p><p class="ck-source-hint">전체 '+source.rows.length+'행 중 앞 3행입니다. 첫 번째 행을 아래에서 비교합니다.</p>'+tableHtml(source.columns,source.rows.slice(0,3),true)+'<p class="ck-source-note">'+esc(source.note)+'</p><details class="ck-full-table"><summary>원본 표 전체 '+source.rows.length+'행 펼쳐보기</summary>'+tableHtml(source.columns,source.rows,false)+'</details></section><h3 class="ck-compare-heading">② 첫 번째 행을 청크로 만들면</h3>':'';
+  var sourceMarkup=source?'<section class="ck-original-table"><h3>① 원본 표</h3><p class="ck-source-title">'+esc(source.title)+'</p><p class="ck-source-hint">전체 '+source.rows.length+'행 중 앞 3행입니다. 첫 번째 데이터 행을 아래에서 비교합니다.</p>'+tableHtml(source.columns,source.rows.slice(0,3),true)+'<p class="ck-source-note">'+esc(source.note)+'</p><details class="ck-full-table"><summary>원본 표 전체 '+source.rows.length+'행 펼쳐보기</summary>'+tableHtml(source.columns,source.rows,false)+'</details></section><h3 class="ck-compare-heading">② 같은 데이터 행의 전후 청크</h3>':'';
   var originalMd=example&&example.sourceMarkdownPath?'<details class="ck-source-md" data-md-path="'+esc(example.sourceMarkdownPath)+'" open><summary>청킹 입력 원문 Markdown 전문 · '+esc(example.sourceMarkdownName||"원문.md")+'</summary><p><a href="'+esc(example.sourceMarkdownPath)+'" target="_blank" rel="noopener">원문 Markdown 파일 열기</a> · TextBundle <code>'+esc(example.sourceBundle||"")+'</code></p><pre data-md-content>원문 Markdown을 불러오는 중…</pre></details>':'';
   var exampleMarkup=example?sourceMarkup+(example.summary?'<p class="ck-example-summary">'+esc(example.summary)+'</p>':'')+'<div class="ck-two ck-stage-examples">'+chunkBlock(example.before,"수정 전")+example.after.map(function(c,i){return chunkBlock(c,example.after.length===1?"수정 후":"수정 후 청크 "+i);}).join("")+'</div>':'<div class="ck-two ck-stage-examples"><article><h3>변경 전</h3><pre>'+esc(s.before)+'</pre></article><article><h3>변경 후</h3><pre>'+esc(s.after)+'</pre></article></div>';
   var metrics=s.metrics.map(function(m){return '<article class="ck-stage-metric"><span>'+esc(m.label)+'</span><b>'+esc(m.value)+'</b><p>'+esc(m.note)+'</p></article>';}).join("");

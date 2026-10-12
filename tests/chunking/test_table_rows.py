@@ -2,6 +2,7 @@
 """큰 표를 행 단위 청크로 나누기(`chunking/structured.py`). 논리 표 자료는 `tabledata` 모양을 합성한다."""
 
 from search_engine.chunking.structured import chunk_elements
+from search_engine.chunking.table_rows import row_chunks
 
 
 def _table(rows, *, header_rows=1, pages=None, row_pages=None, merges=(), degraded=False):
@@ -178,3 +179,68 @@ def test_long_single_cell_first_row_is_not_a_caption():
     """도표 글자가 통째로 칸 하나에 든 첫 행을 제목으로 삼으면 모든 행 청크 본문에 복제된다(KIEP 보고서 34쪽 실측)."""
     rows = [["도표 글자 " * 30, "", ""], ["a", "b", "c"], ["1", "2", "3"], ["4", "5", "6"]]
     assert _logical(rows)[0].caption == ""
+
+
+def test_blank_corner_header_recovers_names_and_sequence_without_losing_items():
+    rows = [["", "국문", "영문"], ["1", "아세트산", "Acetic acid"],
+            ["2", "알루미늄", "Aluminium"], ["3", "아르곤", "Argon"]]
+    [lt] = _logical(rows)
+    assert lt.columns == ["순번", "국문", "영문"]
+    assert lt.rows == rows[1:]
+    assert row_chunks(lt, "doc#table0")[0]["text"] == "순번: 1\n국문: 아세트산\n영문: Acetic acid"
+
+
+def test_blank_header_is_not_called_sequence_for_nonsequential_codes():
+    rows = [["", "국문", "영문"], ["10", "가", "A"], ["30", "나", "B"], ["40", "다", "C"]]
+    [lt] = _logical(rows)
+    assert lt.columns == ["열1", "국문", "영문"]
+    assert lt.rows == rows[1:]
+
+
+def test_embedded_header_recovers_names_and_preserves_long_preamble():
+    intro = "적용기준에 관한 긴 설명입니다. " * 30
+    rows = [[intro, intro], ["구분", "기준"], ["1. 생산", "설비 기준"], ["2. 사용", "사용 기준"]]
+    [lt] = _logical(rows, merges=[{"row": 0, "col": 0, "rowspan": 1, "colspan": 2}])
+    assert lt.columns == ["구분", "기준"]
+    assert lt.rows == rows
+
+
+def test_two_column_merged_title_and_blank_leading_row_do_not_hide_header():
+    rows = [["", ""], ["장비기준", "장비기준"], ["구분", "기준"], ["생산", "100"], ["사용", "200"]]
+    [lt] = _logical(rows, merges=[{"row": 1, "col": 0, "rowspan": 1, "colspan": 2}])
+    assert lt.columns == ["구분", "기준"]
+    assert lt.rows == rows[3:]
+    assert lt.caption == "장비기준"
+
+
+def test_single_column_item_header_is_recovered():
+    rows = [["품 목 명"], ["구급상자와 구급대\n치과용 왁스"]]
+    [lt] = _logical(rows)
+    assert lt.columns == ["품 목 명"]
+    assert lt.rows == rows[1:]
+
+
+def test_short_comparison_placeholders_are_data_not_a_partial_header():
+    rows = [["", "3~9. (생략)", "3~9. (현행과 같음)", ""],
+            ["2B350", "다음 기술 기준에 해당하는 장비", "개정한 기술 기준의 내용", "문구 수정"],
+            ["2B351", "다른 기술 기준에 해당하는 장비", "다른 개정 기준의 내용", "기준 변경"]]
+    [lt] = _logical(rows)
+    assert lt.columns == ["열1", "열2", "열3", "열4"]
+    assert lt.rows == rows
+
+
+def test_alternating_blank_flowchart_cells_are_not_a_column_header():
+    rows = [["접수", "", "검토", "", "결정"],
+            ["신청자가 문서를 제출하는 단계의 설명", "", "담당자가 내용을 확인하는 단계의 설명", "", "위원회가 처리 결과를 결정하는 단계의 설명"],
+            ["1", "", "2", "", "3"]]
+    [lt] = _logical(rows)
+    assert lt.columns == ["열1", "열2", "열3", "열4", "열5"]
+    assert lt.rows == rows
+
+
+def test_corner_header_recovery_does_not_depend_on_korean_or_domain_words():
+    for labels in [["Name", "Description"], ["α", "β"], ["이름", "설명"]]:
+        rows = [["", *labels], ["1", "A", "100"], ["2", "B", "200"], ["3", "C", "300"]]
+        [lt] = _logical(rows)
+        assert lt.columns == ["순번", *labels]
+        assert lt.rows == rows[1:]

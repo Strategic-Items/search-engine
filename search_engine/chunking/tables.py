@@ -28,7 +28,8 @@ class _HtmlGrid(HTMLParser):
             self.rows.append([])
         elif tag in ("td", "th"):
             attrs = dict(attrs)
-            self._cell = {"rs": int(attrs.get("rowspan") or 1), "cs": int(attrs.get("colspan") or 1), "text": ""}
+            self._cell = {"rs": int(attrs.get("rowspan") or 1), "cs": int(attrs.get("colspan") or 1),
+                          "text": "", "header": tag == "th"}
         elif tag == "br" and self._cell is not None:
             self._cell["text"] += "\n"
 
@@ -52,7 +53,8 @@ def _html_cells(html: str) -> list[dict]:
         for cell in row:
             while (r, c) in taken:
                 c += 1
-            cells.append({"r": r, "c": c, "rs": cell["rs"], "cs": cell["cs"], "text": cell["text"]})
+            cells.append({"r": r, "c": c, "rs": cell["rs"], "cs": cell["cs"],
+                          "text": cell["text"], "header": cell["header"]})
             for rr in range(r, r + cell["rs"]):
                 for cc in range(c, c + cell["cs"]):
                     taken.add((rr, cc))
@@ -171,6 +173,14 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
         if not cells:
             continue
         matrix, merges = _matrix(cells, hard_breaks=hard_breaks)
+        header_rows = 0
+        for row_index in range(len(matrix)):
+            row_cells = [cell for cell in cells if cell["r"] == row_index]
+            if (row_cells and any(cell.get("header") for cell in row_cells)
+                    and all(cell.get("header") or not cell["text"].strip() for cell in row_cells)):
+                header_rows += 1
+            else:
+                break
         if tables and len(tables[-1]["rows"][0]) == len(matrix[0]):
             table = tables[-1]
             base = len(table["rows"])
@@ -180,7 +190,7 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
             if part_page not in table["pages"]:
                 table["pages"].append(part_page)
             continue
-        tables.append({"type": "table", "rows": matrix, "header_rows": 0, "header_cols": 0, "merges": merges,
+        tables.append({"type": "table", "rows": matrix, "header_rows": header_rows, "header_cols": 0, "merges": merges,
                        "pages": [part_page], "_row_pages": [part_page] * len(matrix),
                        **({"hard_breaks": True} if hard_breaks else {})})
     for table in tables:
@@ -260,4 +270,46 @@ def element_tables(elements: list[dict], *, hard_breaks: bool) -> list[list[dict
                         "row_count": sum(len(table.rows) for table in logical)}
         else:
             previous = None
+    if not hard_breaks:
+        _inherit_column_names(elements, table_elements, result)
     return result
+
+
+def _inherit_column_names(elements: list[dict], table_elements: list[tuple[int, dict]],
+                          tables: list[list[dict]]) -> None:
+    """페이지 경계에서 빠진 머리글만 복구한다. 표 ID·행 경계는 변경하지 않는다.
+
+    같은 문서의 연속 페이지와 같은 열 수가 필요하다. 새 제목·별표·서식에서 끊고,
+    열 수가 깨진 구간에는 이름을 붙이지 않는다. 번호 목록을 제목으로 파싱한 PDF는 이어진 본문이다.
+    """
+    from search_engine.chunking.table_rows import logical_tables
+
+    anchor: dict | None = None
+    for (position, element), objects in zip(table_elements, tables):
+        if not objects:
+            anchor = None
+            continue
+        logical = [lt for obj in objects for lt in logical_tables(obj)]
+        first_page = min(page for obj in objects for page in obj["pages"])
+        last_page = max(page for obj in objects for page in obj["pages"])
+        if anchor:
+            bridge = elements[anchor["position"] + 1:position]
+            boundary = any(
+                (item["type"] == "heading" and not re.match(r"^\d+[.)]\s", item["text"]))
+                or re.match(r"^\s*(?:[\[【〔〈<■]\s*)?(?:별표|별지|붙임|부록)\s*\d", item["text"])
+                for item in bridge
+            )
+            if boundary or first_page != anchor["last_page"] + 1:
+                anchor = None
+        columns = logical[0].columns
+        generic = bool(columns) and all(name == f"열{i + 1}" for i, name in enumerate(columns))
+        if anchor and generic:
+            if len(columns) == len(anchor["columns"]):
+                for obj, lt in zip(objects, logical):
+                    if all(name == f"열{i + 1}" for i, name in enumerate(lt.columns)):
+                        obj["column_names"] = list(anchor["columns"])
+            anchor.update(position=position, last_page=last_page)
+        elif columns and not any(re.fullmatch(r"열\d+", name) for name in columns):
+            anchor = {"columns": list(columns), "position": position, "last_page": last_page}
+        else:
+            anchor = None
