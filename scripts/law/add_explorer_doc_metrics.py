@@ -130,7 +130,7 @@ def main() -> None:
             returned = list(dict.fromkeys(parent(c) for c in res[mode]["window"]))
             dq.append(round(sum(d in gold for d in returned) / len(returned), 4) if returned else 0.0)
         row["dr"], row["dq"] = dr, dq
-    for key in os.environ.get("LIVE_KEYS", ",".join(LIVE)).split(","):
+    for key in filter(None, os.environ.get("LIVE_KEYS", ",".join(LIVE)).split(",")):
         live_rows(key, catd[key])
         print(key, "rows:", len(catd[key]))
     print("청크 순위 불일치(키, 질문, 방식, 지금, 탐색기):", MISMATCH)
