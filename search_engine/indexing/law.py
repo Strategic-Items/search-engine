@@ -36,9 +36,39 @@ def law_source(source: dict) -> dict:
 
 def law_embedding_title(source: dict) -> str:
     """제목에 조문·별표 경로를 붙인다. 표 행 한 줄짜리 청크는 이 경로 없이는 무엇의 일부인지 알 수 없다."""
-    path = " > ".join(source.get("heading_path") or [])
+    path_parts = [" ".join(part.split()) for part in source.get("heading_path") or [] if part.strip()]
     title = source["title"]
-    return f"{title} — {path}" if path else title
+    if not path_parts:
+        return title
+    # 청커가 만든 title은 보통 문서 제목 — 현재 조문으로 끝난다. 경로를 그대로 더하면
+    # 마지막 조문이 title 안에서 두 번 반복되므로, 기존 접미사를 경로로 정규화한다.
+    leaf = path_parts[-1]
+    if title.endswith(leaf):
+        prefix = title[:-len(leaf)].rstrip()
+        if prefix.endswith(("—", "–", ">", "-")):
+            prefix = prefix[:-1].rstrip()
+        title = prefix
+    path = " > ".join(path_parts)
+    return f"{title} — {path}" if title else path
+
+
+def law_embedding_body(source: dict) -> str:
+    """임베딩 본문에서 제목 경로와 같은 마크다운 제목 줄을 제거한다.
+
+    원문 `body`는 검색 결과·근거 표시를 위해 보존한다. 경로는 임베딩 제목에
+    들어가므로, 본문에서 같은 구조 제목만 제외해 벡터와 SPLADE 입력 중복을 막는다.
+    """
+    path_titles = {" ".join(title.split()) for title in source.get("heading_path") or []}
+    if not path_titles:
+        return source["body"]
+
+    kept: list[str] = []
+    for line in source["body"].splitlines():
+        heading = re.sub(r"^\s{0,3}#{1,6}\s+", "", line).strip()
+        if heading and " ".join(heading.split()) in path_titles:
+            continue
+        kept.append(line)
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(kept)).strip()
 
 
 LAW_NUMBER = re.compile(r"제\s*(\d{4,6})\s*호")

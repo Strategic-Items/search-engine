@@ -748,3 +748,18 @@ tr.hl td { background: var(--gc); color: var(--gc-ink); font-weight: 700; }
 .sw-outcome>span {color:var(--muted)}.sw-outcome>b {font:700 13px var(--font-mono)}.sw-outcome>i {color:var(--vec);font-style:normal;font-size:17px}.sw-outcome>strong {padding:3px 8px;border-radius:999px;background:var(--gc);color:var(--gc-ink);font-size:11px}
 .sw-exception {display:flex;justify-content:space-between;gap:10px;margin-top:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:9px;font-size:12px}.sw-exception span {color:var(--muted);text-align:right}
 @media(max-width:650px){.stage-example{padding:14px}.sw-math{gap:7px}.sw-value{min-width:100px;padding:10px}.sw-value>b{font-size:19px}.sw-op{gap:3px;font-size:12px}.sw-exception{flex-direction:column}.sw-exception span{text-align:left}}
+.ck-stage-item[aria-current=true] { box-shadow:inset 0 0 0 1px var(--vec); }
+.ck-stage-examples { margin:12px 0 20px; }
+.ck-stage-examples article { min-width:0; border:1px solid var(--line); border-radius:10px; padding:14px; background:var(--tint); }
+.ck-stage-examples article:last-child { background:var(--vec-soft); border-color:#8cbead; }
+.ck-stage-examples h3 { margin:0 0 9px; }
+.ck-stage-examples pre { white-space:pre-wrap; overflow-wrap:anywhere; font:13px/1.7 var(--font-body); margin:0; }
+.ck-stage-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:12px 0 18px; }
+.ck-stage-metric { min-width:0; padding:14px; border:1px solid var(--line); border-radius:9px; background:var(--tint); }
+.ck-stage-metric>span { display:block; font-size:12px; color:var(--muted); }
+.ck-stage-metric>b { display:block; margin-top:6px; font-size:17px; }
+.ck-stage-metric>p { margin:6px 0 0; font-size:12px; color:var(--muted); }
+.ck-source-md { margin-top:18px; border-top:1px solid var(--line); padding-top:12px; }
+.ck-source-md summary { cursor:pointer; font-weight:650; }
+.ck-source-md>p { font-size:13px; }
+.ck-source-md pre { max-height:620px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:14px; border-radius:8px; background:var(--tint); font:12px/1.7 var(--font-mono); }

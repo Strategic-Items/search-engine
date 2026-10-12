@@ -15,7 +15,7 @@ from search_engine.config import get_settings
 from search_engine.embeddings import OllamaEmbedder, embedding_text
 from search_engine.indexing.callcenter import CallCenterChunk
 from search_engine.indexing.documents import SearchDocument
-from search_engine.indexing.law import law_embedding_title, law_source
+from search_engine.indexing.law import law_embedding_body, law_embedding_title, law_source
 from search_engine.indexing.identity import FIRST_CHUNK_INDEX, chunk_index, download_copies, period_hint
 from search_engine.indexing.mapping import HSK_INDEX_BODY, callcenter_index_body, index_body, law_index_body
 from search_engine.indexing.synonyms import load_synonyms
@@ -118,18 +118,19 @@ def document_actions(
     """각 줄을 검증하고 문서 ID를 반복하는 파일을 거부한다."""
     pending: list[tuple[str, dict]] = []
 
+    def embedding_input(source: dict, include_heading_path: bool) -> str:
+        if law and include_heading_path:
+            return embedding_text(law_embedding_title(source), law_embedding_body(source))
+        return embedding_text(source["title"], source["body"])
+
     def flush():
         if embedder is not None:
-            vectors = embedder.embed([
-                embedding_text(law_embedding_title(s) if law and dense_heading_path else s["title"], s["body"])
-                for _, s in pending])
+            vectors = embedder.embed([embedding_input(s, dense_heading_path) for _, s in pending])
             for (_, source), vector in zip(pending, vectors):
                 source["embedding"] = vector
         if sparse is not None:
             # 기본은 학습·측정 당시의 title+body. 옵션을 켜면 dense와 같은 제목 경로를 추가한다.
-            terms = sparse.encode_documents([
-                embedding_text(law_embedding_title(s) if law and sparse_heading_path else s["title"], s["body"])
-                for _, s in pending])
+            terms = sparse.encode_documents([embedding_input(s, sparse_heading_path) for _, s in pending])
             for (_, source), weights in zip(pending, terms):
                 source["splade"] = weights
         for doc_id, source in pending:
