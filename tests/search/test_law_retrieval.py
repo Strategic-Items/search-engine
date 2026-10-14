@@ -8,6 +8,14 @@ from search_engine.config import Settings
 from search_engine.search import query as retrieval
 
 
+def test_law_hnsw_exploration_does_not_expand_returned_candidates():
+    query = retrieval.build_vector_query([0.1], date(2026, 10, 13), 25, law_ranking=True)
+    assert query['knn']['embedding']['k'] == 25
+    assert query['knn']['embedding']['method_parameters'] == {'ef_search': 512}
+    general = retrieval.build_vector_query([0.1], date(2026, 10, 13), 25)
+    assert 'method_parameters' not in general['knn']['embedding']
+
+
 def test_law_ranking_uses_splade_without_bm25():
     query = retrieval.build_law_splade_query({'t1': 1.0}, date(2026, 10, 7), '보관 기간은?',
                                             reference_boost=6)
@@ -96,3 +104,37 @@ def test_law_does_not_fall_back_to_bm25_without_splade(monkeypatch):
 def test_law_candidate_count_cannot_be_expanded():
     with pytest.raises(ValidationError):
         Settings(search_law_candidates=50)
+
+
+@pytest.mark.parametrize('text', [
+    '2026년 고시로 봐줘요. 시험한 장비 재수입 신고는?',
+    '2026년 전략물자수출입고시 기준 검사·시험 신고',
+    '2026 고시 버그 패치 수출허가 면제',
+    '2015년도 고시의 유효기간',
+])
+def test_notice_edition_year_filters_both_law_retrievers(text):
+    year = text[:4]
+    sp = retrieval.build_law_splade_query({'t1': 1.0}, date(2026, 10, 12), text, reference_boost=6)
+    dn = retrieval.build_vector_query([0.1], date(2026, 10, 12), 25, text, law_ranking=True)
+    sp = sp.get('function_score', {}).get('query', sp)
+    assert sp['bool']['filter'][-1] == dn['knn']['embedding']['filter']['bool']['filter'][-1]
+    assert {'prefix': {'doc_number_norm': year+'-'}} in sp['bool']['filter'][-1]['bool']['should']
+
+
+@pytest.mark.parametrize('text', [
+    '2026년에 수출한 장비의 신고기한은?',
+    '2026년 수출 실적을 고시 기준으로 보고하려면?',
+    '2015년과 2026년 고시를 비교해 주세요',
+    '제2026-101호 고시의 신고기한은?',
+    '최신 고시의 재수입 신고기한은?',
+])
+def test_event_year_comparison_and_exact_docket_do_not_add_edition_year_gate(text):
+    assert retrieval._law_edition_filters(text) == []
+
+
+def test_admin_and_general_dense_search_do_not_filter_notice_year():
+    query = '2026년 고시로 봐줘요'
+    sp = retrieval.build_splade_query({'t1': 1.0}, date(2026, 10, 12), query)
+    dn = retrieval.build_vector_query([0.1], date(2026, 10, 12), 25, query)
+    assert 'doc_number_norm' not in str(sp)
+    assert 'doc_number_norm' not in str(dn)

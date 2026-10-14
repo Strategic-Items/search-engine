@@ -66,6 +66,7 @@ from dataclasses import replace
 from search_engine.chunking.params import DEFAULT_POLICY, ChunkPolicy
 from search_engine.chunking.splitter import chunk_markdown
 from search_engine.chunking import patterns
+from search_engine.chunking.llm_tables import chunk_table_with_llm
 from search_engine.chunking.table_rows import comparison_chunks, comparison_columns, logical_tables, row_chunks, table_fields
 
 _PAGE_MARKER = re.compile(r"<!--\s*page:\s*(\d+)\s*-->")
@@ -100,7 +101,7 @@ def _table_contexts(elements: list[dict]) -> list[dict[str, str]]:
 
 def chunk_elements(
     elements: list[dict], *, document_id: str, chunk_size: int | None = None, chunk_overlap: int | None = None,
-    tables: list[list[dict]] | None = None, min_chunk_chars: int | None = None, policy: ChunkPolicy = DEFAULT_POLICY,
+    table_token_budget=None, tables: list[list[dict]] | None = None, min_chunk_chars: int | None = None, policy: ChunkPolicy = DEFAULT_POLICY,
 ) -> list[dict]:
     """Chunk at heading/paragraph/list boundaries while keeping tables atomic.
 
@@ -248,6 +249,34 @@ def chunk_elements(
                 lead_unit = lead_unit or _UNIT_LINE.match(pending[-1]["text"]).group(1).strip()
                 trailing_headings.insert(0, pending.pop())
             flush()
+            if policy.use_llm_tables and element.get("text"):
+                llm_chunks = chunk_table_with_llm(
+                    element["text"],
+                    title=" > ".join(current_path()) or document_id,
+                    policy=policy,
+                    heading_path=current_path(),
+                    page_start=element.get("page", 1),
+                    page_end=element.get("page", 1),
+                )
+                if llm_chunks:
+                    for chunk_item in llm_chunks:
+                        chunks.append({
+                            **chunk_item,
+                            "document_id": document_id,
+                            "chunk_id": f"{document_id}#{len(chunks)}",
+                            "element_types": ["table"],
+                        })
+                    continue
+            if table_token_budget is not None and objects:
+                for obj in objects:
+                    table_id = next_table_id()
+                    outputs = table_token_budget.grid_table(
+                        obj, table_id, current_path(), context,
+                        [t["text"] for t in trailing_headings if t["type"] != "heading"])
+                    for output in outputs:
+                        chunks.append({**output, "document_id": document_id,
+                                       "chunk_id": f"{document_id}#{len(chunks)}", "element_types": ["table"]})
+                continue
             logical_entries = [(obj, lt) for obj in objects for lt in logical_tables(obj)]
             logical = [lt for _, lt in logical_entries]
             for lt in logical:
@@ -296,6 +325,7 @@ def chunk_elements(
                         rows[0].pop("section_path", None)  # 여러 행을 합친 청크에 첫 행의 조문만 붙이지 않는다
                     if lead_body and rows:
                         rows[0] = {**rows[0], "text": "\n".join(lead_body + [rows[0]["text"]])}
+                    table_output = []
                     for row in rows:
                         context_lines = [f"표 설명: {context['table_context_before']}"] if context.get("table_context_before") else []
                         if context.get("table_context_after"):
@@ -320,8 +350,10 @@ def chunk_elements(
                                 row["row_index"] = global_index
                                 row["row_id"] = f"{table_id}#row{global_index}"
                         section = row.pop("section_path", [])  # 칸 안 조문 표제(`table_rows._cell_sections`)
-                        chunks.append({"chunk_id": f"{document_id}#{len(chunks)}", "document_id": document_id,
-                                       "element_types": ["table"], **row, "heading_path": table_path + section})
+                        table_output.append({"document_id": document_id, "element_types": ["table"],
+                                             **row, "heading_path": table_path + section})
+                    for output in table_output:
+                        chunks.append({**output, "chunk_id": f"{document_id}#{len(chunks)}"})
                 continue
             context_before = context.get("table_context_before")
             context_after = context.get("table_context_after")

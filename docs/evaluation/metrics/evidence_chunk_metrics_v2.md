@@ -32,7 +32,7 @@
 기준으로 계산한다. 근거 지표의 @5도 부모 문서 5개 기준이며 문서당 청크 수는 다를 수 있다.
 
 추가 지표는 저장된 단계별 질의 순위로 재계산했고, 기존 Recall 및 MRR과 일치함을
-확인했다. 집계값은 `docs/evaluation/docs_v2_stages_summary.json`에 보관한다.
+확인했다. 집계값은 `docs/evaluation/summaries/docs_v2_stages_summary.json`에 보관한다.
 
 논리 문서는 HWP/HWPX/PDF처럼 같은 내용을 담은 다른 형식을 대체 정답 하나로 묶은
 지표다. v2의 근거 Recall이 낮으므로, 정답 문서 탐색과 답변에 쓸 청크 선택은 별도의

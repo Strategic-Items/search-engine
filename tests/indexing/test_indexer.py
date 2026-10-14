@@ -6,7 +6,7 @@ import pytest
 
 from search_engine.config import Settings
 from search_engine.embeddings import embedding_text
-from search_engine.indexing.indexer import document_actions, rebuild
+from search_engine.indexing.indexer import document_actions, rebuild, encoding_metadata
 from search_engine.config import get_settings
 from search_engine.indexing.mapping import index_body
 
@@ -87,6 +87,15 @@ def test_rebuild_applies_the_configured_replica_count(tmp_path, monkeypatch):
 
     body = client.indices.create.call_args.kwargs["body"]
     assert body["settings"]["number_of_replicas"] == 2
+
+
+def test_category_encoding_metadata_records_actual_input_and_window_settings():
+    metadata = encoding_metadata(Settings(search_splade_model="/models/checkpoint",
+                                          search_splade_doc_max_length=256), "source-hash")
+    assert metadata["corpus_sha256"] == "source-hash"
+    assert metadata["sparse_doc_max_length"] == 256
+    assert metadata["sparse_window_overlap"] == 64
+    assert metadata["sparse_document_strategy"] == "overlapping-windows-max-pool-v1"
 
 
 def test_rebuild_rejects_empty_index_before_publish(tmp_path, monkeypatch):

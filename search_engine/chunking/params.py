@@ -10,7 +10,7 @@
 
 from dataclasses import dataclass
 
-CHUNKER_VERSION = 9
+CHUNKER_VERSION = 11
 
 DEFAULT_CHUNK_SIZE = 800
 DEFAULT_CHUNK_OVERLAP = 100
@@ -39,6 +39,13 @@ class ChunkPolicy:
     carry_max_chars: int = 40
     # K4: 청크 제목에 붙이는 절 표시의 최대 길이
     heading_max_chars: int = 60
+
+    # LLM 기반 표 청킹 스위치 (꺼져 있거나 LLM 서버 장애 시 기존 규칙 기반으로 자동 폴백)
+    use_llm_tables: bool = False
+    llm_table_endpoint: str | None = None
+    llm_table_model: str = "qwen2.5:7b"
+    llm_table_timeout: float = 60.0
+    llm_table_min_chars: int = 400
 
     @property
     def long_cell_chars(self) -> int:

@@ -159,6 +159,28 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def encoding_metadata(settings, corpus_sha256: str) -> dict:
+    """Persist the settings that actually produced a physical category index."""
+    checkpoint = Path(settings.search_splade_model)
+    checkpoint_files = sorted(checkpoint.glob("*.safetensors")) if checkpoint.is_dir() else []
+    if checkpoint.is_dir() and not checkpoint_files:
+        checkpoint_files = sorted(checkpoint.glob("pytorch_model*.bin"))
+    return {
+        "input_version": "normalized-law-path-v1",
+        "corpus_sha256": corpus_sha256,
+        "dense_model": settings.ollama_embedding_model,
+        "dense_heading_path": settings.search_dense_include_heading_path,
+        "sparse_model": settings.search_splade_model,
+        "sparse_checkpoint_sha256": {path.name: file_sha256(path) for path in checkpoint_files},
+        "sparse_heading_path": settings.search_splade_include_heading_path,
+        "sparse_doc_max_length": settings.search_splade_doc_max_length,
+        "sparse_document_strategy": "overlapping-windows-max-pool-v1",
+        "sparse_window_overlap": min(64, settings.search_splade_doc_max_length - 3),
+        "sparse_top_terms": settings.search_splade_top_terms,
+        "sparse_min_weight": settings.search_splade_min_weight,
+    }
+
+
 def rebuild(
     path: Path, dataset: str = "core", expected_count: int | None = None,
     expected_sha256: str | None = None,
@@ -187,6 +209,8 @@ def rebuild(
         if spec["mapping"] == "callcenter" else HSK_INDEX_BODY
     )
     mapping["settings"]["number_of_replicas"] = settings.search_number_of_replicas
+    if spec["mapping"] == "law":
+        mapping["mappings"]["_meta"] = encoding_metadata(settings, file_sha256(path))
     if is_document:
         mapping["settings"]["analysis"]["filter"]["domain_synonyms"]["synonyms"] = load_synonyms()
     index_name = f"{prefix}{stamp}-{uuid4().hex[:6]}"

@@ -56,6 +56,7 @@ SPECS = [
 from admin_specs import SPECS as ADMIN_SPECS  # noqa: E402
 from law50_specs import SPECS as LAW50_SPECS  # noqa: E402
 from law100_specs import SPECS as LAW100_SPECS  # noqa: E402
+from faq_law_specs import SPECS as FAQ_LAW_SPECS, EVIDENCE_SPECS, grouped_evidence  # noqa: E402
 
 
 def _specs() -> list:
@@ -63,6 +64,8 @@ def _specs() -> list:
         return ADMIN_SPECS
     if os.environ.get("SPECS") == "law100":
         return LAW100_SPECS
+    if os.environ.get("SPECS") == "faq_law":
+        return FAQ_LAW_SPECS
     return LAW50_SPECS if os.environ.get("SPECS") == "law50" else SPECS
 
 
@@ -104,6 +107,15 @@ def build() -> None:
             rows[-1]["label_review"] = {"date": "2026-10-07", "scope": rule["scope"], "reason": rule["reason"],
                                         "original_chunks": original, "added_chunks": added}
         apply_review(rows[-1], by_id, positive)
+        if os.environ.get("SPECS") == "faq_law":
+            groups = grouped_evidence(query, chunks, norm)
+            if groups is not None:
+                if not all(groups):
+                    bad.append(query)
+                    continue
+                rows[-1]["evidence_groups"] = [[c["id"] for c in group] for group in groups]
+                rows[-1]["gold"] = sorted({c["parent_id"] for group in groups for c in group})
+                rows[-1]["evidence_specs"] = EVIDENCE_SPECS[query]
     if bad:
         sys.exit(f"정답 청크가 없는 질문: {bad}")
     QUERIES.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")

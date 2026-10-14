@@ -117,7 +117,7 @@ cd /Users/jeongbin/git/searchEngine
 `search-index ... --dataset docs --manifest ...`를 실행한다. 그 산출물 경로를
 `--corpus`와 `--prepared`에 전달한다. 코퍼스가 다르면 새 평가 실행으로 기록한다.
 
-요약·코드/데이터 체크섬: [docs_v1_summary.json](../evaluation/docs_v1_summary.json).
+요약·코드/데이터 체크섬: [docs_v1_summary.json](../evaluation/summaries/docs_v1_summary.json).
 질문 작성 범위·한계: [정답 세트 manifest](../../data/queries_docs_v1.manifest.json).
 구현 검증: 검색엔진 테스트 122개 통과, CLI 설치/도움말 및 HTTP docs-only/HSK 제외 확인.
 

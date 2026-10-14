@@ -15,14 +15,27 @@ _TABLE_KEYS = ("table_id", "caption", "unit", "columns", "row_count", "row_id", 
                "table_segment_index", "table_segment_count", "table_continued", "table_page_start",
                "table_page_end", "table_row_offset", "table_segment_row_index",
                "table_context_before", "table_context_after",
-               "column", "piece_index", "piece_count", "article", "image_ids")
+               "table_cells", "table_shape", "table_representation", "table_rows", "table_input_tokens", "table_token_limit", "token_piece_index", "token_piece_count",
+               "column", "piece_index", "piece_count", "article", "image_ids",
+               "llm_chunked", "table_title", "summary")
 
 
-def chunk_bundle(bundle: Bundle, *, policy: ChunkPolicy = DEFAULT_POLICY) -> list[dict]:
+def chunk_bundle(bundle: Bundle, *, policy: ChunkPolicy | None = None, table_token_budget=None) -> list[dict]:
+    if policy is None:
+        try:
+            from search_engine.config import get_settings
+            settings = get_settings()
+            policy = ChunkPolicy(
+                use_llm_tables=settings.chunking_use_llm_tables,
+                llm_table_endpoint=settings.chunking_llm_endpoint,
+                llm_table_model=settings.chunking_llm_model,
+            )
+        except Exception:
+            policy = DEFAULT_POLICY
     parsed = markdown_to_elements(bundle.markdown)
     tables = element_tables(parsed.elements, hard_breaks=bundle.source_format != "pdf")
     chunks: list[dict] = []
-    for raw in chunk_elements(parsed.elements, document_id=bundle.document_id, tables=tables, policy=policy):
+    for raw in chunk_elements(parsed.elements, document_id=bundle.document_id, tables=tables, policy=policy, table_token_budget=table_token_budget):
         text = index_text(raw["text"])
         if not text:
             continue

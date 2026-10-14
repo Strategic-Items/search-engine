@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     search_number_of_replicas: int = Field(default=0, ge=0)
     ollama_base_url: str = "http://localhost:11434"
     ollama_chat_model: str = "qwen2.5:3b"
+    # 표 청킹 시 LLM 사용 여부 (False: 기본 규칙 기반 청킹, True: Qwen 등 LLM 원자 청크 분할)
+    chunking_use_llm_tables: bool = False
+    chunking_llm_endpoint: str = "http://100.120.44.11:11434"
+    chunking_llm_model: str = "qwen2.5:7b"
     # 추론 모델(qwen3 등)은 기본적으로 사고 과정을 먼저 내놓는다. 그 토큰이
     # num_predict를 다 써 버리면 content가 빈 문자열로 돌아오고, 판정자는 그것을
     # 예외로 처리해 결과를 그대로 통과시킨다 -- 꺼진 판정자와 구분되지 않는다.
@@ -101,6 +105,7 @@ class Settings(BaseSettings):
     # 첫 네 개의 후보 청크 외부에 있었으며, 9개의 질문에서
     # 그리고 그 모든 청크는 검색이 가져온 풀에 이미 있었다.
     # 증거 검색은 16에서 포화되지만, 그에 도달하기 위해 컨텍스트는 두 배가 된다.
+    # Legacy document-first selection; category hybrid has no per-parent cap.
     search_chunks_per_document: int = Field(default=6, ge=1, le=20)
     # 질문과 모델이 작성한 재작성된 질문을 병합하여 검색한다. 오프
     # 기본값: on docs v2에서는 40개 중 1~2개의 질문을 확보하고 비용이
@@ -247,8 +252,14 @@ class Settings(BaseSettings):
     search_splade_min_weight: float = Field(default=0.01, ge=0.0)
     # 카테고리 hybrid는 청크 단위 RRF 뒤 1위 청크 점수의 이 비율로 자른다. 40단계 측정 기준은 0.95였고 2026-10-08 사용자 지시로 0.7로 통일했다.
     search_category_cutoff_ratio: float = Field(default=0.7, ge=0.0, le=1.0)
+    # RRF retains document admission and budgets; dense selects evidence inside
+    # admitted category documents from the uncut candidate union.
+    search_category_dense_within_document: bool = True
     # 법령 검색은 각 25개 후보 안에서 순위를 개선한다. 후보 확장은 사용하지 않는다.
     search_law_candidates: int = Field(default=25, ge=25, le=25)
+    # HNSW graph exploration is separate from the 25 returned candidates. Set it
+    # on each law query so rebuilding a graph does not silently lose near hits.
+    search_law_vector_ef_search: int = Field(default=512, ge=25, le=4096)
     # 질문의 조문·별표·통제번호와 대상 항목을 맞춘 청크를 후보 조회 전에 우대한다.
     search_law_reference_boost: float = Field(default=6.0, ge=0.0, le=20.0)
     rag_top_k: int = Field(default=5, ge=1)

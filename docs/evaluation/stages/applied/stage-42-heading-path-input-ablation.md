@@ -120,8 +120,8 @@ SPLADE가 얻은 021·022는 hybrid가 이미 찾던 질문이라 hybrid의 추�
 
 ## 상세 보고서와 원자료
 
-- [SPLADE 경로 추가 상세 결과·손실 원인 추적](../../splade_heading_path_2026-10-06.md)
-- [Dense 경로 제거 상세 결과·ANN 대조군](../../dense_heading_path_ablation_2026-10-06.md)
+- [SPLADE 경로 추가 상세 결과·손실 원인 추적](../../splade-dense/splade_heading_path_2026-10-06.md)
+- [Dense 경로 제거 상세 결과·ANN 대조군](../../splade-dense/dense_heading_path_ablation_2026-10-06.md)
 - [SPLADE 법령 원시 결과](../../../../data/generated/splade-heading-path-2026-10-06/results.json)
 - [SPLADE 행정 원시 결과](../../../../data/generated/splade-heading-path-admin-2026-10-06/results.json)
 - [후보·RRF·결과 정리 추적](../../../../data/generated/splade-heading-path-2026-10-06/trace.json)

@@ -88,7 +88,8 @@ def _split_pipe_row(line: str) -> list[str]:
 def _pipe_cells(text: str) -> list[dict]:
     lines = [line for line in text.splitlines() if line.strip()]
     rows = [_split_pipe_row(line) for i, line in enumerate(lines) if not (i == 1 and _PIPE_SEPARATOR.match(line.strip()))]
-    return [{"r": r, "c": c, "rs": 1, "cs": 1, "text": value} for r, row in enumerate(rows) for c, value in enumerate(row)]
+    return [{"r": r, "c": c, "rs": 1, "cs": 1, "text": value,
+             "source_header": bool(r == 0 and len(lines) > 1 and _PIPE_SEPARATOR.match(lines[1].strip()))} for r, row in enumerate(rows) for c, value in enumerate(row)]
 
 
 def _part_cells(text: str) -> list[dict] | None:
@@ -184,6 +185,7 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
         if tables and len(tables[-1]["rows"][0]) == len(matrix[0]):
             table = tables[-1]
             base = len(table["rows"])
+            table["source_cells"] += [{**c, "header": c.get("header", c.get("source_header", False)), "r": c["r"] + base, "page": part_page} for c in cells]
             table["rows"] += matrix
             table["merges"] += [{**m, "row": m["row"] + base} for m in merges]
             table["_row_pages"] += [part_page] * len(matrix)
@@ -191,6 +193,7 @@ def table_objects(text: str, page: int, *, hard_breaks: bool) -> list[dict]:
                 table["pages"].append(part_page)
             continue
         tables.append({"type": "table", "rows": matrix, "header_rows": header_rows, "header_cols": 0, "merges": merges,
+                       "source_cells": [{**c, "header": c.get("header", c.get("source_header", False)), "page": part_page} for c in cells],
                        "pages": [part_page], "_row_pages": [part_page] * len(matrix),
                        **({"hard_breaks": True} if hard_breaks else {})})
     for table in tables:

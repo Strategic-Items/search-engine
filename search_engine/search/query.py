@@ -91,6 +91,36 @@ def _same_topic_in_title(query: str, title: str) -> bool:
 # 우위가 2위와 11%밖에 안 벌어져 RRF에 넘어가면 순위 하나로 뭉개진다.
 DOCKET = re.compile(r"제?\s*(\d{4})\s*-\s*(\d{2,4})\s*호")
 
+NOTICE_YEAR = re.compile(
+    r"(?<!\d)((?:19|20)\d{2})\s*(?:년(?:도)?\s*)?"
+    r"(?:(?:전략\s*물자\s*(?:수출입)?|산업통상(?:자원)?부|수출입)\s*)?고시"
+)
+
+
+def _law_edition_filters(query: str) -> list[dict]:
+    """A notice year identifies its edition; a transaction year does not.
+
+    Exact docket and multi-year queries retain their existing scope. Sources
+    without a normalized docket use edition dates, then undated titles.
+    """
+    years = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", query))
+    match = NOTICE_YEAR.search(query)
+    if DOCKET.search(query) or len(years) != 1 or not match:
+        return []
+    year = int(match.group(1))
+    dates = [{"range": {field: {"gte": f"{year}-01-01", "lt": f"{year+1}-01-01"}}}
+             for field in ("effective_from", "revision_date", "published_at")]
+    title_fallback = {"bool": {
+        "must": [{"match_phrase": {"title": str(year)}}],
+        "must_not": [{"exists": {"field": field}} for field in
+                     ("effective_from", "revision_date", "published_at")],
+    }}
+    return [{"bool": {"should": [
+        {"prefix": {"doc_number_norm": f"{year}-"}},
+        {"bool": {"must_not": [{"exists": {"field": "doc_number_norm"}}],
+                  "must": [{"bool": {"should": dates + [title_fallback], "minimum_should_match": 1}}]}},
+    ], "minimum_should_match": 1}}]
+
 
 def _docket_filter(query: str) -> list[dict]:
     """질의가 공고 번호를 대면, 그 번호를 담지 않은 문서는 답이 아니다.
@@ -199,6 +229,7 @@ def build_law_splade_query(terms: dict[str, float], as_of: date, query: str,
                            *, reference_boost: float) -> dict:
     """법령의 SPLADE 순위를 보완한다. 후보를 더 읽거나 별도 후보 목록을 합치지 않는다."""
     base = build_splade_query(terms, as_of, query)
+    base["bool"]["filter"] += _law_edition_filters(query)
     filters = [{"match_phrase": {"heading_path": article}}
                for article in dict.fromkeys(ARTICLE_NUMBER.findall(query))]
     for kind, number in re.findall(r"(별표|별지)\s*제?\s*(\d+)\s*호?", query):
@@ -257,7 +288,7 @@ def _validity_filters(as_of: date) -> list[dict]:
 
 
 def build_vector_query(vector: list[float], as_of: date, candidates: int,
-                      query: str = "") -> dict:
+                      query: str = "", *, law_ranking: bool = False) -> dict:
     """근사적 HNSW 코사인 검색, 현재 유효한 레코드에 제한됨.
 
     공고 번호는 여기에도 걸린다. 번호는 관련도가 아니라 어느 문서인지를 말하므로
@@ -265,11 +296,17 @@ def build_vector_query(vector: list[float], as_of: date, candidates: int,
     번호를 못 맞춘 공고문은 애초에 밀집 목록이 데려온 것들이고, 임베딩에 네 자리
     일련번호는 사실상 실리지 않아 코사인으로는 590호와 598호가 구별되지 않는다.
     """
-    return {"knn": {"embedding": {
+    body = {"knn": {"embedding": {
         "vector": vector,
         "k": candidates,
-        "filter": {"bool": {"filter": _validity_filters(as_of) + _docket_filter(query)}},
+        "filter": {"bool": {"filter": _validity_filters(as_of) + _docket_filter(query)
+                              + (_law_edition_filters(query) if law_ranking else [])}},
     }}}
+    if law_ranking:
+        body["knn"]["embedding"]["method_parameters"] = {
+            "ef_search": get_settings().search_law_vector_ef_search,
+        }
+    return body
 
 
 def _warn_on_partial_results(response: dict, retriever: str) -> None:
@@ -360,9 +397,10 @@ def _rrf(ranked_lists: Iterable[tuple[list[dict], float, str]], rrf_k: int) -> l
 
 def _chunk_first(
     ranked_lists: list[tuple[list[dict], float, str]], query: str, *, rrf_k: int,
-    max_chunks: int, cutoff_ratio: float, max_documents: int, chunks_per_document: int,
+    max_chunks: int, cutoff_ratio: float, max_documents: int | None, chunks_per_document: int | None,
     reporting_half: tuple[int, str] | None = None, agreement: float = 0.0,
     superseded_weight: float = 1.0,
+    dense_within_document: bool = False,
 ) -> list[list[dict]]:
     """문서를 먼저 고르지 않고 청크를 고른다. 반환은 문서별로 묶인 청크 목록이다.
 
@@ -437,12 +475,27 @@ def _chunk_first(
         if edition is not None and claimed.setdefault(edition, parent) != parent:
             continue
         group = groups.get(parent)
-        if group is None and len(groups) == max_documents:
+        if max_documents is not None and group is None and len(groups) == max_documents:
             continue
-        if group is not None and len(group) == chunks_per_document:
+        if chunks_per_document is not None and group is not None and len(group) == chunks_per_document:
             continue
         groups.setdefault(parent, []).append({**chunks[chunk_id], "_score": score[chunk_id]})
         taken += 1
+    if dense_within_document and dense_rank:
+        # RRF chooses parents and slot counts. Choose evidence inside admitted
+        # parents before cutting their pool; a sparse miss must not veto dense.
+        for parent, selected in groups.items():
+            pool = [cid for cid, hit in chunks.items()
+                    if (hit["_source"].get("parent_id") or cid) == parent]
+            pool.sort(key=lambda cid: (cid not in dense_rank,
+                                      dense_rank.get(cid, len(chunks) + 1), -score[cid], cid))
+            # Preserve already-admitted retriever leaders. Exact identifiers can
+            # be found only by lexical search; dense must not evict that evidence.
+            required = {hit["_id"] for hit in selected} & leaders
+            chosen = required | set([cid for cid in pool if cid not in required]
+                                    [:len(selected) - len(required)])
+            groups[parent] = [{**chunks[cid], "_score": score[cid]}
+                              for cid in pool if cid in chosen]
     return list(groups.values())
 
 
@@ -558,6 +611,9 @@ def retrieve(
     rerank_chunks: bool | None = None,
     lexical: str = "bm25", chunk_first: bool | None = None,
     chunk_first_cutoff_ratio: float | None = None,
+    chunk_first_dense_within_document: bool = False,
+    chunk_first_document_limits: bool = True,
+    chunk_first_single_modes: bool = False,
     hybrid_candidates: int | None = None,
     law_ranking: bool = False,
 ) -> list[SearchHit]:
@@ -651,7 +707,7 @@ def retrieve(
             semantic = client.search(
                 index=alias,
                 body={"query": build_vector_query(vector, as_of, vector_candidates,
-                                                 query.strip())},
+                                                 query.strip(), law_ranking=law_ranking)},
                 size=vector_candidates,
                 ignore_unavailable=not strict,
             )
@@ -683,11 +739,14 @@ def retrieve(
             max_chunks=settings.search_chunk_first_max_chunks,
             cutoff_ratio=(settings.search_chunk_first_cutoff_ratio
                           if chunk_first_cutoff_ratio is None else chunk_first_cutoff_ratio),
-            max_documents=min(k, settings.search_chunk_first_max_documents),
+            max_documents=(min(k, settings.search_chunk_first_max_documents)
+                           if chunk_first_document_limits else None),
             agreement=settings.search_chunk_first_agreement,
             superseded_weight=settings.search_chunk_first_superseded_weight,
-            chunks_per_document=chunks_per_document or settings.search_chunks_per_document,
-            reporting_half=_reporting_half(query))
+            chunks_per_document=((chunks_per_document or settings.search_chunks_per_document)
+                                 if chunk_first_document_limits else None),
+            reporting_half=_reporting_half(query),
+            dense_within_document=chunk_first_dense_within_document)
         hits = []
         for group in groups:
             lead = group[0]
@@ -699,7 +758,10 @@ def retrieve(
                 "passages": [Passage(id=c["_id"], body=c["_source"].get("body", ""), score=c["_score"])
                              for c in group[1:]],
             }))
-        return _finish(query, _with_current_editions(client, alias, hits, k), settings, answerability)
+        hits = _with_current_editions(client, alias, hits,
+                                      k if chunk_first_document_limits else settings.search_chunk_first_max_chunks)
+        hits = _limit_chunk_budget(hits, settings.search_chunk_first_max_chunks)
+        return _finish(query, hits, settings, answerability)
     period_supported: set[str] = set()
     if len(ranked_lists) > 1:
         # 각 목록을 각각의 검색기의 교정된 비율로 먼저 자른다. 명시적인 `cutoff_ratio`는 전체 절단 정책을 덮어쓴다 -- 0을 전달하여 절단되지 않은 순위를 보려면 그것을 가져와야 하므로, 이 또한 건너뛴다.
@@ -746,6 +808,11 @@ def retrieve(
     # RRF에 맞게 조정된 비율에 대해 원시 코사인 점수를 읽고,
     # 같은 리트리버가 단독으로 반환했을 때보다 더 긴 리스트를 반환한다.
     fused = ranked_lists[0][2] if len(ranked_lists) == 1 else "hybrid"
+    # 카테고리 단독 모드: 리트리버 원점수의 비율로 자르고(청크 컷오프 0.7), 문서당 상한을 두지 않으며
+    # 청크 예산만 건다. RRF 순위가 아니라 원점수를 쓰므로 하이브리드 청크 우선 경로와 다르다.
+    single_budget = chunk_first_single_modes and len(ranked_lists) == 1 and fused in ("splade", "vector")
+    if single_budget and cutoff_ratio is None and chunk_first_cutoff_ratio is not None:
+        cutoff_ratio = chunk_first_cutoff_ratio
     if cutoff_ratio is None:
         cutoff_ratio = settings.cutoff_ratio(fused)
     if score_floor is None:
@@ -788,7 +855,8 @@ def retrieve(
         if len(out) == k:
             break
     if chunks_per_document is None:
-        chunks_per_document = settings.search_chunks_per_document
+        chunks_per_document = (settings.search_chunk_first_max_chunks if single_budget
+                              else settings.search_chunks_per_document)
     hits = _with_current_editions(client, alias, out, k)
     by_parent = _candidates_by_parent(ranked_lists, settings.search_hybrid_rrf_k)
     if rerank_chunks is None:
@@ -803,7 +871,22 @@ def retrieve(
             and chunks_per_document >= 2
             and select_passages(query, hits, by_parent, chunks_per_document, settings)):
         hits = _with_passages(hits, by_parent, chunks_per_document)
+    if single_budget:
+        hits = _limit_chunk_budget(hits, settings.search_chunk_first_max_chunks)
     return _finish(query, hits, settings, answerability)
+
+
+def _limit_chunk_budget(hits: list[SearchHit], max_chunks: int) -> list[SearchHit]:
+    """Keep final chunk order within budget, including appended current editions."""
+    limited = []
+    remaining = max_chunks
+    for hit in hits:
+        if remaining <= 0:
+            break
+        passages = hit.passages[:remaining - 1]
+        limited.append(hit.model_copy(update={"passages": passages}))
+        remaining -= 1 + len(passages)
+    return limited
 
 
 def _finish(query: str, hits: list[SearchHit], settings, answerability: bool | None) -> list[SearchHit]:
