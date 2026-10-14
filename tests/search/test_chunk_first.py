@@ -47,6 +47,38 @@ def test_documents_are_capped_and_chunks_per_document_are_capped():
     assert len(select(same, [], chunks_per_document=3)[0]) == 3
 
 
+def test_no_per_document_cap_allows_one_document_to_fill_only_the_total_budget():
+    same = [chunk(f"s{i}", "S") for i in range(15)]
+    groups = select(same, same, chunks_per_document=None, dense_within_document=True)
+    assert groups == [[f"s{i}" for i in range(10)]]
+
+
+def test_no_document_cap_allows_more_than_five_documents_under_the_total_budget():
+    candidates = [chunk(f"c{i}", f"P{i}") for i in range(15)]
+    groups = select(candidates, candidates, max_documents=None, chunks_per_document=None)
+    assert len(groups) == 10
+    assert sum(map(len, groups)) == 10
+
+
+def test_current_edition_backfill_cannot_exceed_the_final_chunk_budget():
+    from search_engine.search.query import _limit_chunk_budget
+    from search_engine.search.results import SearchHit, Passage
+
+    original = SearchHit(id="old#0", parent_id="old", title="Old", body="0",
+                         passages=[Passage(id=f"old#{i}", body=str(i)) for i in range(1, 10)])
+    current = SearchHit(id="current#0", parent_id="current", title="Current", body="new")
+    assert [cid for h in _limit_chunk_budget([original, current], 10) for cid in h.chunk_ids] == original.chunk_ids
+    assert len(original.passages) == 9
+    # With room for the linked edition, preserve it and trim the next document.
+    tail = SearchHit(id="tail#0", parent_id="tail", title="Tail", body="tail",
+                     passages=[Passage(id=f"tail#{i}", body=str(i)) for i in range(1, 5)])
+    short = original.model_copy(update={"passages": original.passages[:5]})
+    limited = _limit_chunk_budget([short, current, tail], 10)
+    assert [len(h.chunk_ids) for h in limited] == [6, 1, 3]
+    assert limited[1].id == "current#0"
+    assert len(tail.passages) == 4
+
+
 def test_cutoff_drops_weak_chunks_but_keeps_each_lists_first():
     lex = [chunk("l1", "L"), chunk("l2", "L2")]
     vec = [chunk("v1", "V"), chunk("v2", "V2")]
@@ -62,6 +94,42 @@ def test_a_copy_of_a_document_already_carried_is_not_carried_again():
 
 def test_a_leading_chunk_of_no_document_is_needed_to_start():
     assert select([], []) == []
+
+
+def test_dense_evidence_replaces_rrf_overlap_without_expanding_budgets():
+    lex = [chunk("shared1", "A"), chunk("shared2", "A"), chunk("b", "B")]
+    vec = [chunk("shared1", "A"), chunk("answer", "A"),
+           chunk("shared2", "A"), chunk("b", "B")]
+    old = select(lex, vec, cutoff_ratio=0.7, chunks_per_document=2)
+    new = select(lex, vec, cutoff_ratio=0.7, chunks_per_document=2,
+                 dense_within_document=True)
+    assert old == [["shared1", "shared2"], ["b"]]
+    assert new == [["shared1", "answer"], ["b"]]
+    assert list(map(len, old)) == list(map(len, new))
+
+
+def test_dense_selection_does_not_admit_rejected_parents_or_their_copies():
+    lex = [chunk("a", "A", "공지", "2026-01-01")]
+    vec = [chunk("a", "A", "공지", "2026-01-01"),
+           chunk("copy", "COPY", "공지", "2026-01-01"), chunk("other", "B")]
+    assert select(lex, vec, cutoff_ratio=0.95, dense_within_document=True) == [["a"]]
+
+
+def test_dense_selection_keeps_lexical_evidence_when_dense_has_no_same_parent():
+    assert select([chunk("lex", "A")], [chunk("dense", "B")],
+                  dense_within_document=True) == [["dense"], ["lex"]]
+
+
+def test_dense_selection_preserves_the_lexical_leader_for_exact_identifiers():
+    lex = [chunk("exact_code", "A"), chunk("shared", "A")]
+    vec = [chunk("shared", "A"), chunk("nearby", "A")]
+    assert select(lex, vec, chunks_per_document=2, dense_within_document=True) == [["shared", "exact_code"]]
+
+
+def test_one_slot_does_not_drop_an_already_selected_lexical_leader():
+    lex = [chunk("exact", "A")]
+    vec = [chunk("other", "B"), chunk("nearby", "A")]
+    assert select(lex, vec, chunks_per_document=1, dense_within_document=True) == [["other"], ["exact"]]
 
 
 def test_document_agreement_lifts_a_document_both_lists_found_through_different_chunks():

@@ -6,6 +6,7 @@
 
 from collections.abc import Sequence
 from functools import lru_cache
+from threading import RLock
 
 from search_engine.config import Settings, get_settings
 
@@ -58,19 +59,59 @@ class SparseEncoder:
         return vectors
 
     def encode_documents(self, texts: Sequence[str]) -> list[dict[str, float]]:
-        return self.encode(texts, self.settings.search_splade_doc_max_length)
+        """Cover the entire input; max-pool windows before pruning terms."""
+        torch, settings = self._torch, self.settings
+        limit = settings.search_splade_doc_max_length
+        special = self._tokenizer.num_special_tokens_to_add(pair=False)
+        stride = min(64, max(0, limit - special - 1))
+        vectors = []
+        for start in range(0, len(texts), 8):
+            batch_texts = list(texts[start:start + 8])
+            batch = self._tokenizer(
+                batch_texts, padding=True, truncation=True, max_length=limit,
+                stride=stride, return_overflowing_tokens=True, return_tensors="pt")
+            parents = batch.pop("overflow_to_sample_mapping").tolist()
+            pooled_by_parent = {}
+            # Bound inference memory even when one input produces many windows.
+            for offset in range(0, len(parents), 8):
+                window = {key: value[offset:offset + 8].to(self._device)
+                          for key, value in batch.items()}
+                with torch.inference_mode():
+                    logits = self._model(**window).logits
+                    pooled = torch.log1p(torch.relu(logits)).masked_fill(
+                        ~window["attention_mask"].bool().unsqueeze(-1), 0).amax(dim=1).cpu()
+                for parent, row in zip(parents[offset:offset + 8], pooled):
+                    previous = pooled_by_parent.get(parent)
+                    pooled_by_parent[parent] = row if previous is None else torch.maximum(previous, row)
+            for parent in range(len(batch_texts)):
+                row = pooled_by_parent[parent]
+                active = torch.nonzero(row >= settings.search_splade_min_weight).flatten()
+                vectors.append(sparse_terms({int(i): float(row[i]) for i in active},
+                                            settings.search_splade_top_terms))
+        return vectors
 
     def encode_query(self, query: str) -> dict[str, float]:
         return self.encode([query], self.settings.search_splade_query_max_length)[0]
 
 
+_MODEL_LOCK = RLock()
+
+
 @lru_cache(maxsize=1)
-def get_encoder() -> SparseEncoder:
+def _cached_encoder() -> SparseEncoder:
     """모델 로드는 느리니(수 초) 프로세스에서 한 번만 한다."""
     return SparseEncoder()
+
+
+def get_encoder() -> SparseEncoder:
+    # lru_cache itself permits concurrent misses. Transformers initialization
+    # and the shared MPS model must not run concurrently in API worker threads.
+    with _MODEL_LOCK:
+        return _cached_encoder()
 
 
 @lru_cache(maxsize=256)
 def encode_query(query: str) -> dict[str, float]:
     """같은 질문을 모드마다 다시 인코딩하지 않는다."""
-    return get_encoder().encode_query(query)
+    with _MODEL_LOCK:
+        return get_encoder().encode_query(query)

@@ -56,7 +56,7 @@ BM25는 식별자가 일치하면 1위를 최고점으로 밀어올리지만, RR
 때문이다. 8단계 이전 수치와 직접 비교하지 않는다.
 
 원자료는 `data/generated/docs-v2/comparison-135q.json`, 컷오프 비율 곡선은
-[컷오프 비율 스윕](../../cutoff_precision_sweep.md)에 있다.
+[컷오프 비율 스윕](../../metrics/cutoff_precision_sweep.md)에 있다.
 
 3단계 수치를 다시 만들려면 `SEARCH_CHUNKS_PER_DOCUMENT=1`로 실행한다.
 

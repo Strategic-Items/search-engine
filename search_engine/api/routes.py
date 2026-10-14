@@ -202,18 +202,39 @@ def search_category_compare(category: str, request: SearchRequest) -> ModeCompar
     if category == "law" and not splade:
         raise HTTPException(status_code=503, detail="law search requires a configured SPLADE model")
     options = {"lexical": "splade", "chunk_first": True,
-               "chunk_first_cutoff_ratio": settings.search_category_cutoff_ratio} if splade else {}
+               "chunk_first_cutoff_ratio": settings.search_category_cutoff_ratio,
+               "chunk_first_document_limits": False,
+               "chunk_first_single_modes": True,
+               "chunk_first_dense_within_document": settings.search_category_dense_within_document} if splade else {}
     if splade and category == "law":
         options.update(hybrid_candidates=settings.search_law_candidates,
                        law_ranking=True)
     try:
-        return search_modes(
+        return _one_chunk_per_result(search_modes(
             create_client(), alias, request.query, date.today(), 5,
             modes=CATEGORY_MODES if splade else MODES,
             score_floor=CATEGORY_SCORE_FLOOR, answerability=False, **options,
-        )
+        ))
     except OpenSearchException as exc:
         raise HTTPException(status_code=503, detail="category search unavailable") from exc
+
+
+def _one_chunk_per_result(comparison: ModeComparison) -> ModeComparison:
+    """문서로 묶지 않고 청크를 점수 순서대로 한 개씩 낸다. 각 청크는 자기 문서의 속성을 그대로 가진다.
+
+    같은 문서의 청크들도 따로 나오므로 한 문서가 상위를 독차지해도 결과가 한 줄로 끝나지 않는다.
+    """
+    modes = []
+    for mode in comparison.modes:
+        rows = []
+        for hit in mode.hits:
+            rows.append(hit.model_copy(update={"passages": []}))
+            rows += [hit.model_copy(update={"id": passage.id, "body": passage.body,
+                                            "score": passage.score, "passages": []})
+                     for passage in hit.passages]
+        rows.sort(key=lambda row: -(row.score if row.score is not None else float("-inf")))
+        modes.append(mode.model_copy(update={"hits": rows}))
+    return comparison.model_copy(update={"modes": modes})
 
 
 @app.get("/v1/categories/{category}/documents/{parent_id:path}")

@@ -11,4 +11,4 @@
 `nomic-embed-text`(768차원)를 쓰고 있었고, 그 약세의 원인은 [6단계](../applied/stage-06-embedding-model.md)에서
 검색 방식이 아니라 모델 선택이었음이 밝혀진다.
 
-근거 청크 기준 지표는 [단계 2~7 근거 청크 지표](../../evidence_chunk_metrics_v2.md)에 있다.
+근거 청크 기준 지표는 [단계 2~7 근거 청크 지표](../../metrics/evidence_chunk_metrics_v2.md)에 있다.
